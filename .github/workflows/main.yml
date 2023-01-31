@@ -1,0 +1,54 @@
+name: Build and Test
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./multiple
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: 'true'
+      
+      - name: Setting up Ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.2.0'
+      
+      - run: gem install ffi --no-document
+      
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            target/            
+          key: 1-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+    
+      - name: Install uniffi_bindgen
+        uses: taiki-e/cache-cargo-install-action@v1
+        with:
+          tool: uniffi_bindgen@0.22.0
+
+      - name: 🔨 Build
+        run: cargo build --verbose
+
+      - name: 🔎 Test
+        run: cargo test --verbose
