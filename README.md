@@ -73,3 +73,7 @@ sudo apt-get install ruby-full
 # Python
 sudo apt-get install python3.x # 3.8, 3.9
 ```
+
+# Docker setup
+
+There is a Docker image for development on emulated system, but at the moment only for M1 - although it's easily configurable for other architectures. We'll make a set of instructions available for it.

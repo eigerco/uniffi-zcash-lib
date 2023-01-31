@@ -15,7 +15,6 @@ RUN apt-get update -qq \
   zip \
   curl \
   unzip \
-  # Swift dependencies
   libtinfo6 \
   libncurses6 \
   python3-pip \
