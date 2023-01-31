@@ -1,0 +1,2 @@
+[env]
+CLASSPATH = { value = "jna.jar", force = false, relative = true }

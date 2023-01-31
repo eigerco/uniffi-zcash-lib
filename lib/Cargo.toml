@@ -1,0 +1,15 @@
+[workspace]
+members = [
+    "uniffi_demo_module"
+]
+
+[workspace.dependencies]
+uniffi = "0.22.0"
+uniffi_macros = "0.22.0"
+uniffi_build = "0.22.0"
+uniffi_bindgen = "0.22.0"
+
+[profile.release]
+lto = true
+panic = 'abort'
+codegen-units = 1
