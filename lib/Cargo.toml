@@ -1,5 +1,8 @@
 [workspace]
-members = ["uniffi_demo_module"]
+members = [
+    "uniffi_demo_module",
+    "uniffi_backend_keys",
+]
 
 [workspace.dependencies.uniffi]
 git = "https://github.com/eigerco/uniffi-rs"

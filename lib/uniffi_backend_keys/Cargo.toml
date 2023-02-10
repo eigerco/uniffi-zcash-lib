@@ -1,0 +1,25 @@
+[package]
+name = "zcash-backend-keys"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["lib", "cdylib"]
+name = "uniffi_backend_keys"
+
+[dependencies]
+ff = "0.12"
+jubjub = "0.9"
+bls12_381 = "0.7"
+uniffi = { workspace = true }
+hdwallet = { version = "0.3.1", optional = true }
+zcash_primitives = { version = "0.9.1", features = ["transparent-inputs"] }
+zcash_client_backend = { version = "0.6.1", features = ["transparent-inputs", "unstable"] }
+serde = { version = "1.0.152", features = ["derive"] }
+serde_json = "1.0.91"
+
+[build-dependencies]
+uniffi = { workspace = true, features = ["build"] }
+
+[dev-dependencies]
+uniffi = { workspace = true, features = ["bindgen-tests"] }
