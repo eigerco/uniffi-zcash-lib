@@ -5,7 +5,7 @@ This is the Repository for the codebase concerning the [Zcash RFP](https://forum
 ## Contributors
 
  - [@MeerKatDev](https://github.com/MeerKatDev)
- - [@ctoyan](https://github.com/ctoyan)
+ - [@hauleth](https://github.com/hauleth)
  - [@zduny](https://github.com/zduny)
 
 ## License
