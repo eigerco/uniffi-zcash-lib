@@ -10,12 +10,7 @@ This is the Repository for the codebase concerning the [Zcash RFP](https://forum
 
 ## License
 
-All code in this workspace is licensed under either of
-
- * [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0)
- * [MIT license](http://opensource.org/licenses/MIT)
-
-at your option.
+All code in this workspace is licensed under [MIT license](http://opensource.org/licenses/MIT).
 
 ## Conventions
  - We shall use Github Actions for the CI/CD, as long as it's maintainable and practical.
