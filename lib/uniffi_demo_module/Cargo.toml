@@ -9,10 +9,9 @@ name = "uniffi_demo_module"
 
 [dependencies]
 uniffi = { workspace = true }
-uniffi_macros = { workspace = true }
 
 [build-dependencies]
-uniffi_build = { workspace = true }
+uniffi = { workspace = true, features = ["build"] }
 
 [dev-dependencies]
-uniffi_bindgen = { workspace = true }
+uniffi = { workspace = true, features = ["bindgen-tests"] }

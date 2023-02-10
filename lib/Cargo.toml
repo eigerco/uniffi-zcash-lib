@@ -1,13 +1,9 @@
 [workspace]
-members = [
-    "uniffi_demo_module"
-]
+members = ["uniffi_demo_module"]
 
-[workspace.dependencies]
-uniffi = "0.22.0"
-uniffi_macros = "0.22.0"
-uniffi_build = "0.22.0"
-uniffi_bindgen = "0.22.0"
+[workspace.dependencies.uniffi]
+git = "https://github.com/eigerco/uniffi-rs"
+rev = "8b43429f3a4170f02aa796651620a69ed0d4650c"
 
 [profile.release]
 lto = true
