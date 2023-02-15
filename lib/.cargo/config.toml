@@ -1,2 +1,8 @@
 [env]
-CLASSPATH = { value = "jna.jar", force = false, relative = true }
+CLASSPATH = { value = "jna.jar", force = true, relative = true }
+
+[target.'cfg(target_os = "macos")']
+rustflags = [
+    "-C", "link-arg=-undefined",
+    "-C", "link-arg=dynamic_lookup",
+]

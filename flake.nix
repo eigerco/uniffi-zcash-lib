@@ -8,30 +8,48 @@
     devenv.url = "github:cachix/devenv";
   };
 
-  outputs = { nixpkgs, flake-utils, devenv, ... }@inputs:
+  outputs = { nixpkgs, flake-utils, fenix, ... }@inputs:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs { inherit system; };
       in
       {
-        devShells.default = devenv.lib.mkShell {
-          inherit pkgs inputs;
+        devShells.default = pkgs.mkShell
+          {
+            packages = with pkgs; let
+              beamPackages = beam.packages.erlangR25;
+              rustPackages = fenix.packages.${pkgs.system}.stable;
+            in
+            [
+              # Elixir
+              beamPackages.erlang
+              beamPackages.elixir_1_14
+              beamPackages.elixir_ls
 
-          modules = [
-            ./nix/rust.nix
-            {
-              languages = {
-                elixir.enable = true;
-                erlang.enable = true;
-                ruby.enable = true;
-                # Nixified Swift is currently broken on Darwin, so instead you
-                # should use system one
-                swift.enable = !pkgs.stdenv.isDarwin;
-                kotlin.enable = true;
-                python.enable = true;
-              };
-            }
-          ];
-        };
+              # Rust
+              libiconv
+              uniffi-bindgen
+              rustPackages.rustc
+              rustPackages.cargo
+              rustPackages.rustfmt
+              rustPackages.rust-src
+              rustPackages.clippy
+              rustPackages.rust-analyzer
+
+              # Ruby
+              ruby_3_1
+
+              # Python
+              python311
+
+              # Kotlin
+              kotlin
+              gradle
+            ]
+            ++ lib.optionals stdenv.isDarwin [
+              darwin.apple_sdk.frameworks.Security
+              darwin.apple_sdk.frameworks.Foundation
+            ];
+          };
       });
 }
