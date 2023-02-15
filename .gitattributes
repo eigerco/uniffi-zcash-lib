@@ -1,0 +1,9 @@
+*.rs diff=rust
+Cargo.lock merge=binary
+
+*.ex diff=elixir
+*.exs diff=elixir
+*.erl diff=erlang
+mix.lock merge=binary
+
+*.jar merge=binary
