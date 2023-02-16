@@ -54,4 +54,3 @@ RUN mkdir -p /tmp/setup-jna \
   && rm -rf ./setup-jna
 
 RUN gem install ffi --no-document
-RUN cargo install uniffi_bindgen
