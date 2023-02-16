@@ -1,108 +1,130 @@
 /* zcash_client_backend::keys */
 namespace backend_keys {
-    /* zcash_client_backend::keys::UnifiedSpendingKey::from_seed */
-    ZcashUnifiedSpendingKey? unified_sk_from_seed(Network network, sequence<u8> seed, u32 account_id);
-
-    /* zcash_client_backend::keys::UnifiedSpendingKey::to_unified_full_viewing_key */
-    ZcashUnifiedFullViewingKey unified_fvk_from_usk(ZcashUnifiedSpendingKey zusk);
-
-    /* zcash_client_backend::keys::UnifiedFullViewingKey::decode */
-    ZcashUnifiedFullViewingKey? deserialize_ufvk([ByRef] string encoded, Network network);
-
-    ZcashOutgoingViewingKey? ovk_from_ufvk([ByRef] string encoded, Network network, Scope scope);
-
-    ZcashSaplingIvk? ivk_from_ufvk([ByRef] string encoded, Network network, Scope scope);
-    
-    /* zcash_primitives::sapling::SaplingIvk::to_payment_address */
-    sequence<u8> ivk_to_payment_address(ZcashSaplingIvk zivk, sequence<u8> diversifier_bytes);
-
-    /* zcash_primitives::legacy::keys::AccountPrivKey::from_seed */
-    ZcashAccountPrivKey? from_seed(sequence<u8> seed, u32 account_id);
-	
-    ZcashAccountPrivKey? test_from_seed(sequence<u8> seed, u32 account_id);
-
-    /* zcash_primitives::legacy::keys::AccountPrivKey::from_bytes */
-	ZcashAccountPrivKey? from_bytes(sequence<u8> data);
-
-    /* zcash_primitives::legacy::keys::AccountPrivKey::to_account_pubkey */
-    ZcashAccountPubKey to_account_pubkey([ByRef] ZcashAccountPrivKey priv_key);
-
-    /* 
-    ZcashAccountSpendingKey? derive_sk_from_pk([ByRef] ZcashAccountPrivKey priv_key);
-    ZcashAccountSpendingKey create_spending_key(); 
-    */
 };
 
-/* zcash_primitives::zip32::sapling::ExtendedSpendingKey */
-dictionary ZcashExtendedSpendingKey {
-	sequence<u8> data;
+[Error]
+enum ZcashError {
+  /* hdwallet::error::Error */
+  "HDWalletError",
+  /* zcash_client_backend::keys::DerivationError */
+  "DerivationError",
+  "Message",
+  "ArrayLengthMismatch",
+  "Unknown",
+};
+
+/* zcash_primitives::zip32::AccountId */
+dictionary ZcashAccountId {
+  u32 id;
+};
+
+/* zcash_primitives::consensus::Parameters */
+enum ZcashConsensusParameters {
+  /* zcash_primitives::consensus::MainNetwork */
+  "MainNetwork",
+  /* zcash_primitives::consensus::TestNetwork */
+  "TestNetwork",
 };
 
 /* zcash_primitives::legacy::keys::AccountPrivKey */
-dictionary ZcashAccountPrivKey {
-    sequence<u8> data;
-};
+interface ZcashAccountPrivKey {
+  [Name=from_seed, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, sequence<u8> seed, ZcashAccountId account_id);
 
-/* orchard::keys::SpendingKey */
-dictionary ZcashSpendingKey {
-	sequence<u8> data;
+  [Name=from_bytes, Throws=ZcashError]
+  constructor(sequence<u8> data);
+
+  ZcashAccountPubKey to_account_pubkey();
+
+  sequence<u8> to_bytes();
+
+  // todo
 };
 
 /* zcash_primitives::legacy::keys::AccountPubKey */
-dictionary ZcashAccountPubKey {
-    sequence<u8> data;
+interface ZcashAccountPubKey {
+  // todo
 };
 
-/* zcash_primitives::zip32::sapling::DiversifiableFullViewingKey */
-dictionary ZcashDiversifiableFullViewingKey {
-    sequence<u8> data;
+/* zcash_primitives::zip32::sapling::ExtendedSpendingKey */
+interface ZcashExtendedSpendingKey {
+  // todo
 };
 
-/* zcash_primitives::sapling::keys::FullViewingKey */
-dictionary ZcashFullViewingKey {
-    sequence<u8> data;
+/* zcash_client_backend::keys::Era */
+enum ZcashKeysEra {
+  "Orchard",
 };
 
 /* zcash_client_backend::keys::UnifiedSpendingKey */
-dictionary ZcashUnifiedSpendingKey {
-    ZcashAccountPrivKey transparent;
-    ZcashExtendedSpendingKey sapling;
-    ZcashSpendingKey orchard;
-    sequence<u8> binary;
-    Network network;
+interface ZcashUnifiedSpendingKey {
+  [Name=from_seed, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, sequence<u8> seed, ZcashAccountId account_id);
+
+  ZcashUnifiedFullViewingKey to_unified_full_viewing_key();
+  
+  sequence<u8> to_bytes(ZcashKeysEra era);
+
+  // todo
 };
 
 /* zcash_client_backend::keys::UnifiedFullViewingKey */
-dictionary ZcashUnifiedFullViewingKey {
-    ZcashAccountPubKey transparent;
-    ZcashDiversifiableFullViewingKey sapling;
-    ZcashFullViewingKey orchard;
-    string encoded;
+interface ZcashUnifiedFullViewingKey {
+  [Name=decode, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string encoded);
+
+  string encode(ZcashConsensusParameters params);
+
+  ZcashDiversifiableFullViewingKey? sapling();
+  
+  // todo
+};
+
+/* zcash_client_backend::keys::DiversifiableFullViewingKey */
+interface ZcashDiversifiableFullViewingKey {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor(sequence<u8> bytes);
+
+  sequence<u8> to_bytes();
+
+  ZcashSaplingIvk to_ivk(ZcashScope scope);
+
+  ZcashOutgoingViewingKey to_ovk(ZcashScope scope);
+
+  // todo
 };
 
 /* zcash_primitives::sapling::SaplingIvk */
-dictionary ZcashSaplingIvk {
-    sequence<u8> data;
+interface ZcashSaplingIvk {
+  ZcashPaymentAddress? to_payment_address(ZcashDiversifier diversifier);
+
+  sequence<u8> to_repr();
+
+  // todo
+};
+
+/* zcash_primitives::sapling::Diversifier */
+interface ZcashDiversifier {
+  [Throws=ZcashError]
+  constructor(sequence<u8> bytes);
+
+  // todo
 };
 
 /* zcash_primitives::sapling::keys::OutgoingViewingKey */
-dictionary ZcashOutgoingViewingKey {
-    sequence<u8> data;
+interface ZcashOutgoingViewingKey {
+  // todo
 };
 
-enum Network {
-  "MAIN",
-  "TEST"
+/* zcash_primitives::sapling::PaymentAddress */
+interface ZcashPaymentAddress {
+  sequence<u8> to_bytes();
+
+  // todo
 };
 
 /* zcash_primitives::zip32::Scope */
-enum Scope {
-  "EXTERNAL",
-  "INTERNAL"
+enum ZcashScope {
+  "External",
+  "Internal",
 };
-
-/*
-dictionary ZcashAccountSpendingKey {
-	sequence<u8> data;
-};
-*/
