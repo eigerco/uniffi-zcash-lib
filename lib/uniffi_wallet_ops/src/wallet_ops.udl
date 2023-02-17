@@ -1,0 +1,106 @@
+dictionary ZcashOrchardAddress {
+	sequence<u8> data;
+};
+
+dictionary ZcashSaplingAddress {
+	sequence<u8> data;
+};
+
+dictionary ZcashTransparentAddress {
+	sequence<u8> data;
+};
+
+dictionary ZcashUnifiedAddress {
+    ZcashOrchardAddress? orchard;
+    ZcashSaplingAddress? sapling;
+    ZcashTransparentAddress? transparent;
+    Network network;
+};
+
+dictionary ZcashAccount {
+	u32 account_id;
+};
+
+[Enum]
+interface ZcashParsedAddress {
+    Shielded(ZcashSaplingAddress z_address);
+    Transparent(ZcashTransparentAddress t_address);
+    Unified(ZcashUnifiedAddress u_address);
+};
+
+dictionary ZcashKeyValuePair {
+    string key;
+    string value;
+};
+
+dictionary ZcashMemoBytes {
+    sequence<u8> data;
+};
+
+dictionary ZcashPayment {
+    string? label;
+    string? message;
+    ZcashUnifiedAddress recipient_address; // RecipientAddress
+    sequence<ZcashKeyValuePair> other_params;
+    ZcashMemoBytes? memo;
+    i64 amount;
+};
+
+dictionary ZcashTransactionRequest {
+	sequence<ZcashPayment> payments;
+};
+
+enum AddrType {
+	"ZSAPLING",
+	"ZORCHARD",
+	"TRANSPARENT"
+};
+
+enum Network {
+	"MAIN",
+	"TEST"
+};
+
+namespace wallet_ops {
+	ZcashAccount create_account(u32 account_id); 
+
+	/* NOTE
+	// This should create a new address, using the spending key derived from that ZcashAccount.
+	// and derive the other addresses 
+	*/
+	/* ZcashUnifiedAddress? unified_address_from_account(zaccount: ZcashAccount); */
+
+	ZcashUnifiedAddress? make_unified_address(Network network, ZcashOrchardAddress? zo_address, ZcashSaplingAddress? zs_address, ZcashTransparentAddress? tr_address);
+
+	string? encode_unified_address(ZcashUnifiedAddress zua);
+
+	ZcashSaplingAddress? parse_sapling_address(Network network, string zs_address);
+
+	ZcashOrchardAddress? parse_orchard_address(Network network, string zo_address);
+
+	ZcashTransparentAddress? parse_transparent_address(Network network, string tr_address);
+
+	string encode_transparent_address(ZcashTransparentAddress tr_address);
+
+	string encode_sapling_address(ZcashSaplingAddress zs_address);
+	
+	string encode_orchard_address(ZcashOrchardAddress zo_address);
+
+	// ZcashUnifiedAddress? unified_address_from_sk( ... ) // how to bridge this?
+
+	string? transaction_request_to_uri(ZcashTransactionRequest zt_request);
+
+	ZcashTransactionRequest? transaction_request_from_uri(string uri);
+
+	boolean is_address_valid(string address);
+
+	AddrType? get_address_type(string address);
+
+	/* NOTE probably has to be taken from the C/C++ code */
+
+	/* validate_payment_disclosures(); */
+
+	/* verify_payment_disclosure();    */
+
+	f32 get_fee_rate();
+};
