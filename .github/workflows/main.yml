@@ -41,11 +41,6 @@ jobs:
             target/            
           key: 1-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-
-    
-      - name: Install uniffi_bindgen
-        uses: taiki-e/cache-cargo-install-action@v1
-        with:
-          tool: uniffi_bindgen@0.22.0
 
       - name: 🔨 Build
         run: cargo build --verbose
