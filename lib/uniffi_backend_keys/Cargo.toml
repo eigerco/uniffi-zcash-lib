@@ -17,6 +17,10 @@ zcash_primitives = { version = "0.9.1", features = ["transparent-inputs"] }
 zcash_client_backend = { version = "0.6.1", features = ["transparent-inputs", "unstable"] }
 serde = { version = "1.0.152", features = ["derive"] }
 serde_json = "1.0.91"
+rustler = { version = "0.27.0", optional = true }
+
+[features]
+beam = ["rustler"]
 
 [build-dependencies]
 uniffi = { workspace = true, features = ["build"] }

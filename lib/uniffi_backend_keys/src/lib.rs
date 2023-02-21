@@ -267,3 +267,6 @@ pub fn to_account_pubkey(priv_key: &ZcashAccountPrivKey) -> ZcashAccountPubKey {
 // pub fn create_spending_key() -> ZcashAccountSpendingKey {}
 
 uniffi::include_scaffolding!("backend_keys");
+
+#[cfg(feature = "rustler")]
+mod beam;
