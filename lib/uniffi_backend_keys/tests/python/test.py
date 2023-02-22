@@ -2,140 +2,46 @@ import unittest
 from backend_keys import *
 
 class Test(unittest.TestCase):
-    network = Network.MAIN
+    seed = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-    seed = list(range(32))
+    unified_spending_key_bytes = [180, 208, 214, 194, 3, 32, 166, 3, 186, 151, 20, 139, 99, 33, 212, 134, 101, 192, 119, 208, 167, 21, 119, 228, 7, 152, 74, 140, 84, 209, 236, 235, 53, 57, 109, 65, 44, 178, 2, 169, 3, 240, 68, 53, 97, 0, 0, 0, 128, 234, 206, 224, 230, 180, 69, 172, 115, 57, 184, 221, 212, 204, 73, 161, 165, 210, 199, 46, 10, 200, 142, 73, 167, 9, 104, 89, 58, 200, 121, 136, 69, 228, 111, 114, 225, 87, 227, 210, 233, 213, 86, 13, 107, 118, 27, 114, 52, 191, 0, 154, 130, 192, 9, 11, 6, 220, 168, 246, 77, 183, 221, 52, 14, 198, 139, 75, 203, 159, 201, 17, 117, 90, 15, 68, 49, 79, 15, 95, 118, 205, 210, 120, 134, 40, 80, 122, 89, 82, 180, 159, 230, 35, 232, 105, 9, 144, 208, 234, 146, 137, 215, 60, 50, 183, 254, 149, 253, 137, 42, 232, 60, 251, 179, 135, 99, 159, 238, 119, 130, 4, 75, 67, 113, 67, 10, 191, 0, 1, 188, 15, 115, 131, 15, 198, 187, 156, 71, 47, 94, 152, 220, 110, 161, 168, 50, 123, 203, 190, 135, 6, 11, 110, 180, 235, 248, 125, 93, 89, 193, 0, 64, 207, 174, 34, 199, 252, 227, 180, 123, 230, 0, 80, 146, 93, 219, 173, 12, 108, 17, 103, 102, 144, 226, 101, 143, 138, 175, 53, 52, 12, 34, 185, 103, 172, 47, 218, 133, 127, 111, 155, 112, 212, 44, 34, 186, 124, 174, 31, 169, 99, 123, 229, 175, 141, 181, 225, 250, 107, 144, 184, 248, 64, 255, 239, 143]
+    
+    unified_spending_key = ZcashUnifiedSpendingKey.from_seed(
+        ZcashConsensusParameters.MAIN_NETWORK,
+        seed,
+        ZcashAccountId(0),
+    )
 
-    usk = ZcashUnifiedSpendingKey(
-        network=Network.MAIN,
-        transparent=ZcashAccountPrivKey(data=[
-            250, 223, 171, 71, 1, 138, 92, 230, 79, 2, 241, 213, 34, 245, 195,
-            255, 185, 20, 220, 13, 14, 51, 155, 231, 50, 175, 202, 72, 249, 35,
-            94, 164, 155, 160, 67, 156, 106, 45, 61, 144, 56, 131, 212,
-            83, 124, 54, 34, 136, 98, 109, 166, 44, 98, 153, 1,
-            46, 54, 45, 143, 182, 239, 235, 171, 71
-        ]),
-        sapling=ZcashExtendedSpendingKey(data=[
-            3, 55, 45, 139, 67, 0, 0, 0, 128, 78, 90, 121, 143, 208, 223, 107,
-            194, 177, 35, 140, 239, 87, 149, 110, 243, 85, 40, 184, 122, 75,
-            38, 202, 62, 238, 178, 139, 16, 138, 160, 174, 146, 141, 149, 165,
-            183, 58, 50, 17, 109, 17, 226, 211, 146, 234, 25, 168, 222, 43,
-            155, 88, 122, 154, 25, 149, 213, 215, 253, 72, 96, 38, 214, 245,
-            11, 159, 159, 72, 210, 121, 120, 128, 180, 172, 118, 3, 0, 87, 139,
-            139, 153, 197, 112, 86, 161, 170, 80, 57, 170, 16, 50, 116, 151,
-            154, 28, 22, 12, 142, 232, 44, 148, 53, 72, 212, 227, 63, 79, 163,
-            7, 170, 180, 28, 11, 4, 133, 26, 33, 219, 188, 21, 146, 136, 107,
-            109, 168, 178, 198, 190, 109, 143, 124, 7, 250, 26, 45, 175, 16,
-            205, 225, 55, 239, 245, 125, 88, 241, 47, 31, 217, 248, 190, 4, 88,
-            103, 36, 155, 84, 159, 5, 169, 0, 64
-        ]),
-        orchard=ZcashSpendingKey(data=[
-            182, 125, 141, 135, 202, 185, 24, 149, 0, 175, 180, 93, 188, 169,
-            249, 44, 146, 76, 29, 233, 217, 238, 20, 81, 190, 74, 120, 49, 60,
-            178, 35, 180
-        ]),
-        binary=[
-            180, 208, 214, 194, 3, 32, 182, 125, 141, 135, 202, 185, 24, 149,
-            0, 175, 180, 93, 188, 169, 249, 44, 146, 76, 29, 233, 217, 238, 20,
-            81, 190, 74, 120, 49, 60, 178, 35, 180, 2, 169, 3, 55, 45, 139, 67,
-            0, 0, 0, 128, 78, 90, 121, 143, 208, 223, 107, 194, 177, 35, 140,
-            239, 87, 149, 110, 243, 85, 40, 184, 122, 75, 38, 202, 62, 238,
-            178, 139, 16, 138, 160, 174, 146, 141, 149, 165, 183, 58, 50, 17,
-            109, 17, 226, 211, 146, 234, 25, 168, 222, 43, 155, 88, 122, 154,
-            25, 149, 213, 215, 253, 72, 96, 38, 214, 245, 11, 159, 159, 72,
-            210, 121, 120, 128, 180, 172, 118, 3, 0, 87, 139, 139, 153, 197,
-            112, 86, 161, 170, 80, 57, 170, 16, 50, 116, 151, 154, 28, 22, 12,
-            142, 232, 44, 148, 53, 72, 212, 227, 63, 79, 163, 7, 170, 180, 28,
-            11, 4, 133, 26, 33, 219, 188, 21, 146, 136, 107, 109, 168, 178,
-            198, 190, 109, 143, 124, 7, 250, 26, 45, 175, 16, 205, 225, 55,
-            239, 245, 125, 88, 241, 47, 31, 217, 248, 190, 4, 88, 103, 36, 155,
-            84, 159, 5, 169, 0, 64, 0, 64, 250, 223, 171, 71, 1, 138, 92, 230,
-            79, 2, 241, 213, 34, 245, 195, 255, 185, 20, 220, 13, 14, 51, 155,
-            231, 50, 175, 202, 72, 249, 35, 94, 164, 155, 160, 67, 156, 106,
-            45, 61, 144, 56, 131, 212, 83, 124, 54, 34, 136, 98, 109, 166, 44,
-            98, 153, 1, 46, 54, 45, 143, 182, 239, 235, 171, 71
-        ])
+    encoded_unified_full_viewing_key = "uview1ac6swpuurz2cgr8ktk630exjrz45fsuc4jeqwgg4dm33stl8awhcju0kyaxvw58405jla4k7rqfcw35l4rsj3ta74a2me8p9hh52uxp5zm5wk60pkpy7242wdhdgm265ah3pjqe03m0vax0wa2k4yqnu0gzmnnkt2sjmxeg7s3v8j55mnrzwqznttkaj86ghs2hzp0pstlvw4zlc7kqc2n98h6xluat24829f5fvgue0w8m9r2fwtyzrdvxf7vwu67fd0wdtc0m3m952prz3w7sc8s42v48u9nsd4gld2pgjfzu9qxxxs06mdtkz2dcda0926wulk0t564k3gs6mjm04qmj6e2yrj8vmjh3flh6fg7y4k5fjj09xmv2ffv6ua7e97fszgfpp94uytsq0cu35dd53n45ua4m43gha3dquw60as4xrynllveyjczyffsd8fm6npe88pmg6j6kpjfapuurnrwjya3gz2xfvmyv5r433rsnkra8h"
 
-    ufvk = ZcashUnifiedFullViewingKey(
-        transparent=ZcashAccountPubKey(data=[
-            155, 160, 67, 156, 106, 45, 61, 144, 56, 131, 212, 83, 124, 54, 34,
-            136, 98, 109, 166, 44, 98, 153, 1, 46, 54, 45, 143, 182, 239, 235,
-            171, 71, 2, 237, 99, 133, 50, 196, 117, 246, 116, 0, 53, 15, 177,
-            214, 237, 165, 89, 205, 194, 137, 161, 155, 67, 25, 235,
-            23, 81, 64, 170, 134, 137, 56, 54
-        ]),
-        sapling=ZcashDiversifiableFullViewingKey(data=[
-            49, 210, 193, 209, 42, 132, 36, 218, 122, 87, 25, 133, 201, 16, 9,
-            15, 174, 173, 10, 217, 55, 215, 144, 104, 98, 122, 250, 225, 145,
-            108, 220, 193, 238, 195, 114, 170, 36, 2, 206, 114, 97, 31, 199,
-            50, 231, 78, 49, 156, 69, 82, 211, 9, 27, 225, 203, 210, 232, 85,
-            147, 53, 184, 7, 192, 181, 142, 232, 44, 148, 53, 72, 212, 227, 63,
-            79, 163, 7, 170, 180, 28, 11, 4, 133, 26, 33, 219, 188, 21, 146,
-            136, 107, 109, 168, 178, 198, 190, 109, 143, 124, 7, 250, 26, 45,
-            175, 16, 205, 225, 55, 239, 245, 125, 88, 241, 47, 31, 217, 248,
-            190, 4, 88, 103, 36, 155, 84, 159, 5, 169, 0, 64
-        ]),
-        orchard=ZcashFullViewingKey(data=[
-            118, 72, 118, 74, 69, 103, 183, 22, 84, 16, 188, 49, 63, 146, 43,
-            114, 250, 52, 21, 61, 202, 209, 18, 163, 151, 22, 32, 36, 15, 251,
-            243, 13, 127, 25, 237, 185, 242, 149, 205, 241, 96, 190, 24, 99,
-            180, 28, 150, 49, 45, 175, 114, 115, 186, 1, 25, 143, 80, 102, 242,
-            134, 41, 181, 111, 23, 228, 171, 114, 101, 121, 238, 160, 251, 25,
-            171, 90, 226, 184, 136, 156, 228, 85, 199, 156, 89, 89, 191, 218,
-            121, 104, 35, 238, 128, 92, 121, 72, 20
-        ]),
-        encoded=
-        """uview1s7tc5lj2vlldc89g9q9nkjpzzhjpjdgpn2ej3te5xa3pw5nzuty99h42cqya7mj82mv5ynmv
-        7z8tm7tjyp97xcvxt4aaw3uks0vhc3hwucx679l8ktga3qe75pdfsggpjzj35988xz6kxvkjgd258js0xmjpyzju6
-        f7lpnp24f05984rmadavdrjv9z53x636e6qu4xu6nlexrs6ycj9kys2dejqr7p6yeu4eaun44pxlrx5dtj4rzwek3
-        ua3semr724fd980feqwz3fe43cyg785dv6jazn7ttxh22ve2536u50qk6jjelq85kneeauxqksyg76ca8ff6zrgd5
-        rtdeph3u7cv5rlg3qv330ny3zz9nywzyu556qpj4h6lzs7au7e04xaxp49erwqywfu8y8dae7cj8ul79jffmx0nl2
-        rqaccycyfmwt2tqghnm5euzzjejvqvx23eddgmmjv4jqmdpenlkqlg06kv2jglrw08g5yse846wr"""
-        .replace('\n', '').replace(' ', ''))
+    diversifier = ZcashDiversifier([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
-    ovk = ZcashOutgoingViewingKey(data=[142, 232, 44, 148, 53, 72, 212, 227, 63, 79, 163, 7, 170, 180, 28, 11, 4, 133, 26, 33, 219, 188, 21, 146, 136, 107, 109, 168, 178, 198, 190, 109])
+    sapling_ivk_payment_address_bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 150, 127, 9, 126, 127, 135, 242, 241, 100, 51, 242, 226, 238, 170, 123, 25, 163, 69, 216, 183, 101, 10, 82, 150, 119, 1, 188, 11, 103, 156, 95]
 
-    ivk = ZcashSaplingIvk(data=[210, 137, 216, 235, 240, 243, 45, 205, 15, 249, 27, 47, 128, 182, 8, 86, 175, 194, 243, 37, 3, 94, 31, 172, 245, 4, 56, 144, 36, 155, 137, 1])
+    account_priv_key_bytes = [207, 174, 34, 199, 252, 227, 180, 123, 230, 0, 80, 146, 93, 219, 173, 12, 108, 17, 103, 102, 144, 226, 101, 143, 138, 175, 53, 52, 12, 34, 185, 103, 172, 47, 218, 133, 127, 111, 155, 112, 212, 44, 34, 186, 124, 174, 31, 169, 99, 123, 229, 175, 141, 181, 225, 250, 107, 144, 184, 248, 64, 255, 239, 143]
 
-    def test_unified_sk_from_seed(self):
-        usk = unified_sk_from_seed(self.network, self.seed, 0)
-        self.assertEqual(usk, self.usk)
+    account_priv_key = ZcashAccountPrivKey.from_seed(
+        ZcashConsensusParameters.MAIN_NETWORK,
+        seed,
+        ZcashAccountId(0),
+    )
 
-    def test_unified_fvk_from_usk(self):
-        ufvk = unified_fvk_from_usk(self.usk)
-        self.assertEqual(ufvk, self.ufvk)
-
-    def test_deserialize_ufvk(self):
-        enc_ufvk = self.ufvk.encoded
-        ufvk = deserialize_ufvk(enc_ufvk, self.network)
-        self.assertEqual(ufvk, self.ufvk)
-
-    def test_ovk_from_ufvk(self):
-        encoded = self.ufvk.encoded
-        ovk = ovk_from_ufvk(encoded, self.network, Scope.EXTERNAL)
-        self.assertEqual(ovk, self.ovk)
-
-    def test_ivk_from_ufvk(self):
-        encoded = self.ufvk.encoded
-        ivk = ivk_from_ufvk(encoded, self.network, Scope.EXTERNAL)
-        self.assertEqual(ivk, self.ivk)
+    def test_unified_spending_key_from_seed(self):
+        self.assertEqual(self.unified_spending_key.to_bytes(
+            ZcashKeysEra.ORCHARD), self.unified_spending_key_bytes)
         
-    def test_account_private_key_from_bytes(self):
-        byttes = list(range(32))
-        data = ZcashAccountPrivKey(byttes)
-        self.assertEqual(from_bytes(byttes), data)
-
-    def test_account_private_key_from_seed(self):
-        byttes = list(range(1, 33))
-        from_seed_above = [
-            92, 250, 175, 77, 90, 67, 160, 51, 80, 172, 198, 215, 225, 26, 200,
-            85, 75, 221, 126, 85, 70, 217, 7, 14, 33, 91, 162, 40, 0, 118, 207,
-            136, 189, 22, 188, 25, 102, 198, 36, 40, 69, 81, 23, 9, 58, 204,
-            143, 227, 80, 31, 181, 2, 116, 145, 106, 21, 80, 198, 40, 246, 119,
-            26, 102, 63
-        ]
-        data = ZcashAccountPrivKey(from_seed_above)
-        self.assertEqual(from_seed(byttes, 0), data)
+    def test_unified_full_viewing_key_encode(self):
+        self.assertEqual(self.unified_spending_key.to_unified_full_viewing_key()
+            .encode(ZcashConsensusParameters.MAIN_NETWORK), self.encoded_unified_full_viewing_key)
+        
+    def test_sapling_ivk_to_payment_address(self):
+        self.assertEqual(self.unified_spending_key.to_unified_full_viewing_key()
+            .sapling().to_ivk(ZcashScope.EXTERNAL)
+            .to_payment_address(self.diversifier).to_bytes(), self.sapling_ivk_payment_address_bytes)
+        
+    def test_account_priv_key_from_seed(self):
+        self.assertEqual(self.account_priv_key.to_bytes(), self.account_priv_key_bytes)
+        
 
 if __name__ == '__main__':
     unittest.main()

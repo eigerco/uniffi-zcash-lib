@@ -2,53 +2,53 @@ require "test/unit"
 require "backend_keys"
  
 class TestApk < Test::Unit::TestCase
-  @@seed = (1..32).to_a
-
-	@@network = BackendKeys::Network::MAIN
+  @@seed = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
  
-	@@zusk = BackendKeys::ZcashUnifiedSpendingKey.new(
-		@transparent=BackendKeys::ZcashAccountPrivKey.new([92, -6, -81, 77, 90, 67, -96, 51, 80, -84, -58, -41, -31, 26, -56, 85, 75, -35, 126, 85, 70, -39, 7, 14, 33, 91, -94, 40, 0, 118, -49, -120, -67, 22, -68, 25, 102, -58, 36, 40, 69, 81, 23, 9, 58, -52, -113, -29, 80, 31, -75, 2, 116, -111, 106, 21, 80, -58, 40, -10, 119, 26, 102, 63]), 
-		@sapling=BackendKeys::ZcashExtendedSpendingKey.new([3, 23, -96, -95, 0, 0, 0, 0, -128, -7, -57, -103, 117, -64, 64, -73, 56, -40, 60, 40, 89, -40, -71, 14, 28, -32, -52, 24, 99, -35, -58, -37, 14, 119, -6, -5, -104, 120, 97, 123, 14, 29, 96, 111, 107, -43, 57, 90, 46, -44, 54, -34, -59, -51, 79, 80, 58, -36, -128, 56, 61, 35, 88, 124, 68, 120, -100, 64, -74, 61, -2, 73, 7, -119, 55, 88, -103, -110, 14, -93, 60, 127, 38, 37, -78, 104, -57, -50, 104, 118, -85, -70, -86, 116, 36, 25, -7, -95, 112, -88, -95, -8, 14, -30, 10, 63, 7, 73, 101, 60, -107, 50, 114, 58, -84, -52, 34, -19, 69, 57, 34, 2, 57, -49, -83, -31, -52, -70, 117, 102, 9, -105, -118, 97, 6, 33, -101, 124, -95, 25, 123, -43, -69, 48, -94, 33, -68, 58, -126, -47, 68, -106, 80, 18, -66, -89, -117, 118, 24, 70, 75, 99, 25, -97, 22, 79, 28, 82, 84]), 
-		@orchard=BackendKeys::ZcashSpendingKey.new([50, -25, -77, 64, -99, 91, -69, 116, -75, 99, 7, 44, 93, -18, 22, 15, 62, -73, 104, -49, -47, 68, 68, -108, -39, 24, 98, -102, 62, -114, 112, -5]), 
-		@binary=[-76, -48, -42, -62, 3, 32, 50, -25, -77, 64, -99, 91, -69, 116, -75, 99, 7, 44, 93, -18, 22, 15, 62, -73, 104, -49, -47, 68, 68, -108, -39, 24, 98, -102, 62, -114, 112, -5, 2, -87, 3, 23, -96, -95, 0, 0, 0, 0, -128, -7, -57, -103, 117, -64, 64, -73, 56, -40, 60, 40, 89, -40, -71, 14, 28, -32, -52, 24, 99, -35, -58, -37, 14, 119, -6, -5, -104, 120, 97, 123, 14, 29, 96, 111, 107, -43, 57, 90, 46, -44, 54, -34, -59, -51, 79, 80, 58, -36, -128, 56, 61, 35, 88, 124, 68, 120, -100, 64, -74, 61, -2, 73, 7, -119, 55, 88, -103, -110, 14, -93, 60, 127, 38, 37, -78, 104, -57, -50, 104, 118, -85, -70, -86, 116, 36, 25, -7, -95, 112, -88, -95, -8, 14, -30, 10, 63, 7, 73, 101, 60, -107, 50, 114, 58, -84, -52, 34, -19, 69, 57, 34, 2, 57, -49, -83, -31, -52, -70, 117, 102, 9, -105, -118, 97, 6, 33, -101, 124, -95, 25, 123, -43, -69, 48, -94, 33, -68, 58, -126, -47, 68, -106, 80, 18, -66, -89, -117, 118, 24, 70, 75, 99, 25, -97, 22, 79, 28, 82, 84, 0, 64, 92, -6, -81, 77, 90, 67, -96, 51, 80, -84, -58, -41, -31, 26, -56, 85, 75, -35, 126, 85, 70, -39, 7, 14, 33, 91, -94, 40, 0, 118, -49, -120, -67, 22, -68, 25, 102, -58, 36, 40, 69, 81, 23, 9, 58, -52, -113, -29, 80, 31, -75, 2, 116, -111, 106, 21, 80, -58, 40, -10, 119, 26, 102, 63],
-    @network=BackendKeys::Network::MAIN
+  # bug in uniffi-rs?
+  #
+  # def readU8
+  #  unpack_from 1, 'c'  # I believe it should be 'C' https://apidock.com/ruby/v2_5_5/Array/pack
+  # end
+  @@unified_spending_key_bytes = [180, 208, 214, 194, 3, 32, 166, 3, 186, 151, 20, 139, 99, 33, 212, 134, 101, 192, 119, 208, 167, 21, 119, 228, 7, 152, 74, 140, 84, 209, 236, 235, 53, 57, 109, 65, 44, 178, 2, 169, 3, 240, 68, 53, 97, 0, 0, 0, 128, 234, 206, 224, 230, 180, 69, 172, 115, 57, 184, 221, 212, 204, 73, 161, 165, 210, 199, 46, 10, 200, 142, 73, 167, 9, 104, 89, 58, 200, 121, 136, 69, 228, 111, 114, 225, 87, 227, 210, 233, 213, 86, 13, 107, 118, 27, 114, 52, 191, 0, 154, 130, 192, 9, 11, 6, 220, 168, 246, 77, 183, 221, 52, 14, 198, 139, 75, 203, 159, 201, 17, 117, 90, 15, 68, 49, 79, 15, 95, 118, 205, 210, 120, 134, 40, 80, 122, 89, 82, 180, 159, 230, 35, 232, 105, 9, 144, 208, 234, 146, 137, 215, 60, 50, 183, 254, 149, 253, 137, 42, 232, 60, 251, 179, 135, 99, 159, 238, 119, 130, 4, 75, 67, 113, 67, 10, 191, 0, 1, 188, 15, 115, 131, 15, 198, 187, 156, 71, 47, 94, 152, 220, 110, 161, 168, 50, 123, 203, 190, 135, 6, 11, 110, 180, 235, 248, 125, 93, 89, 193, 0, 64, 207, 174, 34, 199, 252, 227, 180, 123, 230, 0, 80, 146, 93, 219, 173, 12, 108, 17, 103, 102, 144, 226, 101, 143, 138, 175, 53, 52, 12, 34, 185, 103, 172, 47, 218, 133, 127, 111, 155, 112, 212, 44, 34, 186, 124, 174, 31, 169, 99, 123, 229, 175, 141, 181, 225, 250, 107, 144, 184, 248, 64, 255, 239, 143].map { |b| [b].pack('c').unpack('c').first }
+
+  @@unified_spending_key = BackendKeys::ZcashUnifiedSpendingKey.from_seed(
+    BackendKeys::ZcashConsensusParameters::MAIN_NETWORK,
+    @@seed,
+    BackendKeys::ZcashAccountId.new(0),
   )
 
-  @@ufvk = BackendKeys::ZcashUnifiedFullViewingKey.new(
-  	@transparent=BackendKeys::ZcashAccountPubKey.new([-67, 22, -68, 25, 102, -58, 36, 40, 69, 81, 23, 9, 58, -52, -113, -29, 80, 31, -75, 2, 116, -111, 106, 21, 80, -58, 40, -10, 119, 26, 102, 63, 3, 116, -99, -70, 3, -100, -60, -15, -25, -68, -124, -25, -5, -73, -59, 120, -114, 7, -84, 114, -26, 107, -40, -11, 50, 39, -87, 97, 26, 96, -88, 99, -119]), 
-  	@sapling=BackendKeys::ZcashDiversifiableFullViewingKey.new([92, 16, 9, -62, -81, -69, 33, -45, -55, -30, 89, 15, 74, 66, 101, -62, -78, 9, -117, -50, -128, 89, -97, 33, -6, -100, 83, -4, -30, 10, -96, -51, -90, 114, -76, 30, 88, -70, -119, -18, 30, -85, 62, -68, 45, 61, -109, 87, -82, -61, -60, 76, 61, -45, -28, -92, 25, 8, 17, -98, 12, -39, 54, -81, 63, 7, 73, 101, 60, -107, 50, 114, 58, -84, -52, 34, -19, 69, 57, 34, 2, 57, -49, -83, -31, -52, -70, 117, 102, 9, -105, -118, 97, 6, 33, -101, 124, -95, 25, 123, -43, -69, 48, -94, 33, -68, 58, -126, -47, 68, -106, 80, 18, -66, -89, -117, 118, 24, 70, 75, 99, 25, -97, 22, 79, 28, 82, 84]), 
-  	@orchard=BackendKeys::ZcashFullViewingKey.new([55, 9, 55, -63, 67, 48, -125, 125, -106, 96, -73, -102, 107, 106, 95, 48, -102, 87, -76, 85, -18, -74, 112, 86, 3, -78, 1, -125, 7, 37, 111, 51, -44, -72, 16, -63, -84, 21, 99, 25, -16, 119, -57, -15, -33, -43, -53, 1, 69, -74, -4, -91, -91, 3, 102, -112, 121, 58, -98, -99, 60, -3, 106, 58, -16, 39, 122, -88, 34, -127, -30, -68, 59, -99, -125, -35, -42, -46, 23, 102, 5, 69, 58, 30, 70, -101, -124, -104, -66, 68, -111, 36, -46, 41, -117, 43]), 
-  	@encoded="uview1an4n3ycwfdxukarppvw6esd3vjwh6ee02sdv228dpkrgz7qnjfuvelfzjsfdg2xtmanv9es2s25k0afzs7rxhdt7eh79y2kn68rhjuqj0h3y4z8yku96xmucuy3u48qkth0djjr5ufe4p26y65fqckqlzfkdwltprj3zth5a0qqgl6x0qxhe5h48el50n00zkw0sve8c6u9zcghgqq2006xu4r4dfzqj74gz2meu9advysxffyw23q7yf63czhg0hzh9xtchlhfc53suycj8h9x0ts2n74xx0acs503uyq04u0d6qus2ajfg3t33u6pqcc659lyyydwtvtewee6xf9sapcvjccnqu2ep5mhkd3k4hgtr0d8hpx74rj9eshl0hw2g99gaj8fuq0y5xfy99pamvgy7npmx8hwtxfp2w8rayx4r633lkt3wcrsnl4f4qusmqr299eepkatw3qdkmp4arue3jzkdzwxvd85cf3k7g8860vwyr0la"
+  @@encoded_unified_full_viewing_key = "uview1ac6swpuurz2cgr8ktk630exjrz45fsuc4jeqwgg4dm33stl8awhcju0kyaxvw58405jla4k7rqfcw35l4rsj3ta74a2me8p9hh52uxp5zm5wk60pkpy7242wdhdgm265ah3pjqe03m0vax0wa2k4yqnu0gzmnnkt2sjmxeg7s3v8j55mnrzwqznttkaj86ghs2hzp0pstlvw4zlc7kqc2n98h6xluat24829f5fvgue0w8m9r2fwtyzrdvxf7vwu67fd0wdtc0m3m952prz3w7sc8s42v48u9nsd4gld2pgjfzu9qxxxs06mdtkz2dcda0926wulk0t564k3gs6mjm04qmj6e2yrj8vmjh3flh6fg7y4k5fjj09xmv2ffv6ua7e97fszgfpp94uytsq0cu35dd53n45ua4m43gha3dquw60as4xrynllveyjczyffsd8fm6npe88pmg6j6kpjfapuurnrwjya3gz2xfvmyv5r433rsnkra8h"
+
+  @@diversifier = BackendKeys::ZcashDiversifier.new([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+  @@sapling_ivk_payment_address_bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 150, 127, 9, 126, 127, 135, 242, 241, 100, 51, 242, 226, 238, 170, 123, 25, 163, 69, 216, 183, 101, 10, 82, 150, 119, 1, 188, 11, 103, 156, 95].map { |b| [b].pack('c').unpack('c').first }
+
+  @@account_priv_key_bytes = [207, 174, 34, 199, 252, 227, 180, 123, 230, 0, 80, 146, 93, 219, 173, 12, 108, 17, 103, 102, 144, 226, 101, 143, 138, 175, 53, 52, 12, 34, 185, 103, 172, 47, 218, 133, 127, 111, 155, 112, 212, 44, 34, 186, 124, 174, 31, 169, 99, 123, 229, 175, 141, 181, 225, 250, 107, 144, 184, 248, 64, 255, 239, 143].map { |b| [b].pack('c').unpack('c').first }
+
+  @@account_priv_key = BackendKeys::ZcashAccountPrivKey.from_seed(
+    BackendKeys::ZcashConsensusParameters::MAIN_NETWORK,
+    @@seed,
+    BackendKeys::ZcashAccountId.new(0),
   )
 
-  def test_unified_sk_from_seed
-    zusk = BackendKeys.unified_sk_from_seed(@@network, @@seed, 0)
-
-    assert_equal(zusk,  @@zusk)
+  def test_unified_spending_key_from_seed
+    assert_equal(@@unified_spending_key.to_bytes(
+      BackendKeys::ZcashKeysEra::ORCHARD), @@unified_spending_key_bytes)
   end
 
-  def test_unified_fvk_from_usk
-  	ufvk = BackendKeys.unified_fvk_from_usk(@@zusk)
-
-    assert_equal(ufvk,  @@ufvk)
+  def test_unified_full_viewing_key_encode
+    assert_equal(@@unified_spending_key.to_unified_full_viewing_key()
+        .encode(BackendKeys::ZcashConsensusParameters::MAIN_NETWORK), @@encoded_unified_full_viewing_key)
   end
-
-  def test_deserialize_ufvk
-  	ufvk = BackendKeys.deserialize_ufvk(@@ufvk.encoded, @@network)
-
-    assert_equal(ufvk,  @@ufvk)
+    
+  def test_sapling_ivk_to_payment_address
+    assert_equal(@@unified_spending_key.to_unified_full_viewing_key()
+        .sapling().to_ivk(BackendKeys::ZcashScope::EXTERNAL)
+        .to_payment_address(@@diversifier).to_bytes(), @@sapling_ivk_payment_address_bytes)
   end
-
-  def test_from_bytes
-    arr_bytes = (1..32).to_a
-    zapk = BackendKeys::ZcashAccountPrivKey.new(arr_bytes)
-    assert_equal(zapk, BackendKeys.from_bytes(arr_bytes))
+    
+  def test_account_priv_key_from_seed
+    assert_equal(@@account_priv_key.to_bytes(), @@account_priv_key_bytes)
   end
-
-  def test_from_seed
-    arr_bytes = (1..32).to_a
-    from_seed_above = [92,-6,-81,77,90,67,-96,51,80,-84,-58,-41,-31,26,-56,85,75,-35,126,85,70,-39,7,14,33,91,-94,40,0,118,-49,-120,-67,22,-68,25,102,-58,36,40,69,81,23,9,58,-52,-113,-29,80,31,-75,2,116,-111,106,21,80,-58,40,-10,119,26,102,63]
-    zapk = BackendKeys::ZcashAccountPrivKey.new(from_seed_above)
-    assert_equal(zapk, BackendKeys.from_seed(arr_bytes, 0))
-  end
+    
 end
