@@ -34,11 +34,20 @@ interface ZcashAccountPrivKey {
   [Name=from_bytes, Throws=ZcashError]
   constructor(sequence<u8> data);
 
+  [Name=from_extended_privkey]
+  constructor(ZcashExtendedPrivKey key);
+
   ZcashAccountPubKey to_account_pubkey();
 
   sequence<u8> to_bytes();
 
   // todo
+};
+
+/* hdwallet::extended_key::ExtendedPrivKey */
+interface ZcashExtendedPrivKey {
+  [Name=with_seed, Throws=ZcashError]
+  constructor(sequence<u8> data);
 };
 
 /* zcash_primitives::legacy::keys::AccountPubKey */

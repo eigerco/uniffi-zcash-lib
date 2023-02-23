@@ -41,7 +41,13 @@ class Test(unittest.TestCase):
         
     def test_account_priv_key_from_seed(self):
         self.assertEqual(self.account_priv_key.to_bytes(), self.account_priv_key_bytes)
-        
+
+    def test_account_priv_key_from_extended_priv_key(self):
+        accountExtendedPrivKey = ZcashExtendedPrivKey.with_seed(self.seed)
+        privkey = ZcashAccountPrivKey.from_extended_privkey(accountExtendedPrivKey)
+        # This "golden" array of bytes was obtained from the original API.
+        expected_bytes = [149, 166, 0, 189, 51, 113, 120, 140, 117, 138, 197, 190, 79, 199, 36, 207, 244, 33, 243, 51, 208, 246, 123, 28, 7, 59, 51, 23, 198, 47, 254, 133, 152, 104, 37, 20, 245, 17, 68, 127, 3, 242, 44, 136, 77, 60, 173, 143, 250, 10, 6, 187, 211, 123, 199, 44, 60, 30, 76, 229, 192, 202, 104, 8]
+        self.assertEqual(privkey.to_bytes(), expected_bytes)
 
 if __name__ == '__main__':
     unittest.main()

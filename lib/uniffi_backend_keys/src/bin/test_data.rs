@@ -1,3 +1,4 @@
+use hdwallet::ExtendedPrivKey;
 use zcash_client_backend::keys::{Era, UnifiedSpendingKey};
 use zcash_primitives::{
     consensus::MainNetwork, legacy::keys::AccountPrivKey, sapling::Diversifier, zip32::Scope,
@@ -46,4 +47,16 @@ fn main() {
     println!("SaplinkIvk PaymentAddress bytes: {address}");
     println!();
     println!("AccountPrivateKey bytes: {apk_bytes}");
+
+    // Obtaining from original API expected byte array results
+    // for derivation from ExtendedPrivKey to AccountPrivKey.
+    let extended_priv_key = ExtendedPrivKey::with_seed(&seed).unwrap();
+    let extended_private_key = AccountPrivKey::from_extended_privkey(extended_priv_key);
+    let extended_private_key_bytes = extended_private_key
+        .to_bytes()
+        .iter()
+        .map(|byte| byte.to_string())
+        .collect::<Vec<String>>()
+        .join(", ");
+    println!("AccountPrivateKey from ExtendedPrivKey bytes: {extended_private_key_bytes}");
 }
