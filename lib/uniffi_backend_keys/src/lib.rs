@@ -1,6 +1,5 @@
-use std::sync::Arc;
-
 use delegate::delegate;
+use std::sync::Arc;
 use zcash_primitives::consensus::{MainNetwork, TestNetwork};
 
 /// Zcash error.
@@ -341,6 +340,14 @@ impl ZcashUnifiedFullViewingKey {
             .map(ZcashDiversifiableFullViewingKey::from)
             .map(Arc::new)
     }
+
+    pub fn orchard(&self) -> Option<Arc<ZcashOrchardFullViewingKey>> {
+        self.inner
+            .orchard()
+            .cloned()
+            .map(ZcashOrchardFullViewingKey::from)
+            .map(Arc::new)
+    }
 }
 
 /// A Sapling key that provides the capability to view incoming and outgoing transactions.
@@ -605,6 +612,129 @@ impl From<ZcashScope> for zcash_primitives::zip32::Scope {
             ZcashScope::External => zcash_primitives::zip32::Scope::External,
             ZcashScope::Internal => zcash_primitives::zip32::Scope::Internal,
         }
+    }
+}
+
+/// A key that provides the capability to view incoming and outgoing transactions.
+///
+/// This key is useful anywhere you need to maintain accurate balance, but do not want the
+/// ability to spend funds (such as a view-only wallet).
+pub struct ZcashOrchardFullViewingKey {
+    inner: orchard::keys::FullViewingKey,
+}
+
+impl ZcashOrchardFullViewingKey {
+    pub fn to_ivk(&self, scope: ZcashOrchardScope) -> Arc<ZcashOrchardIncomingViewingKey> {
+        Arc::new(self.inner.to_ivk(scope.into()).into())
+    }
+    pub fn to_ovk(&self, scope: ZcashOrchardScope) -> Arc<ZcashOrchardOutgoingViewingKey> {
+        Arc::new(self.inner.to_ovk(scope.into()).into())
+    }
+}
+
+impl From<orchard::keys::FullViewingKey> for ZcashOrchardFullViewingKey {
+    fn from(inner: orchard::keys::FullViewingKey) -> Self {
+        Self { inner }
+    }
+}
+
+/// The scope of a viewing key or address.
+pub enum ZcashOrchardScope {
+    /// A scope used for wallet-external operations, namely deriving addresses to give to
+    /// other users in order to receive funds.
+    External,
+    /// A scope used for wallet-internal operations, such as creating change notes,
+    /// auto-shielding, and note management.
+    Internal,
+}
+
+impl From<ZcashOrchardScope> for orchard::keys::Scope {
+    fn from(value: ZcashOrchardScope) -> Self {
+        match value {
+            ZcashOrchardScope::External => orchard::keys::Scope::External,
+            ZcashOrchardScope::Internal => orchard::keys::Scope::Internal,
+        }
+    }
+}
+
+/// Orchard
+
+/// A key that provides the capability to detect and decrypt incoming notes from the block
+/// chain, without being able to spend the notes or detect when they are spent.
+///
+/// This key is useful in situations where you only need the capability to detect inbound
+/// payments, such as merchant terminals.
+pub struct ZcashOrchardIncomingViewingKey {
+    inner: orchard::keys::IncomingViewingKey,
+}
+
+impl ZcashOrchardIncomingViewingKey {
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.inner.to_bytes().to_vec()
+    }
+
+    pub fn address(&self, diversifier: Arc<ZcashOrchardDiversifier>) -> Arc<ZcashOrchardAddress> {
+        Arc::new(self.inner.address(diversifier.inner).into())
+    }
+}
+
+impl From<orchard::keys::IncomingViewingKey> for ZcashOrchardIncomingViewingKey {
+    fn from(inner: orchard::keys::IncomingViewingKey) -> Self {
+        Self { inner }
+    }
+}
+
+/// A diversifier that can be used to derive a specific [`Address`] from a
+/// [`FullViewingKey`] or [`IncomingViewingKey`].
+pub struct ZcashOrchardDiversifier {
+    inner: orchard::keys::Diversifier,
+}
+
+impl ZcashOrchardDiversifier {
+    pub fn from_bytes(data: Vec<u8>) -> Result<Self, ZcashError> {
+        let array = data
+            .try_into()
+            .map_err(|bytes: Vec<u8>| ZcashError::ArrayLengthMismatch {
+                expected: 11,
+                got: bytes.len() as u64,
+            })?;
+        Ok(orchard::keys::Diversifier::from_bytes(array).into())
+    }
+}
+
+impl From<orchard::keys::Diversifier> for ZcashOrchardDiversifier {
+    fn from(inner: orchard::keys::Diversifier) -> Self {
+        Self { inner }
+    }
+}
+
+/// A key that provides the capability to recover outgoing transaction information from
+/// the block chain.
+pub struct ZcashOrchardOutgoingViewingKey {
+    // Check this type how to map types struct(u8)
+    inner: orchard::keys::OutgoingViewingKey,
+}
+
+impl From<orchard::keys::OutgoingViewingKey> for ZcashOrchardOutgoingViewingKey {
+    fn from(inner: orchard::keys::OutgoingViewingKey) -> Self {
+        Self { inner }
+    }
+}
+
+/// A shielded payment address.
+pub struct ZcashOrchardAddress {
+    inner: orchard::Address,
+}
+
+impl ZcashOrchardAddress {
+    pub fn to_raw_address_bytes(&self) -> Vec<u8> {
+        self.inner.to_raw_address_bytes().to_vec()
+    }
+}
+
+impl From<orchard::Address> for ZcashOrchardAddress {
+    fn from(inner: orchard::Address) -> Self {
+        Self { inner }
     }
 }
 

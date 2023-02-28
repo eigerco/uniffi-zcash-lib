@@ -77,6 +77,8 @@ interface ZcashUnifiedFullViewingKey {
 
   ZcashDiversifiableFullViewingKey? sapling();
   
+  ZcashOrchardFullViewingKey? orchard();
+
   // todo
 };
 
@@ -127,4 +129,40 @@ interface ZcashPaymentAddress {
 enum ZcashScope {
   "External",
   "Internal",
+};
+
+/// Orchard
+
+/*orchard::keys::FullViewingKey*/
+interface ZcashOrchardFullViewingKey {
+  ZcashOrchardIncomingViewingKey to_ivk(ZcashOrchardScope scope);
+  ZcashOrchardOutgoingViewingKey to_ovk(ZcashOrchardScope scope);
+};
+
+/*orchard::keys::IncomingViewingKey*/
+interface ZcashOrchardIncomingViewingKey {
+    sequence<u8> to_bytes();
+    ZcashOrchardAddress address(ZcashOrchardDiversifier diversifier);
+};
+
+/*orchard::Address*/
+interface ZcashOrchardAddress {
+  sequence<u8> to_raw_address_bytes();
+};
+
+/* orchard::keys::OutgoingViewingKey */
+interface ZcashOrchardOutgoingViewingKey {
+ // this is only type, check guide for proper type.
+};
+
+/* orchard::keys::Scope */
+enum ZcashOrchardScope {
+  "External",
+  "Internal",
+};
+
+/* zcash_primitives::sapling::Diversifier */
+interface ZcashOrchardDiversifier {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor(sequence<u8> bytes);
 };
