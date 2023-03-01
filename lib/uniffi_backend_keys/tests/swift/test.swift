@@ -38,3 +38,10 @@ assert(unifiedSpendingKey.toUnifiedFullViewingKey()
 
 // Test ZcashAccountPrivKey.fromSeed
 assert(accountPrivKey.toBytes() == accountPrivKeyBytes)
+
+// Test ZcashExtendedPrivKey.withSeed, ending up in a private key.
+let accountExtendedPrivKey = try ZcashExtendedPrivKey.withSeed(data: seed);
+let privkey = ZcashAccountPrivKey.fromExtendedPrivkey(key: accountExtendedPrivKey);
+// This "golden" array of bytes was obtained from the original API.
+let expected_bytes: [UInt8] = [149, 166, 0, 189, 51, 113, 120, 140, 117, 138, 197, 190, 79, 199, 36, 207, 244, 33, 243, 51, 208, 246, 123, 28, 7, 59, 51, 23, 198, 47, 254, 133, 152, 104, 37, 20, 245, 17, 68, 127, 3, 242, 44, 136, 77, 60, 173, 143, 250, 10, 6, 187, 211, 123, 199, 44, 60, 30, 76, 229, 192, 202, 104, 8]
+assert(privkey.toBytes() == expected_bytes);
