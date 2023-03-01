@@ -16,6 +16,10 @@ val saplingDiversifier = ZcashDiversifier(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 
 val saplingIvkPaymentAddressBytes = listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 150, 127, 9, 126, 127, 135, 242, 241, 100, 51, 242, 226, 238, 170, 123, 25, 163, 69, 216, 183, 101, 10, 82, 150, 119, 1, 188, 11, 103, 156, 95).map { it.toUByte() };
 
+val orchardDiversifier = ZcashOrchardDiversifier.fromBytes(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
+
+val orchardIvkPaymentAddressBytes = listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 188, 133, 2, 30, 187, 222, 192, 24, 118, 136, 143, 249, 3, 127, 83, 48, 137, 67, 228, 146, 86, 27, 251, 163, 42, 159, 247, 98, 150, 25, 7).map { it.toUByte() };
+
 val accountPrivKeyBytes = listOf(207, 174, 34, 199, 252, 227, 180, 123, 230, 0, 80, 146, 93, 219, 173, 12, 108, 17, 103, 102, 144, 226, 101, 143, 138, 175, 53, 52, 12, 34, 185, 103, 172, 47, 218, 133, 127, 111, 155, 112, 212, 44, 34, 186, 124, 174, 31, 169, 99, 123, 229, 175, 141, 181, 225, 250, 107, 144, 184, 248, 64, 255, 239, 143).map { it.toUByte() };
 
 val accountPrivKey = ZcashAccountPrivKey.fromSeed(
@@ -35,6 +39,11 @@ assert(unifiedSpendingKey.toUnifiedFullViewingKey()
 assert(unifiedSpendingKey.toUnifiedFullViewingKey()
     .sapling()!!.toIvk(ZcashScope.EXTERNAL)
     .toPaymentAddress(saplingDiversifier)!!.toBytes() == saplingIvkPaymentAddressBytes)
+
+// Test ZcashOrchardIvk.toPaymentAddress
+assert(unifiedSpendingKey.toUnifiedFullViewingKey()
+    .orchard()!!.toIvk(ZcashOrchardScope.EXTERNAL)
+    .address(orchardDiversifier)!!.toRawAddressBytes() == orchardIvkPaymentAddressBytes)
 
 // Test ZcashAccountPrivKey.fromSeed
 assert(accountPrivKey.toBytes() == accountPrivKeyBytes)

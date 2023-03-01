@@ -1,7 +1,7 @@
 use hdwallet::ExtendedPrivKey;
 use zcash_client_backend::keys::{Era, UnifiedSpendingKey};
 use zcash_primitives::{
-    consensus::MainNetwork, legacy::keys::AccountPrivKey, sapling::Diversifier, zip32::Scope,
+    consensus::MainNetwork, legacy::keys::AccountPrivKey, sapling::Diversifier,
 };
 
 fn main() {
@@ -18,15 +18,28 @@ fn main() {
 
     let encoded = key.to_unified_full_viewing_key().encode(&MainNetwork);
 
-    let diversifier = Diversifier([0; 11]);
-    let address = key
+    let sapling_diversifier = Diversifier([0; 11]);
+    let sapling_address = key
         .to_unified_full_viewing_key()
         .sapling()
         .unwrap()
-        .to_ivk(Scope::External)
-        .to_payment_address(diversifier)
+        .to_ivk(zcash_primitives::zip32::Scope::External)
+        .to_payment_address(sapling_diversifier)
         .unwrap()
         .to_bytes()
+        .iter()
+        .map(|byte| byte.to_string())
+        .collect::<Vec<String>>()
+        .join(", ");
+
+    let orchard_diversifier = orchard::keys::Diversifier::from_bytes([0; 11]);
+    let orchard_address = key
+        .to_unified_full_viewing_key()
+        .orchard()
+        .unwrap()
+        .to_ivk(orchard::keys::Scope::External)
+        .address(orchard_diversifier)
+        .to_raw_address_bytes()
         .iter()
         .map(|byte| byte.to_string())
         .collect::<Vec<String>>()
@@ -44,7 +57,9 @@ fn main() {
     println!();
     println!("UnifiedFullViewingKey encoded: {encoded}");
     println!();
-    println!("SaplinkIvk PaymentAddress bytes: {address}");
+    println!("SaplinkIvk PaymentAddress bytes: {sapling_address}");
+    println!();
+    println!("OrchardIvk PaymentAddress bytes: {orchard_address}");
     println!();
     println!("AccountPrivateKey bytes: {apk_bytes}");
 

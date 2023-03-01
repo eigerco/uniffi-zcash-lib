@@ -170,7 +170,7 @@ enum ZcashOrchardScope {
   "Internal",
 };
 
-/* zcash_primitives::sapling::Diversifier */
+/* orchard::keys::Diversifier */
 interface ZcashOrchardDiversifier {
   [Name=from_bytes, Throws=ZcashError]
   constructor(sequence<u8> bytes);

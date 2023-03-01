@@ -1,6 +1,5 @@
 use delegate::delegate;
 use std::sync::Arc;
-use hdwallet::ExtendedPrivKey;
 use zcash_primitives::consensus::{MainNetwork, TestNetwork};
 
 /// Zcash error.
@@ -712,7 +711,7 @@ pub struct ZcashOrchardDiversifier {
     inner: orchard::keys::Diversifier,
 }
 
-impl ZcashOrchardDiversifier {
+impl ZcashOrchardDiversifier {    
     pub fn from_bytes(data: Vec<u8>) -> Result<Self, ZcashError> {
         let array = data
             .try_into()
