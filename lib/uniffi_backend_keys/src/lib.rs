@@ -1,5 +1,6 @@
 use delegate::delegate;
 use std::sync::Arc;
+use hdwallet::ExtendedPrivKey;
 use zcash_primitives::consensus::{MainNetwork, TestNetwork};
 
 /// Zcash error.
@@ -123,11 +124,12 @@ impl ZcashAccountPrivKey {
         Ok(key.into())
     }
 
-    /*
-    pub fn from_extended_privkey(extprivkey: ZcashExtendedPrivKey) -> Self {
-        todo!()
+    pub fn from_extended_privkey(ext_privkey: Arc<ZcashExtendedPrivKey>) -> Self {
+        let key = zcash_primitives::legacy::keys::AccountPrivKey::from_extended_privkey(
+            ext_privkey.inner.clone(),
+        );
+        key.into()
     }
-    */
 
     pub fn to_account_pubkey(&self) -> Arc<ZcashAccountPubKey> {
         Arc::new(self.inner.to_account_pubkey().into())
@@ -165,6 +167,26 @@ impl ZcashAccountPrivKey {
         zcash_primitives::legacy::keys::AccountPrivKey::from_bytes(&bytes)
             .map(ZcashAccountPrivKey::from)
             .ok_or(ZcashError::Unknown)
+    }
+}
+
+/// ExtendedPrivKey is used for child key derivation.
+/// See [secp256k1 crate documentation](https://docs.rs/secp256k1) for SecretKey signatures usage.
+pub struct ZcashExtendedPrivKey {
+    inner: hdwallet::extended_key::ExtendedPrivKey,
+}
+
+impl ZcashExtendedPrivKey {
+    fn with_seed(seed: Vec<u8>) -> Result<Self, ZcashError> {
+        let key =
+            hdwallet::extended_key::ExtendedPrivKey::with_seed(&seed).map_err(ZcashError::from)?;
+        Ok(key.into())
+    }
+}
+
+impl From<hdwallet::extended_key::ExtendedPrivKey> for ZcashExtendedPrivKey {
+    fn from(inner: hdwallet::extended_key::ExtendedPrivKey) -> Self {
+        Self { inner }
     }
 }
 
