@@ -127,10 +127,7 @@ impl ZcashAccountPrivKey {
 
     pub fn from_extended_privkey(ext_privkey: Arc<ZcashExtendedPrivKey>) -> Self {
         let key = zcash_primitives::legacy::keys::AccountPrivKey::from_extended_privkey(
-            ExtendedPrivKey {
-                private_key: ext_privkey.inner.private_key,
-                chain_code: ext_privkey.inner.chain_code.clone(),
-            },
+            ext_privkey.inner.clone(),
         );
         key.into()
     }
