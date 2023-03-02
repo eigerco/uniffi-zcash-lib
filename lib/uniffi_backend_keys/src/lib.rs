@@ -2,6 +2,13 @@ use delegate::delegate;
 use std::sync::Arc;
 use zcash_primitives::consensus::{MainNetwork, TestNetwork};
 
+mod address;
+
+#[cfg(feature = "rustler")]
+mod beam;
+
+pub use self::address::*;
+
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]
 pub enum ZcashError {
@@ -22,6 +29,8 @@ pub enum ZcashError {
     #[error("unknown error occurred")]
     Unknown,
 }
+
+type ZcashResult<T> = Result<T, ZcashError>;
 
 impl From<hdwallet::error::Error> for ZcashError {
     fn from(error: hdwallet::error::Error) -> Self {
@@ -765,6 +774,3 @@ impl From<orchard::Address> for ZcashOrchardAddress {
 }
 
 uniffi::include_scaffolding!("backend_keys");
-
-#[cfg(feature = "rustler")]
-mod beam;
