@@ -104,3 +104,5 @@ namespace wallet_ops {
 
 	f32 get_fee_rate();
 };
+
+/* vi:set ft=cs syn=cs: */

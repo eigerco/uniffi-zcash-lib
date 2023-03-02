@@ -132,6 +132,11 @@ interface ZcashPaymentAddress {
   [Name=from_bytes, Throws=ZcashError]
   constructor([ByRef] sequence<u8> bytes);
 
+  [Name=parse, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string input);
+
+  string encode(ZcashConsensusParameters params);
+
   sequence<u8> to_bytes();
 
   // todo
@@ -196,11 +201,16 @@ interface ZcashUnifiedAddress {
 };
 
 interface ZcashTransparentAddress {
+  [Name=parse, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string input);
+
   [Name=public_key, Throws=ZcashError]
   constructor(sequence<u8> data);
 
   [Name=script, Throws=ZcashError]
   constructor(sequence<u8> data);
+
+  string encode(ZcashConsensusParameters params);
 
   boolean is_public_key();
 
@@ -209,4 +219,4 @@ interface ZcashTransparentAddress {
   sequence<u8> to_bytes();
 };
 
-/* vi:set syn=cpp: */
+/* vi:set ft=cs syn=cs: */

@@ -1,6 +1,8 @@
 use std::sync::Arc;
 
 use zcash_primitives::sapling;
+use zcash_primitives::consensus::Parameters;
+use zcash_client_backend::encoding;
 
 /// A Sapling payment address.
 ///
@@ -24,11 +26,26 @@ impl From<ZcashPaymentAddress> for sapling::PaymentAddress {
 }
 
 impl ZcashPaymentAddress {
+    /// Parse the input string into `ZcashPaymentAddress`
+    pub fn parse(params: crate::ZcashConsensusParameters, string: &str) -> crate::ZcashResult<Self> {
+        let address = encoding::decode_payment_address(params.hrp_sapling_payment_address(), string)
+            // TODO: This is just mock we should use `zcash_client_backend::encoding::Bech32DecodeError` there,
+            // but for whatever reason, that enum is currently not implementing the `Error` trait.
+            .map_err(|_| crate::ZcashError::Unknown)?;
+
+        Ok(address.into())
+    }
+
     pub fn from_bytes(bytes: &[u8]) -> crate::ZcashResult<Self> {
         let bytes = crate::utils::cast_slice(bytes)?;
         sapling::PaymentAddress::from_bytes(&bytes)
             .map(ZcashPaymentAddress)
             .ok_or(crate::ZcashError::Unknown)
+    }
+
+    /// Encode payment address into string
+    pub fn encode(&self, params: crate::ZcashConsensusParameters) -> String {
+        encoding::encode_payment_address_p(&params, &self.0)
     }
 
     /// Returns the byte encoding of this `PaymentAddress`.

@@ -158,4 +158,19 @@ class TestApk < Test::Unit::TestCase
     assert_equal(nil, unified_address.sapling)
     assert_equal(orchard.to_raw_address_bytes(), unified_address.orchard.to_raw_address_bytes())
   end
+
+  def test_transparent_address_parsing
+    net = BackendKeys::ZcashConsensusParameters::TEST_NETWORK
+    input = "tm9iMLAuYMzJ6jtFLcA7rzUmfreGuKvr7Ma"
+    parsed = BackendKeys::ZcashTransparentAddress::parse(net, input)
+
+    assert parsed.is_public_key
+    assert_equal input, parsed.encode(net)
+
+    input = "t26YoyZ1iPgiMEWL4zGUm74eVWfhyDMXzY2"
+    parsed = BackendKeys::ZcashTransparentAddress::parse(net, input)
+
+    assert parsed.is_script
+    assert_equal input, parsed.encode(net)
+  end
 end
