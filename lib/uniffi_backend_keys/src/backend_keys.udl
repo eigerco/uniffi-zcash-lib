@@ -195,4 +195,12 @@ interface ZcashUnifiedAddress {
   string to_string(ZcashConsensusParameters params);
 };
 
+interface ZcashTransparentAddress {
+  [Name=public_key, Throws=ZcashError]
+  constructor(sequence<u8> data);
+
+  [Name=script, Throws=ZcashError]
+  constructor(sequence<u8> data);
+};
+
 /* vi:set syn=cpp: */

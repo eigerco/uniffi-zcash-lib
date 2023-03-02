@@ -6,12 +6,14 @@ mod utils;
 
 mod unified_address;
 mod sapling;
+mod transparent;
 
 #[cfg(feature = "rustler")]
 mod beam;
 
 pub use self::unified_address::*;
 pub use self::sapling::*;
+pub use self::transparent::*;
 
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]

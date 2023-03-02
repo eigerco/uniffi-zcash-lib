@@ -1,3 +1,4 @@
+/// Try to cast slice to fixed length array. Return Zcash Error on failure
 pub(crate) fn cast_slice<T, const N: usize>(slice: &[T]) -> crate::ZcashResult<[T; N]>
 where
     T: Copy,
