@@ -129,6 +129,9 @@ interface ZcashOutgoingViewingKey {
 
 /* zcash_primitives::sapling::PaymentAddress */
 interface ZcashPaymentAddress {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor([ByRef] sequence<u8> bytes);
+
   sequence<u8> to_bytes();
 
   // todo

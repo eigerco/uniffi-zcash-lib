@@ -77,6 +77,16 @@ class TestApk < Test::Unit::TestCase
     assert_equal(privkey.to_bytes(), expected_bytes)
   end
 
+  def test_sapling_payment_address_parsing
+    sapling = @@unified_spending_key.to_unified_full_viewing_key()
+      .sapling().to_ivk(BackendKeys::ZcashScope::EXTERNAL)
+      .to_payment_address(@@sapling_diversifier)
+
+    bytes = sapling.to_bytes
+
+    assert_equal(bytes, BackendKeys::ZcashPaymentAddress::from_bytes(bytes).to_bytes)
+  end
+
   def test_unified_address_parsing
     params = BackendKeys::ZcashConsensusParameters::MAIN_NETWORK
 

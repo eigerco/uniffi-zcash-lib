@@ -3,11 +3,13 @@ use std::sync::Arc;
 use zcash_primitives::consensus::{MainNetwork, TestNetwork};
 
 mod unified_address;
+mod sapling_address;
 
 #[cfg(feature = "rustler")]
 mod beam;
 
 pub use self::unified_address::*;
+pub use self::sapling_address::*;
 
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]
@@ -581,29 +583,6 @@ impl ZcashDiversifier {
             })?;
         let diversifier = zcash_primitives::sapling::Diversifier(array);
         Ok(ZcashDiversifier { inner: diversifier })
-    }
-}
-
-/// A Sapling payment address.
-///
-/// # Invariants
-///
-/// `pk_d` is guaranteed to be prime-order (i.e. in the prime-order subgroup of Jubjub,
-/// and not the identity).
-pub struct ZcashPaymentAddress {
-    inner: zcash_primitives::sapling::PaymentAddress,
-}
-
-impl From<zcash_primitives::sapling::PaymentAddress> for ZcashPaymentAddress {
-    fn from(inner: zcash_primitives::sapling::PaymentAddress) -> Self {
-        ZcashPaymentAddress { inner }
-    }
-}
-
-impl ZcashPaymentAddress {
-    /// Returns the byte encoding of this `PaymentAddress`.
-    pub fn to_bytes(&self) -> Vec<u8> {
-        self.inner.to_bytes().into()
     }
 }
 

@@ -15,7 +15,7 @@ impl ZcashUnifiedAddress {
         // _transparent: Option<()>,
     ) -> ZcashResult<Self> {
         let orchard = orchard.map(|o| o.inner.clone());
-        let sapling = sapling.map(|s| s.inner.clone());
+        let sapling = sapling.map(|s| (&*s).into());
 
         UnifiedAddress::from_receivers(orchard, sapling, None)
             .map(ZcashUnifiedAddress)
