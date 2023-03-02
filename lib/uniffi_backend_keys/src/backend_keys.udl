@@ -201,6 +201,12 @@ interface ZcashTransparentAddress {
 
   [Name=script, Throws=ZcashError]
   constructor(sequence<u8> data);
+
+  boolean is_public_key();
+
+  boolean is_script();
+
+  sequence<u8> to_bytes();
 };
 
 /* vi:set syn=cpp: */
