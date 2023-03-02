@@ -412,12 +412,7 @@ impl ZcashDiversifiableFullViewingKey {
     /// Returns `None` if the bytes do not contain a valid encoding of a diversifiable
     /// Sapling full viewing key.
     pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, ZcashError> {
-        let array = bytes
-            .try_into()
-            .map_err(|bytes: Vec<u8>| ZcashError::ArrayLengthMismatch {
-                expected: 128,
-                got: bytes.len() as u64,
-            })?;
+        let array = utils::cast_slice(&bytes)?;
         let key =
             zcash_client_backend::keys::sapling::DiversifiableFullViewingKey::from_bytes(&array)
                 .ok_or(ZcashError::Unknown)?;
@@ -687,12 +682,7 @@ pub struct ZcashOrchardDiversifier {
 
 impl ZcashOrchardDiversifier {
     pub fn from_bytes(data: Vec<u8>) -> Result<Self, ZcashError> {
-        let array = data
-            .try_into()
-            .map_err(|bytes: Vec<u8>| ZcashError::ArrayLengthMismatch {
-                expected: 11,
-                got: bytes.len() as u64,
-            })?;
+        let array = utils::cast_slice(&data)?;
         Ok(orchard::keys::Diversifier::from_bytes(array).into())
     }
 }
