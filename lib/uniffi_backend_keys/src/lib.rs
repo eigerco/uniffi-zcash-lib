@@ -51,7 +51,7 @@ impl From<String> for ZcashError {
 }
 
 /// Zcash consensus parameters.
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub enum ZcashConsensusParameters {
     /// Marker struct for the production network.
     MainNetwork,
@@ -90,6 +90,7 @@ impl zcash_primitives::consensus::Parameters for ZcashConsensusParameters {
 }
 
 /// A type-safe wrapper for account identifiers.
+#[derive(Copy, Clone)]
 pub struct ZcashAccountId {
     pub id: u32,
 }

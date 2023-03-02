@@ -107,6 +107,7 @@ class TestApk < Test::Unit::TestCase
     unified_address = BackendKeys::ZcashUnifiedAddress::new(nil, sapling)
 
     assert_equal(sapling.to_bytes(), unified_address.sapling.to_bytes())
+    assert_equal(nil, unified_address.orchard)
   end
 
   def test_unified_address_creation_with_orchard
@@ -116,6 +117,7 @@ class TestApk < Test::Unit::TestCase
 
     unified_address = BackendKeys::ZcashUnifiedAddress::new(orchard, nil)
 
+    assert_equal(nil, unified_address.sapling)
     assert_equal(orchard.to_raw_address_bytes(), unified_address.orchard.to_raw_address_bytes())
   end
 end
