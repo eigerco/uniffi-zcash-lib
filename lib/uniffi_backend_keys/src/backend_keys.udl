@@ -124,7 +124,7 @@ interface ZcashDiversifier {
 
 /* zcash_primitives::sapling::keys::OutgoingViewingKey */
 interface ZcashOutgoingViewingKey {
-  // todo
+  sequence<u8> to_bytes();
 };
 
 /* zcash_primitives::sapling::PaymentAddress */
@@ -161,7 +161,9 @@ interface ZcashOrchardAddress {
 
 /* orchard::keys::OutgoingViewingKey */
 interface ZcashOrchardOutgoingViewingKey {
- // this is only type, check guide for proper type.
+    // Currently Orchard OVK
+    // has no public elements we can
+    // expose.
 };
 
 /* orchard::keys::Scope */

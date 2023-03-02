@@ -602,6 +602,12 @@ pub struct ZcashOutgoingViewingKey {
     inner: zcash_primitives::sapling::keys::OutgoingViewingKey,
 }
 
+impl ZcashOutgoingViewingKey {
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.inner.0.to_vec()
+    }
+}
+
 impl From<zcash_primitives::sapling::keys::OutgoingViewingKey> for ZcashOutgoingViewingKey {
     fn from(inner: zcash_primitives::sapling::keys::OutgoingViewingKey) -> Self {
         ZcashOutgoingViewingKey { inner }
@@ -711,7 +717,7 @@ pub struct ZcashOrchardDiversifier {
     inner: orchard::keys::Diversifier,
 }
 
-impl ZcashOrchardDiversifier {    
+impl ZcashOrchardDiversifier {
     pub fn from_bytes(data: Vec<u8>) -> Result<Self, ZcashError> {
         let array = data
             .try_into()
@@ -732,7 +738,6 @@ impl From<orchard::keys::Diversifier> for ZcashOrchardDiversifier {
 /// A key that provides the capability to recover outgoing transaction information from
 /// the block chain.
 pub struct ZcashOrchardOutgoingViewingKey {
-    // Check this type how to map types struct(u8)
     inner: orchard::keys::OutgoingViewingKey,
 }
 
