@@ -136,12 +136,15 @@ class TestApk < Test::Unit::TestCase
     set = [orchard, nil].product([sapling, nil], [transparent, nil])
 
     set
+      # At least one of orchard or sapling address must be set
       .reject { |args| args[0] == nil && args[1] == nil }
       .each do |args|
-        unified_address = BackendKeys::ZcashUnifiedAddress::new(*args)
-
-        assert_not_nil unified_address,
-          "Couldn't create unified address for orchard=#{args[0]} sapling=#{args[1]} transparent=#{args[2]}"
+        begin
+          unified_address = BackendKeys::ZcashUnifiedAddress::new(*args)
+        rescue
+          assert false,
+            "Couldn't create unified address for orchard=#{args[0]} sapling=#{args[1]} transparent=#{args[2]}"
+        end
       end
   end
 
