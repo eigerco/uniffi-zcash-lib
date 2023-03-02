@@ -18,6 +18,8 @@ class Test(unittest.TestCase):
     
     sapling_ivk_payment_address_bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 150, 127, 9, 126, 127, 135, 242, 241, 100, 51, 242, 226, 238, 170, 123, 25, 163, 69, 216, 183, 101, 10, 82, 150, 119, 1, 188, 11, 103, 156, 95]
     
+    sapling_ovk_bytes = [144, 208, 234, 146, 137, 215, 60, 50, 183, 254, 149, 253, 137, 42, 232, 60, 251, 179, 135, 99, 159, 238, 119, 130, 4, 75, 67, 113, 67, 10, 191, 0]
+    
     orchard_diversifier = ZcashOrchardDiversifier.from_bytes([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
     orchard_ivk_payment_address_bytes = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 188, 133, 2, 30, 187, 222, 192, 24, 118, 136, 143, 249, 3, 127, 83, 48, 137, 67, 228, 146, 86, 27, 251, 163, 42, 159, 247, 98, 150, 25, 7]
@@ -42,6 +44,11 @@ class Test(unittest.TestCase):
         self.assertEqual(self.unified_spending_key.to_unified_full_viewing_key()
             .sapling().to_ivk(ZcashScope.EXTERNAL)
             .to_payment_address(self.sapling_diversifier).to_bytes(), self.sapling_ivk_payment_address_bytes)
+    
+    def test_sapling_ovk_to_bytes(self):
+        self.assertEqual(self.unified_spending_key.to_unified_full_viewing_key()
+            .sapling().to_ovk(ZcashScope.EXTERNAL)
+            .to_bytes(), self.sapling_ovk_bytes)
     
     def test_orchard_ivk_to_payment_address(self):
         self.assertEqual(self.unified_spending_key.to_unified_full_viewing_key()

@@ -16,6 +16,8 @@ let sapling_diversifier = try ZcashDiversifier(bytes: [0, 0, 0, 0, 0, 0, 0, 0, 0
 
 let saplingIvkPaymentAddressBytes: [UInt8] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 150, 127, 9, 126, 127, 135, 242, 241, 100, 51, 242, 226, 238, 170, 123, 25, 163, 69, 216, 183, 101, 10, 82, 150, 119, 1, 188, 11, 103, 156, 95]
 
+let saplingOvkBytes: [UInt8] = [144, 208, 234, 146, 137, 215, 60, 50, 183, 254, 149, 253, 137, 42, 232, 60, 251, 179, 135, 99, 159, 238, 119, 130, 4, 75, 67, 113, 67, 10, 191, 0]
+
 let orchard_diversifier = try ZcashOrchardDiversifier.fromBytes(bytes: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
 let orchardIvkPaymentAddressBytes: [UInt8] = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 118, 188, 133, 2, 30, 187, 222, 192, 24, 118, 136, 143, 249, 3, 127, 83, 48, 137, 67, 228, 146, 86, 27, 251, 163, 42, 159, 247, 98, 150, 25, 7]
@@ -39,6 +41,11 @@ assert(unifiedSpendingKey.toUnifiedFullViewingKey()
 assert(unifiedSpendingKey.toUnifiedFullViewingKey()
     .sapling()!.toIvk(scope: ZcashScope.external)
     .toPaymentAddress(diversifier: sapling_diversifier)!.toBytes() == saplingIvkPaymentAddressBytes)
+
+// Test ZcashSaplingOvk
+assert(unifiedSpendingKey.toUnifiedFullViewingKey()
+    .sapling()!.toOvk(scope: ZcashScope.external)
+    .toBytes() == saplingOvkBytes)
 
 // Test ZcashOrchardIvk.toPaymentAddress
 assert(unifiedSpendingKey.toUnifiedFullViewingKey()

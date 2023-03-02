@@ -32,6 +32,15 @@ fn main() {
         .collect::<Vec<String>>()
         .join(", ");
 
+    let sapling_outgoing_viewing_key = key
+        .to_unified_full_viewing_key()
+        .sapling()
+        .unwrap()
+        .to_ovk(zcash_primitives::zip32::Scope::External)
+        .0.map(|byte| byte.to_string())
+        .to_vec()
+        .join(", ");
+
     let orchard_diversifier = orchard::keys::Diversifier::from_bytes([0; 11]);
     let orchard_address = key
         .to_unified_full_viewing_key()
@@ -57,7 +66,9 @@ fn main() {
     println!();
     println!("UnifiedFullViewingKey encoded: {encoded}");
     println!();
-    println!("SaplinkIvk PaymentAddress bytes: {sapling_address}");
+    println!("SaplinkIvk PaymentAddress bytes: {sapling_address}");    
+    println!();
+    println!("SaplingOvk bytes: {sapling_outgoing_viewing_key}");
     println!();
     println!("OrchardIvk PaymentAddress bytes: {orchard_address}");
     println!();
