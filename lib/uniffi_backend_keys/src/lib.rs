@@ -2,14 +2,16 @@ use delegate::delegate;
 use std::sync::Arc;
 use zcash_primitives::consensus::{MainNetwork, TestNetwork};
 
+mod utils;
+
 mod unified_address;
-mod sapling_address;
+mod sapling;
 
 #[cfg(feature = "rustler")]
 mod beam;
 
 pub use self::unified_address::*;
-pub use self::sapling_address::*;
+pub use self::sapling::*;
 
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]
@@ -560,29 +562,6 @@ impl ZcashSaplingIvk {
 
     pub fn to_repr(&self) -> Vec<u8> {
         self.inner.to_repr().into()
-    }
-}
-
-pub struct ZcashDiversifier {
-    inner: zcash_primitives::sapling::Diversifier,
-}
-
-impl From<&ZcashDiversifier> for zcash_primitives::sapling::Diversifier {
-    fn from(value: &ZcashDiversifier) -> Self {
-        value.inner
-    }
-}
-
-impl ZcashDiversifier {
-    pub fn new(bytes: Vec<u8>) -> Result<Self, ZcashError> {
-        let array = bytes
-            .try_into()
-            .map_err(|bytes: Vec<u8>| ZcashError::ArrayLengthMismatch {
-                expected: 11,
-                got: bytes.len() as u64,
-            })?;
-        let diversifier = zcash_primitives::sapling::Diversifier(array);
-        Ok(ZcashDiversifier { inner: diversifier })
     }
 }
 
