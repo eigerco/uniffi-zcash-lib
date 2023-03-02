@@ -2,12 +2,12 @@ use delegate::delegate;
 use std::sync::Arc;
 use zcash_primitives::consensus::{MainNetwork, TestNetwork};
 
-mod address;
+mod unified_address;
 
 #[cfg(feature = "rustler")]
 mod beam;
 
-pub use self::address::*;
+pub use self::unified_address::*;
 
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]
