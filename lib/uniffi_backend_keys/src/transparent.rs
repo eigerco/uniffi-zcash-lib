@@ -1,6 +1,7 @@
 use zcash_primitives::legacy::{self, TransparentAddress::*};
 
 /// A transparent address corresponding to either a public key or a script.
+#[derive(Clone, Copy)]
 pub struct ZcashTransparentAddress(legacy::TransparentAddress);
 
 impl From<legacy::TransparentAddress> for ZcashTransparentAddress {

@@ -102,7 +102,9 @@ class TestApk < Test::Unit::TestCase
       .orchard().to_ivk(BackendKeys::ZcashScope::EXTERNAL)
       .address(@@orchard_diversifier)
 
-    source = BackendKeys::ZcashUnifiedAddress::new(orchard, sapling)
+    transparent = BackendKeys::ZcashTransparentAddress::public_key((1..20).to_a)
+
+    source = BackendKeys::ZcashUnifiedAddress::new(orchard, sapling, transparent)
     address = source.to_string(params)
     parsed = BackendKeys::ZcashUnifiedAddress::parse(params, address)
 
@@ -114,10 +116,33 @@ class TestApk < Test::Unit::TestCase
       .sapling().to_ivk(BackendKeys::ZcashScope::EXTERNAL)
       .to_payment_address(@@sapling_diversifier)
 
-    unified_address = BackendKeys::ZcashUnifiedAddress::new(nil, sapling)
+    unified_address = BackendKeys::ZcashUnifiedAddress::new(nil, sapling, nil)
 
     assert_equal(sapling.to_bytes(), unified_address.sapling.to_bytes())
     assert_equal(nil, unified_address.orchard)
+  end
+
+  def test_unified_address_creation
+    sapling = @@unified_spending_key.to_unified_full_viewing_key()
+      .sapling().to_ivk(BackendKeys::ZcashScope::EXTERNAL)
+      .to_payment_address(@@sapling_diversifier)
+
+    orchard = @@unified_spending_key.to_unified_full_viewing_key()
+      .orchard().to_ivk(BackendKeys::ZcashScope::EXTERNAL)
+      .address(@@orchard_diversifier)
+
+    transparent = BackendKeys::ZcashTransparentAddress::public_key((1..20).to_a)
+
+    set = [orchard, nil].product([sapling, nil], [transparent, nil])
+
+    set
+      .reject { |args| args[0] == nil && args[1] == nil }
+      .each do |args|
+        unified_address = BackendKeys::ZcashUnifiedAddress::new(*args)
+
+        assert_not_nil unified_address,
+          "Couldn't create unified address for orchard=#{args[0]} sapling=#{args[1]} transparent=#{args[2]}"
+      end
   end
 
   def test_unified_address_creation_with_orchard
@@ -125,7 +150,7 @@ class TestApk < Test::Unit::TestCase
       .orchard().to_ivk(BackendKeys::ZcashScope::EXTERNAL)
       .address(@@orchard_diversifier)
 
-    unified_address = BackendKeys::ZcashUnifiedAddress::new(orchard, nil)
+    unified_address = BackendKeys::ZcashUnifiedAddress::new(orchard, nil, nil)
 
     assert_equal(nil, unified_address.sapling)
     assert_equal(orchard.to_raw_address_bytes(), unified_address.orchard.to_raw_address_bytes())

@@ -12,12 +12,13 @@ impl ZcashUnifiedAddress {
     pub fn new(
         orchard: Option<Arc<crate::ZcashOrchardAddress>>,
         sapling: Option<Arc<crate::ZcashPaymentAddress>>,
-        // _transparent: Option<()>,
+        transparent: Option<Arc<crate::ZcashTransparentAddress>>,
     ) -> ZcashResult<Self> {
         let orchard = orchard.map(|o| o.inner.clone());
         let sapling = sapling.map(|s| (&*s).clone().into());
+        let transparent = transparent.map(|t| (&*t).clone().into());
 
-        UnifiedAddress::from_receivers(orchard, sapling, None)
+        UnifiedAddress::from_receivers(orchard, sapling, transparent)
             .map(ZcashUnifiedAddress)
             .ok_or(crate::ZcashError::Unknown)
     }
@@ -36,5 +37,9 @@ impl ZcashUnifiedAddress {
 
     pub fn sapling(&self) -> Option<Arc<crate::ZcashPaymentAddress>> {
         self.0.sapling().cloned().map(Into::into).map(Arc::new)
+    }
+
+    pub fn transparent(&self) -> Option<Arc<crate::ZcashTransparentAddress>> {
+        self.0.transparent().cloned().map(Into::into).map(Arc::new)
     }
 }
