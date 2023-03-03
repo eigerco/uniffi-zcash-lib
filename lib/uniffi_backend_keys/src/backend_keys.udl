@@ -10,6 +10,7 @@ enum ZcashError {
   "DerivationError",
   "Message",
   "ArrayLengthMismatch",
+  "ValueOutOfRange",
   "Unknown",
 };
 
@@ -71,7 +72,7 @@ interface ZcashUnifiedSpendingKey {
   constructor(ZcashConsensusParameters params, sequence<u8> seed, ZcashAccountId account_id);
 
   ZcashUnifiedFullViewingKey to_unified_full_viewing_key();
-  
+
   sequence<u8> to_bytes(ZcashKeysEra era);
 
   // todo
@@ -85,7 +86,7 @@ interface ZcashUnifiedFullViewingKey {
   string encode(ZcashConsensusParameters params);
 
   ZcashDiversifiableFullViewingKey? sapling();
-  
+
   ZcashOrchardFullViewingKey? orchard();
 
   // todo
@@ -129,6 +130,14 @@ interface ZcashOutgoingViewingKey {
 
 /* zcash_primitives::sapling::PaymentAddress */
 interface ZcashPaymentAddress {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor([ByRef] sequence<u8> bytes);
+
+  [Name=parse, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string input);
+
+  string encode(ZcashConsensusParameters params);
+
   sequence<u8> to_bytes();
 
   // todo
@@ -177,3 +186,80 @@ interface ZcashOrchardDiversifier {
   [Name=from_bytes, Throws=ZcashError]
   constructor(sequence<u8> bytes);
 };
+
+interface ZcashUnifiedAddress {
+  [Name=parse, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string address);
+
+  [Throws=ZcashError]
+  constructor(ZcashOrchardAddress? orchard, ZcashPaymentAddress? sapling, ZcashTransparentAddress? transparent);
+
+  ZcashOrchardAddress? orchard();
+  ZcashPaymentAddress? sapling();
+  ZcashTransparentAddress? transparent();
+
+  string to_string(ZcashConsensusParameters params);
+};
+
+interface ZcashTransparentAddress {
+  [Name=parse, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string input);
+
+  [Name=public_key, Throws=ZcashError]
+  constructor(sequence<u8> data);
+
+  [Name=script, Throws=ZcashError]
+  constructor(sequence<u8> data);
+
+  string encode(ZcashConsensusParameters params);
+
+  boolean is_public_key();
+
+  boolean is_script();
+
+  sequence<u8> to_bytes();
+};
+
+dictionary ZcashPaymentParam {
+  string key;
+  string value;
+};
+
+interface ZcashRecipientAddress {
+  [Name=shielded]
+  constructor(ZcashPaymentAddress addr);
+
+  [Name=transparent]
+  constructor(ZcashTransparentAddress addr);
+
+  [Name=unified]
+  constructor(ZcashUnifiedAddress addr);
+
+  string encode(ZcashConsensusParameters params);
+};
+
+interface ZcashMemoBytes {
+  [Throws=ZcashError]
+  constructor([ByRef] sequence<u8> data);
+
+  sequence<u8> data();
+};
+
+interface ZcashAmount {
+  [Throws=ZcashError]
+  constructor(i64 amount);
+
+  [Name=zero]
+  constructor();
+};
+
+dictionary ZcashPayment {
+  ZcashRecipientAddress recipent_address;
+  i64 amount;
+  ZcashMemoBytes? memo;
+  string? label;
+  string? message;
+  sequence<ZcashPaymentParam> other_params;
+};
+
+/* vi:set ft=cs syn=cs: */

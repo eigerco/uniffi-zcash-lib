@@ -2,6 +2,21 @@ use delegate::delegate;
 use std::sync::Arc;
 use zcash_primitives::consensus::{MainNetwork, TestNetwork};
 
+mod utils;
+
+mod unified_address;
+mod sapling;
+mod transparent;
+mod payment;
+
+#[cfg(feature = "rustler")]
+mod beam;
+
+pub use self::unified_address::*;
+pub use self::sapling::*;
+pub use self::transparent::*;
+pub use self::payment::*;
+
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]
 pub enum ZcashError {
@@ -19,9 +34,14 @@ pub enum ZcashError {
     #[error("expected {expected} elements, got {got}")]
     ArrayLengthMismatch { expected: u64, got: u64 },
 
+    #[error("Value {val} out of range, should be within {from}..{to}")]
+    ValueOutOfRange { val: i64, from: i64, to: i64 },
+
     #[error("unknown error occurred")]
     Unknown,
 }
+
+type ZcashResult<T> = Result<T, ZcashError>;
 
 impl From<hdwallet::error::Error> for ZcashError {
     fn from(error: hdwallet::error::Error) -> Self {
@@ -42,7 +62,7 @@ impl From<String> for ZcashError {
 }
 
 /// Zcash consensus parameters.
-#[derive(Clone)]
+#[derive(Copy, Clone)]
 pub enum ZcashConsensusParameters {
     /// Marker struct for the production network.
     MainNetwork,
@@ -81,6 +101,7 @@ impl zcash_primitives::consensus::Parameters for ZcashConsensusParameters {
 }
 
 /// A type-safe wrapper for account identifiers.
+#[derive(Copy, Clone)]
 pub struct ZcashAccountId {
     pub id: u32,
 }
@@ -113,13 +134,13 @@ impl ZcashAccountPrivKey {
         params: ZcashConsensusParameters,
         seed: Vec<u8>,
         account: ZcashAccountId,
-    ) -> Result<Self, ZcashError> {
+    ) -> ZcashResult<Self> {
         let key = zcash_primitives::legacy::keys::AccountPrivKey::from_seed(
             &params,
             &seed,
             account.into(),
-        )
-        .map_err(ZcashError::from)?;
+        )?;
+
         Ok(key.into())
     }
 
@@ -162,7 +183,7 @@ impl ZcashAccountPrivKey {
 
     /// Decodes the `AccountPrivKey` from the encoding specified for a
     /// [BIP 32](https://en.bitcoin.it/wiki/BIP_0032) ExtendedPrivKey
-    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, ZcashError> {
+    pub fn from_bytes(bytes: Vec<u8>) -> ZcashResult<Self> {
         zcash_primitives::legacy::keys::AccountPrivKey::from_bytes(&bytes)
             .map(ZcashAccountPrivKey::from)
             .ok_or(ZcashError::Unknown)
@@ -176,9 +197,9 @@ pub struct ZcashExtendedPrivKey {
 }
 
 impl ZcashExtendedPrivKey {
-    fn with_seed(seed: Vec<u8>) -> Result<Self, ZcashError> {
-        let key =
-            hdwallet::extended_key::ExtendedPrivKey::with_seed(&seed).map_err(ZcashError::from)?;
+    fn with_seed(seed: Vec<u8>) -> ZcashResult<Self> {
+        let key = hdwallet::extended_key::ExtendedPrivKey::with_seed(&seed)?;
+
         Ok(key.into())
     }
 }
@@ -222,7 +243,7 @@ impl ZcashExtendedSpendingKey {
 
     /// Decodes the extended spending key from its serialized representation as defined in
     /// [ZIP 32](https://zips.z.cash/zip-0032)
-    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, ZcashError> {
+    pub fn from_bytes(bytes: Vec<u8>) -> ZcashResult<Self> {
         todo!()
     }
 
@@ -299,13 +320,13 @@ impl ZcashUnifiedSpendingKey {
         params: ZcashConsensusParameters,
         seed: Vec<u8>,
         account: ZcashAccountId,
-    ) -> Result<Self, ZcashError> {
+    ) -> ZcashResult<Self> {
         let key = zcash_client_backend::keys::UnifiedSpendingKey::from_seed(
             &params,
             &seed,
             account.into(),
-        )
-        .map_err(ZcashError::from)?;
+        )?;
+
         Ok(key.into())
     }
 
@@ -342,9 +363,9 @@ impl ZcashUnifiedFullViewingKey {
     /// Parses a `UnifiedFullViewingKey` from its [ZIP 316] string encoding.
     ///
     /// [ZIP 316]: https://zips.z.cash/zip-0316
-    pub fn decode(params: ZcashConsensusParameters, encoding: &str) -> Result<Self, ZcashError> {
-        let key = zcash_client_backend::keys::UnifiedFullViewingKey::decode(&params, encoding)
-            .map_err(ZcashError::from)?;
+    pub fn decode(params: ZcashConsensusParameters, encoding: &str) -> ZcashResult<Self> {
+        let key = zcash_client_backend::keys::UnifiedFullViewingKey::decode(&params, encoding)?;
+
         Ok(key.into())
     }
 
@@ -397,13 +418,8 @@ impl ZcashDiversifiableFullViewingKey {
     ///
     /// Returns `None` if the bytes do not contain a valid encoding of a diversifiable
     /// Sapling full viewing key.
-    pub fn from_bytes(bytes: Vec<u8>) -> Result<Self, ZcashError> {
-        let array = bytes
-            .try_into()
-            .map_err(|bytes: Vec<u8>| ZcashError::ArrayLengthMismatch {
-                expected: 128,
-                got: bytes.len() as u64,
-            })?;
+    pub fn from_bytes(bytes: Vec<u8>) -> ZcashResult<Self> {
+        let array = utils::cast_slice(&bytes)?;
         let key =
             zcash_client_backend::keys::sapling::DiversifiableFullViewingKey::from_bytes(&array)
                 .ok_or(ZcashError::Unknown)?;
@@ -551,52 +567,6 @@ impl ZcashSaplingIvk {
     }
 }
 
-pub struct ZcashDiversifier {
-    inner: zcash_primitives::sapling::Diversifier,
-}
-
-impl From<&ZcashDiversifier> for zcash_primitives::sapling::Diversifier {
-    fn from(value: &ZcashDiversifier) -> Self {
-        value.inner
-    }
-}
-
-impl ZcashDiversifier {
-    pub fn new(bytes: Vec<u8>) -> Result<Self, ZcashError> {
-        let array = bytes
-            .try_into()
-            .map_err(|bytes: Vec<u8>| ZcashError::ArrayLengthMismatch {
-                expected: 11,
-                got: bytes.len() as u64,
-            })?;
-        let diversifier = zcash_primitives::sapling::Diversifier(array);
-        Ok(ZcashDiversifier { inner: diversifier })
-    }
-}
-
-/// A Sapling payment address.
-///
-/// # Invariants
-///
-/// `pk_d` is guaranteed to be prime-order (i.e. in the prime-order subgroup of Jubjub,
-/// and not the identity).
-pub struct ZcashPaymentAddress {
-    inner: zcash_primitives::sapling::PaymentAddress,
-}
-
-impl From<zcash_primitives::sapling::PaymentAddress> for ZcashPaymentAddress {
-    fn from(inner: zcash_primitives::sapling::PaymentAddress) -> Self {
-        ZcashPaymentAddress { inner }
-    }
-}
-
-impl ZcashPaymentAddress {
-    /// Returns the byte encoding of this `PaymentAddress`.
-    pub fn to_bytes(&self) -> Vec<u8> {
-        self.inner.to_bytes().into()
-    }
-}
-
 /// An outgoing viewing key
 pub struct ZcashOutgoingViewingKey {
     inner: zcash_primitives::sapling::keys::OutgoingViewingKey,
@@ -718,13 +688,8 @@ pub struct ZcashOrchardDiversifier {
 }
 
 impl ZcashOrchardDiversifier {
-    pub fn from_bytes(data: Vec<u8>) -> Result<Self, ZcashError> {
-        let array = data
-            .try_into()
-            .map_err(|bytes: Vec<u8>| ZcashError::ArrayLengthMismatch {
-                expected: 11,
-                got: bytes.len() as u64,
-            })?;
+    pub fn from_bytes(data: Vec<u8>) -> ZcashResult<Self> {
+        let array = utils::cast_slice(&data)?;
         Ok(orchard::keys::Diversifier::from_bytes(array).into())
     }
 }
@@ -765,6 +730,3 @@ impl From<orchard::Address> for ZcashOrchardAddress {
 }
 
 uniffi::include_scaffolding!("backend_keys");
-
-#[cfg(feature = "rustler")]
-mod beam;

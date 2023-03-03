@@ -62,11 +62,11 @@ enum Network {
 };
 
 namespace wallet_ops {
-	ZcashAccount create_account(u32 account_id); 
+	ZcashAccount create_account(u32 account_id);
 
 	/* NOTE
 	// This should create a new address, using the spending key derived from that ZcashAccount.
-	// and derive the other addresses 
+	// and derive the other addresses
 	*/
 	/* ZcashUnifiedAddress? unified_address_from_account(zaccount: ZcashAccount); */
 
@@ -83,7 +83,7 @@ namespace wallet_ops {
 	string encode_transparent_address(ZcashTransparentAddress tr_address);
 
 	string encode_sapling_address(ZcashSaplingAddress zs_address);
-	
+
 	string encode_orchard_address(ZcashOrchardAddress zo_address);
 
 	// ZcashUnifiedAddress? unified_address_from_sk( ... ) // how to bridge this?
@@ -104,3 +104,5 @@ namespace wallet_ops {
 
 	f32 get_fee_rate();
 };
+
+/* vi:set ft=cs syn=cs: */

@@ -38,7 +38,7 @@ At the moment we don't have a stable team on this, but once we have a team in pl
 
 ### Easy, using Homebrew:
 
-```
+```bash
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 rustup default nightly
 rustup update
@@ -47,13 +47,13 @@ brew install kotlin
 brew install swift
 brew install python
 brew install ruby
-``` 
+```
 
 ## Linux
 
 ### (Ubuntu/Debian, APT package manager)
 
-```
+```bash
 # Kotlin
 sudo apt install default-jdk # if you still don't have Java installed
 curl -s https://get.sdkman.io | bash # restart the terminal after this
@@ -63,7 +63,7 @@ sdk install kotlin
 sudo apt-get install ruby-full
 
 # Swift
-# Download, un-tar, put in the path the binary from (here)[https://www.swift.org/download].
+# Download, un-tar, put in the path the binary from (here) <https://www.swift.org/download>.
 
 # Python
 sudo apt-get install python3.x # 3.8, 3.9
