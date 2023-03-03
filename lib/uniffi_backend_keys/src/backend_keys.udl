@@ -10,6 +10,7 @@ enum ZcashError {
   "DerivationError",
   "Message",
   "ArrayLengthMismatch",
+  "ValueOutOfRange",
   "Unknown",
 };
 
@@ -217,6 +218,48 @@ interface ZcashTransparentAddress {
   boolean is_script();
 
   sequence<u8> to_bytes();
+};
+
+dictionary ZcashPaymentParam {
+  string key;
+  string value;
+};
+
+interface ZcashRecipientAddress {
+  [Name=shielded]
+  constructor(ZcashPaymentAddress addr);
+
+  [Name=transparent]
+  constructor(ZcashTransparentAddress addr);
+
+  [Name=unified]
+  constructor(ZcashUnifiedAddress addr);
+
+  string encode(ZcashConsensusParameters params);
+};
+
+interface ZcashMemoBytes {
+  [Throws=ZcashError]
+  constructor([ByRef] sequence<u8> data);
+
+  sequence<u8> data();
+};
+
+interface ZcashAmount {
+  [Throws=ZcashError]
+  constructor(i64 amount);
+
+  [Name=zero]
+  constructor();
+};
+
+dictionary ZcashPayment {
+  ZcashRecipientAddress recipent_address;
+  i64 amount;
+  ZcashMemoBytes? memo;
+  string? label;
+  string? message;
+  sequence<ZcashPaymentParam> other_params;
 };
 
 /* vi:set ft=cs syn=cs: */

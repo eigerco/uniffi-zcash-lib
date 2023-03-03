@@ -7,6 +7,7 @@ mod utils;
 mod unified_address;
 mod sapling;
 mod transparent;
+mod payment;
 
 #[cfg(feature = "rustler")]
 mod beam;
@@ -14,6 +15,7 @@ mod beam;
 pub use self::unified_address::*;
 pub use self::sapling::*;
 pub use self::transparent::*;
+pub use self::payment::*;
 
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]
@@ -31,6 +33,9 @@ pub enum ZcashError {
 
     #[error("expected {expected} elements, got {got}")]
     ArrayLengthMismatch { expected: u64, got: u64 },
+
+    #[error("Value {val} out of range, should be within {from}..{to}")]
+    ValueOutOfRange { val: i64, from: i64, to: i64 },
 
     #[error("unknown error occurred")]
     Unknown,

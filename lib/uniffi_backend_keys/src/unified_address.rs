@@ -6,7 +6,20 @@ use crate::ZcashResult;
 use zcash_client_backend::address::UnifiedAddress;
 use zcash_client_backend::encoding::AddressCodec;
 
+#[derive(Clone)]
 pub struct ZcashUnifiedAddress(UnifiedAddress);
+
+impl From<UnifiedAddress> for ZcashUnifiedAddress {
+    fn from(addr: UnifiedAddress) -> Self {
+        ZcashUnifiedAddress(addr)
+    }
+}
+
+impl From<ZcashUnifiedAddress> for UnifiedAddress {
+    fn from(addr: ZcashUnifiedAddress) -> Self {
+        addr.0
+    }
+}
 
 impl ZcashUnifiedAddress {
     pub fn new(
