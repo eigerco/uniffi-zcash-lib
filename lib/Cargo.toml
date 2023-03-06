@@ -2,19 +2,19 @@
 members = [
     # Binary generation crate. Breaks nomenclature to avoid collision with uniffi_bindgen library crate.
     # See https://mozilla.github.io/uniffi-rs/tutorial/foreign_language_bindings.html#multi-crate-workspaces
-    "uniffi-bindgen", 
+    "uniffi-bindgen",
     "uniffi_demo_module",
     "uniffi_backend_keys",
     "uniffi_wallet_ops",
 ]
 
 # We are using eiger fork of uniffi-rs, as we are
-# making improvements (inline documentation) on the 
-# library. Whenever such changes goes upstream, we 
+# making improvements (inline documentation) on the
+# library. Whenever such changes goes upstream, we
 # will add directly the uniffi-rs libraries from crates.io.
 [workspace.dependencies.uniffi]
 git = "https://github.com/eigerco/uniffi-rs"
-rev = "8b43429f3a4170f02aa796651620a69ed0d4650c"
+rev = "4cf40b9fba1769ac65ffcb16616e1eff9c12565a"
 
 [profile.release]
 lto = true
