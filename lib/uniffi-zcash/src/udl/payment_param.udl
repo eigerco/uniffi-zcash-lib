@@ -1,4 +1,0 @@
-dictionary ZcashPaymentParam {
-  string key;
-  string value;
-};

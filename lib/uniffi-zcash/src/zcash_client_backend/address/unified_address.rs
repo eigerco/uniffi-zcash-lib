@@ -1,10 +1,11 @@
 use std::sync::Arc;
 
-use crate::ZcashConsensusParameters;
-use crate::ZcashResult;
+use zcash_client_backend::{address::UnifiedAddress, encoding::AddressCodec};
 
-use zcash_client_backend::address::UnifiedAddress;
-use zcash_client_backend::encoding::AddressCodec;
+use crate::{
+    ZcashConsensusParameters, ZcashError, ZcashOrchardAddress, ZcashPaymentAddress, ZcashResult,
+    ZcashTransparentAddress,
+};
 
 #[derive(Clone)]
 pub struct ZcashUnifiedAddress(UnifiedAddress);
@@ -23,17 +24,17 @@ impl From<ZcashUnifiedAddress> for UnifiedAddress {
 
 impl ZcashUnifiedAddress {
     pub fn new(
-        orchard: Option<Arc<crate::ZcashOrchardAddress>>,
-        sapling: Option<Arc<crate::ZcashPaymentAddress>>,
-        transparent: Option<Arc<crate::ZcashTransparentAddress>>,
+        orchard: Option<Arc<ZcashOrchardAddress>>,
+        sapling: Option<Arc<ZcashPaymentAddress>>,
+        transparent: Option<Arc<ZcashTransparentAddress>>,
     ) -> ZcashResult<Self> {
-        let orchard = orchard.map(|o| o.inner.clone());
-        let sapling = sapling.map(|s| (&*s).clone().into());
-        let transparent = transparent.map(|t| (&*t).clone().into());
+        let orchard = orchard.map(|o| o.0);
+        let sapling = sapling.map(|s| (*s).clone().into());
+        let transparent = transparent.map(|t| (*t).into());
 
         UnifiedAddress::from_receivers(orchard, sapling, transparent)
             .map(ZcashUnifiedAddress)
-            .ok_or(crate::ZcashError::Unknown)
+            .ok_or(ZcashError::Unknown)
     }
 
     pub fn parse(params: ZcashConsensusParameters, addr: &str) -> ZcashResult<Self> {
@@ -44,15 +45,15 @@ impl ZcashUnifiedAddress {
         self.0.encode(&params)
     }
 
-    pub fn orchard(&self) -> Option<Arc<crate::ZcashOrchardAddress>> {
+    pub fn orchard(&self) -> Option<Arc<ZcashOrchardAddress>> {
         self.0.orchard().cloned().map(Into::into).map(Arc::new)
     }
 
-    pub fn sapling(&self) -> Option<Arc<crate::ZcashPaymentAddress>> {
+    pub fn sapling(&self) -> Option<Arc<ZcashPaymentAddress>> {
         self.0.sapling().cloned().map(Into::into).map(Arc::new)
     }
 
-    pub fn transparent(&self) -> Option<Arc<crate::ZcashTransparentAddress>> {
+    pub fn transparent(&self) -> Option<Arc<ZcashTransparentAddress>> {
         self.0.transparent().cloned().map(Into::into).map(Arc::new)
     }
 }

@@ -37,7 +37,8 @@ fn main() {
         .sapling()
         .unwrap()
         .to_ovk(zcash_primitives::zip32::Scope::External)
-        .0.map(|byte| byte.to_string())
+        .0
+        .map(|byte| byte.to_string())
         .to_vec()
         .join(", ");
 
@@ -66,7 +67,7 @@ fn main() {
     println!();
     println!("UnifiedFullViewingKey encoded: {encoded}");
     println!();
-    println!("SaplinkIvk PaymentAddress bytes: {sapling_address}");    
+    println!("SaplinkIvk PaymentAddress bytes: {sapling_address}");
     println!();
     println!("SaplingOvk bytes: {sapling_outgoing_viewing_key}");
     println!();

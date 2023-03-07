@@ -6,3 +6,8 @@ dictionary ZcashPayment {
   string? message;
   sequence<ZcashPaymentParam> other_params;
 };
+
+dictionary ZcashPaymentParam {
+  string key;
+  string value;
+};
