@@ -1,0 +1,6 @@
+interface ZcashDiversifier {
+  [Throws=ZcashError]
+  constructor(sequence<u8> bytes);
+
+  // todo
+};

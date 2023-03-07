@@ -1,0 +1,12 @@
+interface ZcashDiversifiableFullViewingKey {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor(sequence<u8> bytes);
+
+  sequence<u8> to_bytes();
+
+  ZcashSaplingIvk to_ivk(ZcashScope scope);
+
+  ZcashOutgoingViewingKey to_ovk(ZcashScope scope);
+
+  // todo
+};

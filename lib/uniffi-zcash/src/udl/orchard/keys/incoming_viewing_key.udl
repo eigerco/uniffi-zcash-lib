@@ -1,0 +1,4 @@
+interface ZcashOrchardIncomingViewingKey {
+  sequence<u8> to_bytes();
+  ZcashOrchardAddress address(ZcashOrchardDiversifier diversifier);
+};

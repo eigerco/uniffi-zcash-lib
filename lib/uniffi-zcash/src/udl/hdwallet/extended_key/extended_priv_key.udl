@@ -1,0 +1,4 @@
+interface ZcashExtendedPrivKey {
+  [Name=with_seed, Throws=ZcashError]
+  constructor(sequence<u8> data);
+};

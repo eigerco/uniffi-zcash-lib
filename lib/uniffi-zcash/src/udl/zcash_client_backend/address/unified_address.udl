@@ -1,0 +1,13 @@
+interface ZcashUnifiedAddress {
+  [Name=parse, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string address);
+
+  [Throws=ZcashError]
+  constructor(ZcashOrchardAddress? orchard, ZcashPaymentAddress? sapling, ZcashTransparentAddress? transparent);
+
+  ZcashOrchardAddress? orchard();
+  ZcashPaymentAddress? sapling();
+  ZcashTransparentAddress? transparent();
+
+  string to_string(ZcashConsensusParameters params);
+};

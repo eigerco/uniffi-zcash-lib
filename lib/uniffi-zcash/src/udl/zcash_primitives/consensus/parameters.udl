@@ -1,0 +1,6 @@
+enum ZcashConsensusParameters {
+  /* zcash_primitives::consensus::MainNetwork */
+  "MainNetwork",
+  /* zcash_primitives::consensus::TestNetwork */
+  "TestNetwork",
+};

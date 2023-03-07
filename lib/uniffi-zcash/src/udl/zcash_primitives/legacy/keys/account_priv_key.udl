@@ -1,0 +1,16 @@
+interface ZcashAccountPrivKey {
+  [Name=from_seed, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, sequence<u8> seed, ZcashAccountId account_id);
+
+  [Name=from_bytes, Throws=ZcashError]
+  constructor(sequence<u8> data);
+
+  [Name=from_extended_privkey]
+  constructor(ZcashExtendedPrivKey key);
+
+  ZcashAccountPubKey to_account_pubkey();
+
+  sequence<u8> to_bytes();
+
+  // todo
+};

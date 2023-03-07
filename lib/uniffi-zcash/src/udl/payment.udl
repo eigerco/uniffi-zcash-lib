@@ -1,0 +1,8 @@
+dictionary ZcashPayment {
+  ZcashRecipientAddress recipent_address;
+  i64 amount;
+  ZcashMemoBytes? memo;
+  string? label;
+  string? message;
+  sequence<ZcashPaymentParam> other_params;
+};

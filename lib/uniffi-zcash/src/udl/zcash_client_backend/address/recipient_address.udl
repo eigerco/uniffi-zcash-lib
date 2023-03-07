@@ -1,0 +1,12 @@
+interface ZcashRecipientAddress {
+  [Name=shielded]
+  constructor(ZcashPaymentAddress addr);
+
+  [Name=transparent]
+  constructor(ZcashTransparentAddress addr);
+
+  [Name=unified]
+  constructor(ZcashUnifiedAddress addr);
+
+  string encode(ZcashConsensusParameters params);
+};

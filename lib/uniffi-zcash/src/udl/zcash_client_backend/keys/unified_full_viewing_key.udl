@@ -1,0 +1,12 @@
+interface ZcashUnifiedFullViewingKey {
+  [Name=decode, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string encoded);
+
+  string encode(ZcashConsensusParameters params);
+
+  ZcashDiversifiableFullViewingKey? sapling();
+
+  ZcashOrchardFullViewingKey? orchard();
+
+  // todo
+};
