@@ -1,11 +1,7 @@
 [workspace]
 members = [
-    # Binary generation crate. Breaks nomenclature to avoid collision with uniffi_bindgen library crate.
-    # See https://mozilla.github.io/uniffi-rs/tutorial/foreign_language_bindings.html#multi-crate-workspaces
     "uniffi-bindgen",
-    "uniffi_demo_module",
     "uniffi_backend_keys",
-    "uniffi_wallet_ops",
 ]
 
 # We are using eiger fork of uniffi-rs, as we are
