@@ -1,4 +1,4 @@
-import uniffi.backend_keys.*
+import uniffi.zcash.*
 
 fun testUnifiedSpendingKeyFromSeed() {
     val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }

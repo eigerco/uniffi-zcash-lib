@@ -1,11 +1,11 @@
 [package]
-name = "zcash-backend-keys"
+name = "zcash"
 version = "0.1.0"
 edition = "2021"
 
 [lib]
 crate-type = ["lib", "cdylib"]
-name = "uniffi_backend_keys"
+name = "uniffi_zcash"
 
 [features]
 beam = ["rustler"]

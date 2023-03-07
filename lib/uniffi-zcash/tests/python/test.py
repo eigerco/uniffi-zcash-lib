@@ -1,5 +1,5 @@
 import unittest
-from backend_keys import *
+from zcash import *
 
 class Test(unittest.TestCase):
     def test_unified_spending_key_from_seed(self):

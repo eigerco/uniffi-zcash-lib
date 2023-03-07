@@ -54,7 +54,7 @@ fn load(env: rustler::Env, _: rustler::Term) -> bool {
 }
 
 rustler::init!(
-    "Elixir.ZcashBackendKeys",
+    "Elixir.Zcash",
     [from_bytes, from_seed, to_account_pubkey],
     load = load
 );

@@ -729,4 +729,4 @@ impl From<orchard::Address> for ZcashOrchardAddress {
     }
 }
 
-uniffi::include_scaffolding!("backend_keys");
+uniffi::include_scaffolding!("zcash");

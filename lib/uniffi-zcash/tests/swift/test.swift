@@ -1,4 +1,4 @@
-import backend_keys
+import zcash
 
 func testUnifiedSpendingKeyFromSeed() {
     let seed: [UInt8] = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]

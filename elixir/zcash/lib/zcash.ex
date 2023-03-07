@@ -1,10 +1,10 @@
-defmodule ZcashBackendKeys do
+defmodule Zcash do
   use Rustler,
-    otp_app: :zcash_backend_keys,
-    crate: "zcash-backend-keys",
-    path: "../../lib/uniffi_backend_keys",
+    otp_app: :zcash,
+    crate: "zcash",
+    path: "../../lib/uniffi-zcash",
     features: ["beam"],
-    load_from: {:zcash_backend_keys, "priv/native/libuniffi_backend_keys"}
+    load_from: {:zcash, "priv/native/libuniffi_zcash"}
 
   import Record
 

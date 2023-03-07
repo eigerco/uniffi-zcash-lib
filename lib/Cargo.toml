@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "uniffi-bindgen",
-    "uniffi_backend_keys",
+    "uniffi-zcash",
 ]
 
 # We are using eiger fork of uniffi-rs, as we are

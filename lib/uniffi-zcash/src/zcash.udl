@@ -1,5 +1,4 @@
-/* zcash_client_backend::keys */
-namespace backend_keys {
+namespace zcash {
 };
 
 [Error]
