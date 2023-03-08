@@ -1,0 +1,5 @@
+[Enum]
+interface ZcashChildIndex {
+  NonHardened(u32 v);
+  Hardened(u32 v);
+};

@@ -1,0 +1,8 @@
+interface ZcashDiversifierIndex {
+  constructor();
+
+  [Throws=ZcashError]
+  void increment();
+
+  sequence<u8> to_bytes();
+};
