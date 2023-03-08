@@ -1,0 +1,4 @@
+interface ZcashOrchardDiversifier {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor(sequence<u8> bytes);
+};

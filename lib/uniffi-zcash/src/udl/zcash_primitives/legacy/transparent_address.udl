@@ -1,0 +1,18 @@
+interface ZcashTransparentAddress {
+  [Name=parse, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string input);
+
+  [Name=public_key, Throws=ZcashError]
+  constructor(sequence<u8> data);
+
+  [Name=script, Throws=ZcashError]
+  constructor(sequence<u8> data);
+
+  string encode(ZcashConsensusParameters params);
+
+  boolean is_public_key();
+
+  boolean is_script();
+
+  sequence<u8> to_bytes();
+};

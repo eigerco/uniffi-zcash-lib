@@ -1,0 +1,4 @@
+interface ZcashOrchardFullViewingKey {
+  ZcashOrchardIncomingViewingKey to_ivk(ZcashOrchardScope scope);
+  ZcashOrchardOutgoingViewingKey to_ovk(ZcashOrchardScope scope);
+};

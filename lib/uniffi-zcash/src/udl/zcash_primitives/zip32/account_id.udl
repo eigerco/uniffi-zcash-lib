@@ -1,0 +1,3 @@
+dictionary ZcashAccountId {
+  u32 id;
+};

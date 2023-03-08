@@ -1,0 +1,11 @@
+[Error]
+enum ZcashError {
+  /* hdwallet::error::Error */
+  "HDWalletError",
+  /* zcash_client_backend::keys::DerivationError */
+  "DerivationError",
+  "Message",
+  "ArrayLengthMismatch",
+  "ValueOutOfRange",
+  "Unknown",
+};

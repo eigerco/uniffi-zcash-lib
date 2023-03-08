@@ -1,0 +1,7 @@
+interface ZcashAmount {
+  [Throws=ZcashError]
+  constructor(i64 amount);
+
+  [Name=zero]
+  constructor();
+};

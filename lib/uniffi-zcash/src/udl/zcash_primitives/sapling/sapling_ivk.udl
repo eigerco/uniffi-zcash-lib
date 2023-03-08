@@ -1,0 +1,7 @@
+interface ZcashSaplingIvk {
+  ZcashPaymentAddress? to_payment_address(ZcashDiversifier diversifier);
+
+  sequence<u8> to_repr();
+
+  // todo
+};

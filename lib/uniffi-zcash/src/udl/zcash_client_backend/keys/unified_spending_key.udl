@@ -1,0 +1,10 @@
+interface ZcashUnifiedSpendingKey {
+  [Name=from_seed, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, sequence<u8> seed, ZcashAccountId account_id);
+
+  ZcashUnifiedFullViewingKey to_unified_full_viewing_key();
+
+  sequence<u8> to_bytes(ZcashKeysEra era);
+
+  // todo
+};

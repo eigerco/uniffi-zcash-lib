@@ -1,0 +1,3 @@
+interface ZcashOrchardAddress {
+  sequence<u8> to_raw_address_bytes();
+};
