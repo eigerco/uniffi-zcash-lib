@@ -1,0 +1,28 @@
+interface ZcashDiversifiableFullViewingKey {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor(sequence<u8> bytes);
+
+  sequence<u8> to_bytes();
+
+  ZcashFullViewingKey fvk();
+
+  ZcashNullifierDerivingKey to_nk(ZcashScope scope);
+
+  ZcashSaplingIvk to_ivk(ZcashScope scope);
+
+  ZcashOutgoingViewingKey to_ovk(ZcashScope scope);
+
+  ZcashPaymentAddress? address(ZcashDiversifierIndex j);
+
+  ZcashDiversifierIndexAndPaymentAddress? find_address(ZcashDiversifierIndex j);
+
+  ZcashDiversifierIndexAndPaymentAddress? default_address();
+
+  ZcashPaymentAddress? diversified_address(ZcashDiversifier diversifier);
+
+  ZcashDiversifierIndexAndPaymentAddress? change_address();
+
+  ZcashPaymentAddress? diversified_change_address(ZcashDiversifier diversifier);
+
+  ZcashDiversifierIndexAndScope? decrypt_diversifier([ByRef] ZcashPaymentAddress addr);
+};
