@@ -1,0 +1,5 @@
+interface ZcashViewingKey {
+  ZcashSaplingIvk ivk();
+
+  ZcashPaymentAddress? to_payment_address(ZcashDiversifier diversifier);
+};

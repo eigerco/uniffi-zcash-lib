@@ -1,8 +1,17 @@
 interface ZcashDiversifierIndex {
   constructor();
 
+  [Name=from_u32]
+  constructor(u32 i);
+
+  [Name=from_u64]
+  constructor(u64 i);
+
   [Throws=ZcashError]
   void increment();
+
+  [Throws=ZcashError]
+  u32 to_u32();
 
   sequence<u8> to_bytes();
 };
