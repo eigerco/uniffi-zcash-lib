@@ -1,3 +1,5 @@
+use orchard::zip32;
+
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]
 pub enum ZcashError {
@@ -31,6 +33,12 @@ impl From<hdwallet::error::Error> for ZcashError {
 impl From<zcash_client_backend::keys::DerivationError> for ZcashError {
     fn from(error: zcash_client_backend::keys::DerivationError) -> Self {
         ZcashError::DerivationError { error }
+    }
+}
+
+impl From<zip32::Error> for ZcashError {
+    fn from(error: zip32::Error) -> Self {
+        error.to_string().into()
     }
 }
 
