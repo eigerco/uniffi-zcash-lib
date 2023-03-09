@@ -7,7 +7,7 @@ use zcash_primitives::{
 
 use crate::{
     ZcashChildIndex, ZcashDiversifiableFullViewingKey, ZcashDiversifierIndex, ZcashError,
-    ZcashPaymentAddress,
+    ZcashPaymentAddress, ZcashDiversifierIndexAndPaymentAddress,
 };
 
 pub struct ZcashExtendedSpendingKey(ExtendedSpendingKey);
@@ -44,7 +44,7 @@ impl ZcashExtendedSpendingKey {
 
     /// Returns the address with the lowest valid diversifier index, along with
     /// the diversifier index that generated that address.
-    pub fn default_address(&self) -> ZcashDefaultAddressResult {
+    pub fn default_address(&self) -> ZcashDiversifierIndexAndPaymentAddress {
         self.0.default_address().into()
     }
 
@@ -70,19 +70,5 @@ impl From<&ZcashExtendedSpendingKey> for ExtendedSpendingKey {
 impl From<ExtendedSpendingKey> for ZcashExtendedSpendingKey {
     fn from(inner: ExtendedSpendingKey) -> Self {
         ZcashExtendedSpendingKey(inner)
-    }
-}
-
-pub struct ZcashDefaultAddressResult {
-    pub diversifier_index: Arc<ZcashDiversifierIndex>,
-    pub address: Arc<ZcashPaymentAddress>,
-}
-
-impl From<(DiversifierIndex, PaymentAddress)> for ZcashDefaultAddressResult {
-    fn from(elems: (DiversifierIndex, PaymentAddress)) -> Self {
-        ZcashDefaultAddressResult {
-            diversifier_index: Arc::new(elems.0.into()),
-            address: Arc::new(elems.1.into()),
-        }
     }
 }
