@@ -1,6 +1,9 @@
 mod diversifier;
 pub use self::diversifier::*;
 
+mod spending_key;
+pub use self::spending_key::*;
+
 mod full_viewing_key;
 pub use self::full_viewing_key::*;
 

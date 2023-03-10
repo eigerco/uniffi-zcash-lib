@@ -1,4 +1,5 @@
 use hdwallet::ExtendedPrivKey;
+use orchard::keys::SpendingKey;
 use zcash_client_backend::keys::{Era, UnifiedSpendingKey};
 use zcash_primitives::{
     consensus::MainNetwork,
@@ -97,6 +98,9 @@ fn main() {
     sapling_extended_spending_key_default_address(&seed);
     sapling_extended_spending_key_derive_internal(&seed);
     sapling_extended_spending_key_fvk(&seed);
+
+    orchard_spending_key(&key);
+    orchard_spending_key_from_zip32_seed(&seed);
 }
 
 fn sapling_extended_spending_key(seed: &[u8]) {
@@ -190,4 +194,28 @@ fn sapling_extended_spending_key_fvk(seed: &[u8]) {
         .join(", ");
 
     println!("Sapling spending key fvk bytes: {data}");
+}
+
+fn orchard_spending_key(unified_key: &UnifiedSpendingKey) {
+    let data = unified_key
+        .orchard()
+        .to_bytes()
+        .iter()
+        .map(|byte| byte.to_string())
+        .collect::<Vec<String>>()
+        .join(", ");
+
+    println!("Orchard spending key bytes: {data}");
+}
+
+fn orchard_spending_key_from_zip32_seed(seed: &[u8]) {
+    let data = SpendingKey::from_zip32_seed(seed, 234, 2345)
+        .unwrap()
+        .to_bytes()
+        .iter()
+        .map(|byte| byte.to_string())
+        .collect::<Vec<String>>()
+        .join(", ");
+
+    println!("Orchard spending key (from zip32 seed) bytes: {data}");
 }
