@@ -29,7 +29,7 @@ impl ZcashUnifiedAddress {
         transparent: Option<Arc<ZcashTransparentAddress>>,
     ) -> ZcashResult<Self> {
         let orchard = orchard.map(|o| o.0);
-        let sapling = sapling.map(|s| (*s).clone().into());
+        let sapling = sapling.map(|s| s.as_ref().into());
         let transparent = transparent.map(|t| (*t).into());
 
         UnifiedAddress::from_receivers(orchard, sapling, transparent)

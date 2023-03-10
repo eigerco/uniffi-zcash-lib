@@ -3,7 +3,11 @@ interface ZcashFullViewingKey {
   constructor(sequence<u8> bytes);
 
   [Name=from_expanded_spending_key]
-  constructor([ByRef] ZcashExpandedSpendingKey expsk);
+  constructor(ZcashExpandedSpendingKey expsk);
 
   sequence<u8> to_bytes();
+
+  ZcashViewingKey vk();
+
+  ZcashOutgoingViewingKey ovk();
 };
