@@ -1,0 +1,9 @@
+dictionary ZcashDiversifierIndexAndPaymentAddress {
+  ZcashDiversifierIndex diversifier_index;
+  ZcashPaymentAddress address;
+};
+
+dictionary ZcashDiversifierIndexAndScope {
+  ZcashDiversifierIndex diversifier_index;
+  ZcashScope scope;
+};

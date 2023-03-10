@@ -2,7 +2,11 @@ use std::sync::Arc;
 
 use zcash_primitives::zip32::DiversifiableFullViewingKey;
 
-use crate::{utils, ZcashError, ZcashOutgoingViewingKey, ZcashResult, ZcashSaplingIvk, ZcashScope};
+use crate::{
+    utils, ZcashDiversifier, ZcashDiversifierIndex, ZcashDiversifierIndexAndPaymentAddress,
+    ZcashDiversifierIndexAndScope, ZcashError, ZcashFullViewingKey, ZcashNullifierDerivingKey,
+    ZcashOutgoingViewingKey, ZcashPaymentAddress, ZcashResult, ZcashSaplingIvk, ZcashScope,
+};
 
 /// A Sapling key that provides the capability to view incoming and outgoing transactions.
 ///
@@ -37,22 +41,17 @@ impl ZcashDiversifiableFullViewingKey {
         self.0.to_bytes().into()
     }
 
-    /*
     /// Exposes the external [`FullViewingKey`] component of this diversifiable full viewing key.
-    pub fn fvk(&self) -> &FullViewingKey {
-        &self.fvk
+    pub fn fvk(&self) -> Arc<ZcashFullViewingKey> {
+        Arc::new(self.0.fvk().clone().into())
     }
 
     /// Derives a nullifier-deriving key for the provided scope.
     ///
     /// This API is provided so that nullifiers for change notes can be correctly computed.
-    pub fn to_nk(&self, scope: Scope) -> NullifierDerivingKey {
-        match scope {
-            Scope::External => self.fvk.vk.nk,
-            Scope::Internal => self.derive_internal().fvk.vk.nk,
-        }
+    pub fn to_nk(&self, scope: ZcashScope) -> Arc<ZcashNullifierDerivingKey> {
+        Arc::new(self.0.to_nk(scope.into()).into())
     }
-    */
 
     /// Derives an incoming viewing key corresponding to this full viewing key.
     pub fn to_ivk(&self, scope: ZcashScope) -> Arc<ZcashSaplingIvk> {
@@ -64,13 +63,15 @@ impl ZcashDiversifiableFullViewingKey {
         Arc::new(self.0.to_ovk(scope.into()).into())
     }
 
-    /*
     /// Attempts to produce a valid payment address for the given diversifier index.
     ///
     /// Returns `None` if the diversifier index does not produce a valid diversifier for
     /// this `DiversifiableFullViewingKey`.
-    pub fn address(&self, j: DiversifierIndex) -> Option<PaymentAddress> {
-        sapling_address(&self.fvk, &self.dk, j)
+    pub fn address(&self, j: Arc<ZcashDiversifierIndex>) -> Option<Arc<ZcashPaymentAddress>> {
+        self.0
+            .address(j.as_ref().into())
+            .map(From::from)
+            .map(Arc::new)
     }
 
     /// Finds the next valid payment address starting from the given diversifier index.
@@ -81,22 +82,31 @@ impl ZcashDiversifiableFullViewingKey {
     /// Returns the index at which the valid diversifier was found along with the payment
     /// address constructed using that diversifier, or `None` if the maximum index was
     /// reached and no valid diversifier was found.
-    pub fn find_address(&self, j: DiversifierIndex) -> Option<(DiversifierIndex, PaymentAddress)> {
-        sapling_find_address(&self.fvk, &self.dk, j)
+    pub fn find_address(
+        &self,
+        j: Arc<ZcashDiversifierIndex>,
+    ) -> Option<ZcashDiversifierIndexAndPaymentAddress> {
+        self.0.find_address(j.as_ref().into()).map(From::from)
     }
 
     /// Returns the payment address corresponding to the smallest valid diversifier index,
     /// along with that index.
-    pub fn default_address(&self) -> (DiversifierIndex, PaymentAddress) {
-        sapling_default_address(&self.fvk, &self.dk)
+    pub fn default_address(&self) -> ZcashDiversifierIndexAndPaymentAddress {
+        self.0.default_address().into()
     }
 
     /// Returns the payment address corresponding to the specified diversifier, if any.
     ///
     /// In general, it is preferable to use `find_address` instead, but this method is
     /// useful in some cases for matching keys to existing payment addresses.
-    pub fn diversified_address(&self, diversifier: Diversifier) -> Option<PaymentAddress> {
-        self.fvk.vk.to_payment_address(diversifier)
+    pub fn diversified_address(
+        &self,
+        diversifier: Arc<ZcashDiversifier>,
+    ) -> Option<Arc<ZcashPaymentAddress>> {
+        self.0
+            .diversified_address(diversifier.as_ref().into())
+            .map(From::from)
+            .map(Arc::new)
     }
 
     /// Returns the internal address corresponding to the smallest valid diversifier index,
@@ -104,20 +114,22 @@ impl ZcashDiversifiableFullViewingKey {
     ///
     /// This address **MUST NOT** be encoded and exposed to end users. User interfaces
     /// should instead mark these notes as "change notes" or "internal wallet operations".
-    pub fn change_address(&self) -> (DiversifierIndex, PaymentAddress) {
-        let internal_dfvk = self.derive_internal();
-        sapling_default_address(&internal_dfvk.fvk, &internal_dfvk.dk)
+    pub fn change_address(&self) -> ZcashDiversifierIndexAndPaymentAddress {
+        self.0.change_address().into()
     }
 
     /// Returns the change address corresponding to the specified diversifier, if any.
     ///
     /// In general, it is preferable to use `change_address` instead, but this method is
     /// useful in some cases for matching keys to existing payment addresses.
-    pub fn diversified_change_address(&self, diversifier: Diversifier) -> Option<PaymentAddress> {
-        self.derive_internal()
-            .fvk
-            .vk
-            .to_payment_address(diversifier)
+    pub fn diversified_change_address(
+        &self,
+        diversifier: Arc<ZcashDiversifier>,
+    ) -> Option<Arc<ZcashPaymentAddress>> {
+        self.0
+            .diversified_change_address(diversifier.as_ref().into())
+            .map(From::from)
+            .map(Arc::new)
     }
 
     /// Attempts to decrypt the given address's diversifier with this full viewing key.
@@ -129,20 +141,12 @@ impl ZcashDiversifiableFullViewingKey {
     ///
     /// Returns the decrypted diversifier index and its scope, or `None` if the address
     /// was not generated from this key.
-    pub fn decrypt_diversifier(&self, addr: &PaymentAddress) -> Option<(DiversifierIndex, Scope)> {
-        let j_external = self.dk.diversifier_index(addr.diversifier());
-        if self.address(j_external).as_ref() == Some(addr) {
-            return Some((j_external, Scope::External));
-        }
-
-        let j_internal = self
-            .derive_internal()
-            .dk
-            .diversifier_index(addr.diversifier());
-        if self.address(j_internal).as_ref() == Some(addr) {
-            return Some((j_internal, Scope::Internal));
-        }
-
-        None
-    } */
+    pub fn decrypt_diversifier(
+        &self,
+        addr: Arc<ZcashPaymentAddress>,
+    ) -> Option<ZcashDiversifierIndexAndScope> {
+        self.0
+            .decrypt_diversifier(&addr.as_ref().into())
+            .map(From::from)
+    }
 }

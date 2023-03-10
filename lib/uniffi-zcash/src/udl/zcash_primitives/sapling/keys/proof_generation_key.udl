@@ -1,0 +1,3 @@
+interface ZcashProofGenerationKey {
+  ZcashViewingKey to_viewing_key();
+};
