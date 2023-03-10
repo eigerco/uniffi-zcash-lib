@@ -1,13 +1,10 @@
 use std::sync::Arc;
 
-use zcash_primitives::{
-    sapling::PaymentAddress,
-    zip32::{ChildIndex, DiversifierIndex, ExtendedSpendingKey},
-};
+use zcash_primitives::zip32::{ChildIndex, ExtendedSpendingKey};
 
 use crate::{
-    ZcashChildIndex, ZcashDiversifiableFullViewingKey, ZcashDiversifierIndex, ZcashError,
-    ZcashPaymentAddress, ZcashDiversifierIndexAndPaymentAddress,
+    ZcashChildIndex, ZcashDiversifiableFullViewingKey, ZcashDiversifierIndexAndPaymentAddress,
+    ZcashError,
 };
 
 pub struct ZcashExtendedSpendingKey(ExtendedSpendingKey);

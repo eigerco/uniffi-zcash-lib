@@ -16,13 +16,13 @@ interface ZcashDiversifiableFullViewingKey {
 
   ZcashDiversifierIndexAndPaymentAddress? find_address(ZcashDiversifierIndex j);
 
-  ZcashDiversifierIndexAndPaymentAddress? default_address();
+  ZcashDiversifierIndexAndPaymentAddress default_address();
 
   ZcashPaymentAddress? diversified_address(ZcashDiversifier diversifier);
 
-  ZcashDiversifierIndexAndPaymentAddress? change_address();
+  ZcashDiversifierIndexAndPaymentAddress change_address();
 
   ZcashPaymentAddress? diversified_change_address(ZcashDiversifier diversifier);
 
-  ZcashDiversifierIndexAndScope? decrypt_diversifier([ByRef] ZcashPaymentAddress addr);
+  ZcashDiversifierIndexAndScope? decrypt_diversifier(ZcashPaymentAddress addr);
 };

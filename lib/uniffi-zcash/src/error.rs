@@ -11,13 +11,19 @@ pub enum ZcashError {
         error: zcash_client_backend::keys::DerivationError,
     },
 
+    #[error("could not decode the `ask` bytes to a jubjub field element")]
+    InvalidAsk,
+
+    #[error("could not decode the `nsk` bytes to a jubjub field element")]
+    InvalidNsk,
+
     #[error("error occurred: {error}")]
     Message { error: String },
 
     #[error("expected {expected} elements, got {got}")]
     ArrayLengthMismatch { expected: u64, got: u64 },
 
-    #[error("Value {val} out of range, should be within {from}..{to}")]
+    #[error("value {val} out of range, should be within {from}..{to}")]
     ValueOutOfRange { val: i64, from: i64, to: i64 },
 
     #[error("Secp256k1 error occurred: {error:?}")]
@@ -42,6 +48,21 @@ impl From<zcash_client_backend::keys::DerivationError> for ZcashError {
 impl From<zip32::Error> for ZcashError {
     fn from(error: zip32::Error) -> Self {
         error.to_string().into()
+    }
+}
+
+impl From<zcash_primitives::sapling::keys::DecodingError> for ZcashError {
+    fn from(error: zcash_primitives::sapling::keys::DecodingError) -> Self {
+        match error {
+            zcash_primitives::sapling::keys::DecodingError::LengthInvalid { expected, actual } => {
+                ZcashError::ArrayLengthMismatch {
+                    expected: expected as u64,
+                    got: actual as u64,
+                }
+            }
+            zcash_primitives::sapling::keys::DecodingError::InvalidAsk => ZcashError::InvalidAsk,
+            zcash_primitives::sapling::keys::DecodingError::InvalidNsk => ZcashError::InvalidNsk,
+        }
     }
 }
 

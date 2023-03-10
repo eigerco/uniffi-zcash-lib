@@ -4,6 +4,10 @@ enum ZcashError {
   "HDWalletError",
   /* zcash_client_backend::keys::DerivationError */
   "DerivationError",
+  /* zcash_primitives::sapling::keys::DecodingError::InvalidAsk */
+  "InvalidAsk",
+  /* zcash_primitives::sapling::keys::DecodingError::InvalidNsk */
+  "InvalidNsk",
   "Message",
   "ArrayLengthMismatch",
   "ValueOutOfRange",
