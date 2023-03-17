@@ -2,10 +2,19 @@
 
 This is the Repository for the codebase concerning the [Zcash RFP](https://forum.zcashcommunity.com/t/rfp-zcash-uniffi-library/41335) published some time ago on the Forum. [Eiger](https://www.eiger.co/) won the grant to realize the RFP with [this proposal](https://forum.zcashcommunity.com/t/zcash-uniffi-library-rfp/43468).
 
+⚠️ Production use is discouraged, as this project is still under heavy development.
+
+## Status
+
+* We are currently using [Github milestones](https://github.com/eigerco/uniffi-zcash-lib/milestones).
+
+* An updated feature matrix with the API surface status can be found [here](./STATUS.md).
+
 ## Contributors
 
  - [@eloylp](https://github.com/eloylp)
  - [@hauleth](https://github.com/hauleth)
+ - [@MeerKatDev](https://github.com/MeerKatDev)
  - [@zduny](https://github.com/zduny)
 
 ## License
@@ -15,7 +24,7 @@ All code in this workspace is licensed under [MIT license](http://opensource.org
 ## Conventions
  - We shall use Github Actions for the CI/CD, as long as it's maintainable and practical.
  - For local development there will be the option to use a Docker image provided by us. We should also maintain a section to help getting started for local tooling.
- - In order to double check compatibilty, we shall use Test Vectors generated _indirectly_ by the librustzcash, whose data will be used to test the libraries for the foreign languages. This should ensure full compatibility.
+ - In order to double check compatibility, we shall use Test Vectors generated _indirectly_ by the librustzcash, whose data will be used to test the libraries for the foreign languages. This should ensure full compatibility.
 
 ## Generating documentation
 
