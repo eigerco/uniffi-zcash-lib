@@ -6,6 +6,7 @@ This is the Repository for the codebase concerning the [Zcash RFP](https://forum
 
  - [@eloylp](https://github.com/eloylp)
  - [@hauleth](https://github.com/hauleth)
+ - [@MeerKatDev](https://github.com/MeerKatDev)
  - [@zduny](https://github.com/zduny)
 
 ## License
