@@ -16,7 +16,7 @@ All code in this workspace is licensed under [MIT license](http://opensource.org
 ## Conventions
  - We shall use Github Actions for the CI/CD, as long as it's maintainable and practical.
  - For local development there will be the option to use a Docker image provided by us. We should also maintain a section to help getting started for local tooling.
- - In order to double check compatibilty, we shall use Test Vectors generated _indirectly_ by the librustzcash, whose data will be used to test the libraries for the foreign languages. This should ensure full compatibility.
+ - In order to double check compatibility, we shall use Test Vectors generated _indirectly_ by the librustzcash, whose data will be used to test the libraries for the foreign languages. This should ensure full compatibility.
 
 ## Generating documentation
 
