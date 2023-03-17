@@ -4,6 +4,12 @@ This is the Repository for the codebase concerning the [Zcash RFP](https://forum
 
 ⚠️ Production use its discouraged, as this project its still under heavy development.
 
+## Status
+
+* We are currently using [Github milestones](https://github.com/eigerco/uniffi-zcash-lib/milestones).
+
+* An updated feature matrix with the API surface status can be found [here](./STATUS.md).
+
 ## Contributors
 
  - [@eloylp](https://github.com/eloylp)
