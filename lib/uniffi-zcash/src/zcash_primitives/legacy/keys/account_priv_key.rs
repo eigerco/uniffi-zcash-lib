@@ -3,8 +3,8 @@ use std::sync::Arc;
 use zcash_primitives::legacy::keys::AccountPrivKey;
 
 use crate::{
-    ZcashAccountId, ZcashAccountPubKey, ZcashConsensusParameters, ZcashError, ZcashExtendedPrivKey,
-    ZcashResult,
+    SecpSecretKey, ZcashAccountId, ZcashAccountPubKey, ZcashConsensusParameters, ZcashError,
+    ZcashExtendedPrivKey, ZcashResult,
 };
 
 /// A type representing a BIP-44 private key at the account path level
@@ -42,25 +42,25 @@ impl ZcashAccountPrivKey {
         Arc::new(self.0.to_account_pubkey().into())
     }
 
-    /*
     /// Derives the BIP-44 private spending key for the external (incoming payment) child path
     /// `m/44'/<coin_type>'/<account>'/0/<child_index>`.
-    pub fn derive_external_secret_key(
-        &self,
-        child_index: u32,
-    ) -> Result<secp256k1::SecretKey, hdwallet::error::Error> {
-        todo!()
+    pub fn derive_external_secret_key(&self, child_index: u32) -> ZcashResult<Arc<SecpSecretKey>> {
+        let secret = self
+            .0
+            .derive_external_secret_key(child_index)
+            .map_err(ZcashError::from)?;
+        Ok(Arc::new(secret.into()))
     }
 
     /// Derives the BIP-44 private spending key for the internal (change) child path
     /// `m/44'/<coin_type>'/<account>'/1/<child_index>`.
-    pub fn derive_internal_secret_key(
-        &self,
-        child_index: u32,
-    ) -> Result<secp256k1::SecretKey, hdwallet::error::Error> {
-        todo!()
+    pub fn derive_internal_secret_key(&self, child_index: u32) -> ZcashResult<Arc<SecpSecretKey>> {
+        let secret = self
+            .0
+            .derive_internal_secret_key(child_index)
+            .map_err(ZcashError::from)?;
+        Ok(Arc::new(secret.into()))
     }
-    */
 
     /// Returns the `AccountPrivKey` serialized using the encoding for a
     /// [BIP 32](https://en.bitcoin.it/wiki/BIP_0032) ExtendedPrivKey

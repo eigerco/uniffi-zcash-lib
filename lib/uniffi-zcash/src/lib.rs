@@ -7,6 +7,9 @@ pub use self::payment::*;
 mod hdwallet;
 pub use self::hdwallet::*;
 
+mod secp256k1;
+pub use self::secp256k1::*;
+
 mod orchard;
 pub use self::orchard::*;
 
