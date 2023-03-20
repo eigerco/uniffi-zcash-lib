@@ -1,0 +1,12 @@
+interface ZcashOrchardDiversifierIndex {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor(sequence<u8> b);
+
+  [Name=from_u32]
+  constructor(u32 i);
+
+  [Name=from_u64]
+  constructor(u64 i);
+
+  sequence<u8> to_bytes();
+};

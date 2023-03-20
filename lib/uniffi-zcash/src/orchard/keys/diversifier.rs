@@ -13,6 +13,12 @@ impl ZcashOrchardDiversifier {
     }
 }
 
+impl From<&ZcashOrchardDiversifier> for Diversifier {
+    fn from(diversifier: &ZcashOrchardDiversifier) -> Self {
+        diversifier.0
+    }
+}
+
 impl From<Diversifier> for ZcashOrchardDiversifier {
     fn from(diversifier: Diversifier) -> Self {
         Self(diversifier)

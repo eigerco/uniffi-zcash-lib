@@ -1,4 +1,16 @@
 interface ZcashOrchardFullViewingKey {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor(sequence<u8> bytes);
+
+  ZcashOrchardAddress address_at(ZcashOrchardDiversifierIndex j, ZcashOrchardScope scope);
+
+  ZcashOrchardAddress address(ZcashOrchardDiversifier d, ZcashOrchardScope scope);
+
+  ZcashOrchardScope? scope_for_address(ZcashOrchardAddress address);
+
+  sequence<u8> to_bytes();
+
   ZcashOrchardIncomingViewingKey to_ivk(ZcashOrchardScope scope);
+
   ZcashOrchardOutgoingViewingKey to_ovk(ZcashOrchardScope scope);
 };
