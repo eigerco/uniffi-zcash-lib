@@ -1,3 +1,8 @@
 interface ZcashOrchardAddress {
+  [Name=from_raw_address_bytes, Throws=ZcashError]
+  constructor(sequence<u8> bytes);
+
+  ZcashOrchardDiversifier diversifier();
+
   sequence<u8> to_raw_address_bytes();
 };
