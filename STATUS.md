@@ -8,6 +8,7 @@ We currently have implemented and tested the following object graph:
 ```mermaid
 graph LR;
 style TransparentAccountPrivKey fill:#6FBD11
+style TransparentAccountPubKey fill:#6FBD11
 style UnifiedSK fill:#6FBD11
 style UnifiedFVK fill:#6FBD11
 style SaplingDiversifiableFVK fill:#6FBD11
@@ -67,15 +68,15 @@ This is a feature matrix which keeps track of the current state of implementatio
 
 * Original type: [zcash_primitives::legacy::keys::AccountPrivKey](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/legacy/keys/struct.AccountPrivKey.html)
 
-| Object/Method name                                           |    Score     |        UDL         |        Code        |       Tests        | Docs |
-| ------------------------------------------------------------ | :----------: | :----------------: | :----------------: | :----------------: | :--: |
-| ZcashAccountPrivKey::from_seed()                             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |      |
-| ZcashAccountPrivKey::from_extended_privkey([ZcashExtendedPrivKey](###ZcashExtendedPrivKey)) | :red_circle: | :white_check_mark: | :white_check_mark: |                    |      |
-| ZcashAccountPrivKey::to_account_pubkey()                     | :red_circle: | :white_check_mark: | :white_check_mark: |                    |      |
-| ZcashAccountPrivKey::derive_external_secret_key() -> [SecpSecretKey](###SecpSecretKey) | :red_circle: | :white_check_mark: | :white_check_mark: |                    |      |
-| ZcashAccountPrivKey::derive_internal_secret_key() -> [SecpSecretKey](###SecpSecretKey) | :red_circle: | :white_check_mark: | :white_check_mark: |                    |      |
-| ZcashAccountPrivKey::to_bytes()                              | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |      |
-| ZcashAccountPrivKey::from_bytes()                            | :red_circle: | :white_check_mark: | :white_check_mark: |                    |      |
+| Object/Method name                                                                          |    Score     |        UDL         |        Code        |       Tests        | Docs  |
+| ------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :---: |
+| ZcashAccountPrivKey::from_seed()                                                            | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
+| ZcashAccountPrivKey::from_extended_privkey([ZcashExtendedPrivKey](###ZcashExtendedPrivKey)) | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
+| ZcashAccountPrivKey::to_account_pubkey()                                                    | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
+| ZcashAccountPrivKey::derive_external_secret_key() -> [SecpSecretKey](###SecpSecretKey)      | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
+| ZcashAccountPrivKey::derive_internal_secret_key() -> [SecpSecretKey](###SecpSecretKey)      | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
+| ZcashAccountPrivKey::to_bytes()                                                             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
+| ZcashAccountPrivKey::from_bytes()                                                           | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
 
 ### SecpSecretKey
 
@@ -83,26 +84,26 @@ This is a feature matrix which keeps track of the current state of implementatio
 
 :warning: This type does not belong to the zcash API, but its returned from some methods. We are just providing support for serialization, so the user can deserialize the secret by making use of another `secp256k1` library in their specific language.
 
-| Object/Method name                 |        Score        |        UDL         |        Code        | Tests | Docs |
-| ---------------------------------- | :-----------------: | :----------------: | :----------------: | :---: | :--: |
-| SecpSecretKey::new()               |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::display_secret()    |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::non_secure_erase()  |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::from_slice()        | :red_circle: |          :white_check_mark:          |              :white_check_mark:      |       |   :white_check_mark:   |
-| SecpSecretKey::serialize_secret()  |    :red_circle:     | :white_check_mark: | :white_check_mark: |       |  :white_check_mark:    |
-| SecpSecretKey::from_keypair()      |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::from_hashed_data()  |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::secret_bytes()      |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::negate()            |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::add_tweak()         |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::mul_tweak()         |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::negate_assign()     |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::add_assign()        |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::mul_assign()        |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::sign_ecdsa()        |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::keypair()           |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::public_key()        |   :white_circle:    |                    |                    |       |      |
-| SecpSecretKey::x_only_public_key() |   :white_circle:    |                    |                    |       |      |
+| Object/Method name                 |     Score      |        UDL         |        Code        | Tests |        Docs        |
+| ---------------------------------- | :------------: | :----------------: | :----------------: | :---: | :----------------: |
+| SecpSecretKey::new()               | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::display_secret()    | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::non_secure_erase()  | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::from_slice()        |  :red_circle:  | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| SecpSecretKey::serialize_secret()  |  :red_circle:  | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| SecpSecretKey::from_keypair()      | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::from_hashed_data()  | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::secret_bytes()      | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::negate()            | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::add_tweak()         | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::mul_tweak()         | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::negate_assign()     | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::add_assign()        | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::mul_assign()        | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::sign_ecdsa()        | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::keypair()           | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::public_key()        | :white_circle: |                    |                    |       |                    |
+| SecpSecretKey::x_only_public_key() | :white_circle: |                    |                    |       |                    |
 
 ### ZcashExtendedPrivKey
 
@@ -119,17 +120,15 @@ This is a feature matrix which keeps track of the current state of implementatio
 
 * Original type: [zcash_primitives::legacy::keys::AccountPubKey](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/legacy/keys/struct.AccountPubKey.html)
 
-Currently this entity is only present in the `UDL` and the `Code` , but without any method implementation.
-
-| Object/Method name                        | Score |  UDL  | Code  | Tests | Docs  |
-| ----------------------------------------- | :---: | :---: | :---: | :---: | :---: |
-| ZcashAccountPubKey::derive_external_ivk() |       |       |       |       |       |
-| ZcashAccountPubKey::derive_internal_ivk() |       |       |       |       |       |
-| ZcashAccountPubKey::ovks_for_shielding()  |       |       |       |       |       |
-| ZcashAccountPubKey::internal_ovk()        |       |       |       |       |       |
-| ZcashAccountPubKey::external_ovk()        |       |       |       |       |       |
-| ZcashAccountPubKey::serialize()           |       |       |       |       |       |
-| ZcashAccountPubKey::deserialize()         |       |       |       |       |       |
+| Object/Method name                                                  | Score |        UDL         |        Code        | Tests |        Docs        |
+| ------------------------------------------------------------------- | :---: | :----------------: | :----------------: | :---: | :----------------: |
+| ZcashAccountPubKey::derive_external_ivk()                           |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::derive_internal_ivk()                           |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::ovks_for_shielding()                            |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::internal_ovk()                                  |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::external_ovk()                                  |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::serialize()                                     |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::deserialize() (renamed to new() as constructor) |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
 
 ### ZcashUnifiedSpendingKey
 

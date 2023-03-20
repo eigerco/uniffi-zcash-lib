@@ -1,0 +1,7 @@
+interface ZcashExternalOvk {
+    sequence<u8> as_bytes();
+};
+
+interface ZcashInternalOvk {
+    sequence<u8> as_bytes();
+};

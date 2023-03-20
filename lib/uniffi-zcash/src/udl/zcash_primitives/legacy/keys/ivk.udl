@@ -1,0 +1,3 @@
+interface ZcashExternalIvk {};
+
+interface ZcashInternalIvk {};
