@@ -20,6 +20,9 @@ pub enum ZcashError {
     #[error("Value {val} out of range, should be within {from}..{to}")]
     ValueOutOfRange { val: i64, from: i64, to: i64 },
 
+    #[error("Secp256k1 error occurred: {error:?}")]
+    Secp256k1Error { error: secp256k1::Error },
+
     #[error("unknown error occurred")]
     Unknown,
 }
@@ -45,5 +48,11 @@ impl From<zip32::Error> for ZcashError {
 impl From<String> for ZcashError {
     fn from(error: String) -> Self {
         ZcashError::Message { error }
+    }
+}
+
+impl From<secp256k1::Error> for ZcashError {
+    fn from(error: secp256k1::Error) -> Self {
+        ZcashError::Secp256k1Error { error }
     }
 }

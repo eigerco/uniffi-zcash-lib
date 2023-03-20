@@ -9,8 +9,13 @@ interface ZcashAccountPrivKey {
   constructor(ZcashExtendedPrivKey key);
 
   ZcashAccountPubKey to_account_pubkey();
+  
+  [Throws=ZcashError]
+  SecpSecretKey derive_external_secret_key(u32 child_index);
+  
+  [Throws=ZcashError]
+  SecpSecretKey derive_internal_secret_key(u32 child_index);
 
   sequence<u8> to_bytes();
-
-  // todo
+  
 };

@@ -7,5 +7,6 @@ enum ZcashError {
   "Message",
   "ArrayLengthMismatch",
   "ValueOutOfRange",
+  "Secp256k1Error",
   "Unknown",
 };
