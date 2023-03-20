@@ -230,6 +230,8 @@ This is partially defined in `UDL` and `code`.
 
 ### ZcashOrchardFullViewingKey
 
+* Working on this :hammer: - [zduny](https://github.com/zduny)
+
 * Original type: [orchard::keys::FullViewingKey](https://docs.rs/orchard/0.3.0/orchard/keys/struct.FullViewingKey.html)
 
 | Object/Method name                                                                                          | Score        | UDL                | Code               | Tests              | Docs               |
@@ -246,6 +248,8 @@ This is partially defined in `UDL` and `code`.
 | ZcashOrchardFullViewingKey::to_ovk() -> [ZcashOrchardOutgoingViewingKey](###ZcashOrchardOutgoingViewingKey) | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashOrchardIncomingViewingKey
+
+* Working on this :hammer: - [zduny](https://github.com/zduny)
 
 * Original type: [orchard::keys::IncomingViewingKey](https://docs.rs/orchard/0.3.0/orchard/keys/struct.IncomingViewingKey.html)
 
@@ -266,6 +270,8 @@ This is partially defined in `UDL` and `code`.
 | ------------------ | ----- | --- | ---- | ----- | ---- |
 
 ### ZcashOrchardAddress
+
+* Working on this :hammer: - [zduny](https://github.com/zduny)
 
 * Original type: [orchard::Address](https://docs.rs/orchard/0.3.0/orchard/struct.Address.html)
 
