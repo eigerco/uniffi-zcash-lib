@@ -1,3 +1,25 @@
 interface ZcashAccountPubKey {
-  // todo
+
+  [Throws=ZcashError]
+  constructor(sequence<u8> data);
+  
+  [Throws=ZcashError]
+  ZcashExternalIvk derive_external_ivk();
+
+  [Throws=ZcashError]
+  ZcashInternalIvk derive_internal_ivk();
+
+  ZcashInternalOvkExternalOvk ovks_for_shielding();
+
+  ZcashInternalOvk internal_ovk();
+
+  ZcashExternalOvk external_ovk();
+
+  sequence<u8> serialize();
+
+};
+
+dictionary ZcashInternalOvkExternalOvk {
+    ZcashInternalOvk internal_ovk;
+    ZcashExternalOvk external_ovk;
 };
