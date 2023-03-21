@@ -7,5 +7,3 @@ impl From<NullifierDerivingKey> for ZcashNullifierDerivingKey {
         ZcashNullifierDerivingKey(key)
     }
 }
-
-// todo
