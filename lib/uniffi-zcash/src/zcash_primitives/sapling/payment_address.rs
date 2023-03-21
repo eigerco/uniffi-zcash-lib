@@ -18,8 +18,8 @@ impl From<PaymentAddress> for ZcashPaymentAddress {
     }
 }
 
-impl From<ZcashPaymentAddress> for PaymentAddress {
-    fn from(value: ZcashPaymentAddress) -> Self {
+impl From<&ZcashPaymentAddress> for PaymentAddress {
+    fn from(value: &ZcashPaymentAddress) -> Self {
         value.0
     }
 }

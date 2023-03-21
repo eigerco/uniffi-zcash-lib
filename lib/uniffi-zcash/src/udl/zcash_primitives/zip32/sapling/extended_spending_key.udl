@@ -12,16 +12,10 @@ interface ZcashExtendedSpendingKey {
 
   ZcashExtendedSpendingKey derive_child(ZcashChildIndex index);
 
-  ZcashDefaultAddressResult default_address();
+  ZcashDiversifierIndexAndPaymentAddress default_address();
 
   ZcashExtendedSpendingKey derive_internal();
 
   ZcashDiversifiableFullViewingKey to_diversifiable_full_viewing_key();
 
-};
-
-/* We cannot return tuples, so this pseudo type is used*/
-dictionary ZcashDefaultAddressResult {
-  ZcashDiversifierIndex diversifier_index;
-  ZcashPaymentAddress address;
 };

@@ -31,7 +31,7 @@ impl From<ZcashRecipientAddress> for RecipientAddress {
     fn from(addr: ZcashRecipientAddress) -> Self {
         match addr {
             ZcashRecipientAddress::Shielded(addr) => {
-                RecipientAddress::Shielded((*addr).clone().into())
+                RecipientAddress::Shielded(addr.as_ref().into())
             }
             ZcashRecipientAddress::Transparent(addr) => {
                 RecipientAddress::Transparent((*addr).into())

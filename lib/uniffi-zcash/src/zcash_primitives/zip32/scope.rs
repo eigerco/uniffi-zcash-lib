@@ -19,6 +19,15 @@ pub enum ZcashScope {
     Internal,
 }
 
+impl From<Scope> for ZcashScope {
+    fn from(scope: Scope) -> Self {
+        match scope {
+            Scope::External => ZcashScope::External,
+            Scope::Internal => ZcashScope::Internal,
+        }
+    }
+}
+
 impl From<ZcashScope> for Scope {
     fn from(value: ZcashScope) -> Self {
         match value {

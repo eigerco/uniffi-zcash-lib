@@ -59,9 +59,9 @@ This is a feature matrix which keeps track of the current state of implementatio
 * `Test`: Theres test coverage for this element. Directly or indirectly.
 * `Docs`: If there is function level documentation in the `FFI` code, which later will be automatically generated bindings for all languages ([we are working on it](https://github.com/eigerco/uniffi-rs/issues)). See format to be followed [here](https://github.com/eigerco/uniffi-rs/issues/5#issuecomment-1436618667).
 
-**Notes** : 
+**Notes** :
 
-* This should be kept up to date with new developments/findings. 
+* This should be kept up to date with new developments/findings.
 * Its still in progress the creation of new types for `Orchard` below in this index.
 
 ### ZcashAccountPrivKey
@@ -71,10 +71,10 @@ This is a feature matrix which keeps track of the current state of implementatio
 | Object/Method name                                                                          |    Score     |        UDL         |        Code        |       Tests        | Docs  |
 | ------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :---: |
 | ZcashAccountPrivKey::from_seed()                                                            | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashAccountPrivKey::from_extended_privkey([ZcashExtendedPrivKey](###ZcashExtendedPrivKey)) | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
+| ZcashAccountPrivKey::from_extended_privkey([ZcashExtendedPrivKey](#zcashextendedprivkey))   | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
 | ZcashAccountPrivKey::to_account_pubkey()                                                    | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashAccountPrivKey::derive_external_secret_key() -> [SecpSecretKey](###SecpSecretKey)      | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashAccountPrivKey::derive_internal_secret_key() -> [SecpSecretKey](###SecpSecretKey)      | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
+| ZcashAccountPrivKey::derive_external_secret_key() -> [SecpSecretKey](#secpsecretkey)        | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
+| ZcashAccountPrivKey::derive_internal_secret_key() -> [SecpSecretKey](#secpsecretkey)        | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
 | ZcashAccountPrivKey::to_bytes()                                                             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
 | ZcashAccountPrivKey::from_bytes()                                                           | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
 
@@ -137,7 +137,7 @@ This is a feature matrix which keeps track of the current state of implementatio
 | Object/Method name                                                                                                    |    Score     |        UDL         |        Code        |       Tests        | Docs  |
 | --------------------------------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :---: |
 | ZcashUnifiedSpendingKey::from_seed()                                                                                  | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashUnifiedSpendingKey::to_unified_full_viewing_key() -> [ZcashUnifiedFullViewingKey](###ZcashUnifiedFullViewingKey) | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
+| ZcashUnifiedSpendingKey::to_unified_full_viewing_key() -> [ZcashUnifiedFullViewingKey](#zcashunifiedfullviewingkey)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
 | ZcashUnifiedSpendingKey::transparent()                                                                                | :red_circle: |                    |                    |                    |       |
 | ZcashUnifiedSpendingKey::sapling()                                                                                    | :red_circle: |                    |                    |                    |       |
 | ZcashUnifiedSpendingKey::orchard()                                                                                    | :red_circle: |                    |                    |                    |       |
@@ -154,8 +154,8 @@ This is a feature matrix which keeps track of the current state of implementatio
 | ZcashUnifiedFullViewingKey::decode()                                                                                       | :red_circle: | :white_check_mark: | :white_check_mark: |                    |                    |
 | ZcashUnifiedFullViewingKey::encode()                                                                                       | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |
 | ZcashUnifiedFullViewingKey::transparent()                                                                                  | :red_circle: |                    |                    |                    |                    |
-| ZcashUnifiedFullViewingKey::sapling() -> [ZcashDiversifiableFullViewingKey](###ZcashDiversifiableFullViewingKey (Sapling)) | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |
-| ZcashUnifiedFullViewingKey::orchard()  -> [ZcashOrchardFullViewingKey](###ZcashOrchardFullViewingKey)                      | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashUnifiedFullViewingKey::sapling() -> [ZcashDiversifiableFullViewingKey](#zcashdiversifiablefullviewingkey-sapling)     | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |
+| ZcashUnifiedFullViewingKey::orchard() -> [ZcashOrchardFullViewingKey](#zcashorchardfullviewingkey)                         | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashUnifiedFullViewingKey::address()                                                                                      |              |                    |                    |                    |                    |
 | ZcashUnifiedFullViewingKey::find_address()                                                                                 |              |                    |                    |                    |                    |
 | ZcashUnifiedFullViewingKey::default_address()                                                                              |              |                    |                    |                    |                    |
@@ -164,21 +164,21 @@ This is a feature matrix which keeps track of the current state of implementatio
 
 * Original type: [zcash_client_backend::keys::sapling::DiversifiableFullViewingKey]()
 
-| Object/Method name                                                                            |    Score     |        UDL         |        Code        |       Tests        | Docs  |
-| --------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :---: |
-| ZcashDiversifiableFullViewingKey::from_bytes()                                                | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashDiversifiableFullViewingKey::to_bytes()                                                  | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashDiversifiableFullViewingKey::fvk()                                                       | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashDiversifiableFullViewingKey::to_nk()                                                     | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashDiversifiableFullViewingKey::to_ivk() -> [ZcashSaplingIvk](###ZcashSaplingIvk (Sapling)) | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashDiversifiableFullViewingKey::to_ovk()                                                    | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashDiversifiableFullViewingKey::address()                                                   | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashDiversifiableFullViewingKey::find_address()                                              | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashDiversifiableFullViewingKey::default_address()                                           | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashDiversifiableFullViewingKey::diversified_address()                                       | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashDiversifiableFullViewingKey::change_address()                                            | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashDiversifiableFullViewingKey::diversified_change_address()                                | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashDiversifiableFullViewingKey::decrypt_diversifier()                                       | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
+| Object/Method name                                                                                                                         |    Score     |        UDL         |        Code        |       Tests        |         Docs       |
+| ------------------------------------------------------------------------------------------------------------------------------------------ | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashDiversifiableFullViewingKey::from_bytes()                                                                                             | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::to_bytes()                                                                                               | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::fvk() -> [ZcashFullViewingKey](#zcashfullviewingkey-sapling)                                             | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::to_nk() -> [ZcashNullifierDerivingKey](#zcashnullifierderivingkey-sapling)                               | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::to_ivk() -> [ZcashSaplingIvk](#zcashsaplingivk-sapling)                                                  | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::to_ovk() -> [ZcashOutgoingViewingKey](#zcashoutgoingviewingkey-sapling)                                  | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::address() -> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)                                         | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::find_address() -> [ZcashDiversifierIndexAndPaymentAddress](#zcashdiversifierindexandpaymentaddress)      | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::default_address() -> [ZcashDiversifierIndexAndPaymentAddress](#zcashdiversifierindexandpaymentaddress)   | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::diversified_address() -> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)                                     | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::change_address() -> [ZcashDiversifierIndexAndPaymentAddress](#zcashdiversifierindexandpaymentaddress)    | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::diversified_change_address() -> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)                              | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifiableFullViewingKey::decrypt_diversifier() -> [ZcashDiversifierIndexAndScope](#zcashdiversifierindexandscope)                 | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashExtendedSpendingKey (Sapling)
 
@@ -204,7 +204,7 @@ This is a feature matrix which keeps track of the current state of implementatio
 
 | Object/Method name                                                                                                       |    Score     |        UDL         |        Code        |       Tests        | Docs  |
 | ------------------------------------------------------------------------------------------------------------------------ | :----------: | :----------------: | :----------------: | :----------------: | :---: |
-| ::to_payment_address([ZcashDiversifier](###ZcashDiversifier)) -> [ZcashPaymentAddress](###ZcashPaymentAddress (Sapling)) | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
+| ::to_payment_address([ZcashDiversifier](###ZcashDiversifier)) -> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)     | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
 | ZcashSaplingIvk::to_repr()                                                                                               |              | :white_check_mark: | :white_check_mark: |                    |       |
 
 ### ZcashDiversifier (Sapling)
@@ -215,6 +215,53 @@ This is a feature matrix which keeps track of the current state of implementatio
 | ----------------------- | :----------: | :----------------: | :----------------: | :----------------: | :---: |
 | ::new()                 | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
 | ZcashDiversifier::g_d() |              |                    |                    |                    |       |
+
+### ZcashExpandedSpendingKey (Sapling)
+
+* Original type: [zcash_primitives::sapling::keys::ExpandedSpendingKey](https://docs.rs/zcash_primitives/latest/zcash_primitives/sapling/keys/struct.ExpandedSpendingKey.html)
+
+| Object/Method name                                                                                                  |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| ------------------------------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashExpandedSpendingKey::from_spending_key()                                                                       | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashExpandedSpendingKey::from_bytes()                                                                              | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashExpandedSpendingKey::proof_generation_key() -> [ZcashProofGenerationKey](#zcashproofgenerationkey-sapling)     | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashExpandedSpendingKey::to_bytes()                                                                                | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+
+### ZcashFullViewingKey (Sapling)
+
+* Original type: [zcash_primitives::sapling::keys::FullViewingKey](https://docs.rs/zcash_primitives/latest/zcash_primitives/sapling/keys/struct.FullViewingKey.html)
+
+| Object/Method name                                                                            |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| --------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashFullViewingKey::from_bytes()                                                             | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashFullViewingKey::from_expanded_spending_key()                                             | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashFullViewingKey::to_bytes()                                                               | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashFullViewingKey::vk() -> [ZcashViewingKey](#zcashviewingkey-sapling)                      | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashFullViewingKey::ovk() -> [ZcashOutgoingViewingKey](#zcashoutgoingviewingkey-sapling)     | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+
+### ZcashNullifierDerivingKey (Sapling)
+
+* Original type: [zcash_primitives::sapling::keys::NullifierDerivingKey](https://docs.rs/zcash_primitives/latest/zcash_primitives/sapling/keys/struct.NullifierDerivingKey.html)
+
+`NullifierDerivingKey` is a wrapper around [jubjub](https://docs.rs/jubjub/latest/jubjub/)'s `SubgroupPoint` -
+exposing `jubjub` types is beyond the scope of this project.
+
+### ZcashProofGenerationKey (Sapling)
+
+* Original type: [zcash_primitives::sapling::keys::ProofGenerationKey](https://docs.rs/zcash_primitives/latest/zcash_primitives/sapling/keys/struct.ProofGenerationKey.html)
+
+| Object/Method name                                                                           |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| -------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashProofGenerationKey::to_viewing_key() -> [ZcashViewingKey](#zcashviewingkey-sapling)     | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+
+### ZcashViewingKey (Sapling)
+
+* Original type: [zcash_primitives::sapling::keys::ViewingKey](https://docs.rs/zcash_primitives/latest/zcash_primitives/sapling/keys/struct.ViewingKey.html)
+
+| Object/Method name                                                                               |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| ------------------------------------------------------------------------------------------------ | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashViewingKey::ivk() -> [ZcashSaplingIvk](#zcashsaplingivk-sapling)                            | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashViewingKey::to_payment_address() -> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)     | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashOutgoingViewingKey (Sapling)
 
@@ -241,7 +288,6 @@ This is partially defined in `UDL` and `code`.
 | ZcashPaymentAddress::pk_d()        |              |                    |                    |                    |       |
 | ZcashPaymentAddress::g_d()         |              |                    |                    |                    |       |
 | ZcashPaymentAddress::create_note() |              |                    |                    |                    |       |
-
 
 ### ZcashOrchardSpendingKey
 
@@ -270,8 +316,8 @@ This is partially defined in `UDL` and `code`.
 | ZcashOrchardFullViewingKey::read()                                                                          |              |                    |                    |                    |                    |
 | ZcashOrchardFullViewingKey::to_bytes()                                                                      |              |                    |                    |                    |                    |
 | ZcashOrchardFullViewingKey::from_bytes()                                                                    |              |                    |                    |                    |                    |
-| ZcashOrchardFullViewingKey::to_ivk() -> [ZcashOrchardIncomingViewingKey](###ZcashOrchardIncomingViewingKey) | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| ZcashOrchardFullViewingKey::to_ovk() -> [ZcashOrchardOutgoingViewingKey](###ZcashOrchardOutgoingViewingKey) | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardFullViewingKey::to_ivk() -> [ZcashOrchardIncomingViewingKey](#zcashorchardincomingviewingkey)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardFullViewingKey::to_ovk() -> [ZcashOrchardOutgoingViewingKey](#zcashorchardoutgoingviewingkey)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashOrchardIncomingViewingKey
 
@@ -285,7 +331,7 @@ This is partially defined in `UDL` and `code`.
 | ZcashOrchardIncomingViewingKey::from_bytes()                                                |              |                    |                    |                    |                    |
 | ZcashOrchardIncomingViewingKey::diversifier_index()                                         |              |                    |                    |                    |                    |
 | ZcashOrchardIncomingViewingKey::address_at()                                                |              |                    |                    |                    |                    |
-| ZcashOrchardIncomingViewingKey::address()  -> [ZcashOrchardAddress](###ZcashOrchardAddress) | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardIncomingViewingKey::address()  -> [ZcashOrchardAddress](#zcashorchardaddress)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashOrchardOutgoingViewingKey
 
@@ -306,3 +352,33 @@ This is partially defined in `UDL` and `code`.
 | ZcashOrchardAddress::diversifier()            |              |                    |                    |                    |                    |
 | ZcashOrchardAddress::to_raw_address_bytes()   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashOrchardAddress::from_raw_address_bytes() |              |                    |                    |                    |                    |
+
+### ZcashDiversifierIndex
+
+* Original type: [zcash_primitives::zip32::DiversifierIndex](https://docs.rs/zcash_primitives/latest/zcash_primitives/zip32/struct.DiversifierIndex.html)
+
+| Object/Method name                              | Score        | UDL                | Code               | Tests              | Docs               |
+| ----------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashDiversifierIndex::new()                    |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifierIndex::from_u32()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifierIndex::from_u64()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifierIndex::increment()              |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifierIndex::to_u32()                 |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifierIndex::to_bytes()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+
+### ZcashScope
+
+* Original type: [zcash_primitives::zip32::Scope](https://docs.rs/zcash_primitives/latest/zcash_primitives/zip32/enum.Scope.html)
+
+| Members         | Score        | UDL                | Code               | Tests              | Docs               |
+| --------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| External        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Internal        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+### ZcashDiversifierIndexAndPaymentAddress
+
+A pair of [ZcashDiversifierIndex](#zcashdiversifierindex) and [ZcashPaymentAddress](#zcashpaymentaddress-sapling).
+
+### ZcashDiversifierIndexAndScope
+
+A pair of [ZcashDiversifierIndex](#zcashdiversifierindex) and [ZcashScope](#zcashscope).
