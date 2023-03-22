@@ -265,15 +265,12 @@ exposing `jubjub` types is beyond the scope of this project.
 
 ### ZcashOutgoingViewingKey (Sapling)
 
-* Working on this :hammer:
-
 Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://docs.rs/zcash_primitives/latest/zcash_primitives/sapling/keys/struct.OutgoingViewingKey.html)
 
-This is partially defined in `UDL` and `code`.
-
-| Object/Method name                  |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
-| ----------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
-| ZcashOutgoingViewingKey::to_bytes() | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Object/Method name                    |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| ------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashOutgoingViewingKey::from_bytes() |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOutgoingViewingKey::to_bytes()   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashPaymentAddress (Sapling)
 
