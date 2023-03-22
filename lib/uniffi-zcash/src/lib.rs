@@ -19,6 +19,9 @@ pub use self::zcash_client_backend::*;
 mod zcash_primitives;
 pub use self::zcash_primitives::*;
 
+mod jubjub;
+pub use self::jubjub::*;
+
 mod utils;
 
 #[cfg(feature = "rustler")]
