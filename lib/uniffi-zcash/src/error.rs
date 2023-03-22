@@ -72,6 +72,12 @@ impl From<String> for ZcashError {
     }
 }
 
+impl From<&str> for ZcashError {
+    fn from(value: &str) -> Self {
+        value.to_string().into()
+    }
+}
+
 impl From<secp256k1::Error> for ZcashError {
     fn from(error: secp256k1::Error) -> Self {
         ZcashError::Secp256k1Error { error }
