@@ -302,20 +302,15 @@ This is partially defined in `UDL` and `code`.
 
 ### ZcashOrchardFullViewingKey
 
-* Working on this :hammer: - [zduny](https://github.com/zduny)
-
 * Original type: [orchard::keys::FullViewingKey](https://docs.rs/orchard/0.3.0/orchard/keys/struct.FullViewingKey.html)
 
 | Object/Method name                                                                                          | Score        | UDL                | Code               | Tests              | Docs               |
 | ----------------------------------------------------------------------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| ZcashOrchardFullViewingKey::derive_dk_ovk()                                                                 |              |                    |                    |                    |                    |
-| ZcashOrchardFullViewingKey::address_at()                                                                    |              |                    |                    |                    |                    |
-| ZcashOrchardFullViewingKey::address()                                                                       |              |                    |                    |                    |                    |
-| ZcashOrchardFullViewingKey::scope_for_address()                                                             |              |                    |                    |                    |                    |
-| ZcashOrchardFullViewingKey::write()                                                                         |              |                    |                    |                    |                    |
-| ZcashOrchardFullViewingKey::read()                                                                          |              |                    |                    |                    |                    |
-| ZcashOrchardFullViewingKey::to_bytes()                                                                      |              |                    |                    |                    |                    |
-| ZcashOrchardFullViewingKey::from_bytes()                                                                    |              |                    |                    |                    |                    |
+| ZcashOrchardFullViewingKey::address_at() -> [ZcashOrchardAddress](#zcashorchardaddress)                     |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardFullViewingKey::address() -> [ZcashOrchardAddress](#zcashorchardaddress)                        |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardFullViewingKey::scope_for_address() -> [ZcashOrchardScope](#zcashorchardscope)                  |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardFullViewingKey::to_bytes()                                                                      |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardFullViewingKey::from_bytes()                                                                    |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | ZcashOrchardFullViewingKey::to_ivk() -> [ZcashOrchardIncomingViewingKey](#zcashorchardincomingviewingkey)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashOrchardFullViewingKey::to_ovk() -> [ZcashOrchardOutgoingViewingKey](#zcashorchardoutgoingviewingkey)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
@@ -352,6 +347,26 @@ This is partially defined in `UDL` and `code`.
 | ZcashOrchardAddress::diversifier()            |              |                    |                    |                    |                    |
 | ZcashOrchardAddress::to_raw_address_bytes()   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashOrchardAddress::from_raw_address_bytes() |              |                    |                    |                    |                    |
+
+### ZcashOrchardScope
+
+* Original type: [orchard::keys::Scope](https://docs.rs/orchard/0.3.0/orchard/keys/enum.Scope.html)
+
+| Members         | Score        | UDL                | Code               | Tests              | Docs               |
+| --------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| External        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Internal        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+### ZcashOrchardDiversifierIndex
+
+* Original type: [orchard::keys::DiversifierIndex](https://docs.rs/orchard/0.3.0/orchard/keys/struct.DiversifierIndex.html)
+
+| Object/Method name                                     | Score        | UDL                | Code               | Tests              | Docs               |
+| ------------------------------------------------------ | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashOrchardDiversifierIndex::from_bytes()             |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardDiversifierIndex::from_u32()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardDiversifierIndex::from_u64()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardDiversifierIndex::to_bytes()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashDiversifierIndex
 

@@ -18,3 +18,12 @@ impl From<ZcashOrchardScope> for Scope {
         }
     }
 }
+
+impl From<Scope> for ZcashOrchardScope {
+    fn from(value: Scope) -> Self {
+        match value {
+            Scope::External => ZcashOrchardScope::External,
+            Scope::Internal => ZcashOrchardScope::Internal,
+        }
+    }
+}
