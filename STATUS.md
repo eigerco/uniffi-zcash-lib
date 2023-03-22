@@ -336,15 +336,13 @@ This is partially defined in `UDL` and `code`.
 
 ### ZcashOrchardAddress
 
-* Working on this :hammer: - [zduny](https://github.com/zduny)
-
 * Original type: [orchard::Address](https://docs.rs/orchard/0.3.0/orchard/struct.Address.html)
 
-| Object/Method name                            | Score        | UDL                | Code               | Tests              | Docs               |
-| --------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| ZcashOrchardAddress::diversifier()            |              |                    |                    |                    |                    |
-| ZcashOrchardAddress::to_raw_address_bytes()   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| ZcashOrchardAddress::from_raw_address_bytes() |              |                    |                    |                    |                    |
+| Object/Method name                                                                                  | Score        | UDL                | Code               | Tests              | Docs               |
+| --------------------------------------------------------------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashOrchardAddress::diversifier() -> [ZcashOrchardDiversifierIndex](#zcashorcharddiversifierindex) |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardAddress::to_raw_address_bytes()                                                         | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardAddress::from_raw_address_bytes()                                                       |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashOrchardScope
 
