@@ -1,3 +1,6 @@
 interface ZcashOutgoingViewingKey {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor([ByRef] sequence<u8> b);
+
   sequence<u8> to_bytes();
 };
