@@ -316,17 +316,15 @@ This is partially defined in `UDL` and `code`.
 
 ### ZcashOrchardIncomingViewingKey
 
-* Working on this :hammer: - [zduny](https://github.com/zduny)
-
 * Original type: [orchard::keys::IncomingViewingKey](https://docs.rs/orchard/0.3.0/orchard/keys/struct.IncomingViewingKey.html)
 
-| Object/Method name                                                                          | Score        | UDL                | Code               | Tests              | Docs               |
-| ------------------------------------------------------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| ZcashOrchardIncomingViewingKey::to_bytes()                                                  | :red_circle: |                    |                    |                    |                    |
-| ZcashOrchardIncomingViewingKey::from_bytes()                                                |              |                    |                    |                    |                    |
-| ZcashOrchardIncomingViewingKey::diversifier_index()                                         |              |                    |                    |                    |                    |
-| ZcashOrchardIncomingViewingKey::address_at()                                                |              |                    |                    |                    |                    |
-| ZcashOrchardIncomingViewingKey::address()  -> [ZcashOrchardAddress](#zcashorchardaddress)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Object/Method name                                                                                                                            | Score        | UDL                | Code               | Tests              | Docs               |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashOrchardIncomingViewingKey::to_bytes()                                                                                                    | :red_circle: |                    | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardIncomingViewingKey::from_bytes()                                                                                                  |              |                    | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardIncomingViewingKey::diversifier_index() -> [ZcashOrchardDiversifierIndex](#zcashorcharddiversifierindex)                          |              |                    | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardIncomingViewingKey::address_at() -> [ZcashOrchardAddress](#zcashorchardaddress)                                                   |              |                    | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardIncomingViewingKey::address() -> [ZcashOrchardAddress](#zcashorchardaddress)                                                      | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashOrchardOutgoingViewingKey
 
