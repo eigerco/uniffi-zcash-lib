@@ -12,6 +12,12 @@ impl From<FullViewingKey> for ZcashFullViewingKey {
     }
 }
 
+impl From<ZcashFullViewingKey> for FullViewingKey {
+    fn from(key: ZcashFullViewingKey) -> Self {
+        key.0
+    }
+}
+
 impl ZcashFullViewingKey {
     pub fn from_bytes(bytes: Vec<u8>) -> ZcashResult<Self> {
         FullViewingKey::read(bytes.as_slice())

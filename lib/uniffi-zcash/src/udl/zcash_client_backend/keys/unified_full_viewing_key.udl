@@ -1,12 +1,25 @@
 interface ZcashUnifiedFullViewingKey {
+  [Throws=ZcashError]
+  constructor(
+    ZcashAccountPubKey? transparent,
+    ZcashDiversifiableFullViewingKey? sapling,
+    ZcashOrchardFullViewingKey? orchard
+  );
+
   [Name=decode, Throws=ZcashError]
   constructor(ZcashConsensusParameters params, [ByRef] string encoded);
 
   string encode(ZcashConsensusParameters params);
 
+  ZcashAccountPubKey? transparent();
+
   ZcashDiversifiableFullViewingKey? sapling();
 
   ZcashOrchardFullViewingKey? orchard();
 
-  // todo
+  ZcashUnifiedAddress? address(ZcashDiversifierIndex j);
+
+  ZcashUnifiedAddressAndDiversifierIndex? find_address(ZcashDiversifierIndex j);
+
+  ZcashUnifiedAddressAndDiversifierIndex default_address();
 };

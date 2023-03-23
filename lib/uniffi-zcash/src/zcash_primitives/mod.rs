@@ -1,10 +1,10 @@
-mod consensus;
 use std::sync::Arc;
 
 use zcash_primitives::sapling::PaymentAddress;
 use zcash_primitives::zip32::DiversifierIndex;
 use zcash_primitives::zip32::Scope;
 
+mod consensus;
 pub use self::consensus::*;
 
 mod legacy;

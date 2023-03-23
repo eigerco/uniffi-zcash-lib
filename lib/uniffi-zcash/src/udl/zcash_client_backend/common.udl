@@ -1,0 +1,4 @@
+dictionary ZcashUnifiedAddressAndDiversifierIndex {
+  ZcashUnifiedAddress address;
+  ZcashDiversifierIndex diversifier_index;
+};
