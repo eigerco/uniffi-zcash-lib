@@ -160,6 +160,45 @@ This is a feature matrix which keeps track of the current state of implementatio
 | ZcashUnifiedFullViewingKey::find_address() -> [ZcashUnifiedAddressAndDiversifierIndex](#zcashunifiedaddressanddiversifierindex)    |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | ZcashUnifiedFullViewingKey::default_address() -> [ZcashUnifiedAddressAndDiversifierIndex](#zcashunifiedaddressanddiversifierindex) |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
+### ZcashUnifiedAddress
+
+* Original type: [zcash_client_backend::address::UnifiedAddress](https://docs.rs/zcash_client_backend/latest/zcash_client_backend/address/struct.UnifiedAddress.html)
+
+| Object/Method name                                                                        |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| ----------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashUnifiedAddress::new()                                                                | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashUnifiedAddress::orchard() -> [ZcashOrchardAddress](#zcashorchardaddress)             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashUnifiedAddress::sapling()-> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)      | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashUnifiedAddress::transparent() -> [ZcashTransparentAddress](#zcashtransparentaddress) | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashUnifiedAddress::decode()                                                             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashUnifiedAddress::encode()                                                             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+### ZcashRecipientAddress
+
+* Original type: [zcash_client_backend::address::RecipientAddress](https://docs.rs/zcash_client_backend/latest/zcash_client_backend/address/enum.RecipientAddress.html)
+
+| Object/Method name                           |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| -------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashRecipientAddress::shielded()            | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashRecipientAddress::transparent()         | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashRecipientAddress::unified()             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashRecipientAddress::decode()              | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashRecipientAddress::encode()              | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+### ZcashTransparentAddress
+
+* Original type: [zcash_primitives::legacy::TransparentAddress](https://docs.rs/zcash_primitives/latest/zcash_primitives/legacy/enum.TransparentAddress.html)
+
+| Object/Method name                             |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| ---------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashTransparentAddress::public_key()          | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashTransparentAddress::script()              | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashTransparentAddress::decode()              | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashTransparentAddress::encode()              | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashTransparentAddress::is_public_key()       | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashTransparentAddress::is_secret()           | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashTransparentAddress::to_bytes()            | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
 ### ZcashDiversifiableFullViewingKey (Sapling)
 
 * Original type: [zcash_client_backend::keys::sapling::DiversifiableFullViewingKey](https://docs.rs/zcash_client_backend/latest/zcash_client_backend/keys/sapling/struct.DiversifiableFullViewingKey.html)
