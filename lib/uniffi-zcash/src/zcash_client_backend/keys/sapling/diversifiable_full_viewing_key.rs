@@ -25,6 +25,12 @@ impl From<DiversifiableFullViewingKey> for ZcashDiversifiableFullViewingKey {
     }
 }
 
+impl From<&ZcashDiversifiableFullViewingKey> for DiversifiableFullViewingKey {
+    fn from(key: &ZcashDiversifiableFullViewingKey) -> Self {
+        key.0.clone()
+    }
+}
+
 impl ZcashDiversifiableFullViewingKey {
     /// Parses a `DiversifiableFullViewingKey` from its raw byte encoding.
     ///

@@ -64,6 +64,12 @@ impl From<AccountPubKey> for ZcashAccountPubKey {
     }
 }
 
+impl From<&ZcashAccountPubKey> for AccountPubKey {
+    fn from(key: &ZcashAccountPubKey) -> Self {
+        key.0.clone()
+    }
+}
+
 pub struct ZcashInternalOvkExternalOvk {
     pub internal_ovk: Arc<ZcashInternalOvk>,
     pub external_ovk: Arc<ZcashExternalOvk>,

@@ -67,8 +67,12 @@ impl From<ZcashSaplingNoteValue> for NoteValue {
 pub enum ZcashRseed {
     /// This expects the data from ZcashJubjubFr,
     /// which can be obtained by calling ZcashJubjubFr::to_bytes().
-    BeforeZip212 { fr_data: Vec<u8> },
-    AfterZip212 { data: Vec<u8> },
+    BeforeZip212 {
+        fr_data: Vec<u8>,
+    },
+    AfterZip212 {
+        data: Vec<u8>,
+    },
 }
 
 impl TryFrom<ZcashRseed> for Rseed {

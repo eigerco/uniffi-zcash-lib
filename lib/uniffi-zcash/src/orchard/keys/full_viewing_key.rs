@@ -84,3 +84,9 @@ impl From<&ZcashOrchardSpendingKey> for ZcashOrchardFullViewingKey {
         ZcashOrchardFullViewingKey(inner_fvk)
     }
 }
+
+impl From<&ZcashOrchardFullViewingKey> for FullViewingKey {
+    fn from(key: &ZcashOrchardFullViewingKey) -> Self {
+        key.0.clone()
+    }
+}
