@@ -1,4 +1,7 @@
 interface ZcashRecipientAddress {
+  [Name=decode, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string address);
+
   [Name=shielded]
   constructor(ZcashPaymentAddress addr);
 
