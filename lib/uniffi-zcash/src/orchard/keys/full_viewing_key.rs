@@ -4,7 +4,8 @@ use orchard::keys::{DiversifierIndex, FullViewingKey};
 
 use crate::{
     utils, ZcashError, ZcashOrchardAddress, ZcashOrchardDiversifier, ZcashOrchardDiversifierIndex,
-    ZcashOrchardIncomingViewingKey, ZcashOrchardOutgoingViewingKey, ZcashOrchardScope, ZcashResult,
+    ZcashOrchardIncomingViewingKey, ZcashOrchardOutgoingViewingKey, ZcashOrchardScope,
+    ZcashOrchardSpendingKey, ZcashResult,
 };
 
 /// A key that provides the capability to view incoming and outgoing transactions.
@@ -74,5 +75,12 @@ impl ZcashOrchardFullViewingKey {
 impl From<FullViewingKey> for ZcashOrchardFullViewingKey {
     fn from(key: FullViewingKey) -> Self {
         Self(key)
+    }
+}
+
+impl From<&ZcashOrchardSpendingKey> for ZcashOrchardFullViewingKey {
+    fn from(value: &ZcashOrchardSpendingKey) -> Self {
+        let inner_fvk: FullViewingKey = (&value.0).into();
+        ZcashOrchardFullViewingKey(inner_fvk)
     }
 }

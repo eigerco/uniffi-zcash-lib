@@ -1,8 +1,10 @@
+use std::sync::Arc;
+
 use orchard::keys::SpendingKey;
 
-use crate::{utils::cast_slice, ZcashError, ZcashResult};
+use crate::{utils::cast_slice, ZcashError, ZcashResult, ZcashOrchardFullViewingKey};
 
-pub struct ZcashOrchardSpendingKey(SpendingKey);
+pub struct ZcashOrchardSpendingKey(pub(crate) SpendingKey);
 
 impl ZcashOrchardSpendingKey {
     pub fn from_bytes(data: Vec<u8>) -> ZcashResult<Self> {
@@ -17,6 +19,10 @@ impl ZcashOrchardSpendingKey {
 
     pub fn to_bytes(&self) -> Vec<u8> {
         self.0.to_bytes().to_vec()
+    }
+
+    pub fn to_fvk(&self) -> Arc<ZcashOrchardFullViewingKey> {
+        Arc::new(self.into())
     }
 
     pub fn from_zip32_seed(seed: Vec<u8>, coin_type: u32, account: u32) -> ZcashResult<Self> {

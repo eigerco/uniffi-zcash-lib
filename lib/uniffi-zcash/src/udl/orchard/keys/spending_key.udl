@@ -6,4 +6,6 @@ interface ZcashOrchardSpendingKey {
     constructor(sequence<u8> seed, u32 coin_type, u32 account);
 
     sequence<u8> to_bytes();
+    
+    ZcashOrchardFullViewingKey to_fvk();
 };
