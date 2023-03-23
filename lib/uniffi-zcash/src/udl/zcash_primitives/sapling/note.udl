@@ -1,0 +1,16 @@
+interface ZcashSaplingNote {
+    [Name=from_parts, Throws=ZcashError]
+    constructor(ZcashPaymentAddress recipient, ZcashSaplingNoteValue value, ZcashRseed rseed);
+};
+
+interface ZcashSaplingNoteValue {
+    [Name=from_raw]
+    constructor(u64 data);
+    u64 inner();
+};
+
+[Enum]
+interface ZcashRseed {
+    BeforeZip212(sequence<u8> fr_data);
+    AfterZip212(sequence<u8> data);
+};

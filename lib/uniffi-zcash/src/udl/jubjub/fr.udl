@@ -1,0 +1,6 @@
+interface ZcashJubjubFr {
+    [Name=from_bytes, Throws=ZcashError]
+    constructor([ByRef] sequence<u8> data);
+
+    sequence<u8> to_bytes();
+};

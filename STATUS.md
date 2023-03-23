@@ -276,15 +276,48 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 * Original type: [zcash_primitives::sapling::PaymentAddress](https://docs.rs/zcash_primitives/latest/zcash_primitives/sapling/struct.PaymentAddress.html)
 
-| Object/Method name                 |    Score     |        UDL         |        Code        |       Tests        | Docs  |
-| ---------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :---: |
-| ZcashPaymentAddress::from_parts()  |              |                    |                    |                    |       |
-| ZcashPaymentAddress::from_bytes()  |              |                    |                    |                    |       |
+| Object/Method name                 |    Score        |        UDL         |        Code        |       Tests        | Docs  |
+| ---------------------------------- | :----------:    | :----------------: | :----------------: | :----------------: | :---: |
+| ZcashPaymentAddress::from_parts()  | :red_circle: |                    |                    |                    |       |
+| ZcashPaymentAddress::from_bytes()  | :red_circle:                |                    |                    |                    |       |
 | ZcashPaymentAddress::to_bytes()    | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashPaymentAddress::diversifier() |              |                    |                    |                    |       |
-| ZcashPaymentAddress::pk_d()        |              |                    |                    |                    |       |
-| ZcashPaymentAddress::g_d()         |              |                    |                    |                    |       |
-| ZcashPaymentAddress::create_note() |              |                    |                    |                    |       |
+| ZcashPaymentAddress::diversifier() | :red_circle: | :white_check_mark: | :white_check_mark: |                       |  :white_check_mark:     |
+| ZcashPaymentAddress::pk_d()        | :red_circle: | :white_check_mark: | :white_check_mark: |                       |   :white_check_mark:    |
+| ZcashPaymentAddress::create_note() | :red_circle: |  :white_check_mark:| :white_check_mark: |                        |  :white_check_mark:     |
+
+### ZcashSaplingNote
+
+* Original type: [zcash_primitives::sapling::Note](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/note/struct.Note.html)
+
+| Object/Method name                 |    Score        |        UDL         |        Code        |       Tests        | Docs  |
+| ---------------------------------- | :----------:    | :----------------: | :----------------: | :----------------: | :---: |
+| ZcashSaplingNote::from_parts()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |                    |  :white_check_mark:     |
+| ZcashSaplingNote::recipient()   |                  |                    |                    |                    |       |
+| ZcashSaplingNote::value()       |                  |                    |                    |                    |       |
+| ZcashSaplingNote::rseed()       |                  |                    |                    |                    |       |
+| ZcashSaplingNote::nf()          |                  |                    |                    |                    |       |
+| ZcashSaplingNote::cmu()          |                  |                    |                    |                    |       |
+| ZcashSaplingNote::rcm()          |                  |                    |                    |                    |       |
+| ZcashSaplingNote::generate_or_derive_esk()  |                  |                    |                    |          |       |
+
+
+### ZcashSaplingNoteValue
+
+* Original type: [zcash_primitives::sapling::value::NoteValue](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/value/struct.NoteValue.html)
+
+| Object/Method name                 |    Score        |        UDL         |        Code        |       Tests        | Docs  |
+| ---------------------------------- | :----------:    | :----------------: | :----------------: | :----------------: | :---: |
+| ZcashSaplingNoteValue::inner()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |                    |  :white_check_mark:     |
+| ZcashSaplingNoteValue::from_raw()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |                    |  :white_check_mark:     |
+
+
+### ZcashSaplingDiversifiedTransmissionKey
+
+* Original type: [zcash_primitives::sapling::keys::DiversifiedTransmissionKey](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/keys/struct.DiversifiedTransmissionKey.html)
+
+| Object/Method name                 |    Score        |        UDL         |        Code        |       Tests        | Docs  |
+| ---------------------------------- | :----------:    | :----------------: | :----------------: | :----------------: | :---: |
+| ZcashSaplingDiversifiedTransmissionKey::from_parts()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |                    |  :white_check_mark:     |
 
 ### ZcashOrchardSpendingKey
 

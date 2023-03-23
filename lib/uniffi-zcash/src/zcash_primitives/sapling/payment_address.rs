@@ -1,7 +1,12 @@
 use std::sync::Arc;
 
 use zcash_client_backend::encoding;
-use zcash_primitives::{consensus::Parameters, sapling::PaymentAddress};
+use zcash_primitives::{
+    consensus::Parameters,
+    sapling::{value::NoteValue, Note, PaymentAddress},
+};
+
+use crate::{ZcashResult, ZcashRseed, ZcashSaplingDiversifiedTransmissionKey, ZcashSaplingNote};
 
 /// A Sapling payment address.
 ///
@@ -11,18 +16,6 @@ use zcash_primitives::{consensus::Parameters, sapling::PaymentAddress};
 /// and not the identity).
 #[derive(Clone)]
 pub struct ZcashPaymentAddress(PaymentAddress);
-
-impl From<PaymentAddress> for ZcashPaymentAddress {
-    fn from(address: PaymentAddress) -> Self {
-        ZcashPaymentAddress(address)
-    }
-}
-
-impl From<&ZcashPaymentAddress> for PaymentAddress {
-    fn from(value: &ZcashPaymentAddress) -> Self {
-        value.0
-    }
-}
 
 impl ZcashPaymentAddress {
     /// Parse the input string into `ZcashPaymentAddress`
@@ -58,5 +51,33 @@ impl ZcashPaymentAddress {
 
     pub fn diversifier(&self) -> Arc<crate::ZcashDiversifier> {
         Arc::new((*self.0.diversifier()).into())
+    }
+
+    /// Returns `pk_d` for this `PaymentAddress`.
+    pub fn pk_d(&self) -> Arc<ZcashSaplingDiversifiedTransmissionKey> {
+        Arc::new((*self.0.pk_d()).into())
+    }
+
+    pub fn create_note(&self, value: u64, rseed: ZcashRseed) -> ZcashResult<Arc<ZcashSaplingNote>> {
+        let note = Note::from_parts(self.into(), NoteValue::from_raw(value), rseed.try_into()?);
+        Ok(Arc::new(note.into()))
+    }
+}
+
+impl From<PaymentAddress> for ZcashPaymentAddress {
+    fn from(address: PaymentAddress) -> Self {
+        ZcashPaymentAddress(address)
+    }
+}
+
+impl From<&ZcashPaymentAddress> for PaymentAddress {
+    fn from(value: &ZcashPaymentAddress) -> Self {
+        value.0
+    }
+}
+
+impl From<ZcashPaymentAddress> for PaymentAddress {
+    fn from(value: ZcashPaymentAddress) -> Self {
+        value.0
     }
 }

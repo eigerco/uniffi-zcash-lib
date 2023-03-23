@@ -9,5 +9,10 @@ interface ZcashPaymentAddress {
 
   sequence<u8> to_bytes();
 
-  // todo
+  ZcashDiversifier diversifier();
+
+  ZcashSaplingDiversifiedTransmissionKey pk_d();
+
+  [Throws=ZcashError]
+  ZcashSaplingNote create_note(u64 value, ZcashRseed rseed);
 };
