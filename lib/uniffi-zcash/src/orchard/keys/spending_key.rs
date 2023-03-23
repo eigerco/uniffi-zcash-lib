@@ -2,7 +2,7 @@ use std::sync::Arc;
 
 use orchard::keys::SpendingKey;
 
-use crate::{utils::cast_slice, ZcashError, ZcashResult, ZcashOrchardFullViewingKey};
+use crate::{utils::cast_slice, ZcashError, ZcashOrchardFullViewingKey, ZcashResult};
 
 pub struct ZcashOrchardSpendingKey(pub(crate) SpendingKey);
 
