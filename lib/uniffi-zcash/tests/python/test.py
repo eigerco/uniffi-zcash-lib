@@ -126,7 +126,7 @@ class Test(unittest.TestCase):
         params = ZcashConsensusParameters.MAIN_NETWORK
 
         with self.assertRaises(ZcashError.Message) as e:
-            ZcashUnifiedAddress.parse(params, "")
+            ZcashUnifiedAddress.decode(params, "")
 
         sapling_diversifier = ZcashDiversifier([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
@@ -143,10 +143,10 @@ class Test(unittest.TestCase):
         transparent = ZcashTransparentAddress.public_key(range(1, 21))
 
         source = ZcashUnifiedAddress(orchard, sapling, transparent)
-        address = source.to_string(params)
-        parsed = ZcashUnifiedAddress.parse(params, address)
+        address = source.encode(params)
+        parsed = ZcashUnifiedAddress.decode(params, address)
 
-        self.assertEqual(address, parsed.to_string(params))
+        self.assertEqual(address, parsed.encode(params))
 
     def test_unified_address_creation_with_sapling(self):
         seed = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -222,13 +222,13 @@ class Test(unittest.TestCase):
     def test_transparent_address_parsing(self):
         net = ZcashConsensusParameters.TEST_NETWORK
         input = "tm9iMLAuYMzJ6jtFLcA7rzUmfreGuKvr7Ma"
-        parsed = ZcashTransparentAddress.parse(net, input)
+        parsed = ZcashTransparentAddress.decode(net, input)
 
         assert parsed.is_public_key()
         self.assertEqual(input, parsed.encode(net))
 
         input = "t26YoyZ1iPgiMEWL4zGUm74eVWfhyDMXzY2"
-        parsed = ZcashTransparentAddress.parse(net, input)
+        parsed = ZcashTransparentAddress.decode(net, input)
 
         assert parsed.is_script()
         self.assertEqual(input, parsed.encode(net))

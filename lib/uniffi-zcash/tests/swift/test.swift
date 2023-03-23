@@ -148,7 +148,7 @@ func testUnifiedAddressParsing() {
 
     var thrown = false;
     do {
-        let _ = try ZcashUnifiedAddress.parse(params: params, address: "")
+        let _ = try ZcashUnifiedAddress.decode(params: params, address: "")
     } catch ZcashError.Message {
         thrown = true
     } catch {
@@ -170,10 +170,10 @@ func testUnifiedAddressParsing() {
     let transparent = try! ZcashTransparentAddress.publicKey(data: Array(1...20))
 
     let source = try! ZcashUnifiedAddress(orchard: orchard, sapling: sapling, transparent: transparent)
-    let address = source.toString(params: params)
-    let parsed = try! ZcashUnifiedAddress.parse(params: params, address: address)
+    let address = source.encode(params: params)
+    let parsed = try! ZcashUnifiedAddress.decode(params: params, address: address)
 
-    assert(address == parsed.toString(params: params))
+    assert(address == parsed.encode(params: params))
 }
 testUnifiedAddressParsing()
 
@@ -259,13 +259,13 @@ testUnifiedAddressCreationWithOrchard()
 func testTransparentAddressParsing() {
     let net = ZcashConsensusParameters.testNetwork
     let input = "tm9iMLAuYMzJ6jtFLcA7rzUmfreGuKvr7Ma"
-    let parsed = try! ZcashTransparentAddress.parse(params: net, input: input)
+    let parsed = try! ZcashTransparentAddress.decode(params: net, input: input)
 
     assert(parsed.isPublicKey())
     assert(input == parsed.encode(params: net))
 
     let input2 = "t26YoyZ1iPgiMEWL4zGUm74eVWfhyDMXzY2"
-    let parsed2 = try! ZcashTransparentAddress.parse(params: net, input: input2)
+    let parsed2 = try! ZcashTransparentAddress.decode(params: net, input: input2)
 
     assert(parsed2.isScript())
     assert(input2 == parsed2.encode(params: net))

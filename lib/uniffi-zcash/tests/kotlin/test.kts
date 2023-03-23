@@ -147,7 +147,7 @@ fun testUnifiedAddressParsing() {
 
     var thrown = false;
     try {
-        ZcashUnifiedAddress.parse(params, "")
+        ZcashUnifiedAddress.decode(params, "")
     } catch (e: ZcashException.Message) {
         thrown = true;
     }
@@ -168,10 +168,10 @@ fun testUnifiedAddressParsing() {
     val transparent = ZcashTransparentAddress.publicKey((1..20).map { it.toUByte() })
 
     val source = ZcashUnifiedAddress(orchard, sapling, transparent)
-    val address = source.toString(params)
-    val parsed = ZcashUnifiedAddress.parse(params, address)
+    val address = source.encode(params)
+    val parsed = ZcashUnifiedAddress.decode(params, address)
 
-    assert(address == parsed.toString(params))
+    assert(address == parsed.encode(params))
 }
 testUnifiedAddressParsing()
 
@@ -257,13 +257,13 @@ testUnifiedAddressCreationWithOrchard()
 fun testTransparentAddressParsing() {
     val net = ZcashConsensusParameters.TEST_NETWORK
     val input = "tm9iMLAuYMzJ6jtFLcA7rzUmfreGuKvr7Ma"
-    val parsed = ZcashTransparentAddress.parse(net, input)
+    val parsed = ZcashTransparentAddress.decode(net, input)
 
     assert(parsed.isPublicKey())
     assert(input == parsed.encode(net))
 
     val input2 = "t26YoyZ1iPgiMEWL4zGUm74eVWfhyDMXzY2"
-    val parsed2 = ZcashTransparentAddress.parse(net, input2)
+    val parsed2 = ZcashTransparentAddress.decode(net, input2)
 
     assert(parsed2.isScript())
     assert(input2 == parsed2.encode(net))
