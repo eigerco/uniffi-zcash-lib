@@ -109,12 +109,12 @@ This is a feature matrix which keeps track of the current state of implementatio
 
 * Original type: [hdwallet::extended_key::ExtendedPrivKey](https://docs.rs/hdwallet/latest/hdwallet/extended_key/struct.ExtendedPrivKey.html)
 
-| Object/Method name                            |    Score     |        UDL         |        Code        |       Tests        | Docs  |
-| --------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :---: |
-| ZcashExtendedPrivKey::random()                |              |                    |                    |                    |       |
-| ZcashExtendedPrivKey::random_with_seed_size() |              |                    |                    |                    |       |
-| ZcashExtendedPrivKey::with_seed()             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashExtendedPrivKey::derive_private_key()    |              |                    |                    |                    |       |
+| Object/Method name                            |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| --------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashExtendedPrivKey::random()                |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashExtendedPrivKey::random_with_seed_size() |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashExtendedPrivKey::with_seed()             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashExtendedPrivKey::derive_private_key()    |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashAccountPubKey
 
@@ -447,6 +447,19 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashDiversifierIndex::to_u32()                 |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | ZcashDiversifierIndex::to_bytes()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
+### ZcashKeyIndex
+
+* Original type: [hdwallet::extended_key::key_index::KeyIndex](https://docs.rs/hdwallet/latest/hdwallet/extended_key/key_index/enum.KeyIndex.html)
+
+| Object/Method name                              | Score        | UDL                | Code               | Tests              | Docs               |
+| ----------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashKeyIndex::from_u32()                       |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashKeyIndex::raw_index()                      |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashKeyIndex::normalize_index()                |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashKeyIndex::is_valid()                       |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashKeyIndex::hardened_from_normalize_index()  |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashKeyIndex::from_index()                     |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+
 ### ZcashScope
 
 * Original type: [zcash_primitives::zip32::Scope](https://docs.rs/zcash_primitives/latest/zcash_primitives/zip32/enum.Scope.html)
@@ -455,6 +468,16 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | --------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
 | External        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | Internal        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+### ZcashKeySeed
+
+* Original type: [hdwallet::extended_key::KeySeed](https://docs.rs/hdwallet/latest/hdwallet/extended_key/enum.KeySeed.html)
+
+| Members         | Score        | UDL                | Code               | Tests              | Docs               |
+| --------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| S128            |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| S256            |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| S512            |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashDiversifierIndexAndPaymentAddress
 
