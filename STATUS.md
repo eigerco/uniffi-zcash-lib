@@ -134,15 +134,15 @@ This is a feature matrix which keeps track of the current state of implementatio
 
 * Original type: [zcash_client_backend::keys::UnifiedSpendingKey]()
 
-| Object/Method name                                                                                                    |    Score     |        UDL         |        Code        |       Tests        | Docs  |
-| --------------------------------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :---: |
-| ZcashUnifiedSpendingKey::from_seed()                                                                                  | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashUnifiedSpendingKey::to_unified_full_viewing_key() -> [ZcashUnifiedFullViewingKey](#zcashunifiedfullviewingkey)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashUnifiedSpendingKey::transparent()                                                                                | :red_circle: |                    |                    |                    |       |
-| ZcashUnifiedSpendingKey::sapling()                                                                                    | :red_circle: |                    |                    |                    |       |
-| ZcashUnifiedSpendingKey::orchard()                                                                                    | :red_circle: |                    |                    |                    |       |
-| ZcashUnifiedSpendingKey::to_bytes()                                                                                   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashUnifiedSpendingKey::from_bytes()                                                                                 |              |                    |                    |                    |       |
+| Object/Method name                                                                                                    |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| --------------------------------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashUnifiedSpendingKey::from_seed()                                                                                  | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashUnifiedSpendingKey::to_unified_full_viewing_key() -> [ZcashUnifiedFullViewingKey](#zcashunifiedfullviewingkey)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashUnifiedSpendingKey::transparent() -> [ZcashAccountPrivKey](#zcashaccountprivkey)                                                                                | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashUnifiedSpendingKey::sapling() -> [ZcashExtendedSpendingKey](#zcashextendedspendingkey-sapling)                                                                                    | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashUnifiedSpendingKey::orchard() -> [ZcashOrchardSpendingKey](#zcashorchardspendingkey)                                                                                    | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashUnifiedSpendingKey::to_bytes()                                                                                | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashUnifiedSpendingKey::from_bytes()                                                                                 |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashUnifiedFullViewingKey
 

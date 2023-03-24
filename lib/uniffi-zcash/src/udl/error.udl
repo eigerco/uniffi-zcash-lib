@@ -2,6 +2,8 @@
 enum ZcashError {
   /* hdwallet::error::Error */
   "HDWalletError",
+  /* zcash_client_backend::keys::DecodingError */
+  "DecodingError",
   /* zcash_client_backend::keys::DerivationError */
   "DerivationError",
   /* zcash_primitives::sapling::keys::DecodingError::InvalidAsk */
