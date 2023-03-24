@@ -1,4 +1,19 @@
+enum ZcashKeySeed {
+  "S128",
+  "S256",
+  "S512",
+};
+
 interface ZcashExtendedPrivKey {
+  [Name=random, Throws=ZcashError]
+  constructor();
+
+  [Name=random_with_seed_size, Throws=ZcashError]
+  constructor(ZcashKeySeed seed_size);
+
   [Name=with_seed, Throws=ZcashError]
   constructor(sequence<u8> data);
+
+  [Throws=ZcashError]
+  ZcashExtendedPrivKey derive_private_key(ZcashKeyIndex key_index);
 };
