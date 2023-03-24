@@ -146,7 +146,7 @@ class TestApk < Test::Unit::TestCase
     params = Zcash::ZcashConsensusParameters::MAIN_NETWORK
 
     assert_raise Zcash::ZcashError::Message do
-      Zcash::ZcashUnifiedAddress::parse(params, "")
+      Zcash::ZcashUnifiedAddress::decode(params, "")
     end
 
     sapling_diversifier = Zcash::ZcashDiversifier.new([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -164,10 +164,10 @@ class TestApk < Test::Unit::TestCase
     transparent = Zcash::ZcashTransparentAddress::public_key((1..20).to_a)
 
     source = Zcash::ZcashUnifiedAddress::new(orchard, sapling, transparent)
-    address = source.to_string(params)
-    parsed = Zcash::ZcashUnifiedAddress::parse(params, address)
+    address = source.encode(params)
+    parsed = Zcash::ZcashUnifiedAddress::decode(params, address)
 
-    assert_equal(address, parsed.to_string(params))
+    assert_equal(address, parsed.encode(params))
   end
 
   def test_unified_address_creation_with_sapling
@@ -253,13 +253,13 @@ class TestApk < Test::Unit::TestCase
   def test_transparent_address_parsing
     net = Zcash::ZcashConsensusParameters::TEST_NETWORK
     input = "tm9iMLAuYMzJ6jtFLcA7rzUmfreGuKvr7Ma"
-    parsed = Zcash::ZcashTransparentAddress::parse(net, input)
+    parsed = Zcash::ZcashTransparentAddress::decode(net, input)
 
     assert parsed.is_public_key
     assert_equal input, parsed.encode(net)
 
     input = "t26YoyZ1iPgiMEWL4zGUm74eVWfhyDMXzY2"
-    parsed = Zcash::ZcashTransparentAddress::parse(net, input)
+    parsed = Zcash::ZcashTransparentAddress::decode(net, input)
 
     assert parsed.is_script
     assert_equal input, parsed.encode(net)

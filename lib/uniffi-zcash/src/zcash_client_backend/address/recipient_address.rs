@@ -2,8 +2,12 @@ use std::sync::Arc;
 
 use zcash_client_backend::address::RecipientAddress;
 
-use crate::{ZcashPaymentAddress, ZcashTransparentAddress, ZcashUnifiedAddress};
+use crate::{
+    ZcashConsensusParameters, ZcashError, ZcashPaymentAddress, ZcashResult,
+    ZcashTransparentAddress, ZcashUnifiedAddress,
+};
 
+/// An address that funds can be sent to.
 #[derive(Clone)]
 pub enum ZcashRecipientAddress {
     Shielded(Arc<ZcashPaymentAddress>),
@@ -54,6 +58,12 @@ impl ZcashRecipientAddress {
 
     pub fn unified(addr: Arc<crate::ZcashUnifiedAddress>) -> Self {
         ZcashRecipientAddress::Unified(addr)
+    }
+
+    pub fn decode(params: ZcashConsensusParameters, address: &str) -> ZcashResult<Self> {
+        RecipientAddress::decode(&params, address)
+            .map(From::from)
+            .ok_or::<ZcashError>("unable to parse address".into())
     }
 
     pub fn encode(&self, params: crate::ZcashConsensusParameters) -> String {

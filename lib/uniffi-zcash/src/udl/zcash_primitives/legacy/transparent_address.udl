@@ -1,12 +1,12 @@
 interface ZcashTransparentAddress {
-  [Name=parse, Throws=ZcashError]
-  constructor(ZcashConsensusParameters params, [ByRef] string input);
-
   [Name=public_key, Throws=ZcashError]
   constructor(sequence<u8> data);
 
   [Name=script, Throws=ZcashError]
   constructor(sequence<u8> data);
+
+  [Name=decode, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string input);
 
   string encode(ZcashConsensusParameters params);
 

@@ -3,7 +3,7 @@ use zcash_primitives::{consensus::Parameters, legacy::TransparentAddress};
 
 use crate::{utils, ZcashConsensusParameters, ZcashError, ZcashResult};
 
-/// A transparent address corresponding to either a public key or a script.
+/// A transparent address corresponding to either a public key or a `Script`.
 #[derive(Clone, Copy)]
 pub struct ZcashTransparentAddress(TransparentAddress);
 
@@ -20,17 +20,6 @@ impl From<ZcashTransparentAddress> for TransparentAddress {
 }
 
 impl ZcashTransparentAddress {
-    pub fn parse(params: ZcashConsensusParameters, input: &str) -> ZcashResult<Self> {
-        encoding::decode_transparent_address(
-            &params.b58_pubkey_address_prefix(),
-            &params.b58_script_address_prefix(),
-            input,
-        )
-        .map_err(|_| ZcashError::Unknown)?
-        .ok_or(ZcashError::Unknown)
-        .map(Into::into)
-    }
-
     /// Create new transparent address corresponding to public key
     pub fn public_key(input: Vec<u8>) -> ZcashResult<Self> {
         let buf = utils::cast_slice(&input)?;
@@ -43,6 +32,21 @@ impl ZcashTransparentAddress {
         Ok(TransparentAddress::Script(buf).into())
     }
 
+    /// Decodes a [`TransparentAddress`] from a Base58Check-encoded string.
+    pub fn decode(params: ZcashConsensusParameters, input: &str) -> ZcashResult<Self> {
+        encoding::decode_transparent_address(
+            &params.b58_pubkey_address_prefix(),
+            &params.b58_script_address_prefix(),
+            input,
+        )
+        .map_err(|_| ZcashError::Unknown)?
+        .ok_or(ZcashError::Unknown)
+        .map(Into::into)
+    }
+
+    /// Writes a [`TransparentAddress`] as a Base58Check-encoded string.
+    /// using the human-readable prefix values defined in the specified
+    /// network parameters.
     pub fn encode(&self, params: ZcashConsensusParameters) -> String {
         encoding::encode_transparent_address_p(&params, &self.0)
     }
