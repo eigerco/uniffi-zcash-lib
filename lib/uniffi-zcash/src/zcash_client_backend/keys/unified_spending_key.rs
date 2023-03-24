@@ -3,7 +3,8 @@ use std::sync::Arc;
 use zcash_client_backend::keys::UnifiedSpendingKey;
 
 use crate::{
-    ZcashAccountId, ZcashConsensusParameters, ZcashKeysEra, ZcashResult, ZcashUnifiedFullViewingKey,
+    ZcashAccountId, ZcashAccountPrivKey, ZcashConsensusParameters, ZcashExtendedSpendingKey,
+    ZcashKeysEra, ZcashOrchardSpendingKey, ZcashResult, ZcashUnifiedFullViewingKey,
 };
 
 /// A set of viewing keys that are all associated with a single
@@ -23,12 +24,27 @@ impl ZcashUnifiedSpendingKey {
         account: ZcashAccountId,
     ) -> ZcashResult<Self> {
         let key = UnifiedSpendingKey::from_seed(&params, &seed, account.into())?;
-
         Ok(key.into())
     }
 
     pub fn to_unified_full_viewing_key(&self) -> Arc<ZcashUnifiedFullViewingKey> {
         Arc::new(self.0.to_unified_full_viewing_key().into())
+    }
+
+    /// Returns the transparent component of the unified key at the
+    /// BIP44 path `m/44'/<coin_type>'/<account>'`.
+    pub fn transparent(&self) -> Arc<ZcashAccountPrivKey> {
+        Arc::new(self.0.transparent().clone().into())
+    }
+
+    /// Returns the Sapling extended spending key component of this unified spending key.
+    pub fn sapling(&self) -> Arc<ZcashExtendedSpendingKey> {
+        Arc::new(self.0.sapling().clone().into())
+    }
+
+    /// Returns the Orchard spending key component of this unified spending key.
+    pub fn orchard(&self) -> Arc<ZcashOrchardSpendingKey> {
+        Arc::new((*self.0.orchard()).into())
     }
 
     /// Returns a binary encoding of this key suitable for decoding with [`decode`].
@@ -42,5 +58,14 @@ impl ZcashUnifiedSpendingKey {
     /// spend a note that they have authority for.
     pub fn to_bytes(&self, era: ZcashKeysEra) -> Vec<u8> {
         self.0.to_bytes(era.into())
+    }
+
+    /// Decodes a [`UnifiedSpendingKey`] value from its serialized representation.
+    ///
+    /// See [`to_bytes`] for additional detail about the encoded form.
+    pub fn from_bytes(era: ZcashKeysEra, encoded: &[u8]) -> ZcashResult<Self> {
+        UnifiedSpendingKey::from_bytes(era.into(), encoded)
+            .map_err(From::from)
+            .map(From::from)
     }
 }

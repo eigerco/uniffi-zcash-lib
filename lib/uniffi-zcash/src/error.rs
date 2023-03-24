@@ -1,4 +1,5 @@
 use orchard::zip32;
+use zcash_client_backend::keys::DecodingError;
 
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]
@@ -10,6 +11,9 @@ pub enum ZcashError {
     DerivationError {
         error: zcash_client_backend::keys::DerivationError,
     },
+
+    #[error("decoding error occurred: {error:?}")]
+    DecodingError { error: DecodingError },
 
     #[error("could not decode the `ask` bytes to a jubjub field element")]
     InvalidAsk,
@@ -36,6 +40,12 @@ pub enum ZcashError {
 impl From<hdwallet::error::Error> for ZcashError {
     fn from(error: hdwallet::error::Error) -> Self {
         ZcashError::HDWalletError { error }
+    }
+}
+
+impl From<zcash_client_backend::keys::DecodingError> for ZcashError {
+    fn from(error: zcash_client_backend::keys::DecodingError) -> Self {
+        ZcashError::DecodingError { error }
     }
 }
 
