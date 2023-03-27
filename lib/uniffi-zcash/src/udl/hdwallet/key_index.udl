@@ -1,0 +1,16 @@
+interface ZcashKeyIndex {
+  [Name=from_u32, Throws=ZcashError]
+  constructor(u32 i);
+
+  [Name=hardened_from_normalize_index, Throws=ZcashError]
+  constructor(u32 i);
+
+  [Name=from_index, Throws=ZcashError]
+  constructor(u32 i);
+
+  u32 raw_index();
+
+  u32 normalize_index();
+
+  boolean is_valid();
+};
