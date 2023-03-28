@@ -339,6 +339,15 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashSaplingNote::rcm()          |                  |                    |                    |                    |       |
 | ZcashSaplingNote::generate_or_derive_esk()  |                  |                    |                    |          |       |
 
+### ZcashSaplingExtractedNoteCommitment
+
+* Original type: [zcash_primitives::sapling::note::ExtractedNoteCommitment](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/note/struct.ExtractedNoteCommitment.html)
+
+| Object/Method name                 |    Score        |        UDL         |        Code        |       Tests        | Docs  |
+| ---------------------------------- | :----------:    | :----------------: | :----------------: | :----------------: | :---: |
+| ZcashSaplingExtractedNoteCommitment::from_bytes()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |        |  :white_check_mark:     |
+| ZcashSaplingExtractedNoteCommitment::to_bytes()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |          |  :white_check_mark:     |
+
 
 ### ZcashSaplingNoteValue
 
