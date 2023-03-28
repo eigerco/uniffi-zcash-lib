@@ -227,7 +227,7 @@ fn orchard_spending_key_from_zip32_seed(seed: &[u8]) -> String {
     let data = format_u8(
         SpendingKey::from_zip32_seed(seed, in1, in2)
             .unwrap()
-            .to_bytes(),
+            .to_bytes()
     );
     let seed_str = format_u8(seed);
 

@@ -16,7 +16,9 @@ impl ZcashTestSupport {
         let mut outputs: OutputsMap = HashMap::new();
         let mut args: ArgsMap = HashMap::new();
 
-        read_to_string("tests/test_data.csv")
+        let base_url = env!("CARGO_MANIFEST_DIR");
+
+        read_to_string(format!("{base_url}/tests/test_data.csv"))
             .expect("cannot find test data")
             .split("\n")
             .for_each(|line| {
@@ -29,7 +31,9 @@ impl ZcashTestSupport {
                         .split('$')
                         .map(String::from)
                         .collect::<Vec<String>>();
+
                     let output = iter.next().unwrap();
+
                     outputs.insert(
                         method.to_string(),
                         serde_json::from_str::<Vec<u8>>(output).unwrap(),
@@ -84,7 +88,10 @@ impl ZcashSpecificTestSupport {
         let mut output = "";
         let mut args = "";
 
-        let binding = read_to_string("tests/test_data.csv").expect("cannot find test data");
+        let base_url = env!("CARGO_MANIFEST_DIR");
+
+        let binding = read_to_string(format!("{base_url}/tests/test_data.csv"))
+            .expect("cannot find test data");
 
         binding.split("\n").for_each(|line| {
             if !line.is_empty() {
