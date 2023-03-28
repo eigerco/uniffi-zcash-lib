@@ -663,11 +663,10 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                      | Score | UDL | Code | Tests | Docs |
 | ---------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashMemoBytes::empty()      | 🔴     |     |      |       |      |
-| ZcashMemoBytes::from_bytes() | 🔴     |     |      |       |      |
-| ZcashMemoBytes::as_array()   | 🔵     |     |      |       |      |
-| ZcashMemoBytes::as_slice()   | 🔵     |     |      |       |      |
-
+| ZcashMemoBytes::empty()      | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashMemoBytes::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashMemoBytes::as_array()   | 🔵    |     |      |       |      |
+| ZcashMemoBytes::as_slice()   | 🔵    |  ✅ |  ✅  |       |  ✅  |
 ### ZcashDiversifierIndexAndPaymentAddress
 
 A pair of [ZcashDiversifierIndex](#zcashdiversifierindex) and [ZcashPaymentAddress](#zcashpaymentaddress-sapling).
