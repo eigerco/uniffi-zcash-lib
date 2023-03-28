@@ -7,30 +7,39 @@ func testSpendingKeyConversions() {
 
     assert(key.toBytes() == keyBytes)
 }
+
 testSpendingKeyConversions()
 
 func testSpendingKeyArrayMismatch() {
     let keyBytes: [UInt8] = [0, 1]
-    
-    var thrown = false;
+
+    var thrown = false
     do {
-        let _ = try ZcashOrchardSpendingKey.fromBytes(data: keyBytes)
+        _ = try ZcashOrchardSpendingKey.fromBytes(data: keyBytes)
     } catch ZcashError.ArrayLengthMismatch {
         thrown = true
-    } catch {
-    }
+    } catch {}
     assert(thrown)
 }
+
 testSpendingKeyArrayMismatch()
 
 func testSpendingKeyFromSeed32Seed() {
-    let seed: [UInt8] = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    let coinType: UInt32 = 234
-    let account: UInt32 = 2345
-    
+    // let seed: [UInt8] = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    // let coinType: UInt32 = 234
+    // let account: UInt32 = 2345
+
+    let zts = ZcashSpecificTestSupport.fromMethod(method: "SpendingKey::from_zip32_seed")
+
+    let seed: [UInt8] = zts.getArgumentAsByteArray(idx: 0)
+    let coinType: UInt32 = zts.getArgumentAsInteger(idx: 1)
+    let account: UInt32 = zts.getArgumentAsInteger(idx: 2)
+    let expectedBytes: [UInt8] = zts.getOutputAsBytes()
+
     let key = try! ZcashOrchardSpendingKey.fromZip32Seed(seed: seed, coinType: coinType, account: account)
 
-    let keyExpectedBytes: [UInt8] = [23, 204, 133, 79, 99, 251, 110, 203, 15, 118, 24, 192, 12, 136, 237, 233, 13, 99, 222, 152, 174, 33, 68, 24, 46, 232, 217, 91, 241, 233, 151, 141]
-    assert(key.toBytes() == keyExpectedBytes)
+    // let expectedBytes = [23, 204, 133, 79, 99, 251, 110, 203, 15, 118, 24, 192, 12, 136, 237, 233, 13, 99, 222, 152, 174, 33, 68, 24, 46, 232, 217, 91, 241, 233, 151, 141]
+    assert(key.toBytes() == expectedBytes)
 }
+
 testSpendingKeyFromSeed32Seed()
