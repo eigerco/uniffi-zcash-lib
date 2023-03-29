@@ -1,6 +1,10 @@
+use crate::{
+    ZcashPaymentAddress, ZcashResult, ZcashRseed, ZcashSaplingExtractedNoteCommitment,
+    ZcashSaplingNoteValue,
+};
+
 use std::sync::Arc;
 use zcash_primitives::sapling::Note;
-use crate::{ZcashPaymentAddress, ZcashResult, ZcashRseed, ZcashSaplingNoteValue};
 
 pub struct ZcashSaplingNote(Note);
 
@@ -28,6 +32,11 @@ impl ZcashSaplingNote {
             rseed.try_into()?,
         )
         .into())
+    }
+
+    /// Computes the note commitment
+    pub fn cmu(&self) -> Arc<ZcashSaplingExtractedNoteCommitment> {
+        Arc::new(self.0.cmu().into())
     }
 }
 

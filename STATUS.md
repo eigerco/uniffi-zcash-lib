@@ -335,7 +335,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashSaplingNote::value()       |                  |                    |                    |                    |       |
 | ZcashSaplingNote::rseed()       |                  |                    |                    |                    |       |
 | ZcashSaplingNote::nf()          |                  |                    |                    |                    |       |
-| ZcashSaplingNote::cmu()          |                  |                    |                    |                    |       |
+| ZcashSaplingNote::cmu()          |  :red_circle: |  :white_check_mark:                  |    :white_check_mark:                |                    |    :white_check_mark:   |
 | ZcashSaplingNote::rcm()          |                  |                    |                    |                    |       |
 | ZcashSaplingNote::generate_or_derive_esk()  |                  |                    |                    |          |       |
 

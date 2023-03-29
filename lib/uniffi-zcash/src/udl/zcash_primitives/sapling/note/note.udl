@@ -1,6 +1,8 @@
 interface ZcashSaplingNote {
     [Name=from_parts, Throws=ZcashError]
     constructor(ZcashPaymentAddress recipient, ZcashSaplingNoteValue value, ZcashRseed rseed);
+    
+    ZcashSaplingExtractedNoteCommitment cmu();
 };
 
 interface ZcashSaplingNoteValue {
