@@ -19,6 +19,9 @@ pub use self::sapling::*;
 mod transaction;
 pub use self::transaction::*;
 
+mod merkle_tree;
+pub use self::merkle_tree::*;
+
 mod zip32;
 pub use self::zip32::*;
 

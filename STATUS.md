@@ -633,13 +633,13 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                              | Score | UDL | Code | Tests | Docs |
 | ------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashCommitmentTree::empty()         | 🔴     |     |      |       |      |
+| ZcashCommitmentTree::empty()         | 🔴     | ✅ |  ✅  |       |  ✅  |
 | ZcashCommitmentTree::from_frontier() | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::to_frontier()   | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::size()          | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::read()          | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::write()         | 🔵     |     |      |       |      |
-| ZcashCommitmentTree::append()        | 🔴     |     |      |       |      |
+| ZcashCommitmentTree::append()        | 🔴     | ✅  |  ✅  |       |  ✅  |
 | ZcashCommitmentTree::root()          | 🔵     |     |      |       |      |
 
 ### ZcashSaplingNode

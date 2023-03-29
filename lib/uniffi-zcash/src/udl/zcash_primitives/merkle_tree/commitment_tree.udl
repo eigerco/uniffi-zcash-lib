@@ -1,0 +1,7 @@
+interface ZcashCommitmentTree {
+    [Name=empty]
+    constructor();
+
+    [Throws=ZcashError]
+    void append(ZcashSaplingNode node);
+};
