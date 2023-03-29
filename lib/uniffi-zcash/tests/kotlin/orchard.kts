@@ -22,21 +22,7 @@ fun testSpendingKeyArrayMismatch() {
 }
 testSpendingKeyArrayMismatch()
 
-
-// fun testSpendingKeyFromSeed32Seed() {
-//     val zts = ZcashTestSupport.fromCsvFile()
-//     val seed = zts.getArgumentAsByteArray("SpendingKey::from_zip32_seed", 0u)
-//     val coinType = zts.getArgumentAsInteger("SpendingKey::from_zip32_seed", 1u)
-//     val account = zts.getArgumentAsInteger("SpendingKey::from_zip32_seed", 2u)
-//     val keyExpectedBytes = zts.getOutputAsBytes("SpendingKey::from_zip32_seed")
-
-//     val key = ZcashOrchardSpendingKey.fromZip32Seed(seed, coinType, account)
-
-//     assert(key.toBytes() == keyExpectedBytes)
-// }
-// testSpendingKeyFromSeed32Seed()
-
-fun testSpendingKeyFromSeed32Seed() {
+fun testSpendingKeyFromZip32Seed() {
     val zts = ZcashSpecificTestSupport.fromMethod("SpendingKey::from_zip32_seed")
 
     val seed = zts.getArgumentAsByteArray(0u)
@@ -49,4 +35,4 @@ fun testSpendingKeyFromSeed32Seed() {
 
     assert(key.toBytes() == keyExpectedBytes)
 }
-testSpendingKeyFromSeed32Seed()
+testSpendingKeyFromZip32Seed()

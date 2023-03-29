@@ -20,7 +20,7 @@ impl ZcashTestSupport {
 
         read_to_string(format!("{base_url}/tests/test_data.csv"))
             .expect("cannot find test data")
-            .split("\n")
+            .split('\n')
             .for_each(|line| {
                 if !line.is_empty() {
                     let mut iter = line.splitn(3, ';');
@@ -93,7 +93,7 @@ impl ZcashSpecificTestSupport {
         let binding = read_to_string(format!("{base_url}/tests/test_data.csv"))
             .expect("cannot find test data");
 
-        binding.split("\n").for_each(|line| {
+        binding.split('\n').for_each(|line| {
             if !line.is_empty() {
                 let mut iter = line.splitn(3, ';');
                 let method_int = iter.next().unwrap();
@@ -155,7 +155,7 @@ impl ZcashSpecificTestSupport {
             .collect::<Vec<String>>();
 
         if let Some(arg) = args.get(usize::try_from(idx).unwrap()) {
-            serde_json::from_str::<Vec<u8>>(&arg).unwrap()
+            serde_json::from_str::<Vec<u8>>(arg).unwrap()
         } else {
             panic!("the argument index doesn't exist!")
         }
