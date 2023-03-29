@@ -22,9 +22,6 @@ pub use self::zcash_primitives::*;
 mod jubjub;
 pub use self::jubjub::*;
 
-mod test_data;
-// pub use self::test_data::*;
-
 mod utils;
 
 #[cfg(feature = "rustler")]
