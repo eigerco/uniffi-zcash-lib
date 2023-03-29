@@ -1,0 +1,4 @@
+interface ZcashSaplingNode {
+    [Name="from_cmu"]
+    constructor([ByRef] ZcashSaplingExtractedNoteCommitment cmu);
+};

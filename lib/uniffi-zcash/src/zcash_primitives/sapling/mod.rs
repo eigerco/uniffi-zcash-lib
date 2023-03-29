@@ -15,3 +15,6 @@ pub use self::value::*;
 
 mod note;
 pub use self::note::*;
+
+mod tree;
+pub use self::tree::*;

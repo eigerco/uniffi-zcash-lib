@@ -642,14 +642,14 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashCommitmentTree::append()        | 🔴     |     |      |       |      |
 | ZcashCommitmentTree::root()          | 🔵     |     |      |       |      |
 
-### ZcashSaplingTreeNode
+### ZcashSaplingNode
 
 * Original type: [zcash_primitives::sapling::Node](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/struct.Node.html)
 
 | Members                             | Score | UDL | Code | Tests | Docs |
 | ----------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashSaplingTreeNode::from_cmu()    | 🔴     |     |      |       |      |
-| ZcashSaplingTreeNode::from_scalar() | 🔵     |     |      |       |      |
+| ZcashSaplingNode::from_cmu()    | 🔴     | ✅ | ✅   |       |  ✅  |
+| ZcashSaplingNode::from_scalar() | 🔵     |    |      |       |      |
 
 ### ZcashIncrementalWitness
 
