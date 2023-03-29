@@ -1,5 +1,4 @@
 use orchard::zip32;
-use zcash_client_backend::keys::DecodingError;
 
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]
@@ -13,7 +12,7 @@ pub enum ZcashError {
     },
 
     #[error("decoding error occurred: {error:?}")]
-    DecodingError { error: DecodingError },
+    DecodingError { error: zcash_client_backend::keys::DecodingError },
 
     #[error("could not decode the `ask` bytes to a jubjub field element")]
     InvalidAsk,
