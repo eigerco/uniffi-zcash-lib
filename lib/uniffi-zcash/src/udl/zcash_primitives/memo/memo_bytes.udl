@@ -1,6 +1,9 @@
 interface ZcashMemoBytes {
   [Throws=ZcashError]
   constructor([ByRef] sequence<u8> data);
+  
+  [Name=empty]
+  constructor();
 
   sequence<u8> data();
 };
