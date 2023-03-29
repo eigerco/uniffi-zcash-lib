@@ -38,7 +38,7 @@ impl From<ZcashRecipientAddress> for RecipientAddress {
                 RecipientAddress::Shielded(addr.as_ref().into())
             }
             ZcashRecipientAddress::Transparent(addr) => {
-                RecipientAddress::Transparent((*addr).into())
+                RecipientAddress::Transparent(addr.as_ref().into())
             }
             ZcashRecipientAddress::Unified(addr) => {
                 RecipientAddress::Unified((*addr).clone().into())

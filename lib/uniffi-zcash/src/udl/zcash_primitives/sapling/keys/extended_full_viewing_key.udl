@@ -1,0 +1,17 @@
+interface ZcashExtendedFullViewingKey {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor(sequence<u8> bytes);
+
+  sequence<u8> to_bytes();
+
+  [Throws=ZcashError]
+  ZcashExtendedFullViewingKey derive_child(ZcashChildIndex i);
+
+  ZcashDiversifierIndexAndPaymentAddress? find_address(ZcashDiversifierIndex j);
+
+  ZcashDiversifierIndexAndPaymentAddress default_address();
+
+  ZcashExtendedFullViewingKey derive_internal();
+
+  ZcashDiversifiableFullViewingKey to_diversifiable_full_viewing_key();
+};
