@@ -24,3 +24,9 @@ impl ZcashCommitmentTree {
         }
     }
 }
+
+impl From<&ZcashCommitmentTree> for CommitmentTree<Node> {
+    fn from(value: &ZcashCommitmentTree) -> Self {
+        value.0.read().unwrap().clone()
+    }
+}

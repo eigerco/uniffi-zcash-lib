@@ -657,14 +657,14 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                              | Score | UDL | Code | Tests | Docs |
 | ------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashIncrementalWitness::from_tree() | 🔴     |     |      |       |      |
-| ZcashIncrementalWitness::read()      | 🔵     |     |      |       |      |
-| ZcashIncrementalWitness::write()     | 🔵     |     |      |       |      |
-| ZcashIncrementalWitness::position()  | 🔵     |     |      |       |      |
-| ZcashIncrementalWitness::filler()    | 🔵     |     |      |       |      |
-| ZcashIncrementalWitness::append()    | 🔴     |     |      |       |      |
-| ZcashIncrementalWitness::root()      | 🔵     |     |      |       |      |
-| ZcashIncrementalWitness::path()      | 🔵     |     |      |       |      |
+| ZcashIncrementalWitness::from_tree() | 🔴    | ✅ |  ✅  |       |  ✅  |
+| ZcashIncrementalWitness::read()      | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::write()     | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::position()  | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::filler()    | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::append()    | 🔴    | ✅ |  ✅  |       |  ✅  |
+| ZcashIncrementalWitness::root()      | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::path()      | 🔵    |    |      |       |      |
 
 ### ZcashMemoBytes
 
