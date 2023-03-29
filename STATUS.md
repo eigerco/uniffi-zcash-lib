@@ -1,5 +1,4 @@
-
-## Completion map
+# Completion map
 
 We currently have implemented and tested the following object graph:
 
@@ -44,7 +43,7 @@ UnifiedSK-->UnifiedFVK
 ```
 * See API surface section below to see the API detailed status.
 
-## FFI API features matrix
+# FFI API features matrix
 
 This is a feature matrix which keeps track of the current state of implementation for the FFI API surface. Here are the descriptions of each column:
 
@@ -64,19 +63,43 @@ This is a feature matrix which keeps track of the current state of implementatio
 * This should be kept up to date with new developments/findings.
 * Its still in progress the creation of new types for `Orchard` below in this index.
 
+## Index
+
+* [Errors](#errors)
+* [Objects](#objects)
+* [Enums](#enums)
+* [Records](#records)
+
+## Errors
+
+We use a single `ZcashError` encompassing following errors:
+
+* `HDWalletError` - original type: [hdwallet::error::Error](https://docs.rs/hdwallet/latest/hdwallet/error/enum.Error.html)
+* `DerivationError` - original type: [zcash_client_backend::keys::DerivationError]()
+* `DecodingError` - original type: [zcash_client_backend::keys::DecodingError]()
+* `InvalidAsk` - original type: [zcash_primitives::sapling::keys::DecodingError::InvalidAsk](https://docs.rs/zcash_primitives/latest/zcash_primitives/sapling/keys/enum.DecodingError.html#variant.InvalidAsk)
+* `InvalidNsk`- original type: [zcash_primitives::sapling::keys::DecodingError::InvalidNsk](https://docs.rs/zcash_primitives/latest/zcash_primitives/sapling/keys/enum.DecodingError.html#variant.InvalidNsk)
+* `Message` - generic `String` message error
+* `ArrayLengthMismatch` - used when `sequence<u8>` length doesn't match expected array length
+* `ValueOutOfRange` - used when value is outside of expected range
+* `Secp256k1Error` - original type: [secp256k1::Error](https://docs.rs/secp256k1/latest/secp256k1/enum.Error.html)
+* `Unknown` - unknown error, usually used for constructors that return `Option`
+
+## Objects
+
 ### ZcashAccountPrivKey
 
 * Original type: [zcash_primitives::legacy::keys::AccountPrivKey](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/legacy/keys/struct.AccountPrivKey.html)
 
-| Object/Method name                                                                          |    Score     |        UDL         |        Code        |       Tests        | Docs  |
-| ------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :---: |
-| ZcashAccountPrivKey::from_seed()                                                            | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashAccountPrivKey::from_extended_privkey([ZcashExtendedPrivKey](#zcashextendedprivkey))   | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashAccountPrivKey::to_account_pubkey()                                                    | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashAccountPrivKey::derive_external_secret_key() -> [SecpSecretKey](#secpsecretkey)        | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashAccountPrivKey::derive_internal_secret_key() -> [SecpSecretKey](#secpsecretkey)        | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
-| ZcashAccountPrivKey::to_bytes()                                                             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashAccountPrivKey::from_bytes()                                                           | :red_circle: | :white_check_mark: | :white_check_mark: |                    |       |
+| Object/Method name                                                                          |    Score     |        UDL         |        Code        |       Tests        |  Docs  |
+| ------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----: |
+| ZcashAccountPrivKey::from_seed()                                                            | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |        |
+| ZcashAccountPrivKey::from_extended_privkey([ZcashExtendedPrivKey](#zcashextendedprivkey))   | :red_circle: | :white_check_mark: | :white_check_mark: |                    |        |
+| ZcashAccountPrivKey::to_account_pubkey()                                                    | :red_circle: | :white_check_mark: | :white_check_mark: |                    |        |
+| ZcashAccountPrivKey::derive_external_secret_key() -> [SecpSecretKey](#secpsecretkey)        | :red_circle: | :white_check_mark: | :white_check_mark: |                    |        |
+| ZcashAccountPrivKey::derive_internal_secret_key() -> [SecpSecretKey](#secpsecretkey)        | :red_circle: | :white_check_mark: | :white_check_mark: |                    |        |
+| ZcashAccountPrivKey::to_bytes()                                                             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |        |
+| ZcashAccountPrivKey::from_bytes()                                                           | :red_circle: | :white_check_mark: | :white_check_mark: |                    |        |
 
 ### SecpSecretKey
 
@@ -121,14 +144,14 @@ This is a feature matrix which keeps track of the current state of implementatio
 * Original type: [zcash_primitives::legacy::keys::AccountPubKey](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/legacy/keys/struct.AccountPubKey.html)
 
 | Object/Method name                                                  | Score |        UDL         |        Code        | Tests |        Docs        |
-| ------------------------------------------------------------------- | :---: | :----------------: | :----------------: | :---: | :----------------: |
-| ZcashAccountPubKey::derive_external_ivk()                           |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::derive_internal_ivk()                           |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::ovks_for_shielding()                            |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::internal_ovk()                                  |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::external_ovk()                                  |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::serialize()                                     |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::deserialize() (renamed to new() as constructor) |   🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :---: | :----------------: |
+| ZcashAccountPubKey::derive_external_ivk()                           | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::derive_internal_ivk()                           | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::ovks_for_shielding()                            | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::internal_ovk()                                  | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::external_ovk()                                  | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::serialize()                                     | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZcashAccountPubKey::deserialize() (renamed to new() as constructor) | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
 
 ### ZcashUnifiedSpendingKey
 
@@ -138,10 +161,10 @@ This is a feature matrix which keeps track of the current state of implementatio
 | --------------------------------------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
 | ZcashUnifiedSpendingKey::from_seed()                                                                                  | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashUnifiedSpendingKey::to_unified_full_viewing_key() -> [ZcashUnifiedFullViewingKey](#zcashunifiedfullviewingkey)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| ZcashUnifiedSpendingKey::transparent() -> [ZcashAccountPrivKey](#zcashaccountprivkey)                                                                                | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashUnifiedSpendingKey::sapling() -> [ZcashExtendedSpendingKey](#zcashextendedspendingkey-sapling)                                                                                    | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashUnifiedSpendingKey::orchard() -> [ZcashOrchardSpendingKey](#zcashorchardspendingkey)                                                                                    | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashUnifiedSpendingKey::to_bytes()                                                                                | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashUnifiedSpendingKey::transparent() -> [ZcashAccountPrivKey](#zcashaccountprivkey)                                 | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashUnifiedSpendingKey::sapling() -> [ZcashExtendedSpendingKey](#zcashextendedspendingkey-sapling)                   | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashUnifiedSpendingKey::orchard() -> [ZcashOrchardSpendingKey](#zcashorchardspendingkey)                             | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashUnifiedSpendingKey::to_bytes()                                                                                   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashUnifiedSpendingKey::from_bytes()                                                                                 |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashUnifiedFullViewingKey
@@ -315,69 +338,66 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 * Original type: [zcash_primitives::sapling::PaymentAddress](https://docs.rs/zcash_primitives/latest/zcash_primitives/sapling/struct.PaymentAddress.html)
 
-| Object/Method name                 |    Score        |        UDL         |        Code        |       Tests        | Docs  |
-| ---------------------------------- | :----------:    | :----------------: | :----------------: | :----------------: | :---: |
-| ZcashPaymentAddress::from_parts()  | :red_circle: |                    |                    |                    |       |
-| ZcashPaymentAddress::from_bytes()  | :red_circle:                |                    |                    |                    |       |
-| ZcashPaymentAddress::to_bytes()    | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashPaymentAddress::diversifier() | :red_circle: | :white_check_mark: | :white_check_mark: |                       |  :white_check_mark:     |
-| ZcashPaymentAddress::pk_d()        | :red_circle: | :white_check_mark: | :white_check_mark: |                       |   :white_check_mark:    |
-| ZcashPaymentAddress::create_note() | :red_circle: |  :white_check_mark:| :white_check_mark: |                        |  :white_check_mark:     |
+| Object/Method name                 |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| ---------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashPaymentAddress::from_parts()  | :red_circle: |                    |                    |                    |                    |
+| ZcashPaymentAddress::from_bytes()  | :red_circle: |                    |                    |                    |                    |
+| ZcashPaymentAddress::to_bytes()    | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                    |
+| ZcashPaymentAddress::diversifier() | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashPaymentAddress::pk_d()        | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashPaymentAddress::create_note() | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashSaplingNote
 
 * Original type: [zcash_primitives::sapling::Note](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/note/struct.Note.html)
 
-| Object/Method name                 |    Score        |        UDL         |        Code        |       Tests        | Docs  |
-| ---------------------------------- | :----------:    | :----------------: | :----------------: | :----------------: | :---: |
-| ZcashSaplingNote::from_parts()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |                    |  :white_check_mark:     |
-| ZcashSaplingNote::recipient()   |                  |                    |                    |                    |       |
-| ZcashSaplingNote::value()       |                  |                    |                    |                    |       |
-| ZcashSaplingNote::rseed()       |                  |                    |                    |                    |       |
-| ZcashSaplingNote::nf()          |                  |                    |                    |                    |       |
-| ZcashSaplingNote::cmu()          |  :red_circle: |  :white_check_mark:                  |    :white_check_mark:                |                    |    :white_check_mark:   |
-| ZcashSaplingNote::rcm()          |                  |                    |                    |                    |       |
-| ZcashSaplingNote::generate_or_derive_esk()  |                  |                    |                    |          |       |
+| Object/Method name                          |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| ------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashSaplingNote::from_parts()              | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashSaplingNote::recipient()               |              |                    |                    |                    |                    |
+| ZcashSaplingNote::value()                   |              |                    |                    |                    |                    |
+| ZcashSaplingNote::rseed()                   |              |                    |                    |                    |                    |
+| ZcashSaplingNote::nf()                      |              |                    |                    |                    |                    |
+| ZcashSaplingNote::cmu()                     | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashSaplingNote::rcm()                     |              |                    |                    |                    |                    |
+| ZcashSaplingNote::generate_or_derive_esk()  |              |                    |                    |                    |                    |
 
 ### ZcashSaplingExtractedNoteCommitment
 
 * Original type: [zcash_primitives::sapling::note::ExtractedNoteCommitment](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/note/struct.ExtractedNoteCommitment.html)
 
-| Object/Method name                 |    Score        |        UDL         |        Code        |       Tests        | Docs  |
-| ---------------------------------- | :----------:    | :----------------: | :----------------: | :----------------: | :---: |
-| ZcashSaplingExtractedNoteCommitment::from_bytes()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |        |  :white_check_mark:     |
-| ZcashSaplingExtractedNoteCommitment::to_bytes()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |          |  :white_check_mark:     |
-
+| Object/Method name                                |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
+| ------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashSaplingExtractedNoteCommitment::from_bytes() | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashSaplingExtractedNoteCommitment::to_bytes()   | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashSaplingNoteValue
 
 * Original type: [zcash_primitives::sapling::value::NoteValue](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/value/struct.NoteValue.html)
 
-| Object/Method name                 |    Score        |        UDL         |        Code        |       Tests        | Docs  |
-| ---------------------------------- | :----------:    | :----------------: | :----------------: | :----------------: | :---: |
-| ZcashSaplingNoteValue::inner()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |                    |  :white_check_mark:     |
-| ZcashSaplingNoteValue::from_raw()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |                    |  :white_check_mark:     |
-
+| Object/Method name                 |    Score     |        UDL         |        Code        |       Tests        |       Docs         |
+| ---------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashSaplingNoteValue::inner()     | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashSaplingNoteValue::from_raw()  | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashSaplingDiversifiedTransmissionKey
 
 * Original type: [zcash_primitives::sapling::keys::DiversifiedTransmissionKey](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/keys/struct.DiversifiedTransmissionKey.html)
 
-| Object/Method name                 |    Score        |        UDL         |        Code        |       Tests        | Docs  |
-| ---------------------------------- | :----------:    | :----------------: | :----------------: | :----------------: | :---: |
-| ZcashSaplingDiversifiedTransmissionKey::from_parts()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |                    |  :white_check_mark:     |
+| Object/Method name                                    |    Score      |        UDL         |        Code        |       Tests        |        Docs        |
+| ----------------------------------------------------- | :-----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashSaplingDiversifiedTransmissionKey::from_parts()  | :red_circle:  | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashOrchardSpendingKey
 
 * Original type: [orchard::keys::SpendingKey](https://docs.rs/orchard/0.3.0/orchard/keys/struct.SpendingKey.html)
 
-| Object/Method name                         | Score        | UDL                | Code               | Tests              | Docs |
-| ------------------------------------------ | ------------ | ------------------ | ------------------ | ------------------ | ---- |
-| ZcashOrchardSpendingKey::to_bytes()        | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |      |
-| ZcashOrchardSpendingKey::from_zip32_seed() | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |      |
-| ZcashOrchardSpendingKey::from_bytes()      | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |      |
-| ZcashOrchardSpendingKey::to_fvk()          | :red_circle: | :white_check_mark: | :white_check_mark: |             |  :white_check_mark: |
-
+| Object/Method name                         | Score        | UDL                | Code               | Tests              |       Docs          |
+| ------------------------------------------ | ------------ | ------------------ | ------------------ | ------------------ | ------------------- |
+| ZcashOrchardSpendingKey::to_bytes()        | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                     |
+| ZcashOrchardSpendingKey::from_zip32_seed() | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                     |
+| ZcashOrchardSpendingKey::from_bytes()      | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |                     |
+| ZcashOrchardSpendingKey::to_fvk()          | :red_circle: | :white_check_mark: | :white_check_mark: |                    |  :white_check_mark: |
 
 ### ZcashOrchardFullViewingKey
 
@@ -423,15 +443,6 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashOrchardAddress::to_raw_address_bytes()                                                         | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashOrchardAddress::from_raw_address_bytes()                                                       |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
-### ZcashOrchardScope
-
-* Original type: [orchard::keys::Scope](https://docs.rs/orchard/0.3.0/orchard/keys/enum.Scope.html)
-
-| Members         | Score        | UDL                | Code               | Tests              | Docs               |
-| --------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| External        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Internal        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-
 ### ZcashOrchardDiversifierIndex
 
 * Original type: [orchard::keys::DiversifierIndex](https://docs.rs/orchard/0.3.0/orchard/keys/struct.DiversifierIndex.html)
@@ -469,25 +480,6 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashKeyIndex::hardened_from_normalize_index()  |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | ZcashKeyIndex::from_index()                     |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
-### ZcashScope
-
-* Original type: [zcash_primitives::zip32::Scope](https://docs.rs/zcash_primitives/latest/zcash_primitives/zip32/enum.Scope.html)
-
-| Members         | Score        | UDL                | Code               | Tests              | Docs               |
-| --------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| External        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| Internal        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-
-### ZcashKeySeed
-
-* Original type: [hdwallet::extended_key::KeySeed](https://docs.rs/hdwallet/latest/hdwallet/extended_key/enum.KeySeed.html)
-
-| Members         | Score        | UDL                | Code               | Tests              | Docs               |
-| --------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| S128            |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| S256            |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| S512            |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-
 ### ZcashTransactionBuilder
 
 * Original type: [zcash_primitives::transaction::builder::Builder](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/builder/struct.Builder.html)
@@ -512,7 +504,6 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashTransactionBuilder::build()                  | 🔴     |     |      |       |      |
 | ZcashTransactionBuilder::build_zfuture()          | 🔵     |     |      |       |      |
 
-
 ### ZcashParametersMainNetwork
 * Original type: [zcash_primitives::consensus::MainNetwork](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/consensus/struct.MainNetwork.html)
 * Marker struct, no need to implement methods.
@@ -534,7 +525,6 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | Members                      | Score | UDL | Code | Tests | Docs |
 | ---------------------------- | ----- | --- | ---- | ----- | ---- |
 | ZcashBlockHeight::from_u32() | 🔴    |  ✅ |  ✅  |       |  ✅  |
-
 
 ### ZcashExternalIvk
 
@@ -628,7 +618,6 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashFeeRule::marginal_fee()               | 🔴    |  ✅ |  ✅  |       | ✅   |
 | ZcashFeeRule::p2pkh_standard_input_size()  | 🔵    |     |      |       |      |
 | ZcashFeeRule::p2pkh_standard_output_size() | 🔵    |     |      |       |      |
-
 ### ZcashRseed
 
 * Original type: [zcash_primitives::sapling::note::Rseed](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/note/enum.Rseed.html)
@@ -687,9 +676,46 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashMemoBytes::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashMemoBytes::as_array()   | 🔵    |     |      |       |      |
 | ZcashMemoBytes::as_slice()   | 🔵    |  ✅ |  ✅  |       |  ✅  |
-### ZcashDiversifierIndexAndPaymentAddress
 
-A pair of [ZcashDiversifierIndex](#zcashdiversifierindex) and [ZcashPaymentAddress](#zcashpaymentaddress-sapling).
+## Enums
+
+### ZcashScope
+
+* Original type: [zcash_primitives::zip32::Scope](https://docs.rs/zcash_primitives/latest/zcash_primitives/zip32/enum.Scope.html)
+
+| Members         | Score        | UDL                | Code               | Tests              | Docs               |
+| --------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| External        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Internal        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+### ZcashOrchardScope
+
+* Original type: [orchard::keys::Scope](https://docs.rs/orchard/0.3.0/orchard/keys/enum.Scope.html)
+
+| Members         | Score        | UDL                | Code               | Tests              | Docs               |
+| --------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| External        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| Internal        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+### ZcashKeySeed
+
+* Original type: [hdwallet::extended_key::KeySeed](https://docs.rs/hdwallet/latest/hdwallet/extended_key/enum.KeySeed.html)
+
+| Members         | Score        | UDL                | Code               | Tests              | Docs               |
+| --------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| S128            |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| S256            |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| S512            |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+
+### ZcashSaplingRseed
+
+* Original type: [zcash_primitives::sapling::note::Rseed](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/note/enum.Rseed.html)
+* Its an Enum type. No methods to implement.
+
+| Members | Score | UDL | Code | Tests | Docs |
+| ------- | ----- | --- | ---- | ----- | ---- |
+
+## Records
 
 ### ZcashDiversifierIndexAndScope
 
@@ -698,3 +724,7 @@ A pair of [ZcashDiversifierIndex](#zcashdiversifierindex) and [ZcashScope](#zcas
 ### ZcashUnifiedAddressAndDiversifierIndex
 
 A pair of [ZcashUnifiedAddress](#zcashunifiedaddress) and [ZcashDiversifierIndex](#zcashdiversifierindex).
+
+### ZcashDiversifierIndexAndPaymentAddress
+
+A pair of [ZcashDiversifierIndex](#zcashdiversifierindex) and [ZcashPaymentAddress](#zcashpaymentaddress-sapling).
