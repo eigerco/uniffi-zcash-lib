@@ -619,10 +619,11 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashFeeRule::p2pkh_standard_input_size()  | 🔵     |     |      |       |      |
 | ZcashFeeRule::p2pkh_standard_output_size() | 🔵     |     |      |       |      |
 
-### ZcashSaplingRseed
+### ZcashRseed
 
 * Original type: [zcash_primitives::sapling::note::Rseed](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/note/enum.Rseed.html)
 * Its an Enum type. No methods to implement.
+* Completed ✅
 
 | Members | Score | UDL | Code | Tests | Docs |
 | ------- | ----- | --- | ---- | ----- | ---- |
