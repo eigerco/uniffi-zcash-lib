@@ -12,7 +12,9 @@ pub enum ZcashError {
     },
 
     #[error("decoding error occurred: {error:?}")]
-    DecodingError { error: zcash_client_backend::keys::DecodingError },
+    DecodingError {
+        error: zcash_client_backend::keys::DecodingError,
+    },
 
     #[error("could not decode the `ask` bytes to a jubjub field element")]
     InvalidAsk,
@@ -31,6 +33,14 @@ pub enum ZcashError {
 
     #[error("Secp256k1 error occurred: {error:?}")]
     Secp256k1Error { error: secp256k1::Error },
+
+    #[error("Bech32 decoding error occurred: {error}")]
+    Bech32DecodeError {
+        error: zcash_client_backend::encoding::Bech32DecodeError,
+    },
+
+    #[error("Base58 decoding error occurred: {error}")]
+    Bs58Error { error: bs58::decode::Error },
 
     #[error("unknown error occurred")]
     Unknown,
@@ -90,5 +100,17 @@ impl From<&str> for ZcashError {
 impl From<secp256k1::Error> for ZcashError {
     fn from(error: secp256k1::Error) -> Self {
         ZcashError::Secp256k1Error { error }
+    }
+}
+
+impl From<zcash_client_backend::encoding::Bech32DecodeError> for ZcashError {
+    fn from(error: zcash_client_backend::encoding::Bech32DecodeError) -> Self {
+        ZcashError::Bech32DecodeError { error }
+    }
+}
+
+impl From<bs58::decode::Error> for ZcashError {
+    fn from(error: bs58::decode::Error) -> Self {
+        ZcashError::Bs58Error { error }
     }
 }

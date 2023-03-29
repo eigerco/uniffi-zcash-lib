@@ -83,6 +83,8 @@ We use a single `ZcashError` encompassing following errors:
 * `ArrayLengthMismatch` - used when `sequence<u8>` length doesn't match expected array length
 * `ValueOutOfRange` - used when value is outside of expected range
 * `Secp256k1Error` - original type: [secp256k1::Error](https://docs.rs/secp256k1/latest/secp256k1/enum.Error.html)
+* `Bech32DecodeError` - original type: [zcash_client_backend::encoding::Bech32DecodeError](https://docs.rs/zcash_client_backend/latest/zcash_client_backend/encoding/enum.Bech32DecodeError.html),
+* `Bs58Error` - original type: [bs58::decode::Error](https://docs.rs/bs58/latest/bs58/decode/enum.Error.html),
 * `Unknown` - unknown error, usually used for constructors that return `Option`
 
 ## Objects
