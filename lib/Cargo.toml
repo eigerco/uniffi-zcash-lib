@@ -2,7 +2,6 @@
 members = [
     "uniffi-bindgen",
     "uniffi-zcash",
-    "uniffi-test-support",
 ]
 
 # We are using eiger fork of uniffi-rs, as we are

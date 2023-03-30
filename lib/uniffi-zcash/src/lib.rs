@@ -24,6 +24,9 @@ pub use self::jubjub::*;
 
 mod utils;
 
+pub mod test_support;
+pub use self::test_support::*;
+
 #[cfg(feature = "rustler")]
 mod beam;
 

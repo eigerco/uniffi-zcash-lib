@@ -1,7 +1,8 @@
 import zcash
 
 func testSpendingKeyConversions() {
-    let keyBytes: [UInt8] = [166, 3, 186, 151, 20, 139, 99, 33, 212, 134, 101, 192, 119, 208, 167, 21, 119, 228, 7, 152, 74, 140, 84, 209, 236, 235, 53, 57, 109, 65, 44, 178]
+    let zts = TestSupport.fromCsvFile()
+    let keyBytes: [UInt8] = zts.getAsByteArray(key: "orchard_spending_key")
 
     let key = try! ZcashOrchardSpendingKey.fromBytes(data: keyBytes)
 
@@ -25,20 +26,15 @@ func testSpendingKeyArrayMismatch() {
 testSpendingKeyArrayMismatch()
 
 func testSpendingKeyFromSeed32Seed() {
-    // let seed: [UInt8] = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    // let coinType: UInt32 = 234
-    // let account: UInt32 = 2345
+    let zts = TestSupport.fromCsvFile()
 
-    let zts = ZcashSpecificTestSupport.fromMethod(method: "SpendingKey::from_zip32_seed")
-
-    let seed: [UInt8] = zts.getArgumentAsByteArray(idx: 0)
-    let coinType: UInt32 = zts.getArgumentAsInteger(idx: 1)
-    let account: UInt32 = zts.getArgumentAsInteger(idx: 2)
-    let expectedBytes: [UInt8] = zts.getOutputAsBytes()
+    let seed: [UInt8] = zts.getAsByteArray(key: "seed")
+    let coinType: UInt32 = zts.getAsInteger(key: "coin_type")
+    let account: UInt32 = zts.getAsInteger(key: "account")
+    let expectedBytes: [UInt8] = zts.getAsByteArray(key: "orchard_spending_key_from_zip32_seed")
 
     let key = try! ZcashOrchardSpendingKey.fromZip32Seed(seed: seed, coinType: coinType, account: account)
 
-    // let expectedBytes = [23, 204, 133, 79, 99, 251, 110, 203, 15, 118, 24, 192, 12, 136, 237, 233, 13, 99, 222, 152, 174, 33, 68, 24, 46, 232, 217, 91, 241, 233, 151, 141]
     assert(key.toBytes() == expectedBytes)
 }
 

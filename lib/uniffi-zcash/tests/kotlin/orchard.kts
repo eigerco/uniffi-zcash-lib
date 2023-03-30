@@ -1,7 +1,9 @@
 import uniffi.zcash.*
 
 fun testSpendingKeyConversions() {
-    val keyBytes = listOf(166, 3, 186, 151, 20, 139, 99, 33, 212, 134, 101, 192, 119, 208, 167, 21, 119, 228, 7, 152, 74, 140, 84, 209, 236, 235, 53, 57, 109, 65, 44, 178).map { it.toUByte() }
+    val zts = TestSupport.fromCsvFile()
+
+    val keyBytes = zts.getAsByteArray("orchard_spending_key")
 
     val key = ZcashOrchardSpendingKey.fromBytes(keyBytes)
 
@@ -23,13 +25,13 @@ fun testSpendingKeyArrayMismatch() {
 testSpendingKeyArrayMismatch()
 
 fun testSpendingKeyFromZip32Seed() {
-    val zts = TestSupport.from_csv_file()
+    val zts = TestSupport.fromCsvFile()
 
     val seed = zts.getAsByteArray("seed")
-    val coinType = zts.getAsByteArray("coin_type")
-    val account = zts.getAsByteArray("account_id")
+    val coinType = zts.getAsInteger("coin_type")
+    val account = zts.getAsInteger("account")
 
-    val keyExpectedBytes = zts.getAsByteArray("spending_key_from_zip32_seed")
+    val keyExpectedBytes = zts.getAsByteArray("orchard_spending_key_from_zip32_seed")
 
     val key = ZcashOrchardSpendingKey.fromZip32Seed(seed, coinType, account)
 
