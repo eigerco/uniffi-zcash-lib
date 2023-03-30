@@ -560,18 +560,18 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                      | Score | UDL | Code | Tests | Docs |
 | -------------------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashAmount::zero()                          | 🔴     |     |      |       |      |
-| ZcashAmount::from_i64()                      | 🔴     |     |      |       |      |
-| ZcashAmount::from_nonnegative_i64()          | 🔴     |     |      |       |      |
-| ZcashAmount::from_u64()                      | 🔴     |     |      |       |      |
-| ZcashAmount::from_i64_le_bytes()             | 🔵     |     |      |       |      |
-| ZcashAmount::from_i64_le_bytes()             | 🔵     |     |      |       |      |
-| ZcashAmount::from_nonnegative_i64_le_bytes() | 🔵     |     |      |       |      |
-| ZcashAmount::from_i64_le_bytes()             | 🔵     |     |      |       |      |
-| ZcashAmount::to_i64_le_bytes()               | 🔵     |     |      |       |      |
-| ZcashAmount::is_positive()                   | 🔵     |     |      |       |      |
-| ZcashAmount::is_negative()                   | 🔵     |     |      |       |      |
-| ZcashAmount::sum()                           | 🔵     |     |      |       |      |
+| ZcashAmount::zero()                          | 🔴    | ✅  | ✅   |       | ✅   |
+| ZcashAmount::from_i64()                      | 🔴    | ✅  | ✅   |       | ✅   |
+| ZcashAmount::from_nonnegative_i64()          | 🔵    |     |      |       |      |
+| ZcashAmount::from_u64()                      | 🔵    |     |      |       |      |
+| ZcashAmount::from_i64_le_bytes()             | 🔵    |     |      |       |      |
+| ZcashAmount::from_i64_le_bytes()             | 🔵    |     |      |       |      |
+| ZcashAmount::from_nonnegative_i64_le_bytes() | 🔵    |     |      |       |      |
+| ZcashAmount::from_i64_le_bytes()             | 🔵    |     |      |       |      |
+| ZcashAmount::to_i64_le_bytes()               | 🔵    |     |      |       |      |
+| ZcashAmount::is_positive()                   | 🔵    |     |      |       |      |
+| ZcashAmount::is_negative()                   | 🔵    |     |      |       |      |
+| ZcashAmount::sum()                           | 🔵    |     |      |       |      |
 
 ### ZcashOutPoint
 
