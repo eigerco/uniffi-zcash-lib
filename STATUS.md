@@ -533,7 +533,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                      | Score | UDL | Code | Tests | Docs |
 | ---------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashBlockHeight::from_u32() | 🔴     |     |      |       |      |
+| ZcashBlockHeight::from_u32() | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 
 ### ZcashExternalIvk
