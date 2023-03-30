@@ -1,0 +1,4 @@
+interface ZcashOutPoint {
+    [Throws=ZcashError]
+    constructor([ByRef] sequence<u8> hash, u32 n);
+};

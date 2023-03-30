@@ -573,17 +573,17 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashAmount::is_negative()                   | 🔵     |     |      |       |      |
 | ZcashAmount::sum()                           | 🔵     |     |      |       |      |
 
-### ZcashTransparentOutPoint
+### ZcashOutPoint
 
 * Original type: [zcash_primitives::transaction::components::transparent::OutPoint](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/components/transparent/struct.OutPoint.html)
 
 | Members                           | Score | UDL | Code | Tests | Docs |
 | --------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashTransparentOutPoint::new()   | 🔴     |     |      |       |      |
-| ZcashTransparentOutPoint::read()  | 🔵     |     |      |       |      |
-| ZcashTransparentOutPoint::write() | 🔵     |     |      |       |      |
-| ZcashTransparentOutPoint::n()     | 🔵     |     |      |       |      |
-| ZcashTransparentOutPoint::hash()  | 🔵     |     |      |       |      |
+| ZcashOutPoint::new()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOutPoint::read()  | 🔵    |     |      |       |      |
+| ZcashOutPoint::write() | 🔵    |     |      |       |      |
+| ZcashOutPoint::n()     | 🔵    |     |      |       |      |
+| ZcashOutPoint::hash()  | 🔵    |     |      |       |      |
 
 ### ZcashLocalTxProver
 
