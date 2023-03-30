@@ -7,11 +7,11 @@ uniffi::build_foreign_language_testcases!(
     "tests/kotlin/test.kts",
     "tests/kotlin/sapling.kts",
     "tests/kotlin/orchard.kts",
-    // // Ruby tests
+    // Ruby tests
     "tests/ruby/test.rb",
     "tests/ruby/sapling.rb",
     "tests/ruby/orchard.rb",
-    // // Swift tests
+    // Swift tests
     "tests/swift/test.swift",
     "tests/swift/sapling.swift",
     "tests/swift/orchard.swift"

@@ -13,15 +13,14 @@ impl TestSupport {
         let base_dir = env!("CARGO_MANIFEST_DIR");
         let csv_path = format!("{base_dir}/tests/test_data.csv");
 
-        let mut map: KeyValMap = HashMap::new();
-
-        read_to_string(csv_path)
+        let map: KeyValMap = read_to_string(csv_path)
             .expect("cannot find test data")
             .split('\n')
-            .for_each(|line| {
+            .map(|line| {
                 let (k, v) = line.split_once(':').unwrap();
-                map.insert(String::from(k), String::from(v));
-            });
+                (k.to_string(), v.to_string())
+            })
+            .collect();
 
         Self { map }
     }
