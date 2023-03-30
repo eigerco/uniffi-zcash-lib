@@ -11,4 +11,4 @@ lib/Cargo.lock
 
 lib/uniffi-zcash/src/zcash.udl
 
-lib/tests/*.csv
+lib/uniffi-zcash/tests/*.csv
