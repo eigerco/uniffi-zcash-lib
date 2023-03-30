@@ -8,6 +8,11 @@ interface ZcashExtendedSpendingKey {
   [Name=from_path]
   constructor([ByRef] ZcashExtendedSpendingKey master, sequence<ZcashChildIndex> path);
 
+  [Name=decode, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string input);
+
+  string encode(ZcashConsensusParameters params);
+
   sequence<u8> to_bytes();
 
   ZcashExtendedSpendingKey derive_child(ZcashChildIndex index);

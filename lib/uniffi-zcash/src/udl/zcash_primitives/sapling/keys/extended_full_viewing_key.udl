@@ -2,6 +2,11 @@ interface ZcashExtendedFullViewingKey {
   [Name=from_bytes, Throws=ZcashError]
   constructor(sequence<u8> bytes);
 
+  [Name=decode, Throws=ZcashError]
+  constructor(ZcashConsensusParameters params, [ByRef] string input);
+
+  string encode(ZcashConsensusParameters params);
+
   sequence<u8> to_bytes();
 
   [Throws=ZcashError]

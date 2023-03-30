@@ -1,10 +1,12 @@
 use std::sync::Arc;
 
-use zcash_primitives::zip32::ExtendedFullViewingKey;
+use zcash_client_backend::encoding;
+use zcash_primitives::{consensus::Parameters, zip32::ExtendedFullViewingKey};
 
 use crate::{
-    ZcashChildIndex, ZcashDiversifiableFullViewingKey, ZcashDiversifierIndex,
-    ZcashDiversifierIndexAndPaymentAddress, ZcashError, ZcashPaymentAddress, ZcashResult,
+    ZcashChildIndex, ZcashConsensusParameters, ZcashDiversifiableFullViewingKey,
+    ZcashDiversifierIndex, ZcashDiversifierIndexAndPaymentAddress, ZcashError, ZcashPaymentAddress,
+    ZcashResult,
 };
 
 impl From<ExtendedFullViewingKey> for ZcashExtendedFullViewingKey {
@@ -22,6 +24,24 @@ impl From<&ZcashExtendedFullViewingKey> for ExtendedFullViewingKey {
 pub struct ZcashExtendedFullViewingKey(ExtendedFullViewingKey);
 
 impl ZcashExtendedFullViewingKey {
+    /// Writes an [`ExtendedFullViewingKey`] as a Bech32-encoded string.
+    pub fn encode(&self, params: ZcashConsensusParameters) -> String {
+        encoding::encode_extended_full_viewing_key(
+            params.hrp_sapling_extended_full_viewing_key(),
+            &self.0,
+        )
+    }
+
+    /// Decodes an [`ExtendedFullViewingKey`] from a Bech32-encoded string.
+    pub fn decode(params: ZcashConsensusParameters, input: &str) -> ZcashResult<Self> {
+        encoding::decode_extended_full_viewing_key(
+            params.hrp_sapling_extended_full_viewing_key(),
+            input,
+        )
+        .map_err(From::from)
+        .map(From::from)
+    }
+
     pub fn from_bytes(bytes: Vec<u8>) -> ZcashResult<Self> {
         ExtendedFullViewingKey::read(bytes.as_slice())
             .map(From::from)
