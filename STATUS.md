@@ -550,9 +550,11 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                    | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashTransparentTxOut::read()              | 🔵     |     |      |       |      |
+| ZcashTransparentTxOut::read()              | 🔵     |  ✅   |   ✅   |       |   ✅   |
 | ZcashTransparentTxOut::write()             | 🔵     |     |      |       |      |
-| ZcashTransparentTxOut::recipient_address() | 🔵     |     |      |       |      |
+| ZcashTransparentTxOut::recipient_address() | 🔴     |   ✅  |  ✅    |       |    ✅  |
+
+* Additionally Added methods `value()` and `script_pubkey()` getters to access struct properties.
 
 ### ZcashScript
 
