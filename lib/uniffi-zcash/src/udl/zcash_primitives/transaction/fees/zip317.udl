@@ -1,0 +1,12 @@
+interface ZcashZip317FeeRule {
+    [Name=standard]
+    constructor();
+
+    [Name=non_standard, Throws=ZcashError]
+    constructor(ZcashAmount marginal_fee,
+        u64 grace_actions,
+        u64 p2pkh_standard_input_size,
+        u64 p2pkh_standard_output_size);
+
+    ZcashAmount marginal_fee();
+};

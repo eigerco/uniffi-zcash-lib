@@ -613,11 +613,11 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                    | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashFeeRule::non_standard()               | 🔴     |     |      |       |      |
-| ZcashFeeRule::standard()                   | 🔴     |     |      |       |      |
-| ZcashFeeRule::marginal_fee()               | 🔴     |     |      |       |      |
-| ZcashFeeRule::p2pkh_standard_input_size()  | 🔵     |     |      |       |      |
-| ZcashFeeRule::p2pkh_standard_output_size() | 🔵     |     |      |       |      |
+| ZcashFeeRule::non_standard()               | 🔴    |  ✅ |  ✅  |       | ✅   |
+| ZcashFeeRule::standard()                   | 🔴    |  ✅ |  ✅  |       | ✅   |
+| ZcashFeeRule::marginal_fee()               | 🔴    |  ✅ |  ✅  |       | ✅   |
+| ZcashFeeRule::p2pkh_standard_input_size()  | 🔵    |     |      |       |      |
+| ZcashFeeRule::p2pkh_standard_output_size() | 🔵    |     |      |       |      |
 
 ### ZcashRseed
 
