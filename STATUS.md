@@ -63,7 +63,7 @@ This is a feature matrix which keeps track of the current state of implementatio
 * This should be kept up to date with new developments/findings.
 * Its still in progress the creation of new types for `Orchard` below in this index.
 
-## Index
+## Table of contents
 
 * [Errors](#errors)
 * [Objects](#objects)
