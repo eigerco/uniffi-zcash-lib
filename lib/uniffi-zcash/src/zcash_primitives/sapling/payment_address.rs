@@ -1,14 +1,11 @@
 use std::sync::Arc;
 
 use zcash_client_backend::encoding;
-use zcash_primitives::{
-    consensus::Parameters,
-    sapling::PaymentAddress,
-};
+use zcash_primitives::{consensus::Parameters, sapling::PaymentAddress};
 
 use crate::{
-    utils, ZcashConsensusParameters, ZcashError, ZcashResult, ZcashRseed,
-    ZcashSaplingDiversifiedTransmissionKey, ZcashSaplingNote, ZcashDiversifier,
+    utils, ZcashConsensusParameters, ZcashDiversifier, ZcashError, ZcashResult, ZcashRseed,
+    ZcashSaplingDiversifiedTransmissionKey, ZcashSaplingNote,
 };
 
 /// A Sapling payment address.
@@ -57,7 +54,9 @@ impl ZcashPaymentAddress {
     }
 
     pub fn create_note(&self, value: u64, rseed: ZcashRseed) -> ZcashResult<Arc<ZcashSaplingNote>> {
-        Ok(Arc::new(self.0.create_note(value, rseed.try_into()?).into()))
+        Ok(Arc::new(
+            self.0.create_note(value, rseed.try_into()?).into(),
+        ))
     }
 }
 
