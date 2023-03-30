@@ -34,7 +34,6 @@ impl ZcashExtendedSpendingKey {
         self.0.to_bytes().to_vec()
     }
 
-    #[must_use]
     pub fn derive_child(&self, index: ZcashChildIndex) -> Arc<Self> {
         Arc::new(self.0.derive_child(index.into()).into())
     }
@@ -48,7 +47,6 @@ impl ZcashExtendedSpendingKey {
     /// Derives an internal spending key given an external spending key.
     ///
     /// Specified in [ZIP 32](https://zips.z.cash/zip-0032#deriving-a-sapling-internal-spending-key).
-    #[must_use]
     pub fn derive_internal(&self) -> Arc<Self> {
         Arc::new(self.0.derive_internal().into())
     }
