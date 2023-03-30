@@ -6,7 +6,10 @@ use zcash_primitives::{
     sapling::{value::NoteValue, Note, PaymentAddress},
 };
 
-use crate::{ZcashResult, ZcashRseed, ZcashSaplingDiversifiedTransmissionKey, ZcashSaplingNote};
+use crate::{
+    utils, ZcashConsensusParameters, ZcashError, ZcashResult, ZcashRseed,
+    ZcashSaplingDiversifiedTransmissionKey, ZcashSaplingNote, ZcashDiversifier,
+};
 
 /// A Sapling payment address.
 ///
@@ -18,29 +21,22 @@ use crate::{ZcashResult, ZcashRseed, ZcashSaplingDiversifiedTransmissionKey, Zca
 pub struct ZcashPaymentAddress(PaymentAddress);
 
 impl ZcashPaymentAddress {
-    /// Parse the input string into `ZcashPaymentAddress`
-    pub fn parse(
-        params: crate::ZcashConsensusParameters,
-        string: &str,
-    ) -> crate::ZcashResult<Self> {
-        let address =
-            encoding::decode_payment_address(params.hrp_sapling_payment_address(), string)
-                // TODO: This is just mock we should use `zcash_client_backend::encoding::Bech32DecodeError` there,
-                // but for whatever reason, that enum is currently not implementing the `Error` trait.
-                .map_err(|_| crate::ZcashError::Unknown)?;
-
-        Ok(address.into())
+    /// Decodes a [`PaymentAddress`] from a Bech32-encoded string.
+    pub fn decode(params: ZcashConsensusParameters, string: &str) -> ZcashResult<Self> {
+        encoding::decode_payment_address(params.hrp_sapling_payment_address(), string)
+            .map_err(From::from)
+            .map(From::from)
     }
 
-    pub fn from_bytes(bytes: &[u8]) -> crate::ZcashResult<Self> {
-        let bytes = crate::utils::cast_slice(bytes)?;
+    pub fn from_bytes(bytes: &[u8]) -> ZcashResult<Self> {
+        let bytes = utils::cast_slice(bytes)?;
         PaymentAddress::from_bytes(&bytes)
             .map(ZcashPaymentAddress)
-            .ok_or(crate::ZcashError::Unknown)
+            .ok_or(ZcashError::Unknown)
     }
 
     /// Encode payment address into string
-    pub fn encode(&self, params: crate::ZcashConsensusParameters) -> String {
+    pub fn encode(&self, params: ZcashConsensusParameters) -> String {
         encoding::encode_payment_address_p(&params, &self.0)
     }
 
@@ -49,7 +45,7 @@ impl ZcashPaymentAddress {
         self.0.to_bytes().into()
     }
 
-    pub fn diversifier(&self) -> Arc<crate::ZcashDiversifier> {
+    pub fn diversifier(&self) -> Arc<ZcashDiversifier> {
         Arc::new((*self.0.diversifier()).into())
     }
 
