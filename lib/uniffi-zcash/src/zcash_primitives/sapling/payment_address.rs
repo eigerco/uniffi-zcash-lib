@@ -3,7 +3,7 @@ use std::sync::Arc;
 use zcash_client_backend::encoding;
 use zcash_primitives::{
     consensus::Parameters,
-    sapling::{value::NoteValue, Note, PaymentAddress},
+    sapling::PaymentAddress,
 };
 
 use crate::{
@@ -28,6 +28,7 @@ impl ZcashPaymentAddress {
             .map(From::from)
     }
 
+    /// Parses a PaymentAddress from bytes.
     pub fn from_bytes(bytes: &[u8]) -> ZcashResult<Self> {
         let bytes = utils::cast_slice(bytes)?;
         PaymentAddress::from_bytes(&bytes)
@@ -45,6 +46,7 @@ impl ZcashPaymentAddress {
         self.0.to_bytes().into()
     }
 
+    /// Returns the [`Diversifier`] for this `PaymentAddress`.
     pub fn diversifier(&self) -> Arc<ZcashDiversifier> {
         Arc::new((*self.0.diversifier()).into())
     }
@@ -55,8 +57,7 @@ impl ZcashPaymentAddress {
     }
 
     pub fn create_note(&self, value: u64, rseed: ZcashRseed) -> ZcashResult<Arc<ZcashSaplingNote>> {
-        let note = Note::from_parts(self.into(), NoteValue::from_raw(value), rseed.try_into()?);
-        Ok(Arc::new(note.into()))
+        Ok(Arc::new(self.0.create_note(value, rseed.try_into()?).into()))
     }
 }
 
