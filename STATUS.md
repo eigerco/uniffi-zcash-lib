@@ -591,11 +591,10 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                     | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashLocalTxProver::new()                   | 🔴     |     |      |       |      |
-| ZcashLocalTxProver::bundled()               | 🔴     |     |      |       |      |
-| ZcashLocalTxProver::from_bytes()            | 🔴     |     |      |       |      |
-| ZcashLocalTxProver::with_default_location() | 🔴     |     |      |       |      |
-| ZcashLocalTxProver::hash()                  | 🔴     |     |      |       |      |
+| ZcashLocalTxProver::new()                   | 🔴     |  ✅| ✅     |       | ✅     |
+| ZcashLocalTxProver::from_bytes()            | 🔴     |  ✅| ✅     |       | ✅     |
+| ZcashLocalTxProver::with_default_location() | 🔴     |  ✅| ✅     |       | ✅     |
+| ZcashLocalTxProver::bundled()               | 🔴     |  ✅| ✅     |       | ✅     |
 
 ### ZcashFixedFeeRule
 

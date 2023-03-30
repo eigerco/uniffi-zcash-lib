@@ -19,6 +19,9 @@ pub use self::zcash_client_backend::*;
 mod zcash_primitives;
 pub use self::zcash_primitives::*;
 
+mod zcash_proofs;
+pub use self::zcash_proofs::*;
+
 mod jubjub;
 pub use self::jubjub::*;
 
