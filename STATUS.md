@@ -554,6 +554,15 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashTransparentTxOut::write()             | 🔵     |     |      |       |      |
 | ZcashTransparentTxOut::recipient_address() | 🔵     |     |      |       |      |
 
+### ZcashScript
+
+* Original type: [zcash_primitives::legacy::Script](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/legacy/struct.Script.html)
+
+| Members                                    | Score | UDL | Code | Tests | Docs |
+| ------------------------------------------ | ----- | --- | ---- | ----- | ---- |
+| ZcashTransparentTxOut::read()              | 🔵     |     |      |       |      |
+| ZcashTransparentTxOut::write()             | 🔵     |     |      |       |      |
+
 ### ZcashAmount
 
 * Original type: [zcash_primitives::transaction::components::amount::Amount](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/components/amount/struct.Amount.html)
