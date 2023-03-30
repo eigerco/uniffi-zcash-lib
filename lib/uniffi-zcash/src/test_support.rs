@@ -17,8 +17,12 @@ impl TestSupport {
             .expect("cannot find test data")
             .split('\n')
             .map(|line| {
-                let (k, v) = line.split_once(':').unwrap();
-                (k.to_string(), v.to_string())
+                if line.is_empty() {
+                    ("".to_string(), "".to_string())
+                } else {
+                    let (k, v) = line.split_once(':').unwrap();
+                    (k.to_string(), v.to_string())
+                }
             })
             .collect();
 

@@ -46,4 +46,6 @@ jobs:
         run: cargo build --verbose
 
       - name: 🔎 Test
-        run: cargo test --verbose
+        run:
+          cargo run --bin generate_csv
+          cargo test --verbose
