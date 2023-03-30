@@ -542,7 +542,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                            | Score | UDL | Code | Tests | Docs |
 | ---------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashExternalIvk::derive_address() | 🔴     |     |      |       |      |
+| ZcashExternalIvk::derive_address() | 🔴     |  ✅   | ✅     |       |  ✅    |
 
 ### ZcashTransparentTxOut
 

@@ -1,3 +1,6 @@
-interface ZcashExternalIvk {};
+interface ZcashExternalIvk {
+    [Throws=ZcashError]
+    ZcashTransparentAddress derive_address(u32 child_index);
+};
 
 interface ZcashInternalIvk {};
