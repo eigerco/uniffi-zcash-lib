@@ -21,19 +21,17 @@ fn main() {
     seed[0] = 1u8;
 
     let usk = UnifiedSpendingKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
-    let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
-
-    // let sapling_outgoing_viewing_key_bytes = get_ovk(&usk)
-    //     .map(|byte| byte.to_string())
-    //     .to_vec()
-    //     .join(", ");
-
-    let encoded = usk.to_unified_full_viewing_key().encode(&MainNetwork);
 
     // Obtaining from original API expected byte array results
     // for derivation from ExtendedPrivKey to AccountPrivKey.
     let extended_priv_key = ExtendedPrivKey::with_seed(&seed).unwrap();
+
+    let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
     let extended_private_key = AccountPrivKey::from_extended_privkey(extended_priv_key);
+
+    let encoded = usk.to_unified_full_viewing_key().encode(&MainNetwork);
+
+
     let extended_spending_key = ExtendedSpendingKey::master(&seed);
     let (ext_sk_child_index, ext_sk_default_address) = extended_spending_key.default_address();
 
@@ -41,13 +39,11 @@ fn main() {
     let account_number = 2345;
     let orchard_sk = SpendingKey::from_zip32_seed(&seed, coin_type, account_number).unwrap();
 
+    writeln!(file, "{}", format_bytes("seed", &seed)).unwrap();
     writeln!(file, "coin_type:{coin_type}").unwrap();
     writeln!(file, "account:{account_number}").unwrap();
     writeln!(file, "scope:External").unwrap();
     writeln!(file, "unified_full_viewing_key_encoded:{encoded}").unwrap();
-    writeln!(file, "{}", format_bytes("orchard_spending_key_from_zip32_seed", &orchard_sk.to_bytes()[..])).unwrap();
-
-    writeln!(file, "{}", format_bytes("seed", &seed)).unwrap();
     writeln!(file, "{}", format_bytes("sapling_address", &get_sapling_address(&usk).to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("orchard_address", &get_orchard_address(&usk)[..])).unwrap();
     writeln!(file, "{}", format_bytes("unified_spending_key", &usk.to_bytes(Era::Orchard))).unwrap();
@@ -62,6 +58,7 @@ fn main() {
     writeln!(file, "{}", format_bytes("extended_spending_key_fvk", &extended_spending_key.to_diversifiable_full_viewing_key().to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("sapling_outgoing_viewing_key", &get_ovk(&usk))).unwrap();
     writeln!(file, "{}", format_bytes("orchard_spending_key", &usk.orchard().to_bytes()[..])).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_spending_key_from_zip32_seed", &orchard_sk.to_bytes()[..])).unwrap();
 }
 
 fn format_bytes(label: &str, bytes: &[u8]) -> String {
