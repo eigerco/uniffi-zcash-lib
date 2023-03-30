@@ -5,12 +5,11 @@ extern crate serde_json;
 type KeyValMap = HashMap<String, String>;
 
 pub struct TestSupport {
-    map: KeyValMap
+    map: KeyValMap,
 }
 
 impl TestSupport {
     pub fn from_csv_file() -> Self {
-
         let base_dir = env!("CARGO_MANIFEST_DIR");
         let csv_path = format!("{base_dir}/tests/test_data.csv");
 
