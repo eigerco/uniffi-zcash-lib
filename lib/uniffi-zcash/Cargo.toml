@@ -30,3 +30,4 @@ uniffi = { workspace = true, features = ["build"] }
 
 [dev-dependencies]
 uniffi = { workspace = true, features = ["bindgen-tests"] }
+uniffi-test-support = { path = "../uniffi-test-support" }

@@ -29,7 +29,4 @@ mod beam;
 
 pub type ZcashResult<T> = Result<T, ZcashError>;
 
-mod test_support;
-pub use test_support::*;
-
 uniffi::include_scaffolding!("zcash");
