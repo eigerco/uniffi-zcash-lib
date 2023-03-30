@@ -603,9 +603,9 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                      | Score | UDL | Code | Tests | Docs |
 | ---------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashFeeRule::non_standard() | 🔴     |     |      |       |      |
-| ZcashFeeRule::standard()     | 🔴     |     |      |       |      |
-| ZcashFeeRule::fixed_fee()    | 🔴     |     |      |       |      |
+| ZcashFeeRule::non_standard() | 🔴    | ✅  |  ✅  |       |  ✅  |
+| ZcashFeeRule::standard()     | 🔴    | ✅  |  ✅  |       |  ✅  |
+| ZcashFeeRule::fixed_fee()    | 🔴    | ✅  |  ✅  |       |  ✅  |
 
 ### ZcashZip317FeeRule
 
