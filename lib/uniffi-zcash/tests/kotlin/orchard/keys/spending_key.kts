@@ -11,9 +11,21 @@ fun testSpendingKeyConversions() {
 }
 testSpendingKeyConversions()
 
+// TODO
+fun testSpendingKeyToFVK() {
+    val zts = TestSupport.fromCsvFile()
+
+    val keyBytes = zts.getAsByteArray("orchard_spending_key")
+
+    val key = ZcashOrchardSpendingKey.fromBytes(keyBytes)
+
+    assert(key.toBytes() == keyBytes)
+}
+testSpendingKeyToFVK()
+
 fun testSpendingKeyArrayMismatch() {
     val keyBytes = listOf(0, 1).map { it.toUByte() }
-    
+
     var thrown = false;
     try {
         ZcashOrchardSpendingKey.fromBytes(keyBytes)
