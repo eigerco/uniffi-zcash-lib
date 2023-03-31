@@ -1,0 +1,12 @@
+interface ZcashLocalTxProver {    
+    constructor([ByRef] string spend_path, [ByRef] string output_path);
+
+    [Name=from_bytes]
+    constructor([ByRef] sequence<u8> spend_param_bytes, [ByRef] sequence<u8> output_param_bytes);
+
+    [Name=with_default_location, Throws=ZcashError]
+    constructor();
+
+    [Name=bundled]
+    constructor();
+};

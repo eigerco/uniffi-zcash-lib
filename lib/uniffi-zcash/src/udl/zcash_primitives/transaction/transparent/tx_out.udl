@@ -1,0 +1,8 @@
+interface ZcashTxOut {
+
+    ZcashAmount value();
+
+    ZcashScript script_pubkey();
+
+    ZcashTransparentAddress? recipient_address();
+};

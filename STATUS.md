@@ -335,9 +335,18 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashSaplingNote::value()       |                  |                    |                    |                    |       |
 | ZcashSaplingNote::rseed()       |                  |                    |                    |                    |       |
 | ZcashSaplingNote::nf()          |                  |                    |                    |                    |       |
-| ZcashSaplingNote::cmu()          |                  |                    |                    |                    |       |
+| ZcashSaplingNote::cmu()          |  :red_circle: |  :white_check_mark:                  |    :white_check_mark:                |                    |    :white_check_mark:   |
 | ZcashSaplingNote::rcm()          |                  |                    |                    |                    |       |
 | ZcashSaplingNote::generate_or_derive_esk()  |                  |                    |                    |          |       |
+
+### ZcashSaplingExtractedNoteCommitment
+
+* Original type: [zcash_primitives::sapling::note::ExtractedNoteCommitment](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/note/struct.ExtractedNoteCommitment.html)
+
+| Object/Method name                 |    Score        |        UDL         |        Code        |       Tests        | Docs  |
+| ---------------------------------- | :----------:    | :----------------: | :----------------: | :----------------: | :---: |
+| ZcashSaplingExtractedNoteCommitment::from_bytes()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |        |  :white_check_mark:     |
+| ZcashSaplingExtractedNoteCommitment::to_bytes()  | :red_circle:  | :white_check_mark: | :white_check_mark:  |          |  :white_check_mark:     |
 
 
 ### ZcashSaplingNoteValue
@@ -524,7 +533,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                      | Score | UDL | Code | Tests | Docs |
 | ---------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashBlockHeight::from_u32() | 🔴     |     |      |       |      |
+| ZcashBlockHeight::from_u32() | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 
 ### ZcashExternalIvk
@@ -533,7 +542,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                            | Score | UDL | Code | Tests | Docs |
 | ---------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashExternalIvk::derive_address() | 🔴     |     |      |       |      |
+| ZcashExternalIvk::derive_address() | 🔴     |  ✅   | ✅     |       |  ✅    |
 
 ### ZcashTransparentTxOut
 
@@ -541,9 +550,20 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                    | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------ | ----- | --- | ---- | ----- | ---- |
+| ZcashTransparentTxOut::read()              | 🔵     |  ✅   |   ✅   |       |   ✅   |
+| ZcashTransparentTxOut::write()             | 🔵     |     |      |       |      |
+| ZcashTransparentTxOut::recipient_address() | 🔴     |   ✅  |  ✅    |       |    ✅  |
+
+* Additionally Added methods `value()` and `script_pubkey()` getters to access struct properties.
+
+### ZcashScript
+
+* Original type: [zcash_primitives::legacy::Script](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/legacy/struct.Script.html)
+
+| Members                                    | Score | UDL | Code | Tests | Docs |
+| ------------------------------------------ | ----- | --- | ---- | ----- | ---- |
 | ZcashTransparentTxOut::read()              | 🔵     |     |      |       |      |
 | ZcashTransparentTxOut::write()             | 🔵     |     |      |       |      |
-| ZcashTransparentTxOut::recipient_address() | 🔵     |     |      |       |      |
 
 ### ZcashAmount
 
@@ -551,30 +571,30 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                      | Score | UDL | Code | Tests | Docs |
 | -------------------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashAmount::zero()                          | 🔴     |     |      |       |      |
-| ZcashAmount::from_i64()                      | 🔴     |     |      |       |      |
-| ZcashAmount::from_nonnegative_i64()          | 🔴     |     |      |       |      |
-| ZcashAmount::from_u64()                      | 🔴     |     |      |       |      |
-| ZcashAmount::from_i64_le_bytes()             | 🔵     |     |      |       |      |
-| ZcashAmount::from_i64_le_bytes()             | 🔵     |     |      |       |      |
-| ZcashAmount::from_nonnegative_i64_le_bytes() | 🔵     |     |      |       |      |
-| ZcashAmount::from_i64_le_bytes()             | 🔵     |     |      |       |      |
-| ZcashAmount::to_i64_le_bytes()               | 🔵     |     |      |       |      |
-| ZcashAmount::is_positive()                   | 🔵     |     |      |       |      |
-| ZcashAmount::is_negative()                   | 🔵     |     |      |       |      |
-| ZcashAmount::sum()                           | 🔵     |     |      |       |      |
+| ZcashAmount::zero()                          | 🔴    | ✅  | ✅   |       | ✅   |
+| ZcashAmount::from_i64()                      | 🔴    | ✅  | ✅   |       | ✅   |
+| ZcashAmount::from_nonnegative_i64()          | 🔵    |     |      |       |      |
+| ZcashAmount::from_u64()                      | 🔵    |     |      |       |      |
+| ZcashAmount::from_i64_le_bytes()             | 🔵    |     |      |       |      |
+| ZcashAmount::from_i64_le_bytes()             | 🔵    |     |      |       |      |
+| ZcashAmount::from_nonnegative_i64_le_bytes() | 🔵    |     |      |       |      |
+| ZcashAmount::from_i64_le_bytes()             | 🔵    |     |      |       |      |
+| ZcashAmount::to_i64_le_bytes()               | 🔵    |     |      |       |      |
+| ZcashAmount::is_positive()                   | 🔵    |     |      |       |      |
+| ZcashAmount::is_negative()                   | 🔵    |     |      |       |      |
+| ZcashAmount::sum()                           | 🔵    |     |      |       |      |
 
-### ZcashTransparentOutPoint
+### ZcashOutPoint
 
 * Original type: [zcash_primitives::transaction::components::transparent::OutPoint](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/components/transparent/struct.OutPoint.html)
 
 | Members                           | Score | UDL | Code | Tests | Docs |
 | --------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashTransparentOutPoint::new()   | 🔴     |     |      |       |      |
-| ZcashTransparentOutPoint::read()  | 🔵     |     |      |       |      |
-| ZcashTransparentOutPoint::write() | 🔵     |     |      |       |      |
-| ZcashTransparentOutPoint::n()     | 🔵     |     |      |       |      |
-| ZcashTransparentOutPoint::hash()  | 🔵     |     |      |       |      |
+| ZcashOutPoint::new()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOutPoint::read()  | 🔵    |     |      |       |      |
+| ZcashOutPoint::write() | 🔵    |     |      |       |      |
+| ZcashOutPoint::n()     | 🔵    |     |      |       |      |
+| ZcashOutPoint::hash()  | 🔵    |     |      |       |      |
 
 ### ZcashLocalTxProver
 
@@ -582,11 +602,10 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                     | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashLocalTxProver::new()                   | 🔴     |     |      |       |      |
-| ZcashLocalTxProver::bundled()               | 🔴     |     |      |       |      |
-| ZcashLocalTxProver::from_bytes()            | 🔴     |     |      |       |      |
-| ZcashLocalTxProver::with_default_location() | 🔴     |     |      |       |      |
-| ZcashLocalTxProver::hash()                  | 🔴     |     |      |       |      |
+| ZcashLocalTxProver::new()                   | 🔴     |  ✅| ✅     |       | ✅     |
+| ZcashLocalTxProver::from_bytes()            | 🔴     |  ✅| ✅     |       | ✅     |
+| ZcashLocalTxProver::with_default_location() | 🔴     |  ✅| ✅     |       | ✅     |
+| ZcashLocalTxProver::bundled()               | 🔴     |  ✅| ✅     |       | ✅     |
 
 ### ZcashFixedFeeRule
 
@@ -594,9 +613,9 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                      | Score | UDL | Code | Tests | Docs |
 | ---------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashFeeRule::non_standard() | 🔴     |     |      |       |      |
-| ZcashFeeRule::standard()     | 🔴     |     |      |       |      |
-| ZcashFeeRule::fixed_fee()    | 🔴     |     |      |       |      |
+| ZcashFeeRule::non_standard() | 🔴    | ✅  |  ✅  |       |  ✅  |
+| ZcashFeeRule::standard()     | 🔴    | ✅  |  ✅  |       |  ✅  |
+| ZcashFeeRule::fixed_fee()    | 🔴    | ✅  |  ✅  |       |  ✅  |
 
 ### ZcashZip317FeeRule
 
@@ -604,16 +623,17 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                    | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashFeeRule::non_standard()               | 🔴     |     |      |       |      |
-| ZcashFeeRule::standard()                   | 🔴     |     |      |       |      |
-| ZcashFeeRule::marginal_fee()               | 🔴     |     |      |       |      |
-| ZcashFeeRule::p2pkh_standard_input_size()  | 🔵     |     |      |       |      |
-| ZcashFeeRule::p2pkh_standard_output_size() | 🔵     |     |      |       |      |
+| ZcashFeeRule::non_standard()               | 🔴    |  ✅ |  ✅  |       | ✅   |
+| ZcashFeeRule::standard()                   | 🔴    |  ✅ |  ✅  |       | ✅   |
+| ZcashFeeRule::marginal_fee()               | 🔴    |  ✅ |  ✅  |       | ✅   |
+| ZcashFeeRule::p2pkh_standard_input_size()  | 🔵    |     |      |       |      |
+| ZcashFeeRule::p2pkh_standard_output_size() | 🔵    |     |      |       |      |
 
-### ZcashSaplingRseed
+### ZcashRseed
 
 * Original type: [zcash_primitives::sapling::note::Rseed](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/note/enum.Rseed.html)
 * Its an Enum type. No methods to implement.
+* Completed ✅
 
 | Members | Score | UDL | Code | Tests | Docs |
 | ------- | ----- | --- | ---- | ----- | ---- |
@@ -624,23 +644,23 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                              | Score | UDL | Code | Tests | Docs |
 | ------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashCommitmentTree::empty()         | 🔴     |     |      |       |      |
+| ZcashCommitmentTree::empty()         | 🔴     | ✅ |  ✅  |       |  ✅  |
 | ZcashCommitmentTree::from_frontier() | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::to_frontier()   | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::size()          | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::read()          | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::write()         | 🔵     |     |      |       |      |
-| ZcashCommitmentTree::append()        | 🔴     |     |      |       |      |
+| ZcashCommitmentTree::append()        | 🔴     | ✅  |  ✅  |       |  ✅  |
 | ZcashCommitmentTree::root()          | 🔵     |     |      |       |      |
 
-### ZcashSaplingTreeNode
+### ZcashSaplingNode
 
 * Original type: [zcash_primitives::sapling::Node](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/sapling/struct.Node.html)
 
 | Members                             | Score | UDL | Code | Tests | Docs |
 | ----------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashSaplingTreeNode::from_cmu()    | 🔴     |     |      |       |      |
-| ZcashSaplingTreeNode::from_scalar() | 🔵     |     |      |       |      |
+| ZcashSaplingNode::from_cmu()    | 🔴     | ✅ | ✅   |       |  ✅  |
+| ZcashSaplingNode::from_scalar() | 🔵     |    |      |       |      |
 
 ### ZcashIncrementalWitness
 
@@ -648,14 +668,14 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                              | Score | UDL | Code | Tests | Docs |
 | ------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashIncrementalWitness::from_tree() | 🔴     |     |      |       |      |
-| ZcashIncrementalWitness::read()      | 🔵     |     |      |       |      |
-| ZcashIncrementalWitness::write()     | 🔵     |     |      |       |      |
-| ZcashIncrementalWitness::position()  | 🔵     |     |      |       |      |
-| ZcashIncrementalWitness::filler()    | 🔵     |     |      |       |      |
-| ZcashIncrementalWitness::append()    | 🔴     |     |      |       |      |
-| ZcashIncrementalWitness::root()      | 🔵     |     |      |       |      |
-| ZcashIncrementalWitness::path()      | 🔵     |     |      |       |      |
+| ZcashIncrementalWitness::from_tree() | 🔴    | ✅ |  ✅  |       |  ✅  |
+| ZcashIncrementalWitness::read()      | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::write()     | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::position()  | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::filler()    | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::append()    | 🔴    | ✅ |  ✅  |       |  ✅  |
+| ZcashIncrementalWitness::root()      | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::path()      | 🔵    |    |      |       |      |
 
 ### ZcashMemoBytes
 

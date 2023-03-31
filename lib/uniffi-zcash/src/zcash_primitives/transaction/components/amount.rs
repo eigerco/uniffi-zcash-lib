@@ -2,6 +2,17 @@ use zcash_primitives::transaction::components::{amount::MAX_MONEY, Amount};
 
 use crate::ZcashError;
 
+/// A type-safe representation of some quantity of Zcash.
+///
+/// An Amount can only be constructed from an integer that is within the valid monetary
+/// range of `{-MAX_MONEY..MAX_MONEY}` (where `MAX_MONEY` = 21,000,000 × 10⁸ zatoshis).
+/// However, this range is not preserved as an invariant internally; it is possible to
+/// add two valid Amounts together to obtain an invalid Amount. It is the user's
+/// responsibility to handle the result of serializing potentially-invalid Amounts. In
+/// particular, a [`Transaction`] containing serialized invalid Amounts will be rejected
+/// by the network consensus rules.
+///
+/// [`Transaction`]: crate::transaction::Transaction
 #[derive(Clone, Copy)]
 pub struct ZcashAmount(Amount);
 

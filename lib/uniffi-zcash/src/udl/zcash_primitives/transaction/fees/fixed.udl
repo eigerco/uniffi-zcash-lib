@@ -1,0 +1,9 @@
+interface ZcashFixedFeeRule {
+    [Name=non_standard]
+    constructor(ZcashAmount fixed_fee);
+
+    [Name=standard]
+    constructor();
+
+    ZcashAmount fixed_fee();
+};

@@ -1,0 +1,7 @@
+interface ZcashIncrementalWitness {
+    [Name=from_tree]
+    constructor([ByRef] ZcashCommitmentTree tree);
+
+    [Throws=ZcashError]
+    void append(ZcashSaplingNode node);
+};
