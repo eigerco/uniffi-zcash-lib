@@ -2,7 +2,7 @@ interface ZcashPaymentAddress {
   [Name=from_bytes, Throws=ZcashError]
   constructor([ByRef] sequence<u8> bytes);
 
-  [Name=parse, Throws=ZcashError]
+  [Name=decode, Throws=ZcashError]
   constructor(ZcashConsensusParameters params, [ByRef] string input);
 
   string encode(ZcashConsensusParameters params);

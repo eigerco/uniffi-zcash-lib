@@ -1,12 +1,6 @@
-interface ZcashExtendedSpendingKey {
-  [Name=master]
-  constructor(sequence<u8> data);
-
+interface ZcashExtendedFullViewingKey {
   [Name=from_bytes, Throws=ZcashError]
-  constructor(sequence<u8> data);
-
-  [Name=from_path]
-  constructor([ByRef] ZcashExtendedSpendingKey master, sequence<ZcashChildIndex> path);
+  constructor([ByRef] sequence<u8> bytes);
 
   [Name=decode, Throws=ZcashError]
   constructor(ZcashConsensusParameters params, [ByRef] string input);
@@ -15,12 +9,14 @@ interface ZcashExtendedSpendingKey {
 
   sequence<u8> to_bytes();
 
-  ZcashExtendedSpendingKey derive_child(ZcashChildIndex index);
+  [Throws=ZcashError]
+  ZcashExtendedFullViewingKey derive_child(ZcashChildIndex i);
+
+  ZcashDiversifierIndexAndPaymentAddress? find_address(ZcashDiversifierIndex j);
 
   ZcashDiversifierIndexAndPaymentAddress default_address();
 
-  ZcashExtendedSpendingKey derive_internal();
+  ZcashExtendedFullViewingKey derive_internal();
 
   ZcashDiversifiableFullViewingKey to_diversifiable_full_viewing_key();
-
 };

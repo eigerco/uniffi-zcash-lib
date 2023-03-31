@@ -1,2 +1,58 @@
 namespace zcash {
+  /* zcash_client_backend::encoding */
+  [Throws=ZcashError]
+  ZcashExtendedFullViewingKey decode_extended_full_viewing_key(
+    [ByRef] string hrp,
+    [ByRef] string s
+  );
+
+  [Throws=ZcashError]
+  ZcashExtendedSpendingKey decode_extended_spending_key(
+    [ByRef] string hrp,
+    [ByRef] string s
+  );
+
+  [Throws=ZcashError]
+  ZcashPaymentAddress decode_payment_address(
+    [ByRef] string hrp,
+    [ByRef] string s
+  );
+
+  [Throws=ZcashError]
+  ZcashTransparentAddress decode_transparent_address(
+    [ByRef] sequence<u8> pubkey_version,
+    [ByRef] sequence<u8> script_version,
+    [ByRef] string s
+  );
+
+  string encode_extended_full_viewing_key(
+    [ByRef] string hrp,
+    ZcashExtendedFullViewingKey extfvk
+  );
+
+  string encode_extended_spending_key(
+    [ByRef] string hrp,
+    ZcashExtendedSpendingKey extsk
+  );
+
+  string encode_payment_address(
+    [ByRef] string hrp,
+    ZcashPaymentAddress addr
+  );
+
+  string encode_payment_address_p(
+    ZcashConsensusParameters params,
+    ZcashPaymentAddress addr
+  );
+
+  string encode_transparent_address(
+    [ByRef] sequence<u8> pubkey_version,
+    [ByRef] sequence<u8> script_version,
+    ZcashTransparentAddress addr
+  );
+
+  string encode_transparent_address_p(
+    ZcashConsensusParameters params,
+    ZcashTransparentAddress addr
+  );
 };

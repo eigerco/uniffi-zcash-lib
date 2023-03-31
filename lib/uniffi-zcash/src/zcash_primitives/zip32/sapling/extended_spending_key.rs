@@ -1,15 +1,31 @@
 use std::sync::Arc;
 
-use zcash_primitives::zip32::{ChildIndex, ExtendedSpendingKey};
+use zcash_client_backend::encoding;
+use zcash_primitives::{
+    consensus::Parameters,
+    zip32::{ChildIndex, ExtendedSpendingKey},
+};
 
 use crate::{
-    ZcashChildIndex, ZcashDiversifiableFullViewingKey, ZcashDiversifierIndexAndPaymentAddress,
-    ZcashError,
+    ZcashChildIndex, ZcashConsensusParameters, ZcashDiversifiableFullViewingKey,
+    ZcashDiversifierIndexAndPaymentAddress, ZcashError, ZcashResult,
 };
 
 pub struct ZcashExtendedSpendingKey(ExtendedSpendingKey);
 
 impl ZcashExtendedSpendingKey {
+    /// Writes an [`ExtendedSpendingKey`] as a Bech32-encoded string.
+    pub fn encode(&self, params: ZcashConsensusParameters) -> String {
+        encoding::encode_extended_spending_key(params.hrp_sapling_extended_spending_key(), &self.0)
+    }
+
+    /// Decodes an [`ExtendedSpendingKey`] from a Bech32-encoded string.
+    pub fn decode(params: ZcashConsensusParameters, input: &str) -> ZcashResult<Self> {
+        encoding::decode_extended_spending_key(params.hrp_sapling_extended_spending_key(), input)
+            .map_err(From::from)
+            .map(From::from)
+    }
+
     pub fn master(seed: Vec<u8>) -> Self {
         ExtendedSpendingKey::master(seed.as_slice()).into()
     }
@@ -34,7 +50,6 @@ impl ZcashExtendedSpendingKey {
         self.0.to_bytes().to_vec()
     }
 
-    #[must_use]
     pub fn derive_child(&self, index: ZcashChildIndex) -> Arc<Self> {
         Arc::new(self.0.derive_child(index.into()).into())
     }
@@ -48,7 +63,6 @@ impl ZcashExtendedSpendingKey {
     /// Derives an internal spending key given an external spending key.
     ///
     /// Specified in [ZIP 32](https://zips.z.cash/zip-0032#deriving-a-sapling-internal-spending-key).
-    #[must_use]
     pub fn derive_internal(&self) -> Arc<Self> {
         Arc::new(self.0.derive_internal().into())
     }

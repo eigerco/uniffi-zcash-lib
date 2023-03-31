@@ -1,5 +1,14 @@
+mod diversifiable_full_viewing_key;
+pub use self::diversifiable_full_viewing_key::*;
+
+mod diversified_transmission_key;
+pub use self::diversified_transmission_key::*;
+
 mod expanded_spending_key;
 pub use self::expanded_spending_key::*;
+
+mod extended_full_viewing_key;
+pub use self::extended_full_viewing_key::*;
 
 mod full_viewing_key;
 pub use self::full_viewing_key::*;
@@ -15,6 +24,3 @@ pub use self::proof_generation_key::*;
 
 mod viewing_key;
 pub use self::viewing_key::*;
-
-mod diversified_transmission_key;
-pub use self::diversified_transmission_key::*;

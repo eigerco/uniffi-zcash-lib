@@ -13,8 +13,8 @@ impl From<TransparentAddress> for ZcashTransparentAddress {
     }
 }
 
-impl From<ZcashTransparentAddress> for TransparentAddress {
-    fn from(value: ZcashTransparentAddress) -> Self {
+impl From<&ZcashTransparentAddress> for TransparentAddress {
+    fn from(value: &ZcashTransparentAddress) -> Self {
         value.0
     }
 }
