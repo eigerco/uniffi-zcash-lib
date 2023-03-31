@@ -42,8 +42,8 @@ impl ZcashExtendedFullViewingKey {
         .map(From::from)
     }
 
-    pub fn from_bytes(bytes: Vec<u8>) -> ZcashResult<Self> {
-        ExtendedFullViewingKey::read(bytes.as_slice())
+    pub fn from_bytes(bytes: &[u8]) -> ZcashResult<Self> {
+        ExtendedFullViewingKey::read(bytes)
             .map(From::from)
             .map_err(|error| error.to_string().into())
     }
