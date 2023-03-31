@@ -5,7 +5,7 @@ use zcash_primitives::{consensus::Parameters, zip32::ExtendedFullViewingKey};
 
 use crate::{
     ZcashChildIndex, ZcashConsensusParameters, ZcashDiversifiableFullViewingKey,
-    ZcashDiversifierIndex, ZcashDiversifierIndexAndPaymentAddress, ZcashError, ZcashPaymentAddress,
+    ZcashDiversifierIndex, ZcashDiversifierIndexAndPaymentAddress, ZcashPaymentAddress,
     ZcashResult,
 };
 
@@ -60,7 +60,7 @@ impl ZcashExtendedFullViewingKey {
     ) -> ZcashResult<Arc<ZcashExtendedFullViewingKey>> {
         self.0
             .derive_child(i.into())
-            .map_err(|_| ZcashError::Unknown)
+            .map_err(|_| "error ocurred while deriving child".into())
             .map(From::from)
             .map(Arc::new)
     }

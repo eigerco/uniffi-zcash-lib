@@ -94,5 +94,5 @@ pub fn decode_transparent_address(
         .map_err(ZcashError::from)?
         .map(From::from)
         .map(Arc::new)
-        .ok_or(ZcashError::Unknown)
+        .ok_or("error ocurred while decoding transparent address".into())
 }
