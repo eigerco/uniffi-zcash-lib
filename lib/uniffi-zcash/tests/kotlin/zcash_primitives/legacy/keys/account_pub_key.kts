@@ -40,19 +40,18 @@ fun testAccountPubKeyInternalIvk() {
 }
 testAccountPubKeyInternalIvk()
 
-TODO we can cancel this fun I think
 fun testAccountPubKeyForShielding() {
 	val supp = TestSupport.fromCsvFile()
 
 	val ppkBytes = supp.getAsByteArray("account_public_key")
-	val ovkBytes = supp.getAsByteArray("ppk_internal_ovk")
+	val intOvkBytes = supp.getAsByteArray("ppk_internal_ovk")
+	val extOvkBytes = supp.getAsByteArray("ppk_external_ovk")
 
 	val ppk = ZcashAccountPubKey.new(ppkBytes)
 	val ovks = ppk.ovksForShielding()
-	ovks.internal_ovk.a
-	ovks.external_ovk
 
-    // TODO ...
+	assert(ovks.internalOvk.asBytes() == intOvkBytes)
+	assert(ovks.externalOvk.asBytes() == extOvkBytes)
 }
 testAccountPubKeyForShielding()
 
