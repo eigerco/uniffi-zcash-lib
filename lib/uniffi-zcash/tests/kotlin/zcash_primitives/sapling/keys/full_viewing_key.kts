@@ -1,5 +1,7 @@
 import uniffi.zcash.*
 
+
+// TODO the below tests don't belong here
 fun testSaplingOvkToBytes() {
 	val supp = TestSupport.fromCsvFile()
 	val seed = supp.getArgumentAsByteArray("seed")
@@ -10,12 +12,12 @@ fun testSaplingOvkToBytes() {
         ZcashAccountId(0u),
     )
 
-    val expected = supp.getAsByteArray("sapling_outgoing_viewing_key")
+    val expectedBytes = supp.getAsByteArray("sapling_outgoing_viewing_key")
 
     val ovkBytes = unifiedSpendingKey.toUnifiedFullViewingKey()
         .sapling()!!.toOvk(ZcashScope.EXTERNAL).toBytes()
 
-    assert(ovkBytes == expected)
+    assert(ovkBytes == expectedBytes)
 }
 testSaplingOvkToBytes()
 
@@ -31,12 +33,12 @@ fun testOrchardIvkToPaymentAddress() {
 
     val orchardDiversifier = ZcashOrchardDiversifier.fromBytes(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
 
-    val expected = supp.getAsByteArray("orchard_address")
+    val expectedBytes = supp.getAsByteArray("orchard_address")
 
     val rawAddressBytes = unifiedSpendingKey.toUnifiedFullViewingKey()
         .orchard()!!.toIvk(ZcashOrchardScope.EXTERNAL)
         .address(orchardDiversifier)!!.toRawAddressBytes()
 
-    assert(rawAddressBytes == expected)
+    assert(rawAddressBytes == expectedBytes)
 }
 testOrchardIvkToPaymentAddress()

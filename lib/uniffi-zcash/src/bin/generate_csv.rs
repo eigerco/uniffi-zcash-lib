@@ -78,12 +78,19 @@ fn main() {
     writeln!(file, "{}", format_bytes("ppk_internal_ovk", &ppk.internal_ovk().as_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_private_key", &extended_private_key.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key", &extended_spending_key.to_bytes())).unwrap();
+    // writeln!(file, "{}", format_bytes("expanded_spending_key", & ... )).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_from_path", &get_ext_sk_from_path(&extended_spending_key).to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_derived_child", &extended_spending_key.derive_child(ChildIndex::Hardened(32)).to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_default_address", &ext_sk_default_address.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_child_index", &ext_sk_child_index.0)).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_internal_sk", &extended_spending_key.derive_internal().to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_fvk", &extended_spending_key.to_diversifiable_full_viewing_key().to_bytes())).unwrap();
+    // writeln!(file, "{}", format_bytes("extended_fvk_encoded", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("extended_fvk_child", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("extended_fvk_address", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("extended_fvk_find_address", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("extended_fvk_default_address", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("extended_fvk_derive_internal", & ... )).unwrap();
 
     // writeln!(file, "{}", format_bytes("extended_spending_key_fvk_nk", & ... )).unwrap();
     // writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ivk", & ... )).unwrap();
