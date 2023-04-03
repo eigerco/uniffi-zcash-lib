@@ -28,6 +28,7 @@ fn main() {
 
     let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
     let ppk = apk.to_account_pubkey();
+    let secp_secret_key = apk.derive_external_secret_key(0);
     let extended_private_key = AccountPrivKey::from_extended_privkey(extended_priv_key);
 
     let encoded = usk.to_unified_full_viewing_key().encode(&MainNetwork);
@@ -54,11 +55,21 @@ fn main() {
     let coin_type = 234;
     let account_number = 2345;
     let orchard_sk = SpendingKey::from_zip32_seed(&seed, coin_type, account_number).unwrap();
+    let diversifier = ZcashDiversifier::new([0; 11]);
+    let orchard_diversifier = orchard::keys::Diversifier::from_bytes([0; 11]);
+
+
+    let diversifiable_fvk = extended_spending_key.to_diversifiable_full_viewing_key();
+    let sapling_fvk = diversifiable_fvk.fvk();
+
+    let expanded_sk = ZcashExpandedSpendingKey::from_spending_key(&extended_spending_key.to_bytes());
 
     let orchard_div_idx_u32 = 4;
     let orchard_div_idx_u64 = u32::MAX + 1;
     let orchard_div_idx_u32_obj = ZcashOrchardDiversifierIndex::from_u32(orchard_div_idx_u32);
     let orchard_div_idx_u64_obj = ZcashOrchardDiversifierIndex::from_u64(orchard_div_idx_u64);
+
+    let orchard_address = get_orchard_address(&usk);
 
     writeln!(file, "{}", format_bytes("seed", &seed)).unwrap();
     writeln!(file, "coin_type:{coin_type}").unwrap();
@@ -68,7 +79,8 @@ fn main() {
     writeln!(file, "t_address_script:t26YoyZ1iPgiMEWL4zGUm74eVWfhyDMXzY2").unwrap();
     writeln!(file, "unified_full_viewing_key_encoded:{encoded}").unwrap();
     writeln!(file, "{}", format_bytes("sapling_address", &get_sapling_address(&usk).to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("orchard_address", &get_orchard_address(&usk)[..])).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_address", &orchard_address.as_slice())).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_diversifier", &orchard_diversifier.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("unified_spending_key", &usk.to_bytes(Era::Orchard))).unwrap();
     writeln!(file, "{}", format_bytes("account_private_key", &apk.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("account_public_key", &ppk.serialize())).unwrap();
@@ -77,40 +89,42 @@ fn main() {
     writeln!(file, "{}", format_bytes("ppk_external_ovk", &ppk.external_ovk().as_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("ppk_internal_ovk", &ppk.internal_ovk().as_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_private_key", &extended_private_key.to_bytes())).unwrap();
+
     writeln!(file, "{}", format_bytes("extended_spending_key", &extended_spending_key.to_bytes())).unwrap();
-    // writeln!(file, "{}", format_bytes("expanded_spending_key", & ... )).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_from_path", &get_ext_sk_from_path(&extended_spending_key).to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_derived_child", &extended_spending_key.derive_child(ChildIndex::Hardened(32)).to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_default_address", &ext_sk_default_address.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_child_index", &ext_sk_child_index.0)).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_internal_sk", &extended_spending_key.derive_internal().to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_spending_key_fvk", &extended_spending_key.to_diversifiable_full_viewing_key().to_bytes())).unwrap();
-    // writeln!(file, "{}", format_bytes("extended_fvk_encoded", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("extended_fvk_child", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("extended_fvk_address", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("extended_fvk_find_address", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("extended_fvk_default_address", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("extended_fvk_derive_internal", & ... )).unwrap();
 
-    // writeln!(file, "{}", format_bytes("extended_spending_key_fvk_nk", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ivk", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ovk", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("extended_spending_key_fvk_addr", & ... )).unwrap();
+    writeln!(file, "{}", format_bytes("expanded_spending_key", &expanded_sk.to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("diversifiable_fvk", &diversifiable_fvk.to_bytes())).unwrap();
+
+    writeln!(file, "{}", format_bytes("extended_spending_key_fvk", &sapling_fvk.to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_encoded", &sapling_fvk.encode(&MainNetwork))).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_child", &sapling_fvk.derive_child(ZcashChildIndex::Hardened(32)).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_address", &sapling_fvk.address(ZcashDiversifierIndex::from_u32(4)).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_find_address", &sapling_fvk.find_address(ZcashDiversifierIndex::from_u32(0)).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_default_address", &sapling_fvk.default_address().to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_derive_internal", &sapling_fvk.derive_internal().to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_diversifiable_fvk", &sapling_fvk.to_diversifiable_full_viewing_key().to_bytes())).unwrap();
+
+    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_nk", & diversifiable_fvk.to_nk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ivk", & diversifiable_fvk.to_ivk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ovk", & diversifiable_fvk.to_ovk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_addr", &diversifiable_fvk.address(&diversifier).to_bytes())).unwrap();
 
     writeln!(file, "{}", format_bytes("sapling_outgoing_viewing_key", &get_ovk(&usk))).unwrap();
     writeln!(file, "{}", format_bytes("orchard_spending_key", &usk.orchard().to_bytes().as_slice())).unwrap();
     writeln!(file, "{}", format_bytes("orchard_spending_key_from_zip32_seed", &orchard_sk.to_bytes().as_slice())).unwrap();
-    //
     writeln!(file, "{}", format_bytes("orchard_full_viewing_key", &orchard_sk.to_fvk().to_bytes().as_slice())).unwrap();
-    writeln!(file, "{}", format_bytes("orchard_diversifier_from_bytes", &orchard_sk.to_bytes().as_slice())).unwrap();
 
-    // TODO
-    // writeln!(file, "{}", format_bytes("orchard_div_idx_address", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("orchard_div_idx_address_at", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("secp_secret_key", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("orchard_full_viewing_key_ivk", & ... )).unwrap();
-    // writeln!(file, "{}", format_bytes("orchard_full_viewing_key_ovk", & ... )).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_div_idx_address", &orchard_sk.to_fvk().address(&orchard_diversifier).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_div_idx_address_at", &orchard_sk.to_fvk().address_at(ZcashDiversifierIndex::from_u32(4), ZcashOrchardScope::EXTERNAL).to_bytes() )).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_full_viewing_key_ivk", &orchard_sk.to_fvk().to_ivk(ZcashOrchardScope::EXTERNAL).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_full_viewing_key_ovk", &orchard_sk.to_fvk().to_ovk(ZcashOrchardScope::EXTERNAL).to_bytes() )).unwrap();
 
+    writeln!(file, "{}", format_bytes("secp_secret_key", &secp_secret_key.to_bytes())).unwrap();
     writeln!(file, "orchard_diversifier_index_u32:{orchard_div_idx_u32}").unwrap();
     writeln!(file, "orchard_diversifier_index_u64:{orchard_div_idx_u64}").unwrap();
     writeln!(file, "{}", format_bytes("orchard_diversifier_index_from_u32", &orchard_div_idx_u32_obj.to_bytes().as_slice()) ).unwrap();

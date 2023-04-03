@@ -102,7 +102,7 @@ fun testSpendingKeyToDiversifiableFvk () {
 
     val fvk = key.toDiversifiableFullViewingKey()
 
-    val expectedFvkBytes = supp.getAsByteArray("extended_spending_key_fvk")
+    val expectedFvkBytes = supp.getAsByteArray("diversifiable_fvk")
 
     assert(fvk.toBytes() == expectedFvkBytes)
 }

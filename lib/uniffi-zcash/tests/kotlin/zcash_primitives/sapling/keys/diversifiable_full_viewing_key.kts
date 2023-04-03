@@ -2,7 +2,7 @@ import uniffi.zcash.*
 
 fun testDiversifiableFullViewingKeyFromBytes() {
 	val supp = TestSupport.fromCsvFile()
-	val expectedBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val expectedBytes = supp.getAsByteArray("diversifiable_fvk")
 
 	val dfvk = ZcashDiversifiableFullViewingKey.fromBytes(expectedBytes)
 
@@ -13,7 +13,7 @@ testDiversifiableFullViewingKeyFromBytes()
 
 fun testDiversifiableFullViewingKeyFvk() {
 	val supp = TestSupport.fromCsvFile()
-	val expectedBytesDiversifiable = supp.getAsByteArray("extended_spending_key_fvk")
+	val expectedBytesDiversifiable = supp.getAsByteArray("diversifiable_fvk")
 	val expectedBytes = supp.getAsByteArray("extended_spending_key_fvk")
 
 	val dfvk = ZcashDiversifiableFullViewingKey.fromBytes(expectedBytesDiversifiable)
@@ -26,7 +26,7 @@ testDiversifiableFullViewingKeyFvk()
 
 fun testDiversifiableFullViewingKeyToNk() {
 	val supp = TestSupport.fromCsvFile()
-	val expectedBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val expectedBytes = supp.getAsByteArray("diversifiable_fvk")
 	val expectedNkBytes = supp.getAsByteArray("extended_spending_key_fvk_nk")
 
 	val dfvk = ZcashDiversifiableFullViewingKey.fromBytes(expectedBytes)
@@ -38,7 +38,7 @@ testDiversifiableFullViewingKeyToNk()
 
 fun testDiversifiableFullViewingKeyToIvk() {
 	val supp = TestSupport.fromCsvFile()
-	val expectedBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val expectedBytes = supp.getAsByteArray("diversifiable_fvk")
 	val expectedIvkBytes = supp.getAsByteArray("extended_spending_key_fvk_ivk")
 
 	val dfvk = ZcashDiversifiableFullViewingKey.fromBytes(expectedBytes)
@@ -50,7 +50,7 @@ testDiversifiableFullViewingKeyToIvk()
 
 fun testDiversifiableFullViewingKeyToOvk() {
 	val supp = TestSupport.fromCsvFile()
-	val expectedBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val expectedBytes = supp.getAsByteArray("diversifiable_fvk")
 	val expectedOvkBytes = supp.getAsByteArray("extended_spending_key_fvk_ovk")
 
 	val dfvk = ZcashDiversifiableFullViewingKey.fromBytes(expectedBytes)
@@ -62,11 +62,11 @@ testDiversifiableFullViewingKeyToOvk()
 
 fun testDiversifiableFullViewingKeyAddress() {
 	val supp = TestSupport.fromCsvFile()
-	val expectedBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val expectedBytes = supp.getAsByteArray("diversifiable_fvk")
 	val expectedAddrBytes = supp.getAsByteArray("extended_spending_key_fvk_addr")
 
 	val dfvk = ZcashDiversifiableFullViewingKey.fromBytes(expectedBytes)
-	val diversifier = //
+	val diversifier = ZcashDiversifier.new([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 	val addr = dfvk.address(diversifier)
 
 	assert(addr.toBytes() == expectedAddrBytes)

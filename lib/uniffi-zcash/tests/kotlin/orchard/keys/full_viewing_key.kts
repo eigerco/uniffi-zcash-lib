@@ -31,7 +31,7 @@ fun testOrchardFullViewingKeyAddress() {
 	val supp = TestSupport.getFromCsv()
 	val ofvkBytes = supp.getAsByteArray("orchard_full_viewing_key")
 	val fvk = ZcashOrchardFullViewingKey.fromBytes(ofvkBytes)
-	val divBytes = supp.getAsByteArray("orchard_diversifier_from_bytes")
+	val divBytes = supp.getAsByteArray("orchard_diversifier")
 	val expectedBytes = supp.getAsByteArray("orchard_div_idx_address")
 	val diver = ZcashOrchardDiversifier.fromBytes(divBytes)
 	val addr = fvk.address(diver, ZcashOrchardScope.EXTERNAL)
@@ -42,7 +42,7 @@ testOrchardFullViewingKeyAddress()
 
 fun testOrchardFullViewingKeyScopeForAddress() {
 	val fvk = setupGetFvk()
-	val divBytes = supp.getAsByteArray("orchard_diversifier_from_bytes")
+	val divBytes = supp.getAsByteArray("orchard_diversifier")
 	val diver = ZcashOrchardDiversifier.fromBytes(divBytes)
 	val addr = fvk.address(diver, ZcashOrchardScope.EXTERNAL)
 
