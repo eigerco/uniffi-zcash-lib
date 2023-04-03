@@ -1,7 +1,8 @@
 import uniffi.zcash.*
 
 fun testSaplingPaymentAddressParsing() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -22,7 +23,8 @@ fun testSaplingPaymentAddressParsing() {
 testSaplingPaymentAddressParsing()
 
 fun testSaplingIvkToPaymentAddress() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -32,8 +34,7 @@ fun testSaplingIvkToPaymentAddress() {
 
     val saplingDiversifier = ZcashDiversifier(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
 
-    val expected = listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 150, 127, 9, 126, 127, 135, 242, 241, 100, 51, 242, 226, 238, 170, 123, 25, 163, 69, 216, 183, 101, 10, 82, 150, 119, 1, 188, 11, 103, 156, 95).map { it.toUByte() }
-
+    val expected = supp.getAsByteArray("sapling_address")
     assert(unifiedSpendingKey.toUnifiedFullViewingKey()
         .sapling()!!.toIvk(ZcashScope.EXTERNAL)
         .toPaymentAddress(saplingDiversifier)!!.toBytes() == expected)

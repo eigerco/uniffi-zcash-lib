@@ -27,10 +27,26 @@ fn main() {
     let extended_priv_key = ExtendedPrivKey::with_seed(&seed).unwrap();
 
     let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
+    let ppk = apk.to_account_pubkey();
     let extended_private_key = AccountPrivKey::from_extended_privkey(extended_priv_key);
 
     let encoded = usk.to_unified_full_viewing_key().encode(&MainNetwork);
 
+    // https://github.com/eigerco/uniffi-zcash-lib/blob/main/STATUS.md#zcashextendedprivkey
+
+    // https://github.com/eigerco/uniffi-zcash-lib/blob/main/STATUS.md#zcashaccountpubkey
+
+    // https://github.com/eigerco/uniffi-zcash-lib/blob/main/STATUS.md#zcashunifiedspendingkey
+
+    // https://github.com/eigerco/uniffi-zcash-lib/blob/main/STATUS.md#zcashunifiedfullviewingkey
+
+    // https://github.com/eigerco/uniffi-zcash-lib/blob/main/STATUS.md#zcashunifiedaddress
+
+    // https://github.com/eigerco/uniffi-zcash-lib/blob/main/STATUS.md#zcashtransparentaddress
+
+    // https://github.com/eigerco/uniffi-zcash-lib/blob/main/STATUS.md#zcashdiversifiablefullviewingkey-sapling
+
+    // https://github.com/eigerco/uniffi-zcash-lib/blob/main/STATUS.md#zcashextendedspendingkey-sapling
 
     let extended_spending_key = ExtendedSpendingKey::master(&seed);
     let (ext_sk_child_index, ext_sk_default_address) = extended_spending_key.default_address();
@@ -38,6 +54,11 @@ fn main() {
     let coin_type = 234;
     let account_number = 2345;
     let orchard_sk = SpendingKey::from_zip32_seed(&seed, coin_type, account_number).unwrap();
+
+    let orchard_div_idx_u32 = 4;
+    let orchard_div_idx_u64 = u32::MAX + 1;
+    let orchard_div_idx_u32_obj = ZcashOrchardDiversifierIndex::from_u32(orchard_div_idx_u32);
+    let orchard_div_idx_u64_obj = ZcashOrchardDiversifierIndex::from_u64(orchard_div_idx_u64);
 
     writeln!(file, "{}", format_bytes("seed", &seed)).unwrap();
     writeln!(file, "coin_type:{coin_type}").unwrap();
@@ -48,6 +69,11 @@ fn main() {
     writeln!(file, "{}", format_bytes("orchard_address", &get_orchard_address(&usk)[..])).unwrap();
     writeln!(file, "{}", format_bytes("unified_spending_key", &usk.to_bytes(Era::Orchard))).unwrap();
     writeln!(file, "{}", format_bytes("account_private_key", &apk.to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("account_public_key", &ppk.serialize())).unwrap();
+    writeln!(file, "{}", format_bytes("ppk_external_ivk", &ppk.derive_external_ivk().as_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("ppk_internal_ivk", &ppk.derive_internal_ivk().as_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("ppk_external_ovk", &ppk.external_ovk().as_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("ppk_internal_ovk", &ppk.internal_ovk().as_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_private_key", &extended_private_key.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key", &extended_spending_key.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_from_path", &get_ext_sk_from_path(&extended_spending_key).to_bytes())).unwrap();
@@ -57,8 +83,23 @@ fn main() {
     writeln!(file, "{}", format_bytes("extended_spending_key_internal_sk", &extended_spending_key.derive_internal().to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_fvk", &extended_spending_key.to_diversifiable_full_viewing_key().to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("sapling_outgoing_viewing_key", &get_ovk(&usk))).unwrap();
-    writeln!(file, "{}", format_bytes("orchard_spending_key", &usk.orchard().to_bytes()[..])).unwrap();
-    writeln!(file, "{}", format_bytes("orchard_spending_key_from_zip32_seed", &orchard_sk.to_bytes()[..])).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_spending_key", &usk.orchard().to_bytes().as_slice())).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_spending_key_from_zip32_seed", &orchard_sk.to_bytes().as_slice())).unwrap();
+    //
+    writeln!(file, "{}", format_bytes("orchard_full_viewing_key", &orchard_sk.to_fvk().to_bytes().as_slice())).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_diversifier_from_bytes", &orchard_sk.to_bytes().as_slice())).unwrap();
+
+    // TODO
+    // writeln!(file, "{}", format_bytes("orchard_div_idx_address", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("orchard_div_idx_address_at", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("secp_secret_key", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("orchard_full_viewing_key_ivk", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("orchard_full_viewing_key_ovk", & ... )).unwrap();
+
+    writeln!(file, "orchard_diversifier_index_u32:{orchard_div_idx_u32}").unwrap();
+    writeln!(file, "orchard_diversifier_index_u64:{orchard_div_idx_u64}").unwrap();
+    writeln!(file, "{}", format_bytes("orchard_diversifier_index_from_u32", &orchard_div_idx_u32_obj.to_bytes().as_slice()) ).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_diversifier_index_from_u64", &orchard_div_idx_u64_obj.to_bytes().as_slice()) ).unwrap();
 }
 
 fn format_bytes(label: &str, bytes: &[u8]) -> String {

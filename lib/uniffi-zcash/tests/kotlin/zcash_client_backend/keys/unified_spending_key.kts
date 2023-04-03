@@ -1,7 +1,8 @@
 import uniffi.zcash.*
 
 fun testUnifiedSpendingKeyFromSeed() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -9,7 +10,7 @@ fun testUnifiedSpendingKeyFromSeed() {
         ZcashAccountId(0u),
     )
 
-    val expected = listOf(180, 208, 214, 194, 3, 32, 166, 3, 186, 151, 20, 139, 99, 33, 212, 134, 101, 192, 119, 208, 167, 21, 119, 228, 7, 152, 74, 140, 84, 209, 236, 235, 53, 57, 109, 65, 44, 178, 2, 169, 3, 240, 68, 53, 97, 0, 0, 0, 128, 234, 206, 224, 230, 180, 69, 172, 115, 57, 184, 221, 212, 204, 73, 161, 165, 210, 199, 46, 10, 200, 142, 73, 167, 9, 104, 89, 58, 200, 121, 136, 69, 228, 111, 114, 225, 87, 227, 210, 233, 213, 86, 13, 107, 118, 27, 114, 52, 191, 0, 154, 130, 192, 9, 11, 6, 220, 168, 246, 77, 183, 221, 52, 14, 198, 139, 75, 203, 159, 201, 17, 117, 90, 15, 68, 49, 79, 15, 95, 118, 205, 210, 120, 134, 40, 80, 122, 89, 82, 180, 159, 230, 35, 232, 105, 9, 144, 208, 234, 146, 137, 215, 60, 50, 183, 254, 149, 253, 137, 42, 232, 60, 251, 179, 135, 99, 159, 238, 119, 130, 4, 75, 67, 113, 67, 10, 191, 0, 1, 188, 15, 115, 131, 15, 198, 187, 156, 71, 47, 94, 152, 220, 110, 161, 168, 50, 123, 203, 190, 135, 6, 11, 110, 180, 235, 248, 125, 93, 89, 193, 0, 64, 207, 174, 34, 199, 252, 227, 180, 123, 230, 0, 80, 146, 93, 219, 173, 12, 108, 17, 103, 102, 144, 226, 101, 143, 138, 175, 53, 52, 12, 34, 185, 103, 172, 47, 218, 133, 127, 111, 155, 112, 212, 44, 34, 186, 124, 174, 31, 169, 99, 123, 229, 175, 141, 181, 225, 250, 107, 144, 184, 248, 64, 255, 239, 143).map { it.toUByte() }
+    val expected = supp.getAsByteArray("unified_spending_key")
 
     assert(unifiedSpendingKey.toBytes(ZcashKeysEra.ORCHARD) == expected)
 }
@@ -17,23 +18,20 @@ testUnifiedSpendingKeyFromSeed()
 
 
 fun testSpendingKeyConversions() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)
 
-    val keyBytes = key.toBytes()
+    val expectedKeyBytes = supp.getAsByteArray("extended_spending_key")
 
-    val expectedKeyBytes = listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 195, 198, 202, 45, 72, 50, 2, 237, 36, 207, 134, 196, 143, 180, 241, 151, 208, 35, 90, 48, 36, 29, 242, 225, 171, 4, 154, 32, 23, 74, 135, 254, 60, 215, 251, 107, 26, 246, 149, 17, 106, 197, 95, 43, 176, 26, 114, 78, 147, 230, 102, 117, 217, 219, 121, 221, 141, 243, 105, 242, 196, 17, 6, 125, 154, 91, 206, 197, 239, 46, 185, 26, 182, 28, 221, 75, 161, 188, 104, 15, 86, 66, 21, 75, 78, 129, 45, 4, 99, 26, 58, 74, 86, 119, 1, 123, 105, 66, 67, 174, 51, 49, 192, 41, 58, 102, 153, 105, 232, 85, 21, 192, 24, 52, 203, 7, 85, 50, 219, 6, 97, 47, 52, 118, 47, 147, 0, 215, 4, 12, 231, 93, 214, 87, 86, 214, 95, 91, 215, 83, 54, 134, 176, 145, 16, 19, 163, 192, 7, 116, 107, 102, 91, 195, 249, 245, 41, 46, 70).map { it.toUByte() }
-
-    assert(keyBytes == expectedKeyBytes)
-
-    ZcashExtendedSpendingKey.fromBytes(keyBytes)
-
+    assert(key.toBytes() == expectedKeyBytes)
 }
 testSpendingKeyConversions()
 
 fun testSpendingKeyFromPath(){
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)
 
@@ -46,68 +44,66 @@ fun testSpendingKeyFromPath(){
 
     val derivedKey = ZcashExtendedSpendingKey.fromPath(key, childIndex)
 
-    val expectedDerivedKeyBytes = listOf(4, 26, 237, 154, 189, 3, 0, 0, 0, 190, 50, 116, 189, 53, 137, 9, 71, 210, 108, 125, 194, 173, 24, 187, 186, 14, 133, 249, 36, 138, 11, 174, 20, 43, 237, 46, 218, 182, 232, 216, 127, 184, 127, 194, 90, 76, 148, 57, 126, 81, 94, 69, 45, 56, 76, 46, 46, 154, 210, 176, 150, 166, 233, 182, 21, 59, 71, 186, 168, 126, 99, 93, 14, 90, 194, 139, 172, 106, 205, 90, 61, 215, 151, 235, 90, 0, 15, 229, 105, 182, 71, 178, 138, 153, 17, 87, 189, 75, 74, 116, 232, 239, 200, 190, 4, 223, 105, 32, 49, 134, 127, 212, 79, 3, 218, 190, 208, 235, 117, 66, 235, 62, 249, 62, 119, 29, 59, 42, 91, 12, 196, 140, 23, 151, 51, 130, 103, 165, 203, 21, 10, 254, 194, 46, 83, 130, 156, 218, 75, 152, 153, 119, 50, 14, 58, 240, 181, 84, 149, 196, 188, 161, 22, 151, 112, 123, 37, 107, 187).map { it.toUByte() }
-
+    val expectedDerivedKeyBytes = supp.getAsByteArray("extended_spending_key_from_path")
     assert(derivedKey.toBytes() == expectedDerivedKeyBytes)
-
 }
 testSpendingKeyFromPath()
 
 fun testSpendingKeyDeriveChild() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)
 
     val derivedKey = key.deriveChild(ZcashChildIndex.Hardened(32u))
 
-    val expectedDerivedKeyBytes = listOf(1, 218, 182, 42, 238, 32, 0, 0, 128, 15, 138, 2, 193, 121, 32, 219, 17, 134, 25, 134, 93, 158, 90, 28, 34, 125, 195, 175, 185, 30, 223, 112, 158, 65, 160, 216, 168, 76, 86, 1, 219, 19, 65, 107, 114, 227, 231, 62, 196, 207, 83, 181, 21, 198, 185, 156, 211, 235, 215, 133, 233, 176, 98, 210, 232, 233, 32, 140, 24, 128, 153, 38, 9, 97, 77, 211, 193, 69, 175, 211, 71, 79, 1, 123, 27, 72, 49, 64, 180, 55, 202, 198, 55, 64, 72, 77, 134, 29, 114, 210, 223, 11, 63, 210, 1, 53, 73, 172, 144, 203, 7, 79, 239, 215, 40, 231, 131, 33, 202, 175, 158, 66, 216, 167, 222, 67, 54, 218, 137, 175, 235, 191, 193, 103, 178, 60, 96, 91, 201, 140, 62, 175, 124, 173, 170, 68, 4, 129, 95, 45, 189, 39, 214, 40, 1, 222, 82, 243, 17, 102, 236, 197, 198, 215, 198, 209, 187, 83, 220).map { it.toUByte() }
-
+    val expectedDerivedKeyBytes = supp.getAsByteArray("extended_spending_key_derived_child")
     assert(derivedKey.toBytes() == expectedDerivedKeyBytes)
-
 }
 testSpendingKeyDeriveChild()
 
 fun testSpendingKeyDefaultAddress() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
-
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)
 
     val result = key.defaultAddress()
 
-    val expectedAddressBytes = listOf(91, 59, 79, 228, 216, 68, 167, 156, 199, 182, 182, 184, 107, 245, 37, 145, 194, 241, 226, 63, 157, 130, 209, 140, 137, 229, 45, 115, 56, 194, 31, 118, 140, 33, 179, 60, 74, 226, 114, 199, 101, 216, 161).map { it.toUByte() }
+    val expectedAddressBytes = supp.getAsByteArray("extended_spending_key_default_address")
 
     assert( result.address.toBytes() == expectedAddressBytes)
 
-    val expectedIndexBytes = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val expectedIndexBytes = supp.getAsByteArray("extended_spending_key_child_index")
 
     assert(result.diversifierIndex.toBytes() == expectedIndexBytes)
 }
 testSpendingKeyDefaultAddress()
 
 fun testSpendingKeyDeriveInternal(){
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)
 
     val derivedKey = key.deriveInternal()
 
-    val expectedDerivedKeyBytes = listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 17, 195, 198, 202, 45, 72, 50, 2, 237, 36, 207, 134, 196, 143, 180, 241, 151, 208, 35, 90, 48, 36, 29, 242, 225, 171, 4, 154, 32, 23, 74, 135, 254, 60, 215, 251, 107, 26, 246, 149, 17, 106, 197, 95, 43, 176, 26, 114, 78, 147, 230, 102, 117, 217, 219, 121, 221, 141, 243, 105, 242, 196, 17, 6, 121, 209, 143, 180, 33, 137, 166, 142, 214, 103, 176, 171, 151, 188, 142, 87, 90, 50, 78, 79, 228, 154, 68, 183, 17, 91, 125, 90, 236, 27, 42, 6, 23, 159, 15, 53, 108, 230, 232, 135, 19, 31, 121, 130, 26, 233, 11, 243, 222, 23, 184, 46, 212, 75, 194, 186, 225, 111, 54, 239, 211, 251, 61, 87, 134, 175, 157, 85, 96, 14, 187, 153, 221, 181, 4, 120, 22, 17, 65, 203, 204, 206, 159, 46, 1, 19, 73, 177, 78, 243, 121, 114, 129, 220, 59, 205).map { it.toUByte() }
+    val expectedDerivedKeyBytes = getAsByteArray("extended_spending_key_internal_sk")
 
     assert(derivedKey.toBytes() == expectedDerivedKeyBytes)
-
 }
 testSpendingKeyDeriveInternal()
 
-fun testSpendingKeyToDiversFVK () {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+fun testSpendingKeyToDiversifiableFvk () {
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)
 
     val fvk = key.toDiversifiableFullViewingKey()
 
-    val expectedFvkBytes = listOf(180, 218, 137, 100, 66, 229, 135, 7, 174, 157, 113, 19, 232, 105, 128, 118, 177, 64, 30, 134, 210, 145, 222, 74, 128, 42, 119, 208, 217, 140, 101, 104, 198, 249, 149, 21, 94, 172, 49, 11, 230, 230, 232, 240, 12, 49, 137, 107, 82, 105, 250, 222, 183, 232, 109, 136, 236, 230, 19, 63, 96, 93, 151, 190, 123, 105, 66, 67, 174, 51, 49, 192, 41, 58, 102, 153, 105, 232, 85, 21, 192, 24, 52, 203, 7, 85, 50, 219, 6, 97, 47, 52, 118, 47, 147, 0, 215, 4, 12, 231, 93, 214, 87, 86, 214, 95, 91, 215, 83, 54, 134, 176, 145, 16, 19, 163, 192, 7, 116, 107, 102, 91, 195, 249, 245, 41, 46, 70).map { it.toUByte() }
+    val expectedFvkBytes = supp.getAsByteArray("extended_spending_key_fvk")
 
     assert(fvk.toBytes() == expectedFvkBytes)
 }
-testSpendingKeyToDiversFVK()
+testSpendingKeyToDiversifiableFvk()

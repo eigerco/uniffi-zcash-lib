@@ -18,6 +18,7 @@ impl From<&ZcashKeyIndex> for KeyIndex {
 }
 
 impl ZcashKeyIndex {
+    /// DUPLICATE ?
     pub fn from_u32(i: u32) -> ZcashResult<Self> {
         KeyIndex::from_index(i).map_err(From::from).map(From::from)
     }

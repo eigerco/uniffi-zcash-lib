@@ -11,6 +11,13 @@ impl ZcashOrchardDiversifier {
         let array = utils::cast_slice(&data)?;
         Ok(Diversifier::from_bytes(array).into())
     }
+
+    // TODO
+    // added for tests
+    // not sure it will work
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.0.to_bytes().to_vec()
+    }
 }
 
 impl From<&ZcashOrchardDiversifier> for Diversifier {
