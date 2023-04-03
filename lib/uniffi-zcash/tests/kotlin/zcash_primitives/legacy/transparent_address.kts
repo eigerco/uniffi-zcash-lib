@@ -26,7 +26,6 @@ fun testTransparentAddressFromScript() {
     val addr = ZcashTransparentAddress.script(addrBytes)
 
     assert(addr.toBytes() == addrBytes)
-
 }
 
 fun testTransparentAddressPublicKeyEncodeAndDecode() {

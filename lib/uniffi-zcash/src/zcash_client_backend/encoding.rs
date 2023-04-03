@@ -7,6 +7,8 @@ use crate::{
     ZcashPaymentAddress, ZcashResult, ZcashTransparentAddress,
 };
 
+// TODO at least some of the below functions exist somewhere else, like encode_extended_full_viewing_key
+
 /// Writes an [`ExtendedSpendingKey`] as a Bech32-encoded string.
 pub fn encode_extended_spending_key(hrp: &str, extsk: Arc<ZcashExtendedSpendingKey>) -> String {
     encoding::encode_extended_spending_key(hrp, &extsk.as_ref().into())
