@@ -71,6 +71,8 @@ fn main() {
 
     let orchard_address = get_orchard_address(&usk);
 
+    let sapling_fvk_from_expsk = FullViewingKey::from_expanded_spending_key(&expanded_sk)
+
     writeln!(file, "{}", format_bytes("seed", &seed)).unwrap();
     writeln!(file, "coin_type:{coin_type}").unwrap();
     writeln!(file, "account:{account_number}").unwrap();
@@ -100,7 +102,11 @@ fn main() {
     writeln!(file, "{}", format_bytes("expanded_spending_key", &expanded_sk.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("diversifiable_fvk", &diversifiable_fvk.to_bytes())).unwrap();
 
-    writeln!(file, "{}", format_bytes("extended_spending_key_fvk", &sapling_fvk.to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("sapling_full_viewing_key", &sapling_fvk_from_expsk.to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("sapling_full_viewing_key_vk", &sapling_fvk_from_expsk.vk().to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("sapling_full_viewing_key_ovk", &sapling_fvk_from_expsk.ovk().to_bytes())).unwrap();
+
+    writeln!(file, "{}", format_bytes("extended_fvk", &sapling_fvk.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_fvk_encoded", &sapling_fvk.encode(&MainNetwork))).unwrap();
     writeln!(file, "{}", format_bytes("extended_fvk_child", &sapling_fvk.derive_child(ZcashChildIndex::Hardened(32)).to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_fvk_address", &sapling_fvk.address(ZcashDiversifierIndex::from_u32(4)).to_bytes())).unwrap();
@@ -109,9 +115,9 @@ fn main() {
     writeln!(file, "{}", format_bytes("extended_fvk_derive_internal", &sapling_fvk.derive_internal().to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_fvk_diversifiable_fvk", &sapling_fvk.to_diversifiable_full_viewing_key().to_bytes())).unwrap();
 
-    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_nk", & diversifiable_fvk.to_nk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ivk", & diversifiable_fvk.to_ivk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ovk", & diversifiable_fvk.to_ovk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_nk", &diversifiable_fvk.to_nk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ivk", &diversifiable_fvk.to_ivk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ovk", &diversifiable_fvk.to_ovk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_fvk_addr", &diversifiable_fvk.address(&diversifier).to_bytes())).unwrap();
 
     writeln!(file, "{}", format_bytes("sapling_outgoing_viewing_key", &get_ovk(&usk))).unwrap();
@@ -127,6 +133,7 @@ fn main() {
     writeln!(file, "{}", format_bytes("secp_secret_key", &secp_secret_key.to_bytes())).unwrap();
     writeln!(file, "orchard_diversifier_index_u32:{orchard_div_idx_u32}").unwrap();
     writeln!(file, "orchard_diversifier_index_u64:{orchard_div_idx_u64}").unwrap();
+
     writeln!(file, "{}", format_bytes("orchard_diversifier_index_from_u32", &orchard_div_idx_u32_obj.to_bytes().as_slice()) ).unwrap();
     writeln!(file, "{}", format_bytes("orchard_diversifier_index_from_u64", &orchard_div_idx_u64_obj.to_bytes().as_slice()) ).unwrap();
 }

@@ -3,7 +3,7 @@ import uniffi.zcash.*
 fun testExtendedFullViewingKeyFromBytes() {
 	val supp = TestSupport.getFromCsv()
 
-	val fvkBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 
@@ -25,7 +25,7 @@ testExtendedFullViewingKeyEncodeAndDecode()
 fun testExtendedFullViewingKeyDeriveChild() {
 	val supp = TestSupport.getFromCsv()
 
-	val fvkBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 
@@ -42,7 +42,7 @@ testExtendedFullViewingKeyDeriveChild()
 fun testExtendedFullViewingKeyAddress() {
 	val supp = TestSupport.getFromCsv()
 
-	val fvkBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 
@@ -59,7 +59,7 @@ testExtendedFullViewingKeyAddress()
 fun testExtendedFullViewingKeyFindAddress() {
 	val supp = TestSupport.getFromCsv()
 
-	val fvkBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 
@@ -76,7 +76,7 @@ testExtendedFullViewingKeyFindAddress()
 fun testExtendedFullViewingKeyDefaultAddress() {
 	val supp = TestSupport.getFromCsv()
 
-	val fvkBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 
@@ -91,7 +91,7 @@ testExtendedFullViewingKeyDefaultAddress()
 fun testExtendedFullViewingKeyDeriveInternal() {
 	val supp = TestSupport.getFromCsv()
 
-	val fvkBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 
@@ -106,7 +106,7 @@ testExtendedFullViewingKeyDeriveInternal()
 fun testExtendedFullViewingKeyToDiversifiableFvk() {
 	val supp = TestSupport.getFromCsv()
 
-	val fvkBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 

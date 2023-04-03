@@ -14,10 +14,11 @@ testDiversifiableFullViewingKeyFromBytes()
 fun testDiversifiableFullViewingKeyFvk() {
 	val supp = TestSupport.fromCsvFile()
 	val expectedBytesDiversifiable = supp.getAsByteArray("diversifiable_fvk")
-	val expectedBytes = supp.getAsByteArray("extended_spending_key_fvk")
+	val expectedBytes = supp.getAsByteArray("extended_fvk")
 
 	val dfvk = ZcashDiversifiableFullViewingKey.fromBytes(expectedBytesDiversifiable)
 	val fvk = dfvk.fvk()
+	// TODO something wrong here?
 
 	assert(dfvk.toBytes() == fvk.toBytes())
 
