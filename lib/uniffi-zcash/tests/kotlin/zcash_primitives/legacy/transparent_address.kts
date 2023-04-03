@@ -1,30 +1,54 @@
 import uniffi.zcash.*
 
+fun setupNetwork() {
+    ZcashConsensusParameters.TEST_NETWORK
+}
+
 fun testTransparentAddressFromPublicKey() {
-	ZcashTransparentAddress.publicKey()
+    val network = setupNetwork()
+
+    val encodedPublicKeyAddress = supp.getAsString("t_address_public_key")
+    val parsedAsPublicKey = ZcashTransparentAddress.decode(network, encodedPublicKeyAddress)
+    val addrBytes = parsedAsPublicKey.toBytes()
+
+	val addr = ZcashTransparentAddress.publicKey(addrBytes)
+
+    assert(addr.toBytes() == addrBytes)
 }
 
 fun testTransparentAddressFromScript() {
+    val network = setupNetwork()
+
+    val encodedScriptAddress = supp.getAsString("t_address_script")
+    val parsedAsScript = ZcashTransparentAddress.decode(network, encodedScriptAddress)
+    val addrBytes = parsedAsScript.toBytes()
+
+    val addr = ZcashTransparentAddress.script(addrBytes)
+
+    assert(addr.toBytes() == addrBytes)
 
 }
 
-fun testTransparentAddressEncode() {
+fun testTransparentAddressPublicKeyEncodeAndDecode() {
+    val network = setupNetwork()
 
+    val encodedPublicKeyAddress = supp.getAsString("t_address_public_key")
+    val parsedAsPublicKey = ZcashTransparentAddress.decode(network, encodedPublicKeyAddress)
+
+    assert(parsedAsPublicKey.isPublicKey())
+    assert(encodedPublicKeyAddress == parsedAsPublicKey.encode(network))
 }
+testTransparentAddressPublicKeyEncodeAndDecode()
 
-fun testTransparentAddressParsingEncodeAndDecode() {
-    val net = ZcashConsensusParameters.TEST_NETWORK
-    val input = "tm9iMLAuYMzJ6jtFLcA7rzUmfreGuKvr7Ma"
-    val parsed = ZcashTransparentAddress.decode(net, input)
 
-    assert(parsed.isPublicKey())
-    assert(input == parsed.encode(net))
+fun testTransparentAddressScriptEncodeAndDecode() {
+    val network = setupNetwork()
 
-    val input2 = "t26YoyZ1iPgiMEWL4zGUm74eVWfhyDMXzY2"
-    val parsed2 = ZcashTransparentAddress.decode(net, input2)
+    val encodedScriptAddress = supp.getAsString("t_address_script")
+    val parsedAsScript = ZcashTransparentAddress.decode(net, encodedScriptAddress)
 
-    assert(parsed2.isScript())
-    assert(input2 == parsed2.encode(net))
+    assert(parsedAsScript.isScript())
+    assert(encodedScriptAddress == parsedAsScript.encode(network))
 }
-testTransparentAddressParsingEncodeAndDecode()
+testTransparentAddressScriptEncodeAndDecode()
 

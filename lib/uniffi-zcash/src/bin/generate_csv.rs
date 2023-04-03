@@ -64,6 +64,8 @@ fn main() {
     writeln!(file, "coin_type:{coin_type}").unwrap();
     writeln!(file, "account:{account_number}").unwrap();
     writeln!(file, "scope:External").unwrap();
+    writeln!(file, "t_address_public_key:tm9iMLAuYMzJ6jtFLcA7rzUmfreGuKvr7Ma").unwrap();
+    writeln!(file, "t_address_script:t26YoyZ1iPgiMEWL4zGUm74eVWfhyDMXzY2").unwrap();
     writeln!(file, "unified_full_viewing_key_encoded:{encoded}").unwrap();
     writeln!(file, "{}", format_bytes("sapling_address", &get_sapling_address(&usk).to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("orchard_address", &get_orchard_address(&usk)[..])).unwrap();
@@ -82,6 +84,12 @@ fn main() {
     writeln!(file, "{}", format_bytes("extended_spending_key_child_index", &ext_sk_child_index.0)).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_internal_sk", &extended_spending_key.derive_internal().to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_fvk", &extended_spending_key.to_diversifiable_full_viewing_key().to_bytes())).unwrap();
+
+    // writeln!(file, "{}", format_bytes("extended_spending_key_fvk_nk", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ivk", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ovk", & ... )).unwrap();
+    // writeln!(file, "{}", format_bytes("extended_spending_key_fvk_addr", & ... )).unwrap();
+
     writeln!(file, "{}", format_bytes("sapling_outgoing_viewing_key", &get_ovk(&usk))).unwrap();
     writeln!(file, "{}", format_bytes("orchard_spending_key", &usk.orchard().to_bytes().as_slice())).unwrap();
     writeln!(file, "{}", format_bytes("orchard_spending_key_from_zip32_seed", &orchard_sk.to_bytes().as_slice())).unwrap();

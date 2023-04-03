@@ -35,8 +35,11 @@ fun testSaplingIvkToPaymentAddress() {
     val saplingDiversifier = ZcashDiversifier(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
 
     val expected = supp.getAsByteArray("sapling_address")
-    assert(unifiedSpendingKey.toUnifiedFullViewingKey()
+
+    val paymentAddress = unifiedSpendingKey.toUnifiedFullViewingKey()
         .sapling()!!.toIvk(ZcashScope.EXTERNAL)
-        .toPaymentAddress(saplingDiversifier)!!.toBytes() == expected)
+        .toPaymentAddress(saplingDiversifier)!!.toBytes()
+
+    assert(paymentAddress == expected)
 }
 testSaplingIvkToPaymentAddress()
