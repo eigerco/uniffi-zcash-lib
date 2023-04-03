@@ -2,7 +2,8 @@ import uniffi.zcash.*
 
 
 fun testUnifiedAddressParsing() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -20,13 +21,15 @@ fun testUnifiedAddressParsing() {
     }
     assert(thrown)
 
-    val saplingDiversifier = ZcashDiversifier(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
+    val diversifierBytes = listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+
+    val saplingDiversifier = ZcashDiversifier(diversifierBytes)
 
     val sapling = unifiedSpendingKey.toUnifiedFullViewingKey()
         .sapling()!!.toIvk(ZcashScope.EXTERNAL)
         .toPaymentAddress(saplingDiversifier)
 
-    val orchardDiversifier = ZcashOrchardDiversifier.fromBytes(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
+    val orchardDiversifier = ZcashOrchardDiversifier.fromBytes(diversifierBytes)
 
     val orchard = unifiedSpendingKey.toUnifiedFullViewingKey()
         .orchard()!!.toIvk(ZcashOrchardScope.EXTERNAL)
@@ -43,7 +46,8 @@ fun testUnifiedAddressParsing() {
 testUnifiedAddressParsing()
 
 fun testUnifiedAddressCreationWithSapling() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -65,7 +69,8 @@ fun testUnifiedAddressCreationWithSapling() {
 testUnifiedAddressCreationWithSapling()
 
 fun testUnifiedAddressCreation() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -100,7 +105,8 @@ fun testUnifiedAddressCreation() {
 testUnifiedAddressCreation()
 
 fun testUnifiedAddressCreationWithOrchard() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val supp = TestSupport.fromCsvFile()
+    val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,

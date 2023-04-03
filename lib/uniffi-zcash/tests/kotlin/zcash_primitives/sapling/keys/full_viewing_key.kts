@@ -1,7 +1,8 @@
 import uniffi.zcash.*
 
 fun testSaplingOvkToBytes() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+	val supp = TestSupport.fromCsvFile()
+	val seed = supp.getArgumentAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -9,7 +10,7 @@ fun testSaplingOvkToBytes() {
         ZcashAccountId(0u),
     )
 
-    val expected = listOf(144, 208, 234, 146, 137, 215, 60, 50, 183, 254, 149, 253, 137, 42, 232, 60, 251, 179, 135, 99, 159, 238, 119, 130, 4, 75, 67, 113, 67, 10, 191, 0).map { it.toUByte() }
+    val expected = supp.getAsByteArray("sapling_outgoing_viewing_key")
 
     assert(unifiedSpendingKey.toUnifiedFullViewingKey()
         .sapling()!!.toOvk(ZcashScope.EXTERNAL)
@@ -18,7 +19,8 @@ fun testSaplingOvkToBytes() {
 testSaplingOvkToBytes()
 
 fun testOrchardIvkToPaymentAddress() {
-    val seed = listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+	val supp = TestSupport.fromCsvFile()
+	val seed = supp.getArgumentAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
