@@ -89,7 +89,7 @@ class Test(unittest.TestCase):
 
         fvk = key.to_diversifiable_full_viewing_key()
 
-        expected_fvk_bytes = zts.get_as_byte_array("extended_spending_key_fvk")
+        expected_fvk_bytes = zts.get_as_byte_array("diversifiable_fvk")
 
         self.assertEqual(fvk.to_bytes(), expected_fvk_bytes)
 
