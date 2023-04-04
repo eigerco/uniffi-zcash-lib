@@ -699,6 +699,26 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashMemoBytes::as_array()   | 🔵    |     |      |       |      |
 | ZcashMemoBytes::as_slice()   | 🔵    |  ✅ |  ✅  |       |  ✅  |
 
+### ZcashSaplingMerklePath
+
+* Original type: [zcash_primitives::merkle_tree::MerklePath](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/merkle_tree/struct.MerklePath.html)
+* This object was implemented for the Sapling Node specific type.
+* `auth_path` and `position` are just pure invention getters.
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingMerklePath::auth_path() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingMerklePath::position()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingMerklePath::from_path() |       |     |      |       |      |
+| ZcashSaplingMerklePath::from_slice()|       |     |      |       |      |
+| ZcashSaplingMerklePath::root()      |       |     |      |       |      |
+
+### ZcashAuthPath
+A dictionary that holds an [ZcashSaplingNode](#ZcashSaplingNode) and a boolean. 
+This is used in [ZcashSaplingMerklePath](#ZcashSaplingMerklePath)::auth_path() method
+for returning a Vec<ZcashAuthPath>, trying to mimic the original method, which returns
+a tuple.
+
 ## Enums
 
 ### ZcashScope

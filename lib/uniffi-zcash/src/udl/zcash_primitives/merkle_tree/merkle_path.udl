@@ -1,0 +1,10 @@
+interface ZcashSaplingMerklePath {
+    sequence<ZcashAuthPath> auth_path();
+
+    u64 position();
+};
+
+dictionary ZcashAuthPath {
+    ZcashSaplingNode node;
+    boolean bool;
+};
