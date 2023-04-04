@@ -12,9 +12,6 @@ impl ZcashOrchardDiversifier {
         Ok(Diversifier::from_bytes(array).into())
     }
 
-    // TODO
-    // added for tests
-    // not sure it will work
     pub fn to_bytes(&self) -> Vec<u8> {
         self.0.as_array().to_vec()
     }
