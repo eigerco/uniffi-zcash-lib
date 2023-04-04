@@ -161,7 +161,7 @@ class TestApk < Test::Unit::TestCase
       .orchard().to_ivk(Zcash::ZcashScope::EXTERNAL)
       .address(orchard_diversifier)
 
-    transparent = Zcash::ZcashTransparentAddress::public_key((1..20).to_a)
+    transparent = Zcash::ZcashTransparentAddress::from_public_key((1..20).to_a)
 
     source = Zcash::ZcashUnifiedAddress::new(orchard, sapling, transparent)
     address = source.encode(params)
@@ -212,7 +212,7 @@ class TestApk < Test::Unit::TestCase
       .orchard().to_ivk(Zcash::ZcashScope::EXTERNAL)
       .address(orchard_diversifier)
 
-    transparent = Zcash::ZcashTransparentAddress::public_key((1..20).to_a)
+    transparent = Zcash::ZcashTransparentAddress::from_public_key((1..20).to_a)
 
     set = [orchard, nil].product([sapling, nil], [transparent, nil])
 

@@ -167,7 +167,7 @@ func testUnifiedAddressParsing() {
         .orchard()!.toIvk(scope: ZcashOrchardScope.external)
         .address(diversifier: orchardDiversifier)
 
-    let transparent = try! ZcashTransparentAddress.publicKey(data: Array(1...20))
+    let transparent = try! ZcashTransparentAddress.fromPublicKey(data: Array(1...20))
 
     let source = try! ZcashUnifiedAddress(orchard: orchard, sapling: sapling, transparent: transparent)
     let address = source.encode(params: params)
@@ -220,7 +220,7 @@ func testUnifiedAddressCreation() {
         .orchard()!.toIvk(scope: ZcashOrchardScope.external)
         .address(diversifier: orchardDiversifier)
 
-    let transparent = try! ZcashTransparentAddress.publicKey(data: Array(1...20))
+    let transparent = try! ZcashTransparentAddress.fromPublicKey(data: Array(1...20))
 
     // At least one of orchard or sapling address must be set
     // let _ = try! ZcashUnifiedAddress(orchard: nil, sapling: nil, transparent: nil)

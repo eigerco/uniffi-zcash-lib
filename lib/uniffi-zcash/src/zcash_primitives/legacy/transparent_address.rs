@@ -1,7 +1,9 @@
+use std::sync::Arc;
+
 use zcash_client_backend::encoding;
 use zcash_primitives::{consensus::Parameters, legacy::TransparentAddress};
 
-use crate::{utils, ZcashConsensusParameters, ZcashError, ZcashResult};
+use crate::{utils, ZcashConsensusParameters, ZcashError, ZcashResult, ZcashScript};
 
 /// A transparent address corresponding to either a public key or a `Script`.
 #[derive(Clone, Copy)]
@@ -21,15 +23,19 @@ impl From<&ZcashTransparentAddress> for TransparentAddress {
 
 impl ZcashTransparentAddress {
     /// Create new transparent address corresponding to public key
-    pub fn public_key(input: Vec<u8>) -> ZcashResult<Self> {
+    pub fn from_public_key(input: Vec<u8>) -> ZcashResult<Self> {
         let buf = utils::cast_slice(&input)?;
         Ok(TransparentAddress::PublicKey(buf).into())
     }
 
     /// Create new transparent address corresponding to script
-    pub fn script(input: Vec<u8>) -> ZcashResult<Self> {
+    pub fn from_script(input: Vec<u8>) -> ZcashResult<Self> {
         let buf = utils::cast_slice(&input)?;
         Ok(TransparentAddress::Script(buf).into())
+    }
+
+    pub fn script(&self) -> Arc<ZcashScript> {
+        Arc::new(self.0.script().into())
     }
 
     /// Decodes a [`TransparentAddress`] from a Base58Check-encoded string.

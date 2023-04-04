@@ -1,8 +1,8 @@
 interface ZcashTransparentAddress {
-  [Name=public_key, Throws=ZcashError]
+  [Name=from_public_key, Throws=ZcashError]
   constructor(sequence<u8> data);
 
-  [Name=script, Throws=ZcashError]
+  [Name=from_script, Throws=ZcashError]
   constructor(sequence<u8> data);
 
   [Name=decode, Throws=ZcashError]
@@ -13,6 +13,8 @@ interface ZcashTransparentAddress {
   boolean is_public_key();
 
   boolean is_script();
+
+  ZcashScript script();
 
   sequence<u8> to_bytes();
 };
