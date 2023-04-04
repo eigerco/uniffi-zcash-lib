@@ -516,15 +516,33 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashTransactionBuilder::transparent_outputs()    | 🔵     |     |      |       |      |
 | ZcashTransactionBuilder::sapling_inputs()         | 🔵     |     |      |       |      |
 | ZcashTransactionBuilder::sapling_outputs()        | 🔵     |     |      |       |      |
-| ZcashTransactionBuilder::new()                    | 🔴     |     |      |       |      |
+| ZcashTransactionBuilder::new()                    | 🔴     |  ✅ | ✅   |  ✅   | ✅  |
 | ZcashTransactionBuilder::new_with_rng()           | 🔵     |     |      |       |      |
-| ZcashTransactionBuilder::add_sapling_spend()      | 🔴     |     |      |       |      |
-| ZcashTransactionBuilder::add_sapling_output()     | 🔴     |     |      |       |      |
-| ZcashTransactionBuilder::add_transparent_input()  | 🔴     |     |      |       |      |
-| ZcashTransactionBuilder::add_transparent_output() | 🔴     |     |      |       |      |
+| ZcashTransactionBuilder::add_sapling_spend()      | 🔴     |  ✅ | ✅   |  ✅   | ✅   |
+| ZcashTransactionBuilder::add_sapling_output()     | 🔴     |  ✅ | ✅   |  ✅   | ✅   |
+| ZcashTransactionBuilder::add_transparent_input()  | 🔴     |  ✅ | ✅   |  ✅   | ✅   |
+| ZcashTransactionBuilder::add_transparent_output() | 🔴     |  ✅ | ✅   |  ✅   | ✅   |
 | ZcashTransactionBuilder::with_progress_notifier() | 🔵     |     |      |       |      |
-| ZcashTransactionBuilder::build()                  | 🔴     |     |      |       |      |
+| ZcashTransactionBuilder::build()                  | 🔴     |  ✅ | ✅   |  ✅   | ✅   |
 | ZcashTransactionBuilder::build_zfuture()          | 🔵     |     |      |       |      |
+
+### ZcashTransaction
+* Original type: [zcash_primitives::transaction::Transaction](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/struct.Transaction.html)
+* `write` method was implemented as `to_bytes()`.
+
+| Members                              | Score | UDL | Code | Tests | Docs |
+| -------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTransaction::into_data()        | 🔴    |     |      |       |      |
+| ZcashTransaction::txid()             | 🔴    |     |      |       |      |
+| ZcashTransaction::read()             | 🔴    |     |      |       |      |
+| ZcashTransaction::write()            | 🔴    | ✅  |  ✅  |  ✅   | ✅   |
+| ZcashTransaction::write_v4()         |       |     |      |       |      |
+| ZcashTransaction::write_transparent()|       |     |      |       |      |
+| ZcashTransaction::write_v5()         |       |     |      |       |      |
+| ZcashTransaction::write_v5_header()  |       |     |      |       |      |
+| ZcashTransaction::write_v5_sapling() |       |     |      |       |      |
+| ZcashTransaction::write_tze()        |       |     |      |       |      |
+| ZcashTransaction::auth_commitment()  |       |     |      |       |      |
 
 ### ZcashSaplingMetadata
 * Original type: [zcash_primitives::transaction::components::sapling::builder::SaplingMetadata](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/components/sapling/builder/struct.SaplingMetadata.html)
@@ -765,6 +783,11 @@ a tuple.
 | Members | Score | UDL | Code | Tests | Docs |
 | ------- | ----- | --- | ---- | ----- | ---- |
 
+### ZcashFeeRules
+
+This is a pure invention enum. It helps to select the desired fee rules.
+See [ZcashTransactionBuilder](#zcashtransactionbuilder).
+
 ## Records
 
 ### ZcashDiversifierIndexAndScope
@@ -778,7 +801,9 @@ A pair of [ZcashUnifiedAddress](#zcashunifiedaddress) and [ZcashDiversifierIndex
 ### ZcashDiversifierIndexAndPaymentAddress
 
 A pair of [ZcashDiversifierIndex](#zcashdiversifierindex) and [ZcashPaymentAddress](#zcashpaymentaddress-sapling).
+### ZcashTransactionSaplingMetadata
 
+A pair of [ZcashTransaction](#zcashtransaction) and [ZcashSaplingMetadata](#zcashsaplingmetadata)
 ## Functions
 
 ### zcash_client_backend::encoding

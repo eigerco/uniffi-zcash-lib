@@ -3,6 +3,7 @@ uniffi::build_foreign_language_testcases!(
     "tests/python/test.py",
     "tests/python/sapling.py",
     "tests/python/orchard.py",
+    "tests/python/transaction.py",
     // Kotlin tests
     "tests/kotlin/test.kts",
     "tests/kotlin/sapling.kts",
