@@ -2,7 +2,7 @@ use std::sync::{Arc, RwLock};
 
 use zcash_primitives::{merkle_tree::IncrementalWitness, sapling::Node};
 
-use crate::{ZcashCommitmentTree, ZcashResult, ZcashSaplingNode};
+use crate::{ZcashCommitmentTree, ZcashResult, ZcashSaplingMerklePath, ZcashSaplingNode};
 
 pub struct ZcashIncrementalWitness(RwLock<IncrementalWitness<Node>>);
 
@@ -22,6 +22,10 @@ impl ZcashIncrementalWitness {
             // Changing behavior here.
             Err(_) => Err("Tree is full".into()),
         }
+    }
+
+    pub fn path(&self) -> Option<Arc<ZcashSaplingMerklePath>> {
+        self.0.read().unwrap().path().map(From::from).map(Arc::new)
     }
 }
 

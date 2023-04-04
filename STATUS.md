@@ -686,7 +686,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashIncrementalWitness::filler()    | 🔵    |    |      |       |      |
 | ZcashIncrementalWitness::append()    | 🔴    | ✅ |  ✅  |       |  ✅  |
 | ZcashIncrementalWitness::root()      | 🔵    |    |      |       |      |
-| ZcashIncrementalWitness::path()      | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::path()      | 🔴    | ✅ |  ✅  |       |  ✅  |
 
 ### ZcashMemoBytes
 
