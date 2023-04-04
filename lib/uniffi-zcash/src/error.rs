@@ -1,4 +1,7 @@
+use std::{convert::Infallible, num::TryFromIntError};
+
 use orchard::zip32;
+use zcash_primitives::transaction::{self, fees};
 
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]
@@ -41,6 +44,24 @@ pub enum ZcashError {
 
     #[error("Base58 decoding error occurred: {error}")]
     Bs58Error { error: bs58::decode::Error },
+
+    #[error("General builder error occurred: {error:?}")]
+    BuilderError {
+        error: transaction::builder::Error<fees::zip317::FeeError>,
+    },
+
+    #[error("Transparent builder error occurred: {error:?}")]
+    TransparentBuilderError {
+        error: transaction::components::transparent::builder::Error,
+    },
+
+    #[error("Sapling builder error occurred: {error:?}")]
+    SaplingBuilderError {
+        error: transaction::components::sapling::builder::Error,
+    },
+
+    #[error("IO error occurred: {error:?}")]
+    IOError { error: std::io::Error },
 
     #[error("unknown error occurred")]
     Unknown,
@@ -112,5 +133,41 @@ impl From<zcash_client_backend::encoding::Bech32DecodeError> for ZcashError {
 impl From<bs58::decode::Error> for ZcashError {
     fn from(error: bs58::decode::Error) -> Self {
         ZcashError::Bs58Error { error }
+    }
+}
+
+impl From<transaction::builder::Error<Infallible>> for ZcashError {
+    fn from(error: transaction::builder::Error<Infallible>) -> Self {
+        error.to_string().into()
+    }
+}
+
+impl From<transaction::builder::Error<fees::zip317::FeeError>> for ZcashError {
+    fn from(error: transaction::builder::Error<fees::zip317::FeeError>) -> Self {
+        ZcashError::BuilderError { error }
+    }
+}
+
+impl From<transaction::components::transparent::builder::Error> for ZcashError {
+    fn from(error: transaction::components::transparent::builder::Error) -> Self {
+        ZcashError::TransparentBuilderError { error }
+    }
+}
+
+impl From<transaction::components::sapling::builder::Error> for ZcashError {
+    fn from(error: transaction::components::sapling::builder::Error) -> Self {
+        ZcashError::SaplingBuilderError { error }
+    }
+}
+
+impl From<std::io::Error> for ZcashError {
+    fn from(error: std::io::Error) -> Self {
+        ZcashError::IOError { error }
+    }
+}
+
+impl From<TryFromIntError> for ZcashError {
+    fn from(value: TryFromIntError) -> Self {
+        value.to_string().into()
     }
 }
