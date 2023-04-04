@@ -3,7 +3,7 @@ import uniffi.zcash.*
 fun testFromExpandedSpendingKey() {
 	val supp = TestSupport.fromCsvFile()
 
-	// is this the correct spending key?
+	// TODO is this the correct spending key?
 	val skBytes = supp.getAsByteArray("extended_spending_key")
 
 	val spendingKey = ZcashExpandedSpendingKey.fromSpendingKey(skBytes)
@@ -30,10 +30,11 @@ fun testProofGenerationKey() {
 
 	val spendingKey = ZcashExpandedSpendingKey.fromBytes(skBytes)
 
-	val proofGenKey = spendingKey.proofGenerationKey()
+	val viewingKey = spendingKey.proofGenerationKey().toViewingKey()
 
-	// TODO finish this, but how?
-	assert(false)
+	val vkBytes = supp.getAsByteArray("expanded_spending_key_viewing_key")
+
+	assert(viewingKey.toBytes() == vkBytes)
 
 }
 testProofGenerationKey()

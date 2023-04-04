@@ -29,7 +29,7 @@ fun testExtendedFullViewingKeyDeriveChild() {
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 
-	val index = ZcashChildIndex.Hardened(32)
+	val index = ZcashChildIndex.NonHardened(32)
 
 	val efvkChild = key.deriveChild(index)!!.toBytes()
 

@@ -4,6 +4,7 @@ use zcash_primitives::sapling::keys::ExpandedSpendingKey;
 
 use crate::{ZcashProofGenerationKey, ZcashResult};
 
+ #[derive(Clone)]
 pub struct ZcashExpandedSpendingKey(pub ExpandedSpendingKey);
 
 impl From<ExpandedSpendingKey> for ZcashExpandedSpendingKey {

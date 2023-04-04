@@ -3,6 +3,7 @@ use zcash_primitives::sapling::keys::OutgoingViewingKey;
 use crate::{utils, ZcashResult};
 
 /// An outgoing viewing key
+ #[derive(Clone)]
 pub struct ZcashOutgoingViewingKey(OutgoingViewingKey);
 
 impl ZcashOutgoingViewingKey {
