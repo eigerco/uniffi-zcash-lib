@@ -526,6 +526,14 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashTransactionBuilder::build()                  | 🔴     |     |      |       |      |
 | ZcashTransactionBuilder::build_zfuture()          | 🔵     |     |      |       |      |
 
+### ZcashSaplingMetadata
+* Original type: [zcash_primitives::transaction::components::sapling::builder::SaplingMetadata](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/components/sapling/builder/struct.SaplingMetadata.html)
+
+| Members                              | Score | UDL | Code | Tests | Docs |
+| -------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingMetadata::empty()        | 🔴    | ✅  |  ✅  |       | ✅   |
+| ZcashSaplingMetadata::spend_index()  | 🔴    | ✅  |  ✅  |       | ✅   |
+| ZcashSaplingMetadata::output_index() | 🔴    | ✅  |  ✅  |       | ✅   |
 ### ZcashParametersMainNetwork
 * Original type: [zcash_primitives::consensus::MainNetwork](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/consensus/struct.MainNetwork.html)
 * Marker struct, no need to implement methods.
