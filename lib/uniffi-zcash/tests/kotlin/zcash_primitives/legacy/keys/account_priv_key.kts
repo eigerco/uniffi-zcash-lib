@@ -10,7 +10,7 @@ fun testAccountPrivKeyFromSeed() {
         ZcashAccountId(0u),
     )
 
-    val expected = getAsByteArray("account_private_key")
+    val expected = supp.getAsByteArray("account_private_key")
     assert(accountPrivKey.toBytes() == expected)
 }
 testAccountPrivKeyFromSeed()

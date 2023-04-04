@@ -1,11 +1,8 @@
 import uniffi.zcash.*
 
-fun setupNetwork() {
-    ZcashConsensusParameters.TEST_NETWORK
-}
-
 fun testTransparentAddressFromPublicKey() {
-    val network = setupNetwork()
+    val network = ZcashConsensusParameters.TEST_NETWORK
+    val supp = TestSupport.fromCsvFile()
 
     val encodedPublicKeyAddress = supp.getAsString("t_address_public_key")
     val parsedAsPublicKey = ZcashTransparentAddress.decode(network, encodedPublicKeyAddress)
@@ -17,7 +14,8 @@ fun testTransparentAddressFromPublicKey() {
 }
 
 fun testTransparentAddressFromScript() {
-    val network = setupNetwork()
+    val network = ZcashConsensusParameters.TEST_NETWORK
+    val supp = TestSupport.fromCsvFile()
 
     val encodedScriptAddress = supp.getAsString("t_address_script")
     val parsedAsScript = ZcashTransparentAddress.decode(network, encodedScriptAddress)
@@ -29,7 +27,8 @@ fun testTransparentAddressFromScript() {
 }
 
 fun testTransparentAddressPublicKeyEncodeAndDecode() {
-    val network = setupNetwork()
+    val network = ZcashConsensusParameters.TEST_NETWORK
+    val supp = TestSupport.fromCsvFile()
 
     val encodedPublicKeyAddress = supp.getAsString("t_address_public_key")
     val parsedAsPublicKey = ZcashTransparentAddress.decode(network, encodedPublicKeyAddress)
@@ -41,10 +40,11 @@ testTransparentAddressPublicKeyEncodeAndDecode()
 
 
 fun testTransparentAddressScriptEncodeAndDecode() {
-    val network = setupNetwork()
+    val network = ZcashConsensusParameters.TEST_NETWORK
+    val supp = TestSupport.fromCsvFile()
 
     val encodedScriptAddress = supp.getAsString("t_address_script")
-    val parsedAsScript = ZcashTransparentAddress.decode(net, encodedScriptAddress)
+    val parsedAsScript = ZcashTransparentAddress.decode(network, encodedScriptAddress)
 
     assert(parsedAsScript.isScript())
     assert(encodedScriptAddress == parsedAsScript.encode(network))

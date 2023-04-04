@@ -1,7 +1,7 @@
 import uniffi.zcash.*
 
 fun testExtendedFullViewingKeyFromBytes() {
-	val supp = TestSupport.getFromCsv()
+	val supp = TestSupport.fromCsvFile()
 
 	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
@@ -13,8 +13,9 @@ testExtendedFullViewingKeyFromBytes()
 
 fun testExtendedFullViewingKeyEncodeAndDecode() {
 	val network = ZcashConsensusParameters.MAIN_NETWORK
+	val supp = TestSupport.fromCsvFile()
 
-	val fvkAddr = supp.getAsByteArray("extended_fvk_encoded")
+	val fvkAddr = supp.getAsString("extended_fvk_encoded")
 
 	val decodedAddr = ZcashExtendedFullViewingKey.decode(network, fvkAddr)
 
@@ -23,13 +24,13 @@ fun testExtendedFullViewingKeyEncodeAndDecode() {
 testExtendedFullViewingKeyEncodeAndDecode()
 
 fun testExtendedFullViewingKeyDeriveChild() {
-	val supp = TestSupport.getFromCsv()
+	val supp = TestSupport.fromCsvFile()
 
 	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 
-	val index = ZcashChildIndex.NonHardened(32)
+	val index = ZcashChildIndex.NonHardened(32u)
 
 	val efvkChild = key.deriveChild(index)!!.toBytes()
 
@@ -40,13 +41,13 @@ fun testExtendedFullViewingKeyDeriveChild() {
 testExtendedFullViewingKeyDeriveChild()
 
 fun testExtendedFullViewingKeyAddress() {
-	val supp = TestSupport.getFromCsv()
+	val supp = TestSupport.fromCsvFile()
 
 	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 
-	val divIdx = ZcashDiversifierIndex.from_u32(4)
+	val divIdx = ZcashDiversifierIndex.fromU32(4u)
 
 	val paymentAddress = key.address(divIdx)!!.toBytes()
 
@@ -57,13 +58,13 @@ fun testExtendedFullViewingKeyAddress() {
 testExtendedFullViewingKeyAddress()
 
 fun testExtendedFullViewingKeyFindAddress() {
-	val supp = TestSupport.getFromCsv()
+	val supp = TestSupport.fromCsvFile()
 
 	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 
-	val divIdx = ZcashDiversifierIndex.from_u32(0)
+	val divIdx = ZcashDiversifierIndex.fromU32(0u)
 
 	val paymentAddress = key.findAddress(divIdx)
 
@@ -74,7 +75,7 @@ fun testExtendedFullViewingKeyFindAddress() {
 testExtendedFullViewingKeyFindAddress()
 
 fun testExtendedFullViewingKeyDefaultAddress() {
-	val supp = TestSupport.getFromCsv()
+	val supp = TestSupport.fromCsvFile()
 
 	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
@@ -89,7 +90,7 @@ fun testExtendedFullViewingKeyDefaultAddress() {
 testExtendedFullViewingKeyDefaultAddress()
 
 fun testExtendedFullViewingKeyDeriveInternal() {
-	val supp = TestSupport.getFromCsv()
+	val supp = TestSupport.fromCsvFile()
 
 	val fvkBytes = supp.getAsByteArray("extended_fvk")
 
@@ -104,7 +105,7 @@ fun testExtendedFullViewingKeyDeriveInternal() {
 testExtendedFullViewingKeyDeriveInternal()
 
 fun testExtendedFullViewingKeyToDiversifiableFvk() {
-	val supp = TestSupport.getFromCsv()
+	val supp = TestSupport.fromCsvFile()
 
 	val fvkBytes = supp.getAsByteArray("extended_fvk")
 

@@ -34,11 +34,6 @@ impl TestSupport {
         serde_json::from_str::<Vec<u8>>(arr_str).unwrap()
     }
 
-    pub fn get_as_string_array(&self, key: &str) -> Vec<String> {
-        let arr_str = &self.map[key];
-        serde_json::from_str::<Vec<String>>(arr_str).unwrap()
-    }
-
     pub fn get_as_integer_array(&self, key: &str) -> Vec<u32> {
         let arr_str = &self.map[key];
         serde_json::from_str::<Vec<u32>>(arr_str).unwrap()

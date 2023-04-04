@@ -11,7 +11,7 @@ testOutgoingViewingKeyFromBytes()
 
 fun testSaplingOvkToBytes() {
 	val supp = TestSupport.fromCsvFile()
-	val seed = supp.getArgumentAsByteArray("seed")
+	val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,

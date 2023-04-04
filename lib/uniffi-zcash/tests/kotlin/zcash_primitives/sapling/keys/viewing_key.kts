@@ -1,21 +1,22 @@
 import uniffi.zcash.*
 
 fun testViewingKeyToPaymentAddress() {
-    val supp = TestSupport.getFromCsv()
+    val supp = TestSupport.fromCsvFile()
     val fvkBytes = supp.getAsByteArray("sapling_full_viewing_key")
     val expectedBytes = supp.getAsByteArray("sapling_full_viewing_key_vk_payment_address")
-    val vk = ZcashFullViewingKey.fromBytes(fvkBytes).vk()
+    val saplingDiversifier = ZcashDiversifier(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
+    val paymentAddress = ZcashFullViewingKey.fromBytes(fvkBytes).vk().toPaymentAddress(saplingDiversifier)!!
 
-	assert(vk.toPaymentAddress().toBytes() == expectedBytes)
+	assert(paymentAddress.toBytes() == expectedBytes)
 }
 testViewingKeyToPaymentAddress()
 
 fun testViewingKeyIvk() {
-    val supp = TestSupport.getFromCsv()
+    val supp = TestSupport.fromCsvFile()
     val fvkBytes = supp.getAsByteArray("sapling_full_viewing_key")
     val expectedBytes = supp.getAsByteArray("sapling_full_viewing_key_vk_ivk")
-    val vk = ZcashFullViewingKey.fromBytes(fvkBytes).vk()
+    val ivk = ZcashFullViewingKey.fromBytes(fvkBytes).vk().ivk()
 
-	assert(vk.ivk().toBytes() == expectedBytes)
+	assert(ivk.toRepr() == expectedBytes)
 }
 testViewingKeyIvk()

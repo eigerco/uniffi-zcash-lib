@@ -28,7 +28,7 @@ testOrchardDiversifierIndexFromU32()
 fun testOrchardDiversifierIndexFromU64() {
 	val supp = TestSupport.fromCsvFile()
 
-	val integer = supp.getAsInteger("orchard_diversifier_index_u64")
+	val integer = supp.getAsInteger("orchard_diversifier_index_u64").toULong()
 	val expectedBytes = supp.getAsByteArray("orchard_diversifier_index_from_u64")
 
 	val divIdx = ZcashOrchardDiversifierIndex.fromU64(integer)

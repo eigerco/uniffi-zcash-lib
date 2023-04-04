@@ -88,7 +88,7 @@ fun testSpendingKeyDeriveInternal(){
 
     val derivedKey = key.deriveInternal()
 
-    val expectedDerivedKeyBytes = getAsByteArray("extended_spending_key_internal_sk")
+    val expectedDerivedKeyBytes = supp.getAsByteArray("extended_spending_key_internal_sk")
 
     assert(derivedKey.toBytes() == expectedDerivedKeyBytes)
 }

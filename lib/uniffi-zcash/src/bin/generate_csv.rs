@@ -70,7 +70,6 @@ fn main() {
     #[allow(deprecated)]
     let sapling_fvk: ZcashExtendedFullViewingKey = extended_spending_key_orig.to_extended_full_viewing_key().into();
 
-    // let expanded_sk = ZcashExpandedSpendingKey::from_spending_key(&extended_spending_key.to_bytes());
     let expanded_sk = ZcashExpandedSpendingKey::from_spending_key(extended_spending_key.to_bytes());
     let expanded_sk_vk = expanded_sk.proof_generation_key().to_viewing_key();
 
@@ -147,7 +146,7 @@ fn main() {
     // ZcashOrchardOutgoingViewingKey` no to_bytes
     // writeln!(file, "{}", format_bytes("orchard_full_viewing_key_ovk", &(*orchard_sk.to_fvk().to_ovk(ZcashOrchardScope::External).as_ref().clone()).to_bytes() )).unwrap();
 
-    // writeln!(file, "{}", format_bytes("secp_secret_key", &(*secp_secret_key.unwrap().as_ref().clone()).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("secp_secret_key", &(*secp_secret_key.unwrap().as_ref().clone()).serialize_secret())).unwrap();
     writeln!(file, "orchard_diversifier_index_u32:{orchard_div_idx_u32}").unwrap();
     writeln!(file, "orchard_diversifier_index_u64:{orchard_div_idx_u64}").unwrap();
 
