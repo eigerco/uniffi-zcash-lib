@@ -1,5 +1,7 @@
 interface ZcashTxOut {
 
+    constructor(ZcashAmount value, ZcashScript script_pubkey);
+
     ZcashAmount value();
 
     ZcashScript script_pubkey();
