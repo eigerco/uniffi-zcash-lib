@@ -8,7 +8,7 @@ use zcash_primitives::{
     transaction::{
         builder::Builder,
         components::{Amount, OutPoint, TxOut},
-        fees::fixed,
+        fees::{fixed, zip317},
     },
     zip32::Scope,
 };
@@ -21,12 +21,20 @@ fn main() {
     seed[0] = 1u8;
     let key = UnifiedSpendingKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
 
-    transparent_transaction_general_builder_example(&key);
+    transparent_builder_with_nonstandard_fee_example(&key);
+    println!();
+    transparent_builder_with_standard_fee_example(&key);
+    println!();
+    transparent_builder_with_zip317_standard_fee_example(&key);
+    println!();
+    transparent_builder_with_zip317_non_standard_fee_example(&key);
+    println!();
+
     println!();
     sapling_transaction_general_builder_example(&key);
 }
 
-pub fn transparent_transaction_general_builder_example(key: &UnifiedSpendingKey) {
+pub fn transparent_builder_with_nonstandard_fee_example(key: &UnifiedSpendingKey) {
     let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
 
     // Transparent data
@@ -56,7 +64,131 @@ pub fn transparent_transaction_general_builder_example(key: &UnifiedSpendingKey)
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    println!("Transparent transaction data (from general builder)");
+    println!("Transparent transaction data (from general builder, with non standard fee)");
+    println!("___________________________________________________");
+    println!(
+        "[{}]",
+        data.iter()
+            .map(|byte| byte.to_string())
+            .collect::<Vec<String>>()
+            .join(", ")
+    );
+}
+
+pub fn transparent_builder_with_standard_fee_example(key: &UnifiedSpendingKey) {
+    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
+
+    // Transparent data
+    let address = key
+        .transparent()
+        .to_account_pubkey()
+        .derive_external_ivk()
+        .unwrap()
+        .derive_address(0)
+        .unwrap();
+    let prev_coin = TxOut {
+        value: Amount::from_u64(1200).unwrap(),
+        script_pubkey: address.script(),
+    };
+    let secret_key = key.transparent().derive_external_secret_key(0).unwrap();
+    builder
+        .add_transparent_input(secret_key, OutPoint::new([0u8; 32], 1), prev_coin)
+        .unwrap();
+
+    builder
+        .add_transparent_output(&address, Amount::from_u64(200).unwrap())
+        .unwrap();
+
+    let prover = LocalTxProver::bundled();
+    let fee_rule = fixed::FeeRule::standard();
+
+    let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
+    let mut data = Vec::new();
+    transaction.write(&mut data).unwrap();
+    println!("Transparent transaction data (from general builder, with standard fee)");
+    println!("___________________________________________________");
+    println!(
+        "[{}]",
+        data.iter()
+            .map(|byte| byte.to_string())
+            .collect::<Vec<String>>()
+            .join(", ")
+    );
+}
+
+pub fn transparent_builder_with_zip317_standard_fee_example(key: &UnifiedSpendingKey) {
+    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
+
+    // Transparent data
+    let address = key
+        .transparent()
+        .to_account_pubkey()
+        .derive_external_ivk()
+        .unwrap()
+        .derive_address(0)
+        .unwrap();
+    let prev_coin = TxOut {
+        value: Amount::from_u64(19200).unwrap(),
+        script_pubkey: address.script(),
+    };
+    let secret_key = key.transparent().derive_external_secret_key(0).unwrap();
+    builder
+        .add_transparent_input(secret_key, OutPoint::new([0u8; 32], 1), prev_coin)
+        .unwrap();
+
+    builder
+        .add_transparent_output(&address, Amount::from_u64(9200).unwrap())
+        .unwrap();
+
+    let prover = LocalTxProver::bundled();
+    let fee_rule = zip317::FeeRule::standard();
+
+    let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
+    let mut data = Vec::new();
+    transaction.write(&mut data).unwrap();
+    println!("Transparent transaction data (from general builder, with zip317 standard fee)");
+    println!("___________________________________________________");
+    println!(
+        "[{}]",
+        data.iter()
+            .map(|byte| byte.to_string())
+            .collect::<Vec<String>>()
+            .join(", ")
+    );
+}
+
+pub fn transparent_builder_with_zip317_non_standard_fee_example(key: &UnifiedSpendingKey) {
+    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
+
+    // Transparent data
+    let address = key
+        .transparent()
+        .to_account_pubkey()
+        .derive_external_ivk()
+        .unwrap()
+        .derive_address(0)
+        .unwrap();
+    let prev_coin = TxOut {
+        value: Amount::from_u64(19200).unwrap(),
+        script_pubkey: address.script(),
+    };
+    let secret_key = key.transparent().derive_external_secret_key(0).unwrap();
+    builder
+        .add_transparent_input(secret_key, OutPoint::new([0u8; 32], 1), prev_coin)
+        .unwrap();
+
+    builder
+        .add_transparent_output(&address, Amount::from_u64(9200).unwrap())
+        .unwrap();
+
+    let prover = LocalTxProver::bundled();
+    let fee_rule =
+        zip317::FeeRule::non_standard(Amount::from_u64(5000).unwrap(), 2, 150, 34).unwrap();
+
+    let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
+    let mut data = Vec::new();
+    transaction.write(&mut data).unwrap();
+    println!("Transparent transaction data (from general builder, with zip317 non standard fee)");
     println!("___________________________________________________");
     println!(
         "[{}]",
@@ -106,7 +238,10 @@ pub fn sapling_transaction_general_builder_example(key: &UnifiedSpendingKey) {
 
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    println!("Sapling transaction data (from general builder)");
+    println!(
+        "Sapling transaction data (from general builder) len: {}",
+        data.len()
+    );
     println!("_______________________________________________");
     println!(
         "[{}]",
