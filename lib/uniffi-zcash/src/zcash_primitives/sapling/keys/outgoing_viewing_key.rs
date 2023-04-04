@@ -21,3 +21,15 @@ impl From<OutgoingViewingKey> for ZcashOutgoingViewingKey {
         ZcashOutgoingViewingKey(key)
     }
 }
+
+impl From<ZcashOutgoingViewingKey> for OutgoingViewingKey {
+    fn from(value: ZcashOutgoingViewingKey) -> Self {
+        value.0
+    }
+}
+
+impl From<&ZcashOutgoingViewingKey> for OutgoingViewingKey {
+    fn from(value: &ZcashOutgoingViewingKey) -> Self {
+        value.0
+    }
+}

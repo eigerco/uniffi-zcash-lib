@@ -19,6 +19,18 @@ impl From<OutPoint> for ZcashOutPoint {
     }
 }
 
+impl From<ZcashOutPoint> for OutPoint {
+    fn from(value: ZcashOutPoint) -> Self {
+        value.0
+    }
+}
+
+impl From<&ZcashOutPoint> for OutPoint {
+    fn from(value: &ZcashOutPoint) -> Self {
+        value.0.clone()
+    }
+}
+
 pub struct ZcashTxOut(TxOut);
 
 impl ZcashTxOut {
@@ -33,5 +45,17 @@ impl ZcashTxOut {
     /// Returns the address to which the TxOut was sent, if this is a valid P2SH or P2PKH output.
     pub fn recipient_address(&self) -> Option<Arc<ZcashTransparentAddress>> {
         self.0.recipient_address().map(From::from).map(Arc::new)
+    }
+}
+
+impl From<ZcashTxOut> for TxOut {
+    fn from(value: ZcashTxOut) -> Self {
+        value.0
+    }
+}
+
+impl From<&ZcashTxOut> for TxOut {
+    fn from(value: &ZcashTxOut) -> Self {
+        value.0.clone()
     }
 }

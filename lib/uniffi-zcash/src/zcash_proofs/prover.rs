@@ -3,7 +3,7 @@ use std::path::Path;
 use zcash_proofs::prover::LocalTxProver;
 
 use crate::ZcashResult;
-pub struct ZcashLocalTxProver(LocalTxProver);
+pub struct ZcashLocalTxProver(pub(crate) LocalTxProver);
 
 impl ZcashLocalTxProver {
     /// Creates a `LocalTxProver` using parameters from the given local paths.
@@ -40,5 +40,11 @@ impl ZcashLocalTxProver {
 impl From<LocalTxProver> for ZcashLocalTxProver {
     fn from(inner: LocalTxProver) -> Self {
         ZcashLocalTxProver(inner)
+    }
+}
+
+impl From<ZcashLocalTxProver> for LocalTxProver {
+    fn from(value: ZcashLocalTxProver) -> Self {
+        value.0
     }
 }

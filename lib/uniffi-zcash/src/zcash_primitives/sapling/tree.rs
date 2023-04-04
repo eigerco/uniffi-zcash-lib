@@ -17,3 +17,9 @@ impl From<ZcashSaplingNode> for Node {
         value.0
     }
 }
+
+impl From<Node> for ZcashSaplingNode {
+    fn from(inner: Node) -> Self {
+        ZcashSaplingNode(inner)
+    }
+}

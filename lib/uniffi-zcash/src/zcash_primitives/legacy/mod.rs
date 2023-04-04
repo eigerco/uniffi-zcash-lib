@@ -13,3 +13,9 @@ impl From<Script> for ZcashScript {
         ZcashScript(inner)
     }
 }
+
+impl From<&ZcashScript> for Script {
+    fn from(value: &ZcashScript) -> Self {
+        value.0.clone()
+    }
+}
