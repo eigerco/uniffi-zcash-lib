@@ -436,11 +436,11 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Object/Method name                                                                                          | Score        | UDL                | Code               | Tests              | Docs               |
 | ----------------------------------------------------------------------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| ZcashOrchardFullViewingKey::address_at() -> [ZcashOrchardAddress](#zcashorchardaddress)                     |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardFullViewingKey::address() -> [ZcashOrchardAddress](#zcashorchardaddress)                        |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardFullViewingKey::scope_for_address() -> [ZcashOrchardScope](#zcashorchardscope)                  |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardFullViewingKey::to_bytes()                                                                      |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardFullViewingKey::from_bytes()                                                                    |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardFullViewingKey::to_bytes()                                                                      |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardFullViewingKey::from_bytes()                                                                    |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardFullViewingKey::address_at() -> [ZcashOrchardAddress](#zcashorchardaddress)                     |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardFullViewingKey::address() -> [ZcashOrchardAddress](#zcashorchardaddress)                        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardFullViewingKey::scope_for_address() -> [ZcashOrchardScope](#zcashorchardscope)                  |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashOrchardFullViewingKey::to_ivk() -> [ZcashOrchardIncomingViewingKey](#zcashorchardincomingviewingkey)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashOrchardFullViewingKey::to_ovk() -> [ZcashOrchardOutgoingViewingKey](#zcashorchardoutgoingviewingkey)   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
@@ -450,10 +450,10 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Object/Method name                                                                                                                            | Score        | UDL                | Code               | Tests              | Docs               |
 | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| ZcashOrchardIncomingViewingKey::to_bytes()                                                                                                    | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardIncomingViewingKey::from_bytes()                                                                                                  |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardIncomingViewingKey::diversifier_index() -> [ZcashOrchardDiversifierIndex](#zcashorcharddiversifierindex)                          |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardIncomingViewingKey::address_at() -> [ZcashOrchardAddress](#zcashorchardaddress)                                                   |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOrchardIncomingViewingKey::to_bytes()                                                                                                    | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardIncomingViewingKey::from_bytes()                                                                                                  |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardIncomingViewingKey::diversifier_index() -> [ZcashOrchardDiversifierIndex](#zcashorcharddiversifierindex)                          |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardIncomingViewingKey::address_at() -> [ZcashOrchardAddress](#zcashorchardaddress)                                                   |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashOrchardIncomingViewingKey::address() -> [ZcashOrchardAddress](#zcashorchardaddress)                                                      | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashOrchardOutgoingViewingKey

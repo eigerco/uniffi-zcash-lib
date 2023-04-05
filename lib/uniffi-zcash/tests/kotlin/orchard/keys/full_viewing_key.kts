@@ -5,6 +5,20 @@ val supp = TestSupport.fromCsvFile()
 fun setupGetFvk() =
     ZcashOrchardFullViewingKey.fromBytes(supp.getAsByteArray("orchard_full_viewing_key"))
 
+fun testOrchardFullViewingKeyToBytes() {
+    val bytes = supp.getAsByteArray("orchard_full_viewing_key");
+
+    val key = ZcashOrchardFullViewingKey.fromBytes(bytes)
+
+    assert(key.toBytes() == bytes)
+}
+testOrchardFullViewingKeyToBytes()
+
+fun testOrchardFullViewingKeyFromBytes() {
+    // covered by testOrchardFullViewingKeyToBytes()
+}
+testOrchardFullViewingKeyFromBytes()
+
 fun testOrchardFullViewingKeyAddressAt() {
 	val fvk = setupGetFvk()
 	val divIdx = ZcashOrchardDiversifierIndex.fromU32(4u)

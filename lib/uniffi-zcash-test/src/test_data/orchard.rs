@@ -36,14 +36,20 @@ pub fn write_for_orchard<W: Write>(mut file: W, seed: &[u8]) {
     writeln!(file, "orchard_diversifier_index_u32:{orchard_div_idx_u32}").unwrap();
 
     let orchard_div_idx_u32_obj: DiversifierIndex = orchard_div_idx_u32.into();
-    writeln!(file, "{}", format_bytes("orchard_diversifier_index_from_u32", orchard_div_idx_u32_obj.to_bytes().as_slice()) ).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_diversifier_index_from_u32", orchard_div_idx_u32_obj.to_bytes().as_slice())).unwrap();
 
     let orchard_div_idx_u64 = u32::MAX as u64 + 1;
     writeln!(file, "orchard_diversifier_index_u64:{orchard_div_idx_u64}").unwrap();
 
     let orchard_div_idx_u64_obj: DiversifierIndex = orchard_div_idx_u64.into();
-    writeln!(file, "{}", format_bytes("orchard_diversifier_index_from_u64", orchard_div_idx_u64_obj.to_bytes().as_slice()) ).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_diversifier_index_from_u64", orchard_div_idx_u64_obj.to_bytes().as_slice())).unwrap();
 
+    let ivk = FullViewingKey::from(&orchard_sk).to_ivk(Scope::External);
+    let address_at = ivk.address_at(DiversifierIndex::from(0u32));
+    writeln!(file, "{}", format_bytes("orchard_incoming_viewing_key_address_at", &address_at.to_raw_address_bytes())).unwrap();
+
+    let address = ivk.address(orchard_diversifier);
+    writeln!(file, "{}", format_bytes("orchard_incoming_viewing_key_address", &address.to_raw_address_bytes())).unwrap();
 }
 
 fn get_orchard_address(key: &UnifiedSpendingKey) -> [u8; 43] {
