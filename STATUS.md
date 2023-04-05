@@ -143,10 +143,12 @@ We use a single `ZcashError` encompassing following errors:
 
 | Object/Method name                            |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
 | --------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
-| ZcashExtendedPrivKey::random()                |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashExtendedPrivKey::random_with_seed_size() |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashExtendedPrivKey::from_bytes()            |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashExtendedPrivKey::to_bytes()              |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashExtendedPrivKey::random()                |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashExtendedPrivKey::random_with_seed_size() |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashExtendedPrivKey::with_seed()             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| ZcashExtendedPrivKey::derive_private_key()    |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashExtendedPrivKey::derive_private_key()    |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashAccountPubKey
 

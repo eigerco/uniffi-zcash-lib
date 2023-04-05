@@ -1,3 +1,4 @@
+mod hdwallet;
 mod orchard;
 mod secp256k1;
 mod zcash_client_backend;
@@ -6,6 +7,7 @@ mod zcash_primitives;
 use std::fs::OpenOptions;
 use std::io::Write;
 
+use self::hdwallet::write_for_hdwallet;
 use self::orchard::write_for_orchard;
 use self::secp256k1::write_for_secp256k1;
 use self::zcash_client_backend::write_for_zcash_client_backend;
@@ -26,6 +28,7 @@ pub fn generate_test_data() {
     seed[0] = 1u8;
     writeln!(file, "{}", format_bytes("seed", &seed)).unwrap();
 
+    write_for_hdwallet(&mut file, &seed);
     write_for_orchard(&mut file, &seed);
     write_for_secp256k1(&mut file, &seed);
     write_for_zcash_client_backend(&mut file, &seed);

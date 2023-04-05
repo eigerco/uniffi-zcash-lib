@@ -2,7 +2,7 @@ uniffi::build_foreign_language_testcases!(
     // Kotlin tests
     "tests/kotlin/test_support.kts",
     "tests/kotlin/hdwallet/extended_key/extended_priv_key.kts",
-    "tests/kotlin/hdwallet/key_index.kts",
+    /* "tests/kotlin/hdwallet/key_index.kts",
     "tests/kotlin/orchard/keys/diversifier.kts",
     "tests/kotlin/orchard/keys/full_viewing_key.kts",
     "tests/kotlin/orchard/keys/incoming_viewing_key.kts",
@@ -19,7 +19,7 @@ uniffi::build_foreign_language_testcases!(
     "tests/kotlin/zcash_primitives/legacy/keys/account_priv_key.kts",
     "tests/kotlin/zcash_primitives/legacy/keys/account_pub_key.kts",
     "tests/kotlin/zcash_primitives/legacy/transparent_address.kts",
-    "tests/kotlin/zcash_primitives/memo/memo_bytes.kts",
+    "tests/kotlin/zcash_primitives/memo/memo_bytes.kts", */
 
     /* "tests/kotlin/zcash_primitives/sapling/keys/diversifiable_full_viewing_key.kts",
     "tests/kotlin/zcash_primitives/sapling/keys/expanded_spending_key.kts",

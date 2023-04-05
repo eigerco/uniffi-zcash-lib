@@ -2,11 +2,24 @@ import uniffi.zcash.*
 
 val supp = TestSupport.fromCsvFile()
 
+fun testExtendedPrivKeyFromBytes() {
+    val bytes = supp.getAsByteArray("hdwallet_epk")
+
+	val zepk = ZcashExtendedPrivKey.fromBytes(bytes)
+
+    assert(zepk.toBytes() == bytes)
+}
+testExtendedPrivKeyFromBytes()
+
+fun testExtendedPrivKeyToBytes() {
+    // covered by testExtendedPrivKeyFromBytes()
+}
+testExtendedPrivKeyToBytes()
+
 fun testExtendedPrivKeyFromRandom() {
 	val zepk = ZcashExtendedPrivKey.random()
 
 	// no error thrown
-
 }
 testExtendedPrivKeyFromRandom()
 
@@ -18,18 +31,23 @@ fun testExtendedPrivKeyFromRandomWithSeedSize() {
 }
 testExtendedPrivKeyFromRandomWithSeedSize()
 
-fun testExtendedPrivKeyFromRandomWithSeed() {
+fun testExtendedPrivKeyFromWithSeed() {
 	val seed = supp.getAsByteArray("seed")
 	val zepk = ZcashExtendedPrivKey.withSeed(seed)
 
-	// no errors occurred
+    val bytes = supp.getAsByteArray("hdwallet_epk")
+
+    assert(zepk.toBytes() == bytes)
 }
-testExtendedPrivKeyFromRandomWithSeed()
+testExtendedPrivKeyFromWithSeed()
 
 fun testExtendedPrivKeyDerivePrivateKey() {
-	val zepk = ZcashExtendedPrivKey.random()
+	val seed = supp.getAsByteArray("seed")
+	val zepk = ZcashExtendedPrivKey.withSeed(seed)
 	val idx = ZcashKeyIndex.fromIndex(3u)
 
-	zepk.derivePrivateKey(idx)
+    val expected = supp.getAsByteArray("hdwallet_epk_derive_private_key")
+
+	assert(zepk.derivePrivateKey(idx).toBytes() == expected)
 }
 testExtendedPrivKeyDerivePrivateKey()
