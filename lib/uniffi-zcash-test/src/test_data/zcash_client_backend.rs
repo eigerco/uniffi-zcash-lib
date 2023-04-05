@@ -26,6 +26,12 @@ pub fn write_for_zcash_client_backend<W: Write>(mut file: W, seed: &[u8]) {
 
     let diversifiable_fvk = extended_spending_key.to_diversifiable_full_viewing_key();
     writeln!(file, "{}", format_bytes("diversifiable_fvk", &diversifiable_fvk.to_bytes())).unwrap();
+
+    let diversifier = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    writeln!(file, "{}", format_bytes("diversifier", &diversifier)).unwrap();
+
+    let transparent_address_public_key = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
+    writeln!(file, "{}", format_bytes("transparent_address_public_key", &transparent_address_public_key)).unwrap();
 }
 
 fn get_ext_sk_from_path(ext_sk: &ExtendedSpendingKey) -> ExtendedSpendingKey {

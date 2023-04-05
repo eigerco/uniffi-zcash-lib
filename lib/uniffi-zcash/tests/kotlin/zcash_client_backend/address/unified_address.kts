@@ -21,7 +21,7 @@ fun testUnifiedAddressParsing() {
     }
     assert(thrown)
 
-    val diversifierBytes = listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() }
+    val diversifierBytes = supp.getAsByteArray("diversifier")
 
     val saplingDiversifier = ZcashDiversifier(diversifierBytes)
 
@@ -35,7 +35,9 @@ fun testUnifiedAddressParsing() {
         .orchard()!!.toIvk(ZcashOrchardScope.EXTERNAL)
         .address(orchardDiversifier)
 
-    val transparent = ZcashTransparentAddress.publicKey((1..20).map { it.toUByte() })
+    val transparentAddressPublicKey = supp.getAsByteArray("transparent_address_public_key")
+
+    val transparent = ZcashTransparentAddress.publicKey(transparentAddressPublicKey)
 
     val source = ZcashUnifiedAddress(orchard, sapling, transparent)
     val address = source.encode(params)
@@ -54,7 +56,9 @@ fun testUnifiedAddressCreationWithSapling() {
         ZcashAccountId(0u),
     )
 
-    val saplingDiversifier = ZcashDiversifier(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
+    val diversifierBytes = supp.getAsByteArray("diversifier")
+
+    val saplingDiversifier = ZcashDiversifier(diversifierBytes)
 
     val sapling = unifiedSpendingKey.toUnifiedFullViewingKey()
         .sapling()!!.toIvk(ZcashScope.EXTERNAL)
@@ -76,19 +80,23 @@ fun testUnifiedAddressCreation() {
         ZcashAccountId(0u),
     )
 
-    val saplingDiversifier = ZcashDiversifier(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
+    val diversifierBytes = supp.getAsByteArray("diversifier")
+
+    val saplingDiversifier = ZcashDiversifier(diversifierBytes)
 
     val sapling = unifiedSpendingKey.toUnifiedFullViewingKey()
         .sapling()!!.toIvk(ZcashScope.EXTERNAL)
         .toPaymentAddress(saplingDiversifier)
 
-    val orchardDiversifier = ZcashOrchardDiversifier.fromBytes(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
+    val orchardDiversifier = ZcashOrchardDiversifier.fromBytes(diversifierBytes)
 
     val orchard = unifiedSpendingKey.toUnifiedFullViewingKey()
         .orchard()!!.toIvk(ZcashOrchardScope.EXTERNAL)
         .address(orchardDiversifier)
 
-    val transparent = ZcashTransparentAddress.publicKey((1..20).map { it.toUByte() })
+    val transparentAddressPublicKey = supp.getAsByteArray("transparent_address_public_key")
+
+    val transparent = ZcashTransparentAddress.publicKey(transparentAddressPublicKey)
 
     // At least one of orchard or sapling address must be set
     // ZcashUnifiedAddress(null, null, null)
@@ -111,7 +119,9 @@ fun testUnifiedAddressCreationWithOrchard() {
         ZcashAccountId(0u),
     )
 
-    val orchardDiversifier = ZcashOrchardDiversifier.fromBytes(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
+    val diversifierBytes = supp.getAsByteArray("diversifier")
+
+    val orchardDiversifier = ZcashOrchardDiversifier.fromBytes(diversifierBytes)
 
     val orchard = unifiedSpendingKey.toUnifiedFullViewingKey()
         .orchard()!!.toIvk(ZcashOrchardScope.EXTERNAL)
