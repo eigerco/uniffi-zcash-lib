@@ -13,7 +13,6 @@ pub enum ZcashConsensusParameters {
 
     /// Marker struct for the test network.
     TestNetwork,
-    // todo: expose a way to use other types of parameters
 }
 
 impl Parameters for ZcashConsensusParameters {

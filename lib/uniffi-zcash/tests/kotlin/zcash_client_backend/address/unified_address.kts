@@ -1,8 +1,8 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
 
 fun testUnifiedAddressParsing() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
@@ -46,7 +46,6 @@ fun testUnifiedAddressParsing() {
 testUnifiedAddressParsing()
 
 fun testUnifiedAddressCreationWithSapling() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
@@ -69,7 +68,6 @@ fun testUnifiedAddressCreationWithSapling() {
 testUnifiedAddressCreationWithSapling()
 
 fun testUnifiedAddressCreation() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
@@ -105,7 +103,6 @@ fun testUnifiedAddressCreation() {
 testUnifiedAddressCreation()
 
 fun testUnifiedAddressCreationWithOrchard() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(

@@ -1,9 +1,10 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
+
 fun testSecpSecretKey() {
-	val supp = TestSupport.fromCsvFile()
 	val expectedBytes = supp.getAsByteArray("secp_secret_key")
-	val ssk = SecpSecretKey.new(expectedBytes)
+	val ssk = SecpSecretKey(expectedBytes)
 
 	assert(ssk.serializeSecret() == expectedBytes)
 }

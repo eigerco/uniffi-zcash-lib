@@ -1,14 +1,10 @@
 import uniffi.zcash.*
 
-// TODO some conventions:
- // when it's from_bytes() and when new() ?
- // when is to_bytes present? and as_bytes?
-
 fun testAccountPubKeyNew() {
 	val supp = TestSupport.fromCsvFile()
 	val ppkBytes = supp.getAsByteArray("account_public_key")
 
-	val ppk = ZcashAccountPubKey.new(ppkBytes)
+	val ppk = ZcashAccountPubKey(ppkBytes)
 
 	assert(ppk.serialize() == ppkBytes)
 }
@@ -20,10 +16,10 @@ fun testAccountPubKeyExternalIvk() {
 	val ppkBytes = supp.getAsByteArray("account_public_key")
 	val ivkBytes = supp.getAsByteArray("ppk_external_ivk")
 
-	val ppk = ZcashAccountPubKey.new(ppkBytes)
+	val ppk = ZcashAccountPubKey(ppkBytes)
 	val ivk = ppk.deriveExternalIvk()
 
-	assert(ivk.asBytes() == ppkBytes)
+	assert(ivk.toBytes() == ivkBytes)
 }
 testAccountPubKeyExternalIvk()
 
@@ -33,10 +29,10 @@ fun testAccountPubKeyInternalIvk() {
 	val ppkBytes = supp.getAsByteArray("account_public_key")
 	val ivkBytes = supp.getAsByteArray("ppk_internal_ivk")
 
-	val ppk = ZcashAccountPubKey.new(ppkBytes)
+	val ppk = ZcashAccountPubKey(ppkBytes)
 	val ivk = ppk.deriveInternalIvk()
 
-	assert(ivk.asBytes() == ivkBytes)
+	assert(ivk.toBytes() == ivkBytes)
 }
 testAccountPubKeyInternalIvk()
 
@@ -47,7 +43,7 @@ fun testAccountPubKeyForShielding() {
 	val intOvkBytes = supp.getAsByteArray("ppk_internal_ovk")
 	val extOvkBytes = supp.getAsByteArray("ppk_external_ovk")
 
-	val ppk = ZcashAccountPubKey.new(ppkBytes)
+	val ppk = ZcashAccountPubKey(ppkBytes)
 	val ovks = ppk.ovksForShielding()
 
 	assert(ovks.internalOvk.asBytes() == intOvkBytes)
@@ -59,20 +55,21 @@ fun testAccountPubKeyInternalOvk() {
 	val supp = TestSupport.fromCsvFile()
 	val ppkBytes = supp.getAsByteArray("account_public_key")
 	val ovkBytes = supp.getAsByteArray("ppk_internal_ovk")
-	val ppk = ZcashAccountPubKey.new(ppkBytes)
+	val ppk = ZcashAccountPubKey(ppkBytes)
 	val ovk = ppk.internalOvk()
 
-	assert(ovk.asBytes() == ppkBytes)
+	assert(ovk.asBytes() == ovkBytes)
 }
 testAccountPubKeyInternalOvk()
 
+val supp = TestSupport.fromCsvFile()
+
 fun testAccountPubKeyExternalOvk() {
-	val supp = TestSupport.fromCsvFile()
 	val ppkBytes = supp.getAsByteArray("account_public_key")
 	val ovkBytes = supp.getAsByteArray("ppk_external_ovk")
-	val ppk = ZcashAccountPubKey.new(ppkBytes)
+	val ppk = ZcashAccountPubKey(ppkBytes)
 	val ovk = ppk.externalOvk()
 
-	assert(ovk.asBytes() == ppkBytes)
+	assert(ovk.asBytes() == ovkBytes)
 }
 testAccountPubKeyExternalOvk()

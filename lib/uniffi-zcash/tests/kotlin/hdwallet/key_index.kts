@@ -1,36 +1,36 @@
 import uniffi.zcash.*
 
 fun testKeyIndexFromIndex() {
-	val zidx = ZcashKeyIndex.fromIndex(3)
+	val zidx = ZcashKeyIndex.fromIndex(3u)
 
 	// no errors happened
 }
 testKeyIndexFromIndex()
 
 fun testKeyIndexRawIndex() {
-	val zidx = ZcashKeyIndex.fromIndex(3)
+	val zidx = ZcashKeyIndex.fromIndex(3u)
 
-	assert(zidx.rawIndex() == 3)
+	assert(zidx.rawIndex() == 3u)
 }
 testKeyIndexRawIndex()
 
 fun testKeyIndexNormalizeIndex() {
-	val zidx = ZcashKeyIndex.fromIndex(3)
+	val zidx = ZcashKeyIndex.fromIndex(2147483648u + 3u)
 
-	assert(zidx.normalizeIndex() == 300)
+	assert(zidx.normalizeIndex() == 3u)
 }
 testKeyIndexNormalizeIndex()
 
 fun testKeyIndexHardenedFromNormalizeIndex() {
-	val zidx = ZcashKeyIndex.fromIndex(3)
+	val zidx = ZcashKeyIndex.hardenedFromNormalizeIndex(3u)
 
-	// prove that no errors happened
-
+    assert(zidx.rawIndex() == 2147483648u + 3u)
+	assert(zidx.normalizeIndex() == 3u)
 }
 testKeyIndexHardenedFromNormalizeIndex()
 
 fun testKeyIndexIsValid() {
-	val zidx = ZcashKeyIndex.fromIndex(3)
+	val zidx = ZcashKeyIndex.fromIndex(3u)
 
 	assert(zidx.isValid() == true)
 }

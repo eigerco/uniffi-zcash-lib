@@ -56,7 +56,6 @@ impl ZcashExtendedFullViewingKey {
 
     pub fn derive_child(
         &self,
-        // TODO should there be an Arc here?
         i: ZcashChildIndex,
     ) -> ZcashResult<Arc<ZcashExtendedFullViewingKey>> {
         self.0
@@ -86,8 +85,6 @@ impl ZcashExtendedFullViewingKey {
     ) -> Option<ZcashDiversifierIndexAndPaymentAddress> {
         self.0.find_address(j.as_ref().into()).map(From::from)
     }
-
-    // TODO no Arc here?
 
     /// Returns the payment address corresponding to the smallest valid diversifier
     /// index, along with that index.

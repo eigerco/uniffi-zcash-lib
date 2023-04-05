@@ -1,8 +1,8 @@
 import uniffi.zcash.*
 
-fun testFromExpandedSpendingKey() {
-	val supp = TestSupport.fromCsvFile()
+val supp = TestSupport.fromCsvFile()
 
+fun testFromExpandedSpendingKey() {
 	// is this the correct spending key?
 	val skBytes = supp.getAsByteArray("extended_spending_key")
 
@@ -13,8 +13,6 @@ fun testFromExpandedSpendingKey() {
 testFromExpandedSpendingKey()
 
 fun testFromBytes() {
-	val supp = TestSupport.fromCsvFile()
-
 	val skBytes = supp.getAsByteArray("expanded_spending_key")
 
 	val spendingKey = ZcashExpandedSpendingKey.fromBytes(skBytes)
@@ -24,8 +22,6 @@ fun testFromBytes() {
 testFromBytes()
 
 fun testProofGenerationKey() {
-	val supp = TestSupport.fromCsvFile()
-
 	val skBytes = supp.getAsByteArray("expanded_spending_key")
 
 	val spendingKey = ZcashExpandedSpendingKey.fromBytes(skBytes)

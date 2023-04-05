@@ -1,13 +1,13 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
+
 fun testAllGetters() {
-	val supp = TestSupport.fromCsvFile()
-
-	assert(supp.getAsByteArray("seed") == [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-	assert(supp.getAsIntegerArray("seed") == [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-	assert(supp.getAsStringArray("extended_spending_key_child_index") == ["1", "0", "0", "0", "0", "0", "0", "0", "0", "0", "0"])
-	assert(supp.getAsInteger("coin_type") == 234)
-	assert(supp.getAsString("scope") == "External")
-
+	assert(supp.getAsByteArray("seed") == listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
+	assert(supp.getAsU32Array("seed") == listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUInt() })
+    assert(supp.getAsU64Array("seed") == listOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toULong() })
+	assert(supp.getAsU32("coin_type") == 234u)
+    assert(supp.getAsU64("coin_type") == 234.toULong())
+	assert(supp.getAsString("test_string") == "TestString")
 }
 testAllGetters()

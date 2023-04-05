@@ -1,7 +1,8 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
+
 fun testUnifiedFullViewingKeyEncode() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
     val params = ZcashConsensusParameters.MAIN_NETWORK
 

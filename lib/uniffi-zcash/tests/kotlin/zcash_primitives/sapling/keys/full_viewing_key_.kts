@@ -1,7 +1,8 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.getFromCsv()
+
 fun testFullViewingKeyFromBytes() {
-    val supp = TestSupport.getFromCsv()
     val expectedBytes = supp.getAsByteArray("sapling_full_viewing_key")
     val fvk = ZcashFullViewingKey.fromBytes(expectedBytes)
 
@@ -10,7 +11,6 @@ fun testFullViewingKeyFromBytes() {
 testFullViewingKeyFromBytes()
 
 fun testFullViewingKeyFromExpandedSpendingKey() {
-    val supp = TestSupport.getFromCsv()
     val expectedBytes = supp.getAsByteArray("expanded_spending_key")
     val fvk = ZcashFullViewingKey.fromExpandedSpendingKey(expectedBytes)
 
@@ -19,7 +19,6 @@ fun testFullViewingKeyFromExpandedSpendingKey() {
 testFullViewingKeyFromExpandedSpendingKey()
 
 fun testFullViewingKeyVk() {
-    val supp = TestSupport.getFromCsv()
     val expectedBytes = supp.getAsByteArray("sapling_full_viewing_key")
     val vkExpectedBytes = supp.getAsByteArray("sapling_full_viewing_key_vk")
     val vk = ZcashFullViewingKey.fromBytes(expectedBytes).vk()
@@ -29,7 +28,6 @@ fun testFullViewingKeyVk() {
 testFullViewingKeyVk()
 
 fun testFullViewingKeyOvk() {
-    val supp = TestSupport.getFromCsv()
     val expectedBytes = supp.getAsByteArray("sapling_full_viewing_key")
     val ovkExpectedBytes = supp.getAsByteArray("sapling_full_viewing_key_ovk")
     val ovk = ZcashFullViewingKey.fromBytes(expectedBytes).ovk()

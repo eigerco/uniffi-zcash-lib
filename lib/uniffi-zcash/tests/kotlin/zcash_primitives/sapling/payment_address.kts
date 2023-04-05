@@ -1,7 +1,8 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
+
 fun testSaplingPaymentAddressParsing() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
@@ -23,7 +24,6 @@ fun testSaplingPaymentAddressParsing() {
 testSaplingPaymentAddressParsing()
 
 fun testSaplingIvkToPaymentAddress() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(

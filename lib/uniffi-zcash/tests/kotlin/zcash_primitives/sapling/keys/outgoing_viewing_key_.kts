@@ -1,7 +1,8 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
+
 fun testOutgoingViewingKeyFromBytes() {
-	val supp = TestSupport.fromCsvFile()
 	val expectedBytes = supp.getAsByteArray("sapling_outgoing_viewing_key")
 	val ovk = ZcashOutgoingViewingKey.fromBytes(expectedBytes)
 

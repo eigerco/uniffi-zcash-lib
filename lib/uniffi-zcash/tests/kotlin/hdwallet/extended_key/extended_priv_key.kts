@@ -1,9 +1,11 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
+
 fun testExtendedPrivKeyFromRandom() {
 	val zepk = ZcashExtendedPrivKey.random()
 
-	assert zepk.left() == // no error thrown
+	// no error thrown
 
 }
 testExtendedPrivKeyFromRandom()
@@ -17,7 +19,7 @@ fun testExtendedPrivKeyFromRandomWithSeedSize() {
 testExtendedPrivKeyFromRandomWithSeedSize()
 
 fun testExtendedPrivKeyFromRandomWithSeed() {
-	val seed = TestSupport.getAsByteArray("seed")
+	val seed = supp.getAsByteArray("seed")
 	val zepk = ZcashExtendedPrivKey.withSeed(seed)
 
 	// no errors occurred
@@ -26,10 +28,8 @@ testExtendedPrivKeyFromRandomWithSeed()
 
 fun testExtendedPrivKeyDerivePrivateKey() {
 	val zepk = ZcashExtendedPrivKey.random()
-	val idx = ZcashKeyIndex.fromIndex(3)
+	val idx = ZcashKeyIndex.fromIndex(3u)
 
 	zepk.derivePrivateKey(idx)
-
-
 }
 testExtendedPrivKeyDerivePrivateKey()

@@ -1,7 +1,8 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
+
 fun testAccountPrivKeyFromSeed() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val accountPrivKey = ZcashAccountPrivKey.fromSeed(
@@ -10,13 +11,12 @@ fun testAccountPrivKeyFromSeed() {
         ZcashAccountId(0u),
     )
 
-    val expected = getAsByteArray("account_private_key")
+    val expected = supp.getAsByteArray("account_private_key")
     assert(accountPrivKey.toBytes() == expected)
 }
 testAccountPrivKeyFromSeed()
 
 fun testAccountPrivKeyFromExtendedPrivKey() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val extendedPrivKey = ZcashExtendedPrivKey.withSeed(seed)

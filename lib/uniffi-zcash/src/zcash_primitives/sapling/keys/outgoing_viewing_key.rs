@@ -11,9 +11,8 @@ impl ZcashOutgoingViewingKey {
         Ok(ZcashOutgoingViewingKey(OutgoingViewingKey(array)))
     }
 
-    // TODO there is a mistake here?
     pub fn to_bytes(&self) -> Vec<u8> {
-        self.0 .0.to_vec()
+        self.0.0.to_vec()
     }
 }
 

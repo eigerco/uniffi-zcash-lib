@@ -1,8 +1,8 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
 
 fun testOrchardDiversifierFromBytes() {
-	val supp = TestSupport.fromCsvFile()
 	val expectedBytes = supp.getAsByteArray("orchard_diversifier")
 
 	val zod = ZcashOrchardDiversifier.fromBytes(expectedBytes)

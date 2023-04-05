@@ -29,8 +29,8 @@ func testSpendingKeyFromSeed32Seed() {
     let zts = TestSupport.fromCsvFile()
 
     let seed: [UInt8] = zts.getAsByteArray(key: "seed")
-    let coinType: UInt32 = zts.getAsInteger(key: "coin_type")
-    let account: UInt32 = zts.getAsInteger(key: "account")
+    let coinType: UInt32 = zts.getAsU32(key: "coin_type")
+    let account: UInt32 = zts.getAsU32(key: "account")
     let expectedBytes: [UInt8] = zts.getAsByteArray(key: "orchard_spending_key_from_zip32_seed")
 
     let key = try! ZcashOrchardSpendingKey.fromZip32Seed(seed: seed, coinType: coinType, account: account)

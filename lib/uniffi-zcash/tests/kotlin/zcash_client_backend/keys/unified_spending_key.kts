@@ -1,7 +1,8 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
+
 fun testUnifiedSpendingKeyFromSeed() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
@@ -18,7 +19,6 @@ testUnifiedSpendingKeyFromSeed()
 
 
 fun testSpendingKeyConversions() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)
@@ -30,7 +30,6 @@ fun testSpendingKeyConversions() {
 testSpendingKeyConversions()
 
 fun testSpendingKeyFromPath(){
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)
@@ -50,7 +49,6 @@ fun testSpendingKeyFromPath(){
 testSpendingKeyFromPath()
 
 fun testSpendingKeyDeriveChild() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)
@@ -63,7 +61,6 @@ fun testSpendingKeyDeriveChild() {
 testSpendingKeyDeriveChild()
 
 fun testSpendingKeyDefaultAddress() {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)
@@ -81,21 +78,19 @@ fun testSpendingKeyDefaultAddress() {
 testSpendingKeyDefaultAddress()
 
 fun testSpendingKeyDeriveInternal(){
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)
 
     val derivedKey = key.deriveInternal()
 
-    val expectedDerivedKeyBytes = getAsByteArray("extended_spending_key_internal_sk")
+    val expectedDerivedKeyBytes = supp.getAsByteArray("extended_spending_key_internal_sk")
 
     assert(derivedKey.toBytes() == expectedDerivedKeyBytes)
 }
 testSpendingKeyDeriveInternal()
 
 fun testSpendingKeyToDiversifiableFvk () {
-    val supp = TestSupport.fromCsvFile()
     val seed = supp.getAsByteArray("seed")
 
     val key = ZcashExtendedSpendingKey.master(seed)

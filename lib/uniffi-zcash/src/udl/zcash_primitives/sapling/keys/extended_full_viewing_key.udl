@@ -9,6 +9,8 @@ interface ZcashExtendedFullViewingKey {
 
   sequence<u8> to_bytes();
 
+  ZcashPaymentAddress? address(ZcashDiversifierIndex j);
+
   [Throws=ZcashError]
   ZcashExtendedFullViewingKey derive_child(ZcashChildIndex i);
 

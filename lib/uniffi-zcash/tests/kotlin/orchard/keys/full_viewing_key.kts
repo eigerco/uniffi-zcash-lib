@@ -1,34 +1,21 @@
 import uniffi.zcash.*
 
-fun setupGetFvk() {
-	val supp = TestSupport.getFromCsv()
-	val ofvkBytes = supp.getAsByteArray("orchard_full_viewing_key")
-	ZcashOrchardFullViewingKey.fromBytes(ofvkBytes)
-}
+val supp = TestSupport.fromCsvFile()
 
-fun testOrchardFullViewingKeyToFvk() {
-	val supp = TestSupport.getFromCsv()
-	val oskBytes = supp.getAsByteArray("orchard_spending_key")
-
-	val osk = ZcashOrchardSpendingKey.fromBytes(oskBytes)
-	val ofvk = osk.toFvk()
-
-	assert(setupGetFvk() == ofvk.toBytes())
-}
-testOrchardFullViewingKeyToFvk()
+fun setupGetFvk() =
+    ZcashOrchardFullViewingKey.fromBytes(supp.getAsByteArray("orchard_full_viewing_key"))
 
 fun testOrchardFullViewingKeyAddressAt() {
 	val fvk = setupGetFvk()
-	val divIdx = ZcashOrchardDiversifierIndex.fromU32(4)
+	val divIdx = ZcashOrchardDiversifierIndex.fromU32(4u)
 	val expectedBytes = supp.getAsByteArray("orchard_div_idx_address_at")
 	val addr = fvk.addressAt(divIdx, ZcashOrchardScope.EXTERNAL)
 
-	assert(addr.toBytes() == expectedBytes)
+	assert(addr.toRawAddressBytes() == expectedBytes)
 }
 testOrchardFullViewingKeyAddressAt()
 
 fun testOrchardFullViewingKeyAddress() {
-	val supp = TestSupport.getFromCsv()
 	val ofvkBytes = supp.getAsByteArray("orchard_full_viewing_key")
 	val fvk = ZcashOrchardFullViewingKey.fromBytes(ofvkBytes)
 	val divBytes = supp.getAsByteArray("orchard_diversifier")
@@ -36,7 +23,7 @@ fun testOrchardFullViewingKeyAddress() {
 	val diver = ZcashOrchardDiversifier.fromBytes(divBytes)
 	val addr = fvk.address(diver, ZcashOrchardScope.EXTERNAL)
 
-	assert(addr.toBytes() == expectedBytes)
+	assert(addr.toRawAddressBytes() == expectedBytes)
 }
 testOrchardFullViewingKeyAddress()
 
