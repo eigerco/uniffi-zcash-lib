@@ -86,7 +86,12 @@ We use a single `ZcashError` encompassing following errors:
 * `Secp256k1Error` - original type: [secp256k1::Error](https://docs.rs/secp256k1/latest/secp256k1/enum.Error.html)
 * `Bech32DecodeError` - original type: [zcash_client_backend::encoding::Bech32DecodeError](https://docs.rs/zcash_client_backend/latest/zcash_client_backend/encoding/enum.Bech32DecodeError.html),
 * `Bs58Error` - original type: [bs58::decode::Error](https://docs.rs/bs58/latest/bs58/decode/enum.Error.html),
-* `Unknown` - unknown error, usually used for constructors that return `Option`
+* `BuilderError` - original type: [zcash_primitives::transaction::builder::Error](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/builder/enum.Error.html), with fee errors from [zcash_primitives::transaction::fees::zip317::FeeError](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/fees/zip317/enum.FeeError.html). Serves as a catch all error for all the errors we are not handling specifically. This is for the general transaction builder.
+* `TransparentBuilderError` - original type: [transaction::components::transparent::builder::Error](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/components/transparent/builder/enum.Error.html). Serves as a catch all error for all the errors we are not specifically handling from the `Transparent` transaction builder.
+* `SaplingBuilderError`- original type: [transaction::components::sapling::builder::Error](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/components/sapling/builder/enum.Error.html). Serves as a catch all error for all the errors we are not specifically handling from the `Sapling` transaction builder.
+* `InsufficientFundsError` - original type: [zcash_primitives::transaction::builder::Error](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/builder/enum.Error.html#variant.InsufficientFunds) . This error comes from the general transaction builder. We expose it explicitly to the user.
+* `ChangeRequiredError` - original type: [zcash_primitives::transaction::builder::Error](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/builder/enum.Error.html#variant.ChangeRequired) . This error comes from the general transaction builder. We expose it explicitly to the user.
+* `Unknown` - unknown error, usually used for constructors that return `Option`.
 
 ## Objects
 
