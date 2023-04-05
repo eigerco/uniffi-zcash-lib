@@ -37,7 +37,7 @@ impl ZcashUnifiedFullViewingKey {
     ///
     /// [ZIP 316]: https://zips.z.cash/zip-0316
     pub fn decode(params: ZcashConsensusParameters, encoding: &str) -> ZcashResult<Self> {
-        let key = zcash_client_backend::keys::UnifiedFullViewingKey::decode(&params, encoding)?;
+        let key = UnifiedFullViewingKey::decode(&params, encoding)?;
 
         Ok(key.into())
     }
