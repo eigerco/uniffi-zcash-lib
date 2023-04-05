@@ -2,8 +2,6 @@ import uniffi.zcash.*
 
 val supp = TestSupport.fromCsvFile()
 
-// TODO make test intercepting error when: from_u32(too big number)
-
 fun testOrchardDiversifierIndexFromBytes() {
 	val expectedBytes = supp.getAsByteArray("orchard_diversifier_index_from_u32")
 	val divIdx = ZcashOrchardDiversifierIndex.fromBytes(expectedBytes)
@@ -19,6 +17,14 @@ fun testOrchardDiversifierIndexFromU32() {
 	val divIdx = ZcashOrchardDiversifierIndex.fromU32(integer)
 
 	assert(divIdx.toBytes() == expectedBytes)
+
+    var thrown = false;
+    try {
+        ZcashOrchardDiversifierIndex.fromU32(integer)
+    } catch (e: ZcashException.ArrayLengthMismatch) {
+        thrown = true;
+    }
+    assert(thrown)
 }
 testOrchardDiversifierIndexFromU32()
 
