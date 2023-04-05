@@ -10,6 +10,11 @@ fun testOrchardDiversifierIndexFromBytes() {
 }
 testOrchardDiversifierIndexFromBytes()
 
+fun testOrchardDiversifierIndexToBytes() {
+    // covered by testOrchardDiversifierIndexFromBytes()
+}
+testOrchardDiversifierIndexToBytes()
+
 fun testOrchardDiversifierIndexFromU32() {
 	val integer = supp.getAsU32("orchard_diversifier_index_u32")
 	val expectedBytes = supp.getAsByteArray("orchard_diversifier_index_from_u32")

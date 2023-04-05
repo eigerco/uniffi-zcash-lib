@@ -485,8 +485,26 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashOrchardDiversifier::to_bytes()                                                                 |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashOrchardDiversifierIndex
-/// The non-negative value of an individual Orchard note.
- | :white_check_mark: |
+
+* Original type: [orchard::keys::DiversifierIndex](https://docs.rs/orchard/0.3.0/orchard/keys/struct.DiversifierIndex.html)
+
+| Object/Method name                                     | Score        | UDL                | Code               | Tests              | Docs               |
+| ------------------------------------------------------ | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashOrchardDiversifierIndex::from_bytes()             |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardDiversifierIndex::from_u32()               |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardDiversifierIndex::from_u64()               |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardDiversifierIndex::to_bytes()               |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+### ZcashDiversifierIndex
+
+* Original type: [zcash_primitives::zip32::DiversifierIndex](https://docs.rs/zcash_primitives/latest/zcash_primitives/zip32/struct.DiversifierIndex.html)
+
+| Object/Method name                              | Score        | UDL                | Code               | Tests              | Docs               |
+| ----------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashDiversifierIndex::new()                    |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifierIndex::from_u32()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifierIndex::from_u64()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifierIndex::increment()              |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | ZcashDiversifierIndex::to_u32()                 |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | ZcashDiversifierIndex::to_bytes()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
@@ -744,7 +762,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashSaplingMerklePath::root()      |       |     |      |       |      |
 
 ### ZcashAuthPath
-A dictionary that holds an [ZcashSaplingNode](#ZcashSaplingNode) and a boolean. 
+A dictionary that holds an [ZcashSaplingNode](#ZcashSaplingNode) and a boolean.
 This is used in [ZcashSaplingMerklePath](#ZcashSaplingMerklePath)::auth_path() method
 for returning a Vec<ZcashAuthPath>, trying to mimic the original method, which returns
 a tuple.
