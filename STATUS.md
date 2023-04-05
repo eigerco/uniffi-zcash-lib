@@ -459,10 +459,11 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 ### ZcashOrchardOutgoingViewingKey
 
 * Original type: [orchard::keys::OutgoingViewingKey](https://docs.rs/orchard/0.3.0/orchard/keys/struct.OutgoingViewingKey.html)
-* Just a type, no pub methods
 
-| Object/Method name | Score | UDL | Code | Tests | Docs |
-| ------------------ | ----- | --- | ---- | ----- | ---- |
+| Object/Method name                                                                                                                            | Score        | UDL                | Code               | Tests              | Docs               |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashOrchardOutgoingViewingKey::to_bytes()                                                                                                    |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardOutgoingViewingKey::from_bytes()                                                                                                  |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashOrchardAddress
 

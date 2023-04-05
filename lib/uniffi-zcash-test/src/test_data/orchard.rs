@@ -22,12 +22,13 @@ pub fn write_for_orchard<W: Write>(mut file: W, seed: &[u8]) {
     writeln!(file, "account:{account_number}").unwrap();
 
     let orchard_sk = SpendingKey::from_zip32_seed(seed, coin_type, account_number).unwrap();
+    let fvk = FullViewingKey::from(&orchard_sk);
     writeln!(file, "{}", format_bytes("orchard_spending_key_from_zip32_seed", orchard_sk.to_bytes().as_slice())).unwrap();
-    writeln!(file, "{}", format_bytes("orchard_full_viewing_key", FullViewingKey::from(&orchard_sk).to_bytes().as_slice())).unwrap();
-    writeln!(file, "{}", format_bytes("orchard_div_idx_address", &FullViewingKey::from(&orchard_sk).address(orchard_diversifier, Scope::External).to_raw_address_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("orchard_div_idx_address_at", &FullViewingKey::from(&orchard_sk).address_at(DiversifierIndex::from(4u32), Scope::External).to_raw_address_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("orchard_full_viewing_key_ivk", &FullViewingKey::from(&orchard_sk).to_ivk(Scope::External).to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("orchard_full_viewing_key_ovk", FullViewingKey::from(&orchard_sk).to_ovk(Scope::External).as_ref())).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_full_viewing_key", fvk.to_bytes().as_slice())).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_div_idx_address", &fvk.address(orchard_diversifier, Scope::External).to_raw_address_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_div_idx_address_at", &fvk.address_at(DiversifierIndex::from(4u32), Scope::External).to_raw_address_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_full_viewing_key_ivk", &fvk.to_ivk(Scope::External).to_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_full_viewing_key_ovk", fvk.to_ovk(Scope::External).as_ref())).unwrap();
 
     let orchard_address = get_orchard_address(&usk);
     writeln!(file, "{}", format_bytes("orchard_address", orchard_address.as_slice())).unwrap();
@@ -50,6 +51,9 @@ pub fn write_for_orchard<W: Write>(mut file: W, seed: &[u8]) {
 
     let address = ivk.address(orchard_diversifier);
     writeln!(file, "{}", format_bytes("orchard_incoming_viewing_key_address", &address.to_raw_address_bytes())).unwrap();
+
+    let ovk = fvk.to_ovk(Scope::External);
+    writeln!(file, "{}", format_bytes("orchard_outgoing_viewing_key", &ovk.as_ref().to_vec())).unwrap();
 }
 
 fn get_orchard_address(key: &UnifiedSpendingKey) -> [u8; 43] {
