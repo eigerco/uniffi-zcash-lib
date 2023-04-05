@@ -60,6 +60,12 @@ pub enum ZcashError {
         error: transaction::components::sapling::builder::Error,
     },
 
+    #[error("Insufficient founds error: {amount}")]
+    InsufficientFundsError { amount: u64 },
+
+    #[error("Change required error: {amount}")]
+    ChangeRequiredError { amount: u64 },
+
     #[error("IO error occurred: {error:?}")]
     IOError { error: std::io::Error },
 
@@ -144,7 +150,22 @@ impl From<transaction::builder::Error<Infallible>> for ZcashError {
 
 impl From<transaction::builder::Error<fees::zip317::FeeError>> for ZcashError {
     fn from(error: transaction::builder::Error<fees::zip317::FeeError>) -> Self {
-        ZcashError::BuilderError { error }
+        match error {
+            transaction::builder::Error::InsufficientFunds(amount) => {
+                ZcashError::ChangeRequiredError {
+                    amount: amount.into(),
+                }
+            }
+            transaction::builder::Error::ChangeRequired(amount) => {
+                ZcashError::ChangeRequiredError {
+                    amount: amount.into(),
+                }
+            }
+            transaction::builder::Error::Fee(_) => ZcashError::BuilderError { error },
+            transaction::builder::Error::Balance(_) => ZcashError::BuilderError { error },
+            transaction::builder::Error::TransparentBuild(_) => ZcashError::BuilderError { error },
+            transaction::builder::Error::SaplingBuild(_) => ZcashError::BuilderError { error },
+        }
     }
 }
 
