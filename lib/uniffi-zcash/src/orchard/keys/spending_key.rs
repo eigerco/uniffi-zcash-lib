@@ -7,6 +7,7 @@ use crate::{utils::cast_slice, ZcashError, ZcashOrchardFullViewingKey, ZcashResu
 pub struct ZcashOrchardSpendingKey(pub(crate) SpendingKey);
 
 impl ZcashOrchardSpendingKey {
+    /// Constructs an Orchard spending key from uniformly-random bytes.
     pub fn from_bytes(data: Vec<u8>) -> ZcashResult<Self> {
         let slice = cast_slice(&data)?;
         let sk = SpendingKey::from_bytes(slice);
@@ -17,6 +18,7 @@ impl ZcashOrchardSpendingKey {
         }
     }
 
+    /// Returns the raw bytes of the spending key.
     pub fn to_bytes(&self) -> Vec<u8> {
         self.0.to_bytes().to_vec()
     }
@@ -25,6 +27,7 @@ impl ZcashOrchardSpendingKey {
         Arc::new(self.into())
     }
 
+    /// Derives the Orchard spending key for the given seed, coin type, and account.
     pub fn from_zip32_seed(seed: Vec<u8>, coin_type: u32, account: u32) -> ZcashResult<Self> {
         let key = SpendingKey::from_zip32_seed(seed.as_slice(), coin_type, account)
             .map_err(ZcashError::from)?;
