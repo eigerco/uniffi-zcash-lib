@@ -22,14 +22,6 @@ fun testOrchardDiversifierIndexFromU32() {
 	val divIdx = ZcashOrchardDiversifierIndex.fromU32(integer)
 
 	assert(divIdx.toBytes() == expectedBytes)
-
-    var thrown = false;
-    try {
-        ZcashOrchardDiversifierIndex.fromU32(integer)
-    } catch (e: ZcashException.ArrayLengthMismatch) {
-        thrown = true;
-    }
-    assert(thrown)
 }
 testOrchardDiversifierIndexFromU32()
 
