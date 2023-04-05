@@ -7,12 +7,12 @@ use super::format_bytes;
 
 #[rustfmt::skip]
 pub fn write_for_zcash_client_backend<W: Write>(mut file: W, seed: &[u8]) {
-    let usk = UnifiedSpendingKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
+    let usk = UnifiedSpendingKey::from_seed(&MainNetwork, seed, 0.into()).unwrap();
     let encoded = usk.to_unified_full_viewing_key().encode(&MainNetwork);
     writeln!(file, "unified_full_viewing_key_encoded:{encoded}").unwrap();
     writeln!(file, "{}", format_bytes("unified_spending_key", &usk.to_bytes(Era::Orchard))).unwrap();
 
-    let extended_spending_key = ExtendedSpendingKey::master(&seed);
+    let extended_spending_key = ExtendedSpendingKey::master(seed);
     let (ext_sk_child_index, ext_sk_default_address) = extended_spending_key.default_address();
     writeln!(file, "{}", format_bytes("extended_spending_key", &extended_spending_key.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_from_path", &get_ext_sk_from_path(&extended_spending_key).to_bytes())).unwrap();

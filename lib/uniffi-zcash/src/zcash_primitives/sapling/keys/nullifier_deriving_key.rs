@@ -16,7 +16,7 @@ impl ZcashNullifierDerivingKey {
     pub fn from_bytes(bytes: &[u8]) -> ZcashResult<Self> {
         let array = utils::cast_slice(bytes)?;
         let group: Option<_> = SubgroupPoint::from_bytes(&array).into();
-        let group = group.ok_or_else(|| "unable to parse nullifier deriving key")?;
+        let group = group.ok_or("unable to parse nullifier deriving key")?;
         Ok(ZcashNullifierDerivingKey(NullifierDerivingKey(group)))
     }
 

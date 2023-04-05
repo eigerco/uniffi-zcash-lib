@@ -7,7 +7,7 @@ use super::format_bytes;
 
 #[rustfmt::skip]
 pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
-    let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
+    let apk = AccountPrivKey::from_seed(&MainNetwork, seed, 0.into()).unwrap();
     writeln!(file, "{}", format_bytes("account_private_key", &apk.to_bytes())).unwrap();
 
     let ppk = apk.to_account_pubkey();
@@ -17,7 +17,7 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
     writeln!(file, "{}", format_bytes("ppk_external_ovk", &ppk.external_ovk().as_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("ppk_internal_ovk", &ppk.internal_ovk().as_bytes())).unwrap();
 
-    let extended_priv_key = ExtendedPrivKey::with_seed(&seed).unwrap();
+    let extended_priv_key = ExtendedPrivKey::with_seed(seed).unwrap();
     let extended_private_key = AccountPrivKey::from_extended_privkey(extended_priv_key);
     writeln!(file, "{}", format_bytes("extended_private_key", &extended_private_key.to_bytes())).unwrap();
 
