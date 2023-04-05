@@ -1,5 +1,12 @@
 import uniffi.zcash.*
 
+fun testKeyIndexFromU32() {
+    val zidx = ZcashKeyIndex.fromIndex(3u)
+
+	// no errors happened
+}
+testKeyIndexFromU32()
+
 fun testKeyIndexFromIndex() {
 	val zidx = ZcashKeyIndex.fromIndex(3u)
 

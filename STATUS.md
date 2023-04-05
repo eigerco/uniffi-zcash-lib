@@ -486,12 +486,12 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Object/Method name                              | Score        | UDL                | Code               | Tests              | Docs               |
 | ----------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| ZcashKeyIndex::from_u32()                       |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashKeyIndex::raw_index()                      |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashKeyIndex::normalize_index()                |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashKeyIndex::is_valid()                       |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashKeyIndex::hardened_from_normalize_index()  |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashKeyIndex::from_index()                     |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashKeyIndex::from_u32()                       |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashKeyIndex::raw_index()                      |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashKeyIndex::normalize_index()                |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashKeyIndex::is_valid()                       |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashKeyIndex::hardened_from_normalize_index()  |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashKeyIndex::from_index()                     |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashTransactionBuilder
 
