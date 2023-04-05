@@ -474,6 +474,15 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashOrchardAddress::to_raw_address_bytes()                                                         | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashOrchardAddress::from_raw_address_bytes()                                                       |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
+### ZcashOrchardDiversifier
+
+* Original type: [orchard::keys::Diversifier](https://docs.rs/orchard/latest/orchard/keys/struct.Diversifier.html
+
+| Object/Method name                                                                                  | Score        | UDL                | Code               | Tests              | Docs               |
+| --------------------------------------------------------------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashOrchardDiversifier::from_bytes()                                                               |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashOrchardDiversifier::to_bytes()                                                                 |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
 ### ZcashOrchardDiversifierIndex
 /// The non-negative value of an individual Orchard note.
  | :white_check_mark: |

@@ -10,3 +10,8 @@ fun testOrchardDiversifierFromBytes() {
 	assert(expectedBytes == zod.toBytes())
 }
 testOrchardDiversifierFromBytes()
+
+fun testOrchardDiversifierToBytes() {
+    // covered by testOrchardDiversifierFromBytes()
+}
+testOrchardDiversifierToBytes()
