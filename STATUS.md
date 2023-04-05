@@ -116,26 +116,25 @@ We use a single `ZcashError` encompassing following errors:
 
 :warning: This type does not belong to the zcash API, but its returned from some methods. We are just providing support for serialization, so the user can deserialize the secret by making use of another `secp256k1` library in their specific language.
 
-| Object/Method name                 |     Score      |        UDL         |        Code        | Tests |        Docs        |
-| ---------------------------------- | :------------: | :----------------: | :----------------: | :---: | :----------------: |
-| SecpSecretKey::new()               | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::display_secret()    | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::non_secure_erase()  | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::from_slice()        |  :red_circle:  | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| SecpSecretKey::serialize_secret()  |  :red_circle:  | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| SecpSecretKey::from_keypair()      | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::from_hashed_data()  | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::secret_bytes()      | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::negate()            | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::add_tweak()         | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::mul_tweak()         | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::negate_assign()     | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::add_assign()        | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::mul_assign()        | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::sign_ecdsa()        | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::keypair()           | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::public_key()        | :white_circle: |                    |                    |       |                    |
-| SecpSecretKey::x_only_public_key() | :white_circle: |                    |                    |       |                    |
+| Object/Method name                 |     Score      |        UDL         |        Code        |       Tests        |        Docs        |
+| ---------------------------------- | :------------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| SecpSecretKey::display_secret()    | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::non_secure_erase()  | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::from_slice()        |  :red_circle:  | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| SecpSecretKey::serialize_secret()  |  :red_circle:  | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| SecpSecretKey::from_keypair()      | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::from_hashed_data()  | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::secret_bytes()      | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::negate()            | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::add_tweak()         | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::mul_tweak()         | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::negate_assign()     | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::add_assign()        | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::mul_assign()        | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::sign_ecdsa()        | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::keypair()           | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::public_key()        | :white_circle: |                    |                    |                    |                    |
+| SecpSecretKey::x_only_public_key() | :white_circle: |                    |                    |                    |                    |
 
 ### ZcashExtendedPrivKey
 
