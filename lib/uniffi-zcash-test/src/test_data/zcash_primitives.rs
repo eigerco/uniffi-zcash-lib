@@ -1,7 +1,10 @@
 use std::io::Write;
 
 use hdwallet::ExtendedPrivKey;
-use zcash_primitives::{legacy::keys::{AccountPrivKey, IncomingViewingKey}, consensus::MainNetwork};
+use zcash_primitives::{
+    consensus::MainNetwork,
+    legacy::keys::{AccountPrivKey, IncomingViewingKey},
+};
 
 use super::format_bytes;
 
@@ -83,7 +86,6 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 
     */ */
 }
-
 
 /*
 fn get_ovk(key: &UnifiedSpendingKey) -> [u8; 32] {

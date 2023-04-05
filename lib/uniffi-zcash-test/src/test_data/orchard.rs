@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use orchard::keys::{DiversifierIndex, SpendingKey, FullViewingKey, Scope};
+use orchard::keys::{DiversifierIndex, FullViewingKey, Scope, SpendingKey};
 use zcash_client_backend::keys::UnifiedSpendingKey;
 use zcash_primitives::consensus::MainNetwork;
 

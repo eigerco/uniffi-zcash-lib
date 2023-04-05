@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use hdwallet::{ExtendedPrivKey, traits::Serialize};
+use hdwallet::{traits::Serialize, ExtendedPrivKey};
 
 use super::format_bytes;
 

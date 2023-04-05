@@ -1,7 +1,10 @@
 use std::io::Write;
 
-use zcash_client_backend::keys::{UnifiedSpendingKey, Era};
-use zcash_primitives::{consensus::MainNetwork, zip32::{ExtendedSpendingKey, ChildIndex}};
+use zcash_client_backend::keys::{Era, UnifiedSpendingKey};
+use zcash_primitives::{
+    consensus::MainNetwork,
+    zip32::{ChildIndex, ExtendedSpendingKey},
+};
 
 use super::format_bytes;
 

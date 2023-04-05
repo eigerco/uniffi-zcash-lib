@@ -1,6 +1,6 @@
 use orchard::keys::OutgoingViewingKey;
 
-use crate::{ZcashResult, utils};
+use crate::{utils, ZcashResult};
 
 /// A key that provides the capability to recover outgoing transaction information from
 /// the block chain.

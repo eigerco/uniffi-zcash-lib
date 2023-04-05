@@ -1,6 +1,6 @@
 use std::io::Write;
 
-use zcash_primitives::{legacy::keys::AccountPrivKey, consensus::MainNetwork};
+use zcash_primitives::{consensus::MainNetwork, legacy::keys::AccountPrivKey};
 
 use super::format_bytes;
 

@@ -21,6 +21,6 @@ impl ZcashNullifierDerivingKey {
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
-        self.0.0.to_bytes().to_vec()
+        self.0 .0.to_bytes().to_vec()
     }
 }

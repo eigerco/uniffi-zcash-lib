@@ -5,7 +5,7 @@ use zcash_primitives::legacy::{
     TransparentAddress,
 };
 
-use crate::{ZcashError, ZcashResult, ZcashTransparentAddress, utils};
+use crate::{utils, ZcashError, ZcashResult, ZcashTransparentAddress};
 
 /// A type representing an incoming viewing key at the BIP-44 "external"
 /// path `m/44'/<coin_type>'/<account>'/0`. This allows derivation
@@ -28,7 +28,9 @@ impl ZcashExternalIvk {
 
     pub fn from_bytes(data: &[u8]) -> ZcashResult<Self> {
         let array = utils::cast_slice(data)?;
-        ExternalIvk::deserialize(&array).map_err(From::from).map(From::from)
+        ExternalIvk::deserialize(&array)
+            .map_err(From::from)
+            .map(From::from)
     }
 }
 
@@ -62,7 +64,9 @@ impl ZcashInternalIvk {
 
     pub fn from_bytes(data: &[u8]) -> ZcashResult<Self> {
         let array = utils::cast_slice(data)?;
-        InternalIvk::deserialize(&array).map_err(From::from).map(From::from)
+        InternalIvk::deserialize(&array)
+            .map_err(From::from)
+            .map(From::from)
     }
 }
 
