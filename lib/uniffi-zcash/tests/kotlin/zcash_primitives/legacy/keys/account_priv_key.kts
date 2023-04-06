@@ -26,3 +26,68 @@ fun testAccountPrivKeyFromExtendedPrivKey() {
     assert(accountPrivKey.toBytes() == expected)
 }
 testAccountPrivKeyFromExtendedPrivKey()
+
+fun testAccountPrivKeyToAccountPubKey() {
+    val seed = supp.getAsByteArray("seed")
+
+    val key = ZcashAccountPrivKey.fromSeed(
+        ZcashConsensusParameters.MAIN_NETWORK,
+        seed,
+        ZcashAccountId(0u),
+    )
+
+    val expected = supp.getAsByteArray("account_public_key")
+
+    assert(key.toAccountPubkey().serialize() == expected)
+}
+testAccountPrivKeyToAccountPubKey()
+
+fun testAccountPrivKeyDeriveExternalSecretKey() {
+    val seed = supp.getAsByteArray("seed")
+
+    val key = ZcashAccountPrivKey.fromSeed(
+        ZcashConsensusParameters.MAIN_NETWORK,
+        seed,
+        ZcashAccountId(0u),
+    )
+
+    val expected = supp.getAsByteArray("apk_derive_external_secret_key")
+
+    assert(key.deriveExternalSecretKey(0u).serializeSecret() == expected)
+}
+testAccountPrivKeyDeriveExternalSecretKey()
+
+fun testAccountPrivKeyDeriveInternalSecretKey() {
+    val seed = supp.getAsByteArray("seed")
+
+    val key = ZcashAccountPrivKey.fromSeed(
+        ZcashConsensusParameters.MAIN_NETWORK,
+        seed,
+        ZcashAccountId(0u),
+    )
+
+    val expected = supp.getAsByteArray("apk_derive_internal_secret_key")
+
+    assert(key.deriveInternalSecretKey(0u).serializeSecret() == expected)
+}
+testAccountPrivKeyDeriveInternalSecretKey()
+
+fun testAccountPrivKeyToBytes() {
+    // covered by testAccountPrivKeyFromSeed()
+}
+testAccountPrivKeyToBytes()
+
+fun testAccountPrivKeyFromBytes() {
+    val seed = supp.getAsByteArray("seed")
+
+    val key = ZcashAccountPrivKey.fromSeed(
+        ZcashConsensusParameters.MAIN_NETWORK,
+        seed,
+        ZcashAccountId(0u),
+    )
+
+    val expected = key.toBytes()
+
+    assert(ZcashAccountPrivKey.fromBytes(expected).toBytes() == expected)
+}
+testAccountPrivKeyFromBytes()
