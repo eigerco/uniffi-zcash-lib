@@ -1,7 +1,8 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
+
 fun testAccountPubKeyNew() {
-	val supp = TestSupport.fromCsvFile()
 	val ppkBytes = supp.getAsByteArray("account_public_key")
 
 	val ppk = ZcashAccountPubKey(ppkBytes)
@@ -11,8 +12,6 @@ fun testAccountPubKeyNew() {
 testAccountPubKeyNew()
 
 fun testAccountPubKeyExternalIvk() {
-	val supp = TestSupport.fromCsvFile()
-
 	val ppkBytes = supp.getAsByteArray("account_public_key")
 	val ivkBytes = supp.getAsByteArray("ppk_external_ivk")
 
@@ -24,8 +23,6 @@ fun testAccountPubKeyExternalIvk() {
 testAccountPubKeyExternalIvk()
 
 fun testAccountPubKeyInternalIvk() {
-	val supp = TestSupport.fromCsvFile()
-
 	val ppkBytes = supp.getAsByteArray("account_public_key")
 	val ivkBytes = supp.getAsByteArray("ppk_internal_ivk")
 
@@ -37,8 +34,6 @@ fun testAccountPubKeyInternalIvk() {
 testAccountPubKeyInternalIvk()
 
 fun testAccountPubKeyForShielding() {
-	val supp = TestSupport.fromCsvFile()
-
 	val ppkBytes = supp.getAsByteArray("account_public_key")
 	val intOvkBytes = supp.getAsByteArray("ppk_internal_ovk")
 	val extOvkBytes = supp.getAsByteArray("ppk_external_ovk")
@@ -52,7 +47,6 @@ fun testAccountPubKeyForShielding() {
 testAccountPubKeyForShielding()
 
 fun testAccountPubKeyInternalOvk() {
-	val supp = TestSupport.fromCsvFile()
 	val ppkBytes = supp.getAsByteArray("account_public_key")
 	val ovkBytes = supp.getAsByteArray("ppk_internal_ovk")
 	val ppk = ZcashAccountPubKey(ppkBytes)
@@ -61,8 +55,6 @@ fun testAccountPubKeyInternalOvk() {
 	assert(ovk.asBytes() == ovkBytes)
 }
 testAccountPubKeyInternalOvk()
-
-val supp = TestSupport.fromCsvFile()
 
 fun testAccountPubKeyExternalOvk() {
 	val ppkBytes = supp.getAsByteArray("account_public_key")
@@ -73,3 +65,8 @@ fun testAccountPubKeyExternalOvk() {
 	assert(ovk.asBytes() == ovkBytes)
 }
 testAccountPubKeyExternalOvk()
+
+fun testAccountPubKeySerialize() {
+    // covered by testAccountPubKeyNew()
+}
+testAccountPubKeySerialize()

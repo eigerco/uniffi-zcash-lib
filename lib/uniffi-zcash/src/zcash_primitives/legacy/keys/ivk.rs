@@ -5,7 +5,7 @@ use zcash_primitives::legacy::{
     TransparentAddress,
 };
 
-use crate::{utils, ZcashError, ZcashResult, ZcashTransparentAddress};
+use crate::{utils, ZcashResult, ZcashTransparentAddress};
 
 /// A type representing an incoming viewing key at the BIP-44 "external"
 /// path `m/44'/<coin_type>'/<account>'/0`. This allows derivation
@@ -13,13 +13,11 @@ use crate::{utils, ZcashError, ZcashResult, ZcashTransparentAddress};
 pub struct ZcashExternalIvk(ExternalIvk);
 
 impl ZcashExternalIvk {
-    /// Derives a transparent address at the provided child index.
-    pub fn derive_address(&self, child_index: u32) -> ZcashResult<Arc<ZcashTransparentAddress>> {
-        let address = self
-            .0
-            .derive_address(child_index)
-            .map_err(ZcashError::from)?;
-        Ok(Arc::new(address.into()))
+    /// Searches the space of child indexes for an index that will
+    /// generate a valid transparent address, and returns the resulting
+    /// address and the index at which it was generated.
+    pub fn default_address(&self) -> ZcashTransparentAddressAndIndex {
+        self.0.default_address().into()
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {

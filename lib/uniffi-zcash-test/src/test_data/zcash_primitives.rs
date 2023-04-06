@@ -1,6 +1,7 @@
 use std::io::Write;
 
 use hdwallet::ExtendedPrivKey;
+use zcash_client_backend::encoding;
 use zcash_primitives::{
     consensus::MainNetwork,
     legacy::keys::{AccountPrivKey, IncomingViewingKey},
@@ -17,8 +18,21 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 
     let ppk = apk.to_account_pubkey();
     writeln!(file, "{}", format_bytes("account_public_key", &ppk.serialize())).unwrap();
-    writeln!(file, "{}", format_bytes("ppk_external_ivk", &ppk.derive_external_ivk().unwrap().serialize())).unwrap();
-    writeln!(file, "{}", format_bytes("ppk_internal_ivk", &ppk.derive_internal_ivk().unwrap().serialize())).unwrap();
+
+    let external_ivk = ppk.derive_external_ivk().unwrap();
+    writeln!(file, "{}", format_bytes("ppk_external_ivk", &external_ivk.serialize())).unwrap();
+
+    let (default_address_address, default_address_index) = external_ivk.default_address();
+    writeln!(file, "external_ivk_default_address_address:{}", encoding::encode_transparent_address_p(&MainNetwork, &default_address_address)).unwrap();
+    writeln!(file, "external_ivk_default_address_index:{}", default_address_index).unwrap();
+
+    let internal_ivk = ppk.derive_internal_ivk().unwrap();
+    writeln!(file, "{}", format_bytes("ppk_internal_ivk", &internal_ivk.serialize())).unwrap();
+
+    let (default_address_address, default_address_index) = internal_ivk.default_address();
+    writeln!(file, "internal_ivk_default_address_address:{}", encoding::encode_transparent_address_p(&MainNetwork, &default_address_address)).unwrap();
+    writeln!(file, "internal_ivk_default_address_index:{}", default_address_index).unwrap();
+
     writeln!(file, "{}", format_bytes("ppk_external_ovk", &ppk.external_ovk().as_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("ppk_internal_ovk", &ppk.internal_ovk().as_bytes())).unwrap();
 

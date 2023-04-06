@@ -153,15 +153,15 @@ We use a single `ZcashError` encompassing following errors:
 
 * Original type: [zcash_primitives::legacy::keys::AccountPubKey](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/legacy/keys/struct.AccountPubKey.html)
 
-| Object/Method name                                                  | Score |        UDL         |        Code        | Tests |        Docs        |
-| ------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :---: | :----------------: |
-| ZcashAccountPubKey::derive_external_ivk()                           | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::derive_internal_ivk()                           | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::ovks_for_shielding()                            | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::internal_ovk()                                  | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::external_ovk()                                  | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::serialize()                                     | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
-| ZcashAccountPubKey::deserialize() (renamed to new() as constructor) | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| Object/Method name                                                  | Score        |        UDL         |        Code        |       Tests        |        Docs        |
+| ------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashAccountPubKey::derive_external_ivk()                           | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashAccountPubKey::derive_internal_ivk()                           | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashAccountPubKey::ovks_for_shielding()                            | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashAccountPubKey::internal_ovk()                                  | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashAccountPubKey::external_ovk()                                  | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashAccountPubKey::serialize()                                     | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashAccountPubKey::deserialize() (renamed to new() as constructor) | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashUnifiedSpendingKey
 
@@ -599,9 +599,37 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 * Original type: [zcash_primitives::legacy::keys::ExternalIvk](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/legacy/keys/struct.ExternalIvk.html)
 
-| Members                            | Score | UDL | Code | Tests | Docs |
-| ---------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashExternalIvk::derive_address() | 🔴     |  ✅   | ✅     |       |  ✅    |
+| Members                             | Score        | UDL                | Code               | Tests              | Docs               |
+| ----------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashExternalIvk::default_address() | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashExternalIvk::from_bytes()      | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashExternalIvk::to_bytes()        | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+### ZcashInternalIvk
+
+* Original type: [zcash_primitives::legacy::keys::InternalIvk](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/legacy/keys/struct.InternalIvk.html)
+
+| Members                             | Score        | UDL                | Code               | Tests              | Docs               |
+| ----------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashInternalIvk::default_address() | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashInternalIvk::from_bytes()      | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashInternalIvk::to_bytes()        | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+### ZcashExternalOvk
+
+* Original type: [zcash_primitives::legacy::keys::ExternalOvk](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/legacy/keys/struct.ExternalOvk.html)
+
+| Members                             | Score        | UDL                | Code               | Tests              | Docs               |
+| ----------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashExternalOvk::as_bytes()        | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+
+### ZcashInternalOvk
+
+* Original type: [zcash_primitives::legacy::keys::InternalOvk](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/legacy/keys/struct.InternalOvk.html)
+
+| Members                             | Score        | UDL                | Code               | Tests              | Docs               |
+| ----------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashInternalOvk::as_bytes()        | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashTransparentTxOut
 

@@ -50,3 +50,12 @@ fun testTransparentAddressScriptEncodeAndDecode() {
 }
 testTransparentAddressScriptEncodeAndDecode()
 
+fun testTransparentAddressIsPublicKey() {
+    // covered by testTransparentAddressPublicKeyEncodeAndDecode()
+}
+testTransparentAddressIsPublicKey()
+
+fun testTransparentAddresIsScript() {
+    // covered by testTransparentAddressScriptEncodeAndDecode()
+}
+testTransparentAddresIsScript()
