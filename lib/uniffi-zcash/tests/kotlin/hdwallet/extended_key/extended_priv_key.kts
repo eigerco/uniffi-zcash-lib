@@ -3,7 +3,7 @@ import uniffi.zcash.*
 val supp = TestSupport.fromCsvFile()
 
 fun testExtendedPrivKeyFromBytes() {
-    val bytes = supp.getAsByteArray("hdwallet_epk")
+    val bytes = supp.getAsU8Array("hdwallet_epk")
 
 	val zepk = ZcashExtendedPrivKey.fromBytes(bytes)
 
@@ -32,21 +32,21 @@ fun testExtendedPrivKeyFromRandomWithSeedSize() {
 testExtendedPrivKeyFromRandomWithSeedSize()
 
 fun testExtendedPrivKeyFromWithSeed() {
-	val seed = supp.getAsByteArray("seed")
+	val seed = supp.getAsU8Array("seed")
 	val zepk = ZcashExtendedPrivKey.withSeed(seed)
 
-    val bytes = supp.getAsByteArray("hdwallet_epk")
+    val bytes = supp.getAsU8Array("hdwallet_epk")
 
     assert(zepk.toBytes() == bytes)
 }
 testExtendedPrivKeyFromWithSeed()
 
 fun testExtendedPrivKeyDerivePrivateKey() {
-	val seed = supp.getAsByteArray("seed")
+	val seed = supp.getAsU8Array("seed")
 	val zepk = ZcashExtendedPrivKey.withSeed(seed)
 	val idx = ZcashKeyIndex.fromIndex(3u)
 
-    val expected = supp.getAsByteArray("hdwallet_epk_derive_private_key")
+    val expected = supp.getAsU8Array("hdwallet_epk_derive_private_key")
 
 	assert(zepk.derivePrivateKey(idx).toBytes() == expected)
 }

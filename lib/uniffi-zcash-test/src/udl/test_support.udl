@@ -2,7 +2,7 @@ interface TestSupport {
   [Name=from_csv_file]
   constructor();
 
-  sequence<u8> get_as_byte_array([ByRef] string key);
+  sequence<u8> get_as_u8_array([ByRef] string key);
 
   sequence<u32> get_as_u32_array([ByRef] string key);
 

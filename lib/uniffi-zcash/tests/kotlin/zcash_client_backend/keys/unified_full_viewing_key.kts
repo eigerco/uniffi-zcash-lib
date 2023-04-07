@@ -31,7 +31,7 @@ fun testUnifiedFullViewingKeyDecode() {
 testUnifiedFullViewingKeyDecode()
 
 fun testUnifiedFullViewingKeyEncode() {
-    val seed = supp.getAsByteArray("seed")
+    val seed = supp.getAsU8Array("seed")
     val params = ZcashConsensusParameters.MAIN_NETWORK
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
@@ -91,7 +91,7 @@ fun testUnifiedFullViewingKeyFindAddress() {
 
     val expectedAddress = supp.getAsString("unified_full_viewing_key_find_address_address_encoded");
 
-    val expectedIndex = supp.getAsByteArray("unified_full_viewing_key_find_address_index");
+    val expectedIndex = supp.getAsU8Array("unified_full_viewing_key_find_address_index");
 
     assert(foundAddress.address.encode(params) == expectedAddress)
     assert(foundAddress.diversifierIndex.toBytes() == expectedIndex)
@@ -109,7 +109,7 @@ fun testUnifiedFullViewingKeyDefaultAddress() {
 
     val expectedAddress = supp.getAsString("unified_full_viewing_key_default_address_address_encoded");
 
-    val expectedIndex = supp.getAsByteArray("unified_full_viewing_key_default_address_index");
+    val expectedIndex = supp.getAsU8Array("unified_full_viewing_key_default_address_index");
 
     assert(defaultAddress.address.encode(params) == expectedAddress)
     assert(defaultAddress.diversifierIndex.toBytes() == expectedIndex)

@@ -16,7 +16,10 @@ impl ZcashMemoBytes {
     /// case is [`MemoBytes::empty`], which uses a specific encoding to indicate that no
     /// memo is present.
     pub fn new(data: &[u8]) -> ZcashResult<Self> {
-        let memo = MemoBytes::from_bytes(data).map_err(|_| ZcashError::Unknown)?;
+        let memo = MemoBytes::from_bytes(data).map_err(|_| ZcashError::ArrayLengthMismatch {
+            expected: 512,
+            got: data.len() as u64,
+        })?;
 
         Ok(ZcashMemoBytes(memo))
     }

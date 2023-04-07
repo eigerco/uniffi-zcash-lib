@@ -28,7 +28,7 @@ impl TestSupport {
         Self { map }
     }
 
-    pub fn get_as_byte_array(&self, key: &str) -> Vec<u8> {
+    pub fn get_as_u8_array(&self, key: &str) -> Vec<u8> {
         let arr_str = &self.map[key];
         serde_json::from_str::<Vec<u8>>(arr_str).unwrap()
     }

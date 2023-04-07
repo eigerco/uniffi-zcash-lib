@@ -9,7 +9,7 @@ fun testSecpFromSlice() {
 testSecpFromSlice()
 
 fun testSecpSecretKey() {
-	val expectedBytes = supp.getAsByteArray("secp_secret_key")
+	val expectedBytes = supp.getAsU8Array("secp_secret_key")
 	val ssk = SecpSecretKey(expectedBytes)
 
 	assert(ssk.serializeSecret() == expectedBytes)

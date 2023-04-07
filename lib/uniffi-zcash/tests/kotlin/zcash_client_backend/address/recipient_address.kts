@@ -1,4 +1,26 @@
 import uniffi.zcash.*
 
-// TODO no way to construct this unless you
-// already have a string address
+fun testRecipientAddressShielded() {
+    // todo
+}
+testRecipientAddressShielded()
+
+fun testRecipientAddressTransparent() {
+    // todo
+}
+testRecipientAddressTransparent()
+
+fun testRecipientAddressUnified() {
+    // todo
+}
+testRecipientAddressUnified()
+
+fun testRecipientAddressDecode() {
+    // todo
+}
+testRecipientAddressUnified()
+
+fun testRecipientAddressEncode() {
+    // todo
+}
+testRecipientAddressUnified()

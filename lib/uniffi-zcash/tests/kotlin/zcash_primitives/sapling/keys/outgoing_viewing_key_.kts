@@ -3,7 +3,7 @@ import uniffi.zcash.*
 val supp = TestSupport.fromCsvFile()
 
 fun testOutgoingViewingKeyFromBytes() {
-	val expectedBytes = supp.getAsByteArray("sapling_outgoing_viewing_key")
+	val expectedBytes = supp.getAsU8Array("sapling_outgoing_viewing_key")
 	val ovk = ZcashOutgoingViewingKey.fromBytes(expectedBytes)
 
 	assert(ovk.toBytes() == expectedBytes)
@@ -20,7 +20,7 @@ fun testSaplingOvkToBytes() {
         ZcashAccountId(0u),
     )
 
-    val expectedBytes = supp.getAsByteArray("sapling_outgoing_viewing_key")
+    val expectedBytes = supp.getAsU8Array("sapling_outgoing_viewing_key")
 
     val ovkBytes = unifiedSpendingKey.toUnifiedFullViewingKey()
         .sapling()!!.toOvk(ZcashScope.EXTERNAL).toBytes()

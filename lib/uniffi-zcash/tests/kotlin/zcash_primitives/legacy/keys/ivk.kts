@@ -3,7 +3,7 @@ import uniffi.zcash.*
 val supp = TestSupport.fromCsvFile()
 
 fun testExternalIvkDefaultAddress() {
-    val ppkBytes = supp.getAsByteArray("account_public_key")
+    val ppkBytes = supp.getAsU8Array("account_public_key")
 
 	val ppk = ZcashAccountPubKey(ppkBytes)
 
@@ -25,7 +25,7 @@ fun testExternalIvkToBytes() {
 testExternalIvkToBytes()
 
 fun testExternalIvkFromBytes() {
-    val ppkBytes = supp.getAsByteArray("account_public_key")
+    val ppkBytes = supp.getAsU8Array("account_public_key")
 
 	val ppk = ZcashAccountPubKey(ppkBytes)
 
@@ -36,7 +36,7 @@ fun testExternalIvkFromBytes() {
 testExternalIvkFromBytes()
 
 fun testInternalIvkDefaultAddress() {
-    val ppkBytes = supp.getAsByteArray("account_public_key")
+    val ppkBytes = supp.getAsU8Array("account_public_key")
 
 	val ppk = ZcashAccountPubKey(ppkBytes)
 
@@ -58,7 +58,7 @@ fun testInternalIvkToBytes() {
 testInternalIvkToBytes()
 
 fun testInternalIvkFromBytes() {
-    val ppkBytes = supp.getAsByteArray("account_public_key")
+    val ppkBytes = supp.getAsU8Array("account_public_key")
 
 	val ppk = ZcashAccountPubKey(ppkBytes)
 

@@ -4,7 +4,7 @@ use hdwallet::ExtendedPrivKey;
 use zcash_client_backend::encoding;
 use zcash_primitives::{
     consensus::MainNetwork,
-    legacy::keys::{AccountPrivKey, IncomingViewingKey},
+    legacy::keys::{AccountPrivKey, IncomingViewingKey}, memo::MemoBytes,
 };
 
 use super::format_bytes;
@@ -42,6 +42,18 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 
     writeln!(file, "t_address_public_key:tm9iMLAuYMzJ6jtFLcA7rzUmfreGuKvr7Ma").unwrap();
     writeln!(file, "t_address_script:t26YoyZ1iPgiMEWL4zGUm74eVWfhyDMXzY2").unwrap();
+
+    let memo_bytes = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    writeln!(file, "{}", format_bytes("memo_bytes", &memo_bytes)).unwrap();
+
+    let memo_bytes = MemoBytes::from_bytes(&memo_bytes).unwrap();
+    writeln!(file, "{}", format_bytes("memo_data", memo_bytes.as_slice())).unwrap();
+
+    let memo_bytes_too_long = [0; 520];
+    writeln!(file, "{}", format_bytes("memo_bytes_too_long", &memo_bytes_too_long)).unwrap();
+
+    let memo_empty = MemoBytes::empty();
+    writeln!(file, "{}", format_bytes("memo_empty", &memo_empty.as_slice())).unwrap();
     /*
     let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
     let ppk = apk.to_account_pubkey();

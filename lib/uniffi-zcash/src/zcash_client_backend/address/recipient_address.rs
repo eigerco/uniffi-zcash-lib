@@ -48,15 +48,15 @@ impl From<ZcashRecipientAddress> for RecipientAddress {
 }
 
 impl ZcashRecipientAddress {
-    pub fn shielded(addr: Arc<crate::ZcashPaymentAddress>) -> Self {
+    pub fn shielded(addr: Arc<ZcashPaymentAddress>) -> Self {
         ZcashRecipientAddress::Shielded(addr)
     }
 
-    pub fn transparent(addr: Arc<crate::ZcashTransparentAddress>) -> Self {
+    pub fn transparent(addr: Arc<ZcashTransparentAddress>) -> Self {
         ZcashRecipientAddress::Transparent(addr)
     }
 
-    pub fn unified(addr: Arc<crate::ZcashUnifiedAddress>) -> Self {
+    pub fn unified(addr: Arc<ZcashUnifiedAddress>) -> Self {
         ZcashRecipientAddress::Unified(addr)
     }
 

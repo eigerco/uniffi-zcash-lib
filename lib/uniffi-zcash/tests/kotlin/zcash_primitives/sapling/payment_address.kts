@@ -3,7 +3,7 @@ import uniffi.zcash.*
 val supp = TestSupport.fromCsvFile()
 
 fun testSaplingPaymentAddressParsing() {
-    val seed = supp.getAsByteArray("seed")
+    val seed = supp.getAsU8Array("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -24,7 +24,7 @@ fun testSaplingPaymentAddressParsing() {
 testSaplingPaymentAddressParsing()
 
 fun testSaplingIvkToPaymentAddress() {
-    val seed = supp.getAsByteArray("seed")
+    val seed = supp.getAsU8Array("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -34,7 +34,7 @@ fun testSaplingIvkToPaymentAddress() {
 
     val saplingDiversifier = ZcashDiversifier(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
 
-    val expected = supp.getAsByteArray("sapling_address")
+    val expected = supp.getAsU8Array("sapling_address")
 
     val paymentAddress = unifiedSpendingKey.toUnifiedFullViewingKey()
         .sapling()!!.toIvk(ZcashScope.EXTERNAL)

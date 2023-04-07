@@ -3,7 +3,7 @@ import uniffi.zcash.*
 val supp = TestSupport.fromCsvFile()
 
 fun testOrchardIncomingViewingKeyToBytes() {
-    val bytes = supp.getAsByteArray("orchard_full_viewing_key_ivk");
+    val bytes = supp.getAsU8Array("orchard_full_viewing_key_ivk");
 
     val key = ZcashOrchardIncomingViewingKey.fromBytes(bytes)
 
@@ -17,7 +17,7 @@ fun testOrchardIncomingViewingKeyFromBytes() {
 testOrchardIncomingViewingKeyFromBytes()
 
 fun testOrchardIncomingViewingKeyDiversifierIndex() {
-    val bytes = supp.getAsByteArray("orchard_full_viewing_key_ivk");
+    val bytes = supp.getAsU8Array("orchard_full_viewing_key_ivk");
 
     val key = ZcashOrchardIncomingViewingKey.fromBytes(bytes)
 
@@ -30,7 +30,7 @@ fun testOrchardIncomingViewingKeyDiversifierIndex() {
 testOrchardIncomingViewingKeyDiversifierIndex()
 
 fun testOrchardIncomingViewingKeyAddressAt() {
-    val bytes = supp.getAsByteArray("orchard_full_viewing_key_ivk");
+    val bytes = supp.getAsU8Array("orchard_full_viewing_key_ivk");
 
     val key = ZcashOrchardIncomingViewingKey.fromBytes(bytes)
 
@@ -38,22 +38,22 @@ fun testOrchardIncomingViewingKeyAddressAt() {
 
     val address = key.addressAt(index)
 
-    val expected = supp.getAsByteArray("orchard_incoming_viewing_key_address_at")
+    val expected = supp.getAsU8Array("orchard_incoming_viewing_key_address_at")
 
     assert(address.toRawAddressBytes() == expected)
 }
 testOrchardIncomingViewingKeyAddressAt()
 
 fun testOrchardIncomingViewingKeyAddress() {
-    val bytes = supp.getAsByteArray("orchard_full_viewing_key_ivk");
+    val bytes = supp.getAsU8Array("orchard_full_viewing_key_ivk");
 
     val key = ZcashOrchardIncomingViewingKey.fromBytes(bytes)
 
-	val zod = ZcashOrchardDiversifier.fromBytes(supp.getAsByteArray("orchard_diversifier"))
+	val zod = ZcashOrchardDiversifier.fromBytes(supp.getAsU8Array("orchard_diversifier"))
 
     val address = key.address(zod)
 
-    val expected = supp.getAsByteArray("orchard_incoming_viewing_key_address")
+    val expected = supp.getAsU8Array("orchard_incoming_viewing_key_address")
 
     assert(address.toRawAddressBytes() == expected)
 }

@@ -3,7 +3,7 @@ import uniffi.zcash.*
 val supp = TestSupport.fromCsvFile()
 
 fun testUnifiedAddressParsing() {
-    val seed = supp.getAsByteArray("seed")
+    val seed = supp.getAsU8Array("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -21,7 +21,7 @@ fun testUnifiedAddressParsing() {
     }
     assert(thrown)
 
-    val diversifierBytes = supp.getAsByteArray("diversifier")
+    val diversifierBytes = supp.getAsU8Array("diversifier")
 
     val saplingDiversifier = ZcashDiversifier(diversifierBytes)
 
@@ -35,7 +35,7 @@ fun testUnifiedAddressParsing() {
         .orchard()!!.toIvk(ZcashOrchardScope.EXTERNAL)
         .address(orchardDiversifier)
 
-    val transparentAddressPublicKey = supp.getAsByteArray("transparent_address_public_key")
+    val transparentAddressPublicKey = supp.getAsU8Array("transparent_address_public_key")
 
     val transparent = ZcashTransparentAddress.publicKey(transparentAddressPublicKey)
 
@@ -48,7 +48,7 @@ fun testUnifiedAddressParsing() {
 testUnifiedAddressParsing()
 
 fun testUnifiedAddressCreationWithSapling() {
-    val seed = supp.getAsByteArray("seed")
+    val seed = supp.getAsU8Array("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -56,7 +56,7 @@ fun testUnifiedAddressCreationWithSapling() {
         ZcashAccountId(0u),
     )
 
-    val diversifierBytes = supp.getAsByteArray("diversifier")
+    val diversifierBytes = supp.getAsU8Array("diversifier")
 
     val saplingDiversifier = ZcashDiversifier(diversifierBytes)
 
@@ -72,7 +72,7 @@ fun testUnifiedAddressCreationWithSapling() {
 testUnifiedAddressCreationWithSapling()
 
 fun testUnifiedAddressCreation() {
-    val seed = supp.getAsByteArray("seed")
+    val seed = supp.getAsU8Array("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -80,7 +80,7 @@ fun testUnifiedAddressCreation() {
         ZcashAccountId(0u),
     )
 
-    val diversifierBytes = supp.getAsByteArray("diversifier")
+    val diversifierBytes = supp.getAsU8Array("diversifier")
 
     val saplingDiversifier = ZcashDiversifier(diversifierBytes)
 
@@ -94,7 +94,7 @@ fun testUnifiedAddressCreation() {
         .orchard()!!.toIvk(ZcashOrchardScope.EXTERNAL)
         .address(orchardDiversifier)
 
-    val transparentAddressPublicKey = supp.getAsByteArray("transparent_address_public_key")
+    val transparentAddressPublicKey = supp.getAsU8Array("transparent_address_public_key")
 
     val transparent = ZcashTransparentAddress.publicKey(transparentAddressPublicKey)
 
@@ -111,7 +111,7 @@ fun testUnifiedAddressCreation() {
 testUnifiedAddressCreation()
 
 fun testUnifiedAddressCreationWithOrchard() {
-    val seed = supp.getAsByteArray("seed")
+    val seed = supp.getAsU8Array("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -119,7 +119,7 @@ fun testUnifiedAddressCreationWithOrchard() {
         ZcashAccountId(0u),
     )
 
-    val diversifierBytes = supp.getAsByteArray("diversifier")
+    val diversifierBytes = supp.getAsU8Array("diversifier")
 
     val orchardDiversifier = ZcashOrchardDiversifier.fromBytes(diversifierBytes)
 

@@ -3,7 +3,7 @@ import uniffi.zcash.*
 val supp = TestSupport.fromCsvFile()
 
 fun testOrchardAddressFromRawAddressBytes() {
-	val rawBytes = supp.getAsByteArray("orchard_address")
+	val rawBytes = supp.getAsU8Array("orchard_address")
 	val zoa = ZcashOrchardAddress.fromRawAddressBytes(rawBytes)
 
 	assert(zoa.toRawAddressBytes() == rawBytes)
@@ -11,8 +11,8 @@ fun testOrchardAddressFromRawAddressBytes() {
 testOrchardAddressFromRawAddressBytes()
 
 fun testOrchardAddressDiversifier() {
-	val rawBytes = supp.getAsByteArray("orchard_address")
-	val expectedBytes = supp.getAsByteArray("orchard_diversifier")
+	val rawBytes = supp.getAsU8Array("orchard_address")
+	val expectedBytes = supp.getAsU8Array("orchard_diversifier")
 	val zoa = ZcashOrchardAddress.fromRawAddressBytes(rawBytes)
 	val diver = zoa.diversifier().toBytes()
 
@@ -21,7 +21,7 @@ fun testOrchardAddressDiversifier() {
 testOrchardAddressDiversifier()
 
 fun testOrchardIvkToPaymentAddress() {
-	val seed = supp.getAsByteArray("seed")
+	val seed = supp.getAsU8Array("seed")
 
     val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
         ZcashConsensusParameters.MAIN_NETWORK,
@@ -31,7 +31,7 @@ fun testOrchardIvkToPaymentAddress() {
 
     val orchardDiversifier = ZcashOrchardDiversifier.fromBytes(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
 
-    val expectedBytes = supp.getAsByteArray("orchard_address")
+    val expectedBytes = supp.getAsU8Array("orchard_address")
 
     val rawAddressBytes = unifiedSpendingKey.toUnifiedFullViewingKey()
         .orchard()!!.toIvk(ZcashOrchardScope.EXTERNAL)
