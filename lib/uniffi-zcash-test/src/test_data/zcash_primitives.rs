@@ -1,10 +1,11 @@
 use std::io::Write;
 
+use group::GroupEncoding;
 use hdwallet::ExtendedPrivKey;
 use zcash_client_backend::encoding;
 use zcash_primitives::{
     consensus::MainNetwork,
-    legacy::keys::{AccountPrivKey, IncomingViewingKey}, memo::MemoBytes,
+    legacy::keys::{AccountPrivKey, IncomingViewingKey}, memo::MemoBytes, zip32::{ExtendedSpendingKey, Scope}, sapling::Diversifier,
 };
 
 use super::format_bytes;
@@ -54,6 +55,55 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 
     let memo_empty = MemoBytes::empty();
     writeln!(file, "{}", format_bytes("memo_empty", &memo_empty.as_slice())).unwrap();
+
+    let extended_spending_key = ExtendedSpendingKey::master(seed);
+    let diversifiable_fvk = extended_spending_key.to_diversifiable_full_viewing_key();
+    let diversifiable_fvk_fvk = diversifiable_fvk.fvk().to_bytes();
+    writeln!(file, "{}", format_bytes("diversifiable_fvk_fvk", &diversifiable_fvk_fvk)).unwrap();
+
+    let diversifiable_fvk_nk = diversifiable_fvk.to_nk(Scope::External).0.to_bytes();
+    writeln!(file, "{}", format_bytes("diversifiable_fvk_nk", &diversifiable_fvk_nk)).unwrap();
+
+    let diversifiable_fvk_ivk = diversifiable_fvk.to_ivk(Scope::External).to_repr();
+    writeln!(file, "{}", format_bytes("diversifiable_fvk_ivk", &diversifiable_fvk_ivk)).unwrap();
+
+    let diversifiable_fvk_ovk = diversifiable_fvk.to_ovk(Scope::External).0;
+    writeln!(file, "{}", format_bytes("diversifiable_fvk_ovk", &diversifiable_fvk_ovk)).unwrap();
+
+    let diversifiable_fvk_address = encoding::encode_payment_address_p(&MainNetwork, &diversifiable_fvk.address(1u32.into()).unwrap());
+    writeln!(file, "diversifiable_fvk_address:{}", &diversifiable_fvk_address).unwrap();
+
+    let (dfvk_find_address_index, dfvk_find_address_address)  = diversifiable_fvk.find_address(1u32.into()).unwrap();
+    writeln!(file, "{}", format_bytes("dfvk_find_address_index", &dfvk_find_address_index.0)).unwrap();
+
+    let dfvk_find_address_address = encoding::encode_payment_address_p(&MainNetwork, &dfvk_find_address_address);
+    writeln!(file, "dfvk_find_address_address:{}", &dfvk_find_address_address).unwrap();
+
+    let (dfvk_default_address_index, dfvk_default_address_address)  = diversifiable_fvk.default_address();
+    writeln!(file, "{}", format_bytes("dfvk_default_address_index", &dfvk_default_address_index.0)).unwrap();
+
+    let dfvk_default_address_address = encoding::encode_payment_address_p(&MainNetwork, &dfvk_default_address_address);
+    writeln!(file, "dfvk_default_address_address:{}", &dfvk_default_address_address).unwrap();
+
+    let diversifier = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    let dfvk_diversified_address = diversifiable_fvk.diversified_address(Diversifier(diversifier)).unwrap();
+    let dfvk_diversified_address = encoding::encode_payment_address_p(&MainNetwork, &dfvk_diversified_address);
+    writeln!(file, "dfvk_diversified_address:{}", &dfvk_diversified_address).unwrap();
+
+    let (dfvk_change_address_index, dfvk_change_address_address) = diversifiable_fvk.change_address();
+    writeln!(file, "{}", format_bytes("dfvk_change_address_index", &dfvk_change_address_index.0)).unwrap();
+
+    let dfvk_change_address_address = encoding::encode_payment_address_p(&MainNetwork, &dfvk_change_address_address);
+    writeln!(file, "dfvk_change_address_address:{}", &dfvk_change_address_address).unwrap();
+
+    let dfvk_diversified_change_address = diversifiable_fvk.diversified_change_address(Diversifier(diversifier)).unwrap();
+    let dfvk_diversified_change_address = encoding::encode_payment_address_p(&MainNetwork, &dfvk_diversified_change_address);
+    writeln!(file, "dfvk_diversified_change_address:{}", &dfvk_diversified_change_address).unwrap();
+
+    let address = diversifiable_fvk.default_address().1;
+    let (dfvk_decrypt_diversifier, scope) = diversifiable_fvk.decrypt_diversifier(&address).unwrap();
+    writeln!(file, "{}", format_bytes("dfvk_decrypt_diversifier", &dfvk_decrypt_diversifier.0)).unwrap();
+    assert_eq!(scope, Scope::External)
     /*
     let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
     let ppk = apk.to_account_pubkey();
@@ -69,9 +119,6 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 
 
 
-    let sapling_fvk_from_expsk = FullViewingKey::from_expanded_spending_key(&expanded_sk);
-
-    let sapling_fvk = diversifiable_fvk.fvk();
 
 
 
