@@ -145,5 +145,39 @@ class TransactionBuilderTest(unittest.TestCase):
         # This asserts the size, as its deterministic.
         self.assertEqual(len(result.transaction.to_bytes()), 2377)
 
+class OrchardTransactionBuilderTest(unittest.TestCase):
+     def test_transaction_generation(self):
+        key_seed = [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        
+        key = ZcashUnifiedSpendingKey.from_seed(
+            ZcashConsensusParameters.MAIN_NETWORK,
+            key_seed,
+            ZcashAccountId(0))
+
+        ufvk = key.to_unified_full_viewing_key()
+        fvk = ufvk.orchard()
+        ovk = fvk.to_ovk(ZcashOrchardScope.EXTERNAL)
+        address = fvk.to_ivk(ZcashOrchardScope.INTERNAL).address(ZcashOrchardDiversifier.from_bytes([0] * 11))
+        
+        ## Note construction
+        note_value = ZcashOrchardNoteValue.from_raw(15)
+        nullifier = ZcashOrchardNullifier.from_bytes([0] * 32)
+        rseed = ZcashOrchardRandomSeed.from_bytes([0] * 32, nullifier)
+        note = ZcashOrchardNote.from_parts(address, note_value, nullifier, rseed)
+
+        auth_path = [ZcashOrchardMerkleHash.from_bytes([0] * 32)] * 32
+        merkle_path = ZcashOrchardMerklePath.from_parts(0, auth_path)
+
+
+        anchor = merkle_path.root(note.commitment().to_extracted_note_commitment())
+    
+        builder = ZcashOrchardTransactionBuilder(ZcashConsensusParameters.MAIN_NETWORK, ZcashBlockHeight(2030820), ZcashBlockHeight(2030820+100), anchor)
+        builder.add_spend(fvk, note, merkle_path)
+        builder.add_output(ovk, address, 15, None)
+
+        transaction = builder.build([key.orchard()], [0]*32)
+        
+        self.assertEqual(len(transaction.to_bytes()), 9165)
+
 if __name__ == '__main__':
     unittest.main()

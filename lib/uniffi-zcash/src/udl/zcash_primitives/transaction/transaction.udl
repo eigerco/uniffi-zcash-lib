@@ -55,3 +55,32 @@ dictionary ZcashTransactionAndSaplingMetadata {
     ZcashTransaction transaction;
     ZcashSaplingMetadata sapling_metadata;
 };
+
+interface ZcashOrchardTransactionBuilder {
+    constructor(
+        ZcashConsensusParameters parameters, 
+        ZcashBlockHeight target_height, 
+        ZcashBlockHeight expiry_height,
+        ZcashAnchor anchor
+    );
+
+    void add_spend(
+       ZcashOrchardFullViewingKey fvk,
+       ZcashOrchardNote note,
+       ZcashOrchardMerklePath merkle_path
+    );
+    
+    [Throws=ZcashError]
+    void add_output(
+        ZcashOrchardOutgoingViewingKey ovk,
+        ZcashOrchardAddress recipient,
+        u64 value,
+        sequence<u8>? memo
+    );
+
+    [Throws=ZcashError]
+    ZcashTransaction build(
+       sequence<ZcashOrchardSpendingKey> keys,
+       sequence<u8> sighash
+    );
+};

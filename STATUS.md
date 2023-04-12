@@ -515,6 +515,17 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashTransactionBuilder::build()                  | 🔴     |  ✅ | ✅   |  ✅   | ✅   |
 | ZcashTransactionBuilder::build_zfuture()          | 🔵     |     |      |       |      |
 
+### ZcashOrchardTransactionBuilder
+
+* This type comes from pure invention. Its a wrapper builder that wraps the original [orchard::builder::Builder](https://docs.rs/orchard/0.3.0/orchard/builder/struct.Builder.html)
+
+| Members                                                  | Score | UDL | Code | Tests | Docs |
+| -------------------------------------------------------- | ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardTransactionBuilder::new()                    |   🔴  | ✅  | ✅   | ✅    |  ✅  |
+| ZcashOrchardTransactionBuilder::add_spend()              |   🔴  | ✅  | ✅   | ✅    |  ✅  |
+| ZcashOrchardTransactionBuilder::add_output()             |   🔴  | ✅  | ✅   | ✅    |  ✅  |
+| ZcashOrchardTransactionBuilder::build()                  |   🔴  | ✅  | ✅   | ✅    |  ✅  |
+
 ### ZcashTransaction
 * Original type: [zcash_primitives::transaction::Transaction](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/struct.Transaction.html)
 * `write` method was implemented as `to_bytes()`.
