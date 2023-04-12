@@ -784,6 +784,24 @@ a tuple.
 | ZcashOrchardRandomSeed::from_bytes()      | 🔴    |  ✅ |  ✅  |   ✅  |  ✅   |
 | ZcashOrchardRandomSeed::to_bytes()        | 🔴    |  ✅ |  ✅  |       |  ✅   |
 
+### ZcashOrchardMerklePath
+
+* Original type: [orchard::tree::MerklePath](https://docs.rs/orchard/0.3.0/orchard/tree/struct.MerklePath.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardMerklePath::from_parts()| 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
+| ZcashOrchardMerklePath::root()      | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
+
+### ZcashOrchardMerkleHash
+
+* Original type: [orchard::tree::MerkleHashOrchard](https://docs.rs/orchard/0.3.0/orchard/tree/struct.MerkleHashOrchard.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardMerkleHash::from_cmx()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardMerkleHash::to_bytes()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardMerkleHash::from_bytes()| 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
 
 ## Enums
 
