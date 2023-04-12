@@ -14,6 +14,7 @@ enum ZcashError {
   "BuilderError",
   "TransparentBuilderError",
   "SaplingBuilderError",
+  "OrchardBuilderError",
   "InsufficientFundsError",
   "ChangeRequiredError",
   "IOError",

@@ -60,6 +60,11 @@ pub enum ZcashError {
         error: transaction::components::sapling::builder::Error,
     },
 
+    #[error("Orchard builder error occurred: {error:?}")]
+    OrchardBuilderError {
+        error: orchard::builder::Error,
+    },
+
     #[error("Insufficient founds error: {amount}")]
     InsufficientFundsError { amount: u64 },
 
@@ -178,6 +183,12 @@ impl From<transaction::components::transparent::builder::Error> for ZcashError {
 impl From<transaction::components::sapling::builder::Error> for ZcashError {
     fn from(error: transaction::components::sapling::builder::Error) -> Self {
         ZcashError::SaplingBuilderError { error }
+    }
+}
+
+impl From<orchard::builder::Error> for ZcashError {
+    fn from(error: orchard::builder::Error) -> Self {
+        ZcashError::OrchardBuilderError { error }
     }
 }
 
