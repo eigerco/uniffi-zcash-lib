@@ -197,7 +197,8 @@ We use a single `ZcashError` encompassing following errors:
 * Original type: [zcash_client_backend::address::UnifiedAddress](https://docs.rs/zcash_client_backend/latest/zcash_client_backend/address/struct.UnifiedAddress.html)
 
 | Object/Method name                                                                        |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
-| ----------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| -------------mod value;
+pub use self::value::*;---------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
 | ZcashUnifiedAddress::new()                                                                | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashUnifiedAddress::orchard() -> [ZcashOrchardAddress](#zcashorchardaddress)             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashUnifiedAddress::sapling()-> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)      | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
@@ -472,26 +473,8 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashOrchardAddress::from_raw_address_bytes()                                                       |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashOrchardDiversifierIndex
-
-* Original type: [orchard::keys::DiversifierIndex](https://docs.rs/orchard/0.3.0/orchard/keys/struct.DiversifierIndex.html)
-
-| Object/Method name                                     | Score        | UDL                | Code               | Tests              | Docs               |
-| ------------------------------------------------------ | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| ZcashOrchardDiversifierIndex::from_bytes()             |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardDiversifierIndex::from_u32()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardDiversifierIndex::from_u64()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardDiversifierIndex::to_bytes()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-
-### ZcashDiversifierIndex
-
-* Original type: [zcash_primitives::zip32::DiversifierIndex](https://docs.rs/zcash_primitives/latest/zcash_primitives/zip32/struct.DiversifierIndex.html)
-
-| Object/Method name                              | Score        | UDL                | Code               | Tests              | Docs               |
-| ----------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| ZcashDiversifierIndex::new()                    |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashDiversifierIndex::from_u32()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashDiversifierIndex::from_u64()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashDiversifierIndex::increment()              |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+/// The non-negative value of an individual Orchard note.
+ | :white_check_mark: |
 | ZcashDiversifierIndex::to_u32()                 |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | ZcashDiversifierIndex::to_bytes()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
@@ -539,23 +522,8 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | Members                              | Score | UDL | Code | Tests | Docs |
 | -------------------------------------| ----- | --- | ---- | ----- | ---- |
 | ZcashTransaction::into_data()        | 🔴    |     |      |       |      |
-| ZcashTransaction::txid()             | 🔴    |     |      |       |      |
-| ZcashTransaction::read()             | 🔴    |     |      |       |      |
-| ZcashTransaction::write()            | 🔴    | ✅  |  ✅  |  ✅   | ✅   |
-| ZcashTransaction::write_v4()         |       |     |      |       |      |
-| ZcashTransaction::write_transparent()|       |     |      |       |      |
-| ZcashTransaction::write_v5()         |       |     |      |       |      |
-| ZcashTransaction::write_v5_header()  |       |     |      |       |      |
-| ZcashTransaction::write_v5_sapling() |       |     |      |       |      |
-| ZcashTransaction::write_tze()        |       |     |      |       |      |
-| ZcashTransaction::auth_commitment()  |       |     |      |       |      |
+| ZcashTransaction::txid()             | 🔴    |     |      |       |      |/// The non-negative value of an individual Orchard note.
 
-### ZcashSaplingMetadata
-* Original type: [zcash_primitives::transaction::components::sapling::builder::SaplingMetadata](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/components/sapling/builder/struct.SaplingMetadata.html)
-
-| Members                              | Score | UDL | Code | Tests | Docs |
-| -------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashSaplingMetadata::empty()        | 🔴    | ✅  |  ✅  |       | ✅   |
 | ZcashSaplingMetadata::spend_index()  | 🔴    | ✅  |  ✅  |       | ✅   |
 | ZcashSaplingMetadata::output_index() | 🔴    | ✅  |  ✅  |       | ✅   |
 ### ZcashParametersMainNetwork
@@ -750,6 +718,15 @@ A dictionary that holds an [ZcashSaplingNode](#ZcashSaplingNode) and a boolean.
 This is used in [ZcashSaplingMerklePath](#ZcashSaplingMerklePath)::auth_path() method
 for returning a Vec<ZcashAuthPath>, trying to mimic the original method, which returns
 a tuple.
+
+### ZcashOrchardNoteValue
+
+* Original type: [orchard::value::NoteValue](https://docs.rs/orchard/0.3.0/orchard/value/struct.NoteValue.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardNoteValue::from_raw()   | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
+| ZcashOrchardNoteValue::inner()      |       |     |      |       |      |
 
 ## Enums
 

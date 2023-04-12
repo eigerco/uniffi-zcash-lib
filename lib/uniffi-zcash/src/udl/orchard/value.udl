@@ -1,0 +1,4 @@
+interface ZcashOrchardNoteValue {
+    [Name=from_raw]
+    constructor(u64 value);
+};
