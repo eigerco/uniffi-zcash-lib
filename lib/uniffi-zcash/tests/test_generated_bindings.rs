@@ -25,8 +25,8 @@ uniffi::build_foreign_language_testcases!(
     "tests/kotlin/zcash_primitives/sapling/keys/diversifiable_full_viewing_key.kts", */
 
     "tests/kotlin/zcash_primitives/sapling/keys/expanded_spending_key.kts",
-    /* "tests/kotlin/zcash_primitives/sapling/keys/extended_full_viewing_key.kts",
-    "tests/kotlin/zcash_primitives/sapling/keys/full_viewing_key_.kts",
+    "tests/kotlin/zcash_primitives/sapling/keys/extended_full_viewing_key.kts",
+    /* "tests/kotlin/zcash_primitives/sapling/keys/full_viewing_key_.kts",
     "tests/kotlin/zcash_primitives/sapling/keys/outgoing_viewing_key_.kts",
     "tests/kotlin/zcash_primitives/sapling/keys/proof_generation_key.kts",
     "tests/kotlin/zcash_primitives/sapling/keys/viewing_key.kts",

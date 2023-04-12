@@ -11,6 +11,11 @@ fun testExtendedFullViewingKeyFromBytes() {
 }
 testExtendedFullViewingKeyFromBytes()
 
+fun testExtendedFullViewingKeyToBytes() {
+    // covered by testExtendedFullViewingKeyToBytes()
+}
+testExtendedFullViewingKeyToBytes()
+
 fun testExtendedFullViewingKeyEncodeAndDecode() {
 	val network = ZcashConsensusParameters.MAIN_NETWORK
 
@@ -27,7 +32,7 @@ fun testExtendedFullViewingKeyDeriveChild() {
 
 	val key = ZcashExtendedFullViewingKey.fromBytes(fvkBytes)
 
-	val index = ZcashChildIndex.Hardened(32u)
+	val index = ZcashChildIndex.NonHardened(32u)
 
 	val efvkChild = key.deriveChild(index)
 
@@ -44,11 +49,11 @@ fun testExtendedFullViewingKeyAddress() {
 
 	val divIdx = ZcashDiversifierIndex.fromU32(4u)
 
-	val paymentAddress = key.address(divIdx)
+	val paymentAddress = key.address(divIdx)!!
 
 	val fvkAddressBytes = supp.getAsU8Array("extended_fvk_address")
 
-	assert(paymentAddress!.toBytes() == fvkAddressBytes)
+	assert(paymentAddress.toBytes() == fvkAddressBytes)
 }
 testExtendedFullViewingKeyAddress()
 
@@ -59,13 +64,13 @@ fun testExtendedFullViewingKeyFindAddress() {
 
 	val divIdx = ZcashDiversifierIndex.fromU32(0u)
 
-	val paymentAddress = key.findAddress(divIdx)
+	val paymentAddress = key.findAddress(divIdx)!!
 
     val expectedIndexBytes = supp.getAsU8Array("extended_fvk_find_address_index")
-	val expectedAddressBytes = supp.getAsU8Array("extended_fvk_find_address_bytes")
+	val expectedAddressBytes = supp.getAsU8Array("extended_fvk_find_address_address")
 
-    assert(paymentAddress!.diversifierIndex.toBytes() == expectedIndexBytes)
-	assert(paymentAddress!.address.toBytes() == expectedAddressBytes)
+    assert(paymentAddress.diversifierIndex.toBytes() == expectedIndexBytes)
+	assert(paymentAddress.address.toBytes() == expectedAddressBytes)
 }
 testExtendedFullViewingKeyFindAddress()
 
@@ -76,9 +81,11 @@ fun testExtendedFullViewingKeyDefaultAddress() {
 
 	val paymentAddress = key.defaultAddress()
 
-	val fvkChildBytes = supp.getAsU8Array("extended_fvk_default_address")
+	val index = supp.getAsU8Array("extended_fvk_default_address_index")
+    val address = supp.getAsU8Array("extended_fvk_default_address_address")
 
-	assert(paymentAddress.toBytes() == paymentAddress)
+	assert(paymentAddress.diversifierIndex.toBytes() == index)
+    assert(paymentAddress.address.toBytes() == address)
 }
 testExtendedFullViewingKeyDefaultAddress()
 

@@ -1,11 +1,11 @@
-use std::io::Write;
+use std::{io::Write, vec};
 
 use group::GroupEncoding;
 use hdwallet::ExtendedPrivKey;
 use zcash_client_backend::encoding;
 use zcash_primitives::{
-    consensus::MainNetwork,
-    legacy::keys::{AccountPrivKey, IncomingViewingKey}, memo::MemoBytes, zip32::{ExtendedSpendingKey, Scope}, sapling::{Diversifier, keys::ExpandedSpendingKey},
+    consensus::{MainNetwork, Parameters},
+    legacy::keys::{AccountPrivKey, IncomingViewingKey}, memo::MemoBytes, zip32::{ExtendedSpendingKey, Scope, ChildIndex}, sapling::{Diversifier, keys::ExpandedSpendingKey},
 };
 
 use super::format_bytes;
@@ -108,7 +108,42 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
     let expanded_sk = ExpandedSpendingKey::from_spending_key(&extended_spending_key.to_bytes());
     writeln!(file, "{}", format_bytes("expanded_spending_key", &expanded_sk.to_bytes())).unwrap();
 
-    expanded_sk.proof_generation_key();
+    #[allow(deprecated)]
+    let sapling_fvk = extended_spending_key.to_extended_full_viewing_key();
+
+    let mut sapling_fvk_bytes = vec![];
+    sapling_fvk.write(&mut sapling_fvk_bytes).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk", &sapling_fvk_bytes)).unwrap();
+
+    let sapling_fvk_encoded = encoding::encode_extended_full_viewing_key(
+        MainNetwork.hrp_sapling_extended_full_viewing_key(),
+        &sapling_fvk,
+    );
+    writeln!(file, "extended_fvk_encoded:{sapling_fvk_encoded}").unwrap();
+
+    let child = sapling_fvk.derive_child(ChildIndex::from_index(32)).unwrap();
+    let mut child_bytes = vec![];
+    child.write(&mut child_bytes).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_child", &child_bytes)).unwrap();
+
+    let address = sapling_fvk.address(4u32.into()).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_address", &address.to_bytes())).unwrap();
+
+    let (index, address) = sapling_fvk.find_address(0u32.into()).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_find_address_index", &index.0)).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_find_address_address", &address.to_bytes())).unwrap();
+
+    let (index, address) = sapling_fvk.default_address();
+    writeln!(file, "{}", format_bytes("extended_fvk_default_address_index", &index.0)).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_default_address_address", &address.to_bytes())).unwrap();
+
+    let mut derived_bytes = vec![];
+    sapling_fvk.derive_internal().write(&mut derived_bytes).unwrap();
+    writeln!(file, "{}", format_bytes("extended_fvk_derive_internal", &derived_bytes)).unwrap();
+
+    writeln!(file, "{}", format_bytes("extended_fvk_diversifiable_fvk", &sapling_fvk.to_diversifiable_full_viewing_key().to_bytes())).unwrap();
+
+
     /*
     let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
     let ppk = apk.to_account_pubkey();
@@ -144,14 +179,7 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
     writeln!(file, "{}", format_bytes("sapling_full_viewing_key_vk_nk", &sapling_fvk_from_expsk.vk.nk.0.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("sapling_full_viewing_key_ovk", &sapling_fvk_from_expsk.ovk.0)).unwrap();
 
-    writeln!(file, "{}", format_bytes("extended_fvk", &sapling_fvk.to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_fvk_encoded", &sapling_fvk.encode(&MainNetwork))).unwrap();
-    writeln!(file, "{}", format_bytes("extended_fvk_child", &sapling_fvk.derive_child(ZcashChildIndex::Hardened(32)).to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_fvk_address", &sapling_fvk.address(ZcashDiversifierIndex::from_u32(4)).to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_fvk_find_address", &sapling_fvk.find_address(ZcashDiversifierIndex::from_u32(0)).to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_fvk_default_address", &sapling_fvk.default_address().to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_fvk_derive_internal", &sapling_fvk.derive_internal().to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_fvk_diversifiable_fvk", &sapling_fvk.to_diversifiable_full_viewing_key().to_bytes())).unwrap();
+
 
     writeln!(file, "{}", format_bytes("extended_spending_key_fvk_nk", &diversifiable_fvk.to_nk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ivk", &diversifiable_fvk.to_ivk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
