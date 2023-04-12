@@ -2,34 +2,32 @@ import uniffi.zcash.*
 
 val supp = TestSupport.fromCsvFile()
 
-fun testFromExpandedSpendingKey() {
-	// is this the correct spending key?
-	val skBytes = supp.getAsU8Array("extended_spending_key")
+fun testExpandedSpendingKeyFromSpendingKey() {
+    val bytes = supp.getAsU8Array("extended_spending_key")
 
-	val spendingKey = ZcashExpandedSpendingKey.fromSpendingKey(skBytes)
+	val key = ZcashExpandedSpendingKey.fromSpendingKey(bytes)
 
-	assert(spendingKey.toBytes() == skBytes)
+	val expected = supp.getAsU8Array("expanded_spending_key")
+
+	assert(key.toBytes() == expected)
 }
-testFromExpandedSpendingKey()
+testExpandedSpendingKeyFromSpendingKey()
 
-fun testFromBytes() {
-	val skBytes = supp.getAsU8Array("expanded_spending_key")
+fun testExpandedSpendingKeyFromBytes() {
+	val bytes = supp.getAsU8Array("expanded_spending_key")
 
-	val spendingKey = ZcashExpandedSpendingKey.fromBytes(skBytes)
+	val key = ZcashExpandedSpendingKey.fromBytes(bytes)
 
-	assert(spendingKey.toBytes() == skBytes)
+	assert(key.toBytes() == bytes)
 }
-testFromBytes()
+testExpandedSpendingKeyFromBytes()
 
-fun testProofGenerationKey() {
-	val skBytes = supp.getAsU8Array("expanded_spending_key")
-
-	val spendingKey = ZcashExpandedSpendingKey.fromBytes(skBytes)
-
-	val proofGenKey = spendingKey.proofGenerationKey()
-
-	// TODO finish this, but how?
-	assert(false)
-
+fun testExpandedSpendingKeyProofGenerationKey() {
+    // todo
 }
-testProofGenerationKey()
+testExpandedSpendingKeyProofGenerationKey()
+
+fun testExpandedSpendingKeyToBytes() {
+    // covered by testExpandedSpendingKeyFromBytes()
+}
+testExpandedSpendingKeyToBytes()

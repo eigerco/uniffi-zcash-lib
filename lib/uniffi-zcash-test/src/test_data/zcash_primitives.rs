@@ -5,7 +5,7 @@ use hdwallet::ExtendedPrivKey;
 use zcash_client_backend::encoding;
 use zcash_primitives::{
     consensus::MainNetwork,
-    legacy::keys::{AccountPrivKey, IncomingViewingKey}, memo::MemoBytes, zip32::{ExtendedSpendingKey, Scope}, sapling::Diversifier,
+    legacy::keys::{AccountPrivKey, IncomingViewingKey}, memo::MemoBytes, zip32::{ExtendedSpendingKey, Scope}, sapling::{Diversifier, keys::ExpandedSpendingKey},
 };
 
 use super::format_bytes;
@@ -103,7 +103,12 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
     let address = diversifiable_fvk.default_address().1;
     let (dfvk_decrypt_diversifier, scope) = diversifiable_fvk.decrypt_diversifier(&address).unwrap();
     writeln!(file, "{}", format_bytes("dfvk_decrypt_diversifier", &dfvk_decrypt_diversifier.0)).unwrap();
-    assert_eq!(scope, Scope::External)
+    assert_eq!(scope, Scope::External);
+
+    let expanded_sk = ExpandedSpendingKey::from_spending_key(&extended_spending_key.to_bytes());
+    writeln!(file, "{}", format_bytes("expanded_spending_key", &expanded_sk.to_bytes())).unwrap();
+
+    expanded_sk.proof_generation_key();
     /*
     let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
     let ppk = apk.to_account_pubkey();
@@ -115,7 +120,7 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 
 
 
-    let expanded_sk = ExpandedSpendingKey::from_spending_key(&extended_spending_key.to_bytes());
+
 
 
 
@@ -131,8 +136,6 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 
 
 
-
-    writeln!(file, "{}", format_bytes("expanded_spending_key", &expanded_sk.to_bytes())).unwrap();
 
 /*
     writeln!(file, "{}", format_bytes("sapling_full_viewing_key", &sapling_fvk_from_expsk.to_bytes())).unwrap();
