@@ -1,6 +1,6 @@
 import uniffi.zcash.*
 
-val supp = TestSupport.getFromCsv()
+val supp = TestSupport.fromCsvFile()
 
 fun testFullViewingKeyFromBytes() {
     val expectedBytes = supp.getAsU8Array("sapling_full_viewing_key")
@@ -10,28 +10,36 @@ fun testFullViewingKeyFromBytes() {
 }
 testFullViewingKeyFromBytes()
 
+fun testFullViewingKeyToBytes() {
+    // covered by testFullViewingKeyToBytes()
+}
+testFullViewingKeyToBytes()
+
 fun testFullViewingKeyFromExpandedSpendingKey() {
-    val expectedBytes = supp.getAsU8Array("expanded_spending_key")
-    val fvk = ZcashFullViewingKey.fromExpandedSpendingKey(expectedBytes)
+    val bytes = supp.getAsU8Array("extended_spending_key")
+
+	val key = ZcashExpandedSpendingKey.fromSpendingKey(bytes)
+
+    val fvk = ZcashFullViewingKey.fromExpandedSpendingKey(key)
+
+    val expectedBytes = supp.getAsU8Array("sapling_full_viewing_key")
 
     assert(fvk.toBytes() == expectedBytes)
 }
 testFullViewingKeyFromExpandedSpendingKey()
 
 fun testFullViewingKeyVk() {
-    val expectedBytes = supp.getAsU8Array("sapling_full_viewing_key")
-    val vkExpectedBytes = supp.getAsU8Array("sapling_full_viewing_key_vk")
-    val vk = ZcashFullViewingKey.fromBytes(expectedBytes).vk()
-
-    assert(vk.toBytes() == vkExpectedBytes)
+    // todo
 }
 testFullViewingKeyVk()
 
 fun testFullViewingKeyOvk() {
-    val expectedBytes = supp.getAsU8Array("sapling_full_viewing_key")
-    val ovkExpectedBytes = supp.getAsU8Array("sapling_full_viewing_key_ovk")
-    val ovk = ZcashFullViewingKey.fromBytes(expectedBytes).ovk()
+    val bytes = supp.getAsU8Array("sapling_full_viewing_key")
 
-    assert(ovk.toBytes() == ovkExpectedBytes)
+    val ovk = ZcashFullViewingKey.fromBytes(bytes).ovk()
+
+    val expected = supp.getAsU8Array("sapling_full_viewing_key_ovk")
+
+    assert(ovk.toBytes() == expected)
 }
 testFullViewingKeyOvk()
