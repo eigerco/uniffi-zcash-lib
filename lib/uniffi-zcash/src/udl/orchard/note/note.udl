@@ -1,0 +1,23 @@
+interface ZcashOrchardNote {
+    [Name=from_parts, Throws=ZcashError]
+    constructor(
+        ZcashOrchardAddress recipient,
+        ZcashOrchardNoteValue value,
+        ZcashOrchardNullifier rho,
+        ZcashOrchardRandomSeed rseed
+    );
+
+    ZcashOrchardNoteCommitment commitment();
+};
+
+interface ZcashOrchardNullifier {
+    [Name=from_bytes, Throws=ZcashError]
+    constructor([ByRef] sequence<u8> data);
+    sequence<u8> to_bytes();
+};
+
+interface ZcashOrchardRandomSeed {
+    [Name=from_bytes, Throws=ZcashError]
+    constructor([ByRef] sequence<u8> data, ZcashOrchardNullifier rho);
+    sequence<u8> to_bytes();
+};

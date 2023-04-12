@@ -752,6 +752,39 @@ a tuple.
 | ZcashOrchardNoteValue::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashOrchardNoteValue::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
+### ZcashOrchardNote
+
+* Original type: [orchard::note::Note](https://docs.rs/orchard/0.3.0/orchard/note/struct.Note.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardNote::from_parts()      | 🔴    |  ✅ |  ✅  |   ✅ |  ✅   |
+| ZcashOrchardNote::recipient()       |       |     |      |       |      |
+| ZcashOrchardNote::value()           |       |     |      |       |      |
+| ZcashOrchardNote::rseed()           |       |     |      |       |      |
+| ZcashOrchardNote::rho()             |       |     |      |       |      |
+| ZcashOrchardNote::commitment()      |  🔴   |  ✅ |  ✅  |  ✅   |  ✅ |
+| ZcashOrchardNote::nullifier()       |       |     |      |       |      |
+
+### ZcashOrchardNullifier
+
+* Original type: [orchard::note::Nullifier](https://docs.rs/orchard/0.3.0/orchard/note/struct.Nullifier.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardNullifier::from_bytes()      | 🔴    |  ✅ |  ✅  |   ✅ |  ✅   |
+| ZcashOrchardNullifier::to_bytes()        | 🔴    |  ✅ |  ✅  |   ✅ |  ✅   |
+
+### ZcashOrchardRandomSeed
+
+* Original type: [orchard::note::RandomSeed](https://docs.rs/orchard/0.3.0/orchard/note/struct.RandomSeed.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardRandomSeed::from_bytes()      | 🔴    |  ✅ |  ✅  |   ✅  |  ✅   |
+| ZcashOrchardRandomSeed::to_bytes()        | 🔴    |  ✅ |  ✅  |       |  ✅   |
+
+
 ## Enums
 
 ### ZcashScope
