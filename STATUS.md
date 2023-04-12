@@ -743,6 +743,15 @@ a tuple.
 | ZcashOrchardNoteValue::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashOrchardNoteValue::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
+### ZcashAnchor
+
+* Original type: [orchard::tree::Anchor](https://docs.rs/orchard/0.3.0/orchard/tree/struct.Anchor.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardNoteValue::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardNoteValue::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
 ## Enums
 
 ### ZcashScope
