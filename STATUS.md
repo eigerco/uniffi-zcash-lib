@@ -728,6 +728,21 @@ a tuple.
 | ZcashOrchardNoteValue::from_raw()   | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
 | ZcashOrchardNoteValue::inner()      |       |     |      |       |      |
 
+### ZcashOrchardNoteCommitment
+
+* Original type: [orchard::note::NoteCommitment](https://docs.rs/orchard/0.3.0/orchard/note/struct.NoteCommitment.html)
+
+* No  pub methods. Just added `to_extracted_note_commitment` to be able to do the conversion.
+
+### ZcashExtractedNoteCommitment
+
+* Original type: [orchard::note::ExtractedNoteCommitment](https://docs.rs/orchard/0.3.0/orchard/note/struct.ExtractedNoteCommitment.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardNoteValue::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardNoteValue::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
 ## Enums
 
 ### ZcashScope
