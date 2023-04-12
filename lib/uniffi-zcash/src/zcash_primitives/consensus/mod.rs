@@ -17,3 +17,9 @@ impl From<ZcashBlockHeight> for BlockHeight {
         value.0
     }
 }
+
+impl From<&ZcashBlockHeight> for BlockHeight {
+    fn from(value: &ZcashBlockHeight) -> Self {
+        value.0
+    }
+}

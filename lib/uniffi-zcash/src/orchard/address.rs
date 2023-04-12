@@ -38,6 +38,12 @@ impl From<&ZcashOrchardAddress> for Address {
     }
 }
 
+impl From<ZcashOrchardAddress> for Address {
+    fn from(address: ZcashOrchardAddress) -> Self {
+        address.0
+    }
+}
+
 impl From<Address> for ZcashOrchardAddress {
     fn from(address: Address) -> Self {
         Self(address)
