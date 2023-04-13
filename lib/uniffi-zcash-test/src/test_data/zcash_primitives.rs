@@ -160,6 +160,13 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
         .to_ovk(zcash_primitives::zip32::Scope::External)
         .0;
     writeln!(file, "{}", format_bytes("sapling_outgoing_viewing_key", &ovk)).unwrap();
+
+    let vk = expanded_sk.proof_generation_key().to_viewing_key();
+    let ivk = vk.ivk();
+    writeln!(file, "{}", format_bytes("viewing_key_ivk", &ivk.to_repr())).unwrap();
+
+    let address = vk.to_payment_address(Diversifier(diversifier)).unwrap();
+    writeln!(file, "{}", format_bytes("viewing_key_payment_address", &address.to_bytes())).unwrap();
     /*
     let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
     let ppk = apk.to_account_pubkey();

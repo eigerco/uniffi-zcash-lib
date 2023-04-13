@@ -350,8 +350,8 @@ exposing `jubjub` types is beyond the scope of this project.
 
 | Object/Method name                                                                               |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
 | ------------------------------------------------------------------------------------------------ | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
-| ZcashViewingKey::ivk() -> [ZcashSaplingIvk](#zcashsaplingivk-sapling)                            | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashViewingKey::to_payment_address() -> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)     | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashViewingKey::ivk() -> [ZcashSaplingIvk](#zcashsaplingivk-sapling)                            | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashViewingKey::to_payment_address() -> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)     | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashOutgoingViewingKey (Sapling)
 
