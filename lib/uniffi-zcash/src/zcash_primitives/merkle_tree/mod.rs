@@ -18,7 +18,7 @@ impl ZcashSaplingMerklePath {
             .auth_path
             .iter()
             .map(|(node, bool)| ZcashAuthPath {
-                node: Arc::new(node.clone().into()),
+                node: Arc::new((*node).into()),
                 bool: *bool,
             })
             .collect()
