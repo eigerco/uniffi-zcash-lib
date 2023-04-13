@@ -36,24 +36,10 @@ pub use self::components::*;
 pub struct ZcashTransactionBuilder {
     parameters: ZcashConsensusParameters,
     target_height: Arc<ZcashBlockHeight>,
-    sapling_spends: RwLock<
-        Vec<(
-            Arc<ZcashExtendedSpendingKey>,
-            Arc<ZcashDiversifier>,
-            Arc<ZcashSaplingNote>,
-            Arc<ZcashSaplingMerklePath>,
-        )>,
-    >,
-    sapling_outputs: RwLock<
-        Vec<(
-            Option<Arc<ZcashOutgoingViewingKey>>,
-            Arc<ZcashPaymentAddress>,
-            Arc<ZcashAmount>,
-            Arc<ZcashMemoBytes>,
-        )>,
-    >,
-    transparent_input: RwLock<Vec<(Arc<SecpSecretKey>, Arc<ZcashOutPoint>, Arc<ZcashTxOut>)>>,
-    transparent_output: RwLock<Vec<(Arc<ZcashTransparentAddress>, Arc<ZcashAmount>)>>,
+    sapling_spends: SaplingSpends,
+    sapling_outputs: SaplingOutputs,
+    transparent_input: TransparentInput,
+    transparent_output: TransparentOutput,
 }
 
 impl ZcashTransactionBuilder {
@@ -137,13 +123,8 @@ impl ZcashTransactionBuilder {
             .unwrap()
             .iter()
             .try_for_each(|(ovk, to, value, memo)| {
-                let ovk_p = match ovk {
-                    Some(ovk) => Some(ovk.as_ref()),
-                    None => None,
-                };
-
                 builder.add_sapling_output(
-                    ovk_p.map(From::from),
+                    ovk.as_ref().map(|ovk| ovk.as_ref()).map(From::from),
                     to.as_ref().into(),
                     value.as_ref().into(),
                     memo.as_ref().into(),
@@ -209,6 +190,28 @@ impl ZcashTransactionBuilder {
     }
 }
 
+type TransparentInput = RwLock<Vec<(Arc<SecpSecretKey>, Arc<ZcashOutPoint>, Arc<ZcashTxOut>)>>;
+
+type TransparentOutput = RwLock<Vec<(Arc<ZcashTransparentAddress>, Arc<ZcashAmount>)>>;
+
+type SaplingSpends = RwLock<
+    Vec<(
+        Arc<ZcashExtendedSpendingKey>,
+        Arc<ZcashDiversifier>,
+        Arc<ZcashSaplingNote>,
+        Arc<ZcashSaplingMerklePath>,
+    )>,
+>;
+
+type SaplingOutputs = RwLock<
+    Vec<(
+        Option<Arc<ZcashOutgoingViewingKey>>,
+        Arc<ZcashPaymentAddress>,
+        Arc<ZcashAmount>,
+        Arc<ZcashMemoBytes>,
+    )>,
+>;
+
 /// A selector for the desired fee rules for applying to a transaction.
 pub enum ZcashFeeRules {
     FixedStandard,
@@ -259,21 +262,8 @@ pub struct ZcashOrchardTransactionBuilder {
     target_height: Arc<ZcashBlockHeight>,
     expiry_height: Arc<ZcashBlockHeight>,
     anchor: Arc<ZcashAnchor>,
-    spends: RwLock<
-        Vec<(
-            Arc<ZcashOrchardFullViewingKey>,
-            Arc<ZcashOrchardNote>,
-            Arc<ZcashOrchardMerklePath>,
-        )>,
-    >,
-    outputs: RwLock<
-        Vec<(
-            Arc<ZcashOrchardOutgoingViewingKey>,
-            Arc<ZcashOrchardAddress>,
-            u64,
-            Option<[u8; 512]>,
-        )>,
-    >,
+    spends: OrchardSpends,
+    outputs: OrchardOutputs,
 }
 
 impl ZcashOrchardTransactionBuilder {
@@ -396,3 +386,20 @@ impl ZcashOrchardTransactionBuilder {
         Ok(Arc::new(transaction.into()))
     }
 }
+
+type OrchardSpends = RwLock<
+    Vec<(
+        Arc<ZcashOrchardFullViewingKey>,
+        Arc<ZcashOrchardNote>,
+        Arc<ZcashOrchardMerklePath>,
+    )>,
+>;
+
+type OrchardOutputs = RwLock<
+    Vec<(
+        Arc<ZcashOrchardOutgoingViewingKey>,
+        Arc<ZcashOrchardAddress>,
+        u64,
+        Option<[u8; 512]>,
+    )>,
+>;
