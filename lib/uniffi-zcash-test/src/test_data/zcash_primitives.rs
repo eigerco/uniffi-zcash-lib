@@ -60,7 +60,7 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
     writeln!(file, "{}", format_bytes("memo_bytes_too_long", &memo_bytes_too_long)).unwrap();
 
     let memo_empty = MemoBytes::empty();
-    writeln!(file, "{}", format_bytes("memo_empty", &memo_empty.as_slice())).unwrap();
+    writeln!(file, "{}", format_bytes("memo_empty", memo_empty.as_slice())).unwrap();
 
     let extended_spending_key = ExtendedSpendingKey::master(seed);
     let diversifiable_fvk = extended_spending_key.to_diversifiable_full_viewing_key();
@@ -167,65 +167,4 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 
     let address = vk.to_payment_address(Diversifier(diversifier)).unwrap();
     writeln!(file, "{}", format_bytes("viewing_key_payment_address", &address.to_bytes())).unwrap();
-    /*
-    let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
-    let ppk = apk.to_account_pubkey();
-
-
-
-    let diversifier = Diversifier([0; 11]);
-
-
-
-
-
-
-
-
-
-
-
-
-    writeln!(file, "{}", format_bytes("sapling_address", &get_sapling_address(&usk).to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("orchard_diversifier", orchard_diversifier.as_array())).unwrap();
-
-    writeln!(file, "{}", format_bytes("account_private_key", &apk.to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("account_public_key", &ppk.serialize())).unwrap();
-
-
-
-
-/*
-
-    writeln!(file, "{}", format_bytes("sapling_full_viewing_key_vk", &sapling_fvk_from_expsk.vk.to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("sapling_full_viewing_key_vk_ak", &sapling_fvk_from_expsk.vk.ak.to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("sapling_full_viewing_key_vk_nk", &sapling_fvk_from_expsk.vk.nk.0.to_bytes())).unwrap();
-
-
-
-
-    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_nk", &diversifiable_fvk.to_nk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ivk", &diversifiable_fvk.to_ivk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_ovk", &diversifiable_fvk.to_ovk(ZcashScope::EXTERNAL).to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("extended_spending_key_fvk_addr", &diversifiable_fvk.address(&diversifier).to_bytes())).unwrap();
-
-    writeln!(file, "{}", format_bytes("sapling_outgoing_viewing_key", &get_ovk(&usk))).unwrap();
-
-
-
-    */ */
 }
-
-/*
-
-fn get_sapling_address(key: &UnifiedSpendingKey) -> PaymentAddress {
-    let diversifier = zcash_primitives::sapling::Diversifier([0; 11]);
-
-    key.to_unified_full_viewing_key()
-        .sapling()
-        .unwrap()
-        .to_ivk(zcash_primitives::zip32::Scope::External)
-        .to_payment_address(diversifier)
-        .unwrap()
-}
-*/

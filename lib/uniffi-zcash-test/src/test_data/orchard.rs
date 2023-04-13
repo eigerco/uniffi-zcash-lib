@@ -53,7 +53,7 @@ pub fn write_for_orchard<W: Write>(mut file: W, seed: &[u8]) {
     writeln!(file, "{}", format_bytes("orchard_incoming_viewing_key_address", &address.to_raw_address_bytes())).unwrap();
 
     let ovk = fvk.to_ovk(Scope::External);
-    writeln!(file, "{}", format_bytes("orchard_outgoing_viewing_key", &ovk.as_ref().to_vec())).unwrap();
+    writeln!(file, "{}", format_bytes("orchard_outgoing_viewing_key", ovk.as_ref())).unwrap();
 }
 
 fn get_orchard_address(key: &UnifiedSpendingKey) -> [u8; 43] {
