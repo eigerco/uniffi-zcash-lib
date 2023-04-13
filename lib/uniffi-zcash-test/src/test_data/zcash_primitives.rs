@@ -2,10 +2,16 @@ use std::{io::Write, vec};
 
 use group::GroupEncoding;
 use hdwallet::ExtendedPrivKey;
-use zcash_client_backend::encoding;
+use zcash_client_backend::{encoding, keys::UnifiedSpendingKey};
 use zcash_primitives::{
     consensus::{MainNetwork, Parameters},
-    legacy::keys::{AccountPrivKey, IncomingViewingKey}, memo::MemoBytes, zip32::{ExtendedSpendingKey, Scope, ChildIndex}, sapling::{Diversifier, keys::{ExpandedSpendingKey, FullViewingKey}},
+    legacy::keys::{AccountPrivKey, IncomingViewingKey},
+    memo::MemoBytes,
+    sapling::{
+        keys::{ExpandedSpendingKey, FullViewingKey},
+        Diversifier,
+    },
+    zip32::{ChildIndex, ExtendedSpendingKey, Scope},
 };
 
 use super::format_bytes;
@@ -146,6 +152,14 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
     let sapling_fvk_from_expsk = FullViewingKey::from_expanded_spending_key(&expanded_sk);
     writeln!(file, "{}", format_bytes("sapling_full_viewing_key", &sapling_fvk_from_expsk.to_bytes())).unwrap();
     writeln!(file, "{}", format_bytes("sapling_full_viewing_key_ovk", &sapling_fvk_from_expsk.ovk.0)).unwrap();
+
+    let usk = UnifiedSpendingKey::from_seed(&MainNetwork, seed, 0.into()).unwrap();
+    let ovk = usk.to_unified_full_viewing_key()
+        .sapling()
+        .unwrap()
+        .to_ovk(zcash_primitives::zip32::Scope::External)
+        .0;
+    writeln!(file, "{}", format_bytes("sapling_outgoing_viewing_key", &ovk)).unwrap();
     /*
     let apk = AccountPrivKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
     let ppk = apk.to_account_pubkey();
@@ -196,13 +210,6 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 }
 
 /*
-fn get_ovk(key: &UnifiedSpendingKey) -> [u8; 32] {
-    key.to_unified_full_viewing_key()
-        .sapling()
-        .unwrap()
-        .to_ovk(zcash_primitives::zip32::Scope::External)
-        .0
-}
 
 fn get_sapling_address(key: &UnifiedSpendingKey) -> PaymentAddress {
     let diversifier = zcash_primitives::sapling::Diversifier([0; 11]);

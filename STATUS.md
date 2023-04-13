@@ -359,7 +359,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Object/Method name                    |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
 | ------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
-| ZcashOutgoingViewingKey::from_bytes() |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashOutgoingViewingKey::from_bytes() |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashOutgoingViewingKey::to_bytes()   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashPaymentAddress (Sapling)
