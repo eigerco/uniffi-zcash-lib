@@ -533,10 +533,12 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | Members                              | Score | UDL | Code | Tests | Docs |
 | -------------------------------------| ----- | --- | ---- | ----- | ---- |
 | ZcashTransaction::into_data()        | 🔴    |     |      |       |      |
-| ZcashTransaction::txid()             | 🔴    |     |      |       |      |/// The non-negative value of an individual Orchard note.
+| ZcashTransaction::txid()             | 🔴    |     |      |       |      |
 
+### ZcashSaplingMetadata
 | ZcashSaplingMetadata::spend_index()  | 🔴    | ✅  |  ✅  |       | ✅   |
 | ZcashSaplingMetadata::output_index() | 🔴    | ✅  |  ✅  |       | ✅   |
+
 ### ZcashParametersMainNetwork
 * Original type: [zcash_primitives::consensus::MainNetwork](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/consensus/struct.MainNetwork.html)
 * Marker struct, no need to implement methods.
