@@ -34,9 +34,6 @@ interface ZcashTransactionBuilder {
 interface ZcashFeeRules {
     FixedStandard();
     FixedNonStandard(u64 amount);
-    /// Construct a new FeeRule using the standard [ZIP 317] constants.
-    ///
-    /// [ZIP 317]: https//zips.z.cash/zip-0317
     Zip317Standard();
     Zip317NonStandard(
         u64 marginal_fee,
