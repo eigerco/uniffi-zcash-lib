@@ -1,0 +1,7 @@
+interface ZcashSaplingMetadata {
+    constructor();
+
+    u64? spend_index(u64 n);
+
+    u64? output_index(u64 n);
+};

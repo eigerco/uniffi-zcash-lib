@@ -140,7 +140,7 @@ class Test(unittest.TestCase):
             .orchard().to_ivk(ZcashOrchardScope.EXTERNAL) \
             .address(orchard_diversifier)
 
-        transparent = ZcashTransparentAddress.public_key(range(1, 21))
+        transparent = ZcashTransparentAddress.from_public_key(range(1, 21))
 
         source = ZcashUnifiedAddress(orchard, sapling, transparent)
         address = source.encode(params)
@@ -187,7 +187,7 @@ class Test(unittest.TestCase):
             .orchard().to_ivk(ZcashOrchardScope.EXTERNAL) \
             .address(orchard_diversifier)
 
-        transparent = ZcashTransparentAddress.public_key(range(1, 21))
+        transparent = ZcashTransparentAddress.from_public_key(range(1, 21))
 
         # At least one of orchard or sapling address must be set
         # ZcashUnifiedAddress(None, None, None)

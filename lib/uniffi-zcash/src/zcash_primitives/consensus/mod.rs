@@ -3,6 +3,7 @@ pub use self::parameters::*;
 
 use zcash_primitives::consensus::BlockHeight;
 
+#[derive(Clone, Copy)]
 pub struct ZcashBlockHeight(BlockHeight);
 
 impl ZcashBlockHeight {
@@ -13,6 +14,12 @@ impl ZcashBlockHeight {
 
 impl From<ZcashBlockHeight> for BlockHeight {
     fn from(value: ZcashBlockHeight) -> Self {
+        value.0
+    }
+}
+
+impl From<&ZcashBlockHeight> for BlockHeight {
+    fn from(value: &ZcashBlockHeight) -> Self {
         value.0
     }
 }

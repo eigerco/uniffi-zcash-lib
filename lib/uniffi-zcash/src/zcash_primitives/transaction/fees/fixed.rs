@@ -7,7 +7,7 @@ use crate::ZcashAmount;
 /// A fee rule that always returns a fixed fee, irrespective of the structure of
 /// the transaction being constructed.
 #[derive(Clone, Copy)]
-pub struct ZcashFixedFeeRule(FeeRule);
+pub struct ZcashFixedFeeRule(pub(crate) FeeRule);
 
 impl ZcashFixedFeeRule {
     /// Creates a new nonstandard fixed fee rule with the specified fixed fee.
@@ -29,5 +29,17 @@ impl ZcashFixedFeeRule {
 impl From<FeeRule> for ZcashFixedFeeRule {
     fn from(inner: FeeRule) -> Self {
         ZcashFixedFeeRule(inner)
+    }
+}
+
+impl From<ZcashFixedFeeRule> for FeeRule {
+    fn from(value: ZcashFixedFeeRule) -> Self {
+        value.0
+    }
+}
+
+impl From<&ZcashFixedFeeRule> for FeeRule {
+    fn from(value: &ZcashFixedFeeRule) -> Self {
+        value.0
     }
 }

@@ -1,0 +1,83 @@
+interface ZcashTransactionBuilder {
+    constructor(ZcashConsensusParameters parameters, ZcashBlockHeight block_height);
+
+    void add_sapling_spend(
+        ZcashExtendedSpendingKey extsk, 
+        ZcashDiversifier diversifier, 
+        ZcashSaplingNote note, 
+        ZcashSaplingMerklePath merkle_path
+    );
+    
+    void add_sapling_output(
+        ZcashOutgoingViewingKey? ovk,
+        ZcashPaymentAddress to,
+        ZcashAmount value,
+        ZcashMemoBytes memo
+    );
+
+    void add_transparent_input(
+        SecpSecretKey sk,
+        ZcashOutPoint utxo,
+        ZcashTxOut coin
+    );
+
+    void add_transparent_output(
+        ZcashTransparentAddress to,
+        ZcashAmount value
+    );
+
+    [Throws=ZcashError]
+    ZcashTransactionAndSaplingMetadata build(ZcashLocalTxProver prover, ZcashFeeRules fee_rule);
+};
+
+[Enum]
+interface ZcashFeeRules {
+    FixedStandard();
+    FixedNonStandard(u64 amount);
+    Zip317Standard();
+    Zip317NonStandard(
+        u64 marginal_fee,
+        u64 grace_actions,
+        u64 p2pkh_standard_input_size,
+        u64 p2pkh_standard_output_size
+    );
+};
+
+interface ZcashTransaction {
+    [Throws=ZcashError]
+    sequence<u8> to_bytes();
+};
+
+dictionary ZcashTransactionAndSaplingMetadata {
+    ZcashTransaction transaction;
+    ZcashSaplingMetadata sapling_metadata;
+};
+
+interface ZcashOrchardTransactionBuilder {
+    constructor(
+        ZcashConsensusParameters parameters, 
+        ZcashBlockHeight target_height, 
+        ZcashBlockHeight expiry_height,
+        ZcashAnchor anchor
+    );
+
+    void add_spend(
+       ZcashOrchardFullViewingKey fvk,
+       ZcashOrchardNote note,
+       ZcashOrchardMerklePath merkle_path
+    );
+    
+    [Throws=ZcashError]
+    void add_output(
+        ZcashOrchardOutgoingViewingKey ovk,
+        ZcashOrchardAddress recipient,
+        u64 value,
+        sequence<u8>? memo
+    );
+
+    [Throws=ZcashError]
+    ZcashTransaction build(
+       sequence<ZcashOrchardSpendingKey> keys,
+       sequence<u8> sighash
+    );
+};

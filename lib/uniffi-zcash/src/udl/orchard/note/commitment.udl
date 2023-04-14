@@ -1,0 +1,10 @@
+interface ZcashOrchardNoteCommitment {
+    ZcashExtractedNoteCommitment to_extracted_note_commitment();
+};
+
+interface ZcashExtractedNoteCommitment {
+    [Name=from_bytes, Throws=ZcashError]
+    constructor([ByRef] sequence<u8> data);
+
+    sequence<u8> to_bytes();
+};

@@ -86,7 +86,13 @@ We use a single `ZcashError` encompassing following errors:
 * `Secp256k1Error` - original type: [secp256k1::Error](https://docs.rs/secp256k1/latest/secp256k1/enum.Error.html)
 * `Bech32DecodeError` - original type: [zcash_client_backend::encoding::Bech32DecodeError](https://docs.rs/zcash_client_backend/latest/zcash_client_backend/encoding/enum.Bech32DecodeError.html),
 * `Bs58Error` - original type: [bs58::decode::Error](https://docs.rs/bs58/latest/bs58/decode/enum.Error.html),
-* `Unknown` - unknown error, usually used for constructors that return `Option`
+* `BuilderError` - original type: [zcash_primitives::transaction::builder::Error](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/builder/enum.Error.html), with fee errors from [zcash_primitives::transaction::fees::zip317::FeeError](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/fees/zip317/enum.FeeError.html). Serves as a catch all error for all the errors we are not handling specifically. This is for the general transaction builder.
+* `TransparentBuilderError` - original type: [transaction::components::transparent::builder::Error](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/components/transparent/builder/enum.Error.html). Serves as a catch all error for all the errors we are not specifically handling from the `Transparent` transaction builder.
+* `SaplingBuilderError`- original type: [transaction::components::sapling::builder::Error](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/components/sapling/builder/enum.Error.html). Serves as a catch all error for all the errors we are not specifically handling from the `Sapling` transaction builder.
+* `OrchardBuilderError`- original type: [orchard::builder::Error](https://docs.rs/orchard/0.3.0/orchard/builder/enum.Error.html). Serves as a catch all error for all the errors we are not specifically handling from the `Orchard` transaction builder.
+* `InsufficientFundsError` - original type: [zcash_primitives::transaction::builder::Error](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/builder/enum.Error.html#variant.InsufficientFunds) . This error comes from the general transaction builder. We expose it explicitly to the user.
+* `ChangeRequiredError` - original type: [zcash_primitives::transaction::builder::Error](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/builder/enum.Error.html#variant.ChangeRequired) . This error comes from the general transaction builder. We expose it explicitly to the user.
+* `Unknown` - unknown error, usually used for constructors that return `Option`.
 
 ## Objects
 
@@ -191,7 +197,8 @@ We use a single `ZcashError` encompassing following errors:
 * Original type: [zcash_client_backend::address::UnifiedAddress](https://docs.rs/zcash_client_backend/latest/zcash_client_backend/address/struct.UnifiedAddress.html)
 
 | Object/Method name                                                                        |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
-| ----------------------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| -------------mod value;
+pub use self::value::*;---------------------------------------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
 | ZcashUnifiedAddress::new()                                                                | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashUnifiedAddress::orchard() -> [ZcashOrchardAddress](#zcashorchardaddress)             | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashUnifiedAddress::sapling()-> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)      | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
@@ -217,7 +224,8 @@ We use a single `ZcashError` encompassing following errors:
 
 | Object/Method name                             |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
 | ---------------------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
-| ZcashTransparentAddress::public_key()          | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashTransparentAddress::PublicKey()          | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashTransparentAddress::Script()          | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashTransparentAddress::script()              | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashTransparentAddress::decode()              | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashTransparentAddress::encode()              | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
@@ -465,26 +473,8 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashOrchardAddress::from_raw_address_bytes()                                                       |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
 ### ZcashOrchardDiversifierIndex
-
-* Original type: [orchard::keys::DiversifierIndex](https://docs.rs/orchard/0.3.0/orchard/keys/struct.DiversifierIndex.html)
-
-| Object/Method name                                     | Score        | UDL                | Code               | Tests              | Docs               |
-| ------------------------------------------------------ | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| ZcashOrchardDiversifierIndex::from_bytes()             |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardDiversifierIndex::from_u32()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardDiversifierIndex::from_u64()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashOrchardDiversifierIndex::to_bytes()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-
-### ZcashDiversifierIndex
-
-* Original type: [zcash_primitives::zip32::DiversifierIndex](https://docs.rs/zcash_primitives/latest/zcash_primitives/zip32/struct.DiversifierIndex.html)
-
-| Object/Method name                              | Score        | UDL                | Code               | Tests              | Docs               |
-| ----------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| ZcashDiversifierIndex::new()                    |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashDiversifierIndex::from_u32()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashDiversifierIndex::from_u64()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashDiversifierIndex::increment()              |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+/// The non-negative value of an individual Orchard note.
+ | :white_check_mark: |
 | ZcashDiversifierIndex::to_u32()                 |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | ZcashDiversifierIndex::to_bytes()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 
@@ -515,16 +505,38 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashTransactionBuilder::transparent_outputs()    | 🔵     |     |      |       |      |
 | ZcashTransactionBuilder::sapling_inputs()         | 🔵     |     |      |       |      |
 | ZcashTransactionBuilder::sapling_outputs()        | 🔵     |     |      |       |      |
-| ZcashTransactionBuilder::new()                    | 🔴     |     |      |       |      |
+| ZcashTransactionBuilder::new()                    | 🔴     |  ✅ | ✅   |  ✅   | ✅  |
 | ZcashTransactionBuilder::new_with_rng()           | 🔵     |     |      |       |      |
-| ZcashTransactionBuilder::add_sapling_spend()      | 🔴     |     |      |       |      |
-| ZcashTransactionBuilder::add_sapling_output()     | 🔴     |     |      |       |      |
-| ZcashTransactionBuilder::add_transparent_input()  | 🔴     |     |      |       |      |
-| ZcashTransactionBuilder::add_transparent_output() | 🔴     |     |      |       |      |
+| ZcashTransactionBuilder::add_sapling_spend()      | 🔴     |  ✅ | ✅   |  ✅   | ✅   |
+| ZcashTransactionBuilder::add_sapling_output()     | 🔴     |  ✅ | ✅   |  ✅   | ✅   |
+| ZcashTransactionBuilder::add_transparent_input()  | 🔴     |  ✅ | ✅   |  ✅   | ✅   |
+| ZcashTransactionBuilder::add_transparent_output() | 🔴     |  ✅ | ✅   |  ✅   | ✅   |
 | ZcashTransactionBuilder::with_progress_notifier() | 🔵     |     |      |       |      |
-| ZcashTransactionBuilder::build()                  | 🔴     |     |      |       |      |
+| ZcashTransactionBuilder::build()                  | 🔴     |  ✅ | ✅   |  ✅   | ✅   |
 | ZcashTransactionBuilder::build_zfuture()          | 🔵     |     |      |       |      |
 
+### ZcashOrchardTransactionBuilder
+
+* This type comes from pure invention. Its a wrapper builder that wraps the original [orchard::builder::Builder](https://docs.rs/orchard/0.3.0/orchard/builder/struct.Builder.html)
+
+| Members                                                  | Score | UDL | Code | Tests | Docs |
+| -------------------------------------------------------- | ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardTransactionBuilder::new()                    |   🔴  | ✅  | ✅   | ✅    |  ✅  |
+| ZcashOrchardTransactionBuilder::add_spend()              |   🔴  | ✅  | ✅   | ✅    |  ✅  |
+| ZcashOrchardTransactionBuilder::add_output()             |   🔴  | ✅  | ✅   | ✅    |  ✅  |
+| ZcashOrchardTransactionBuilder::build()                  |   🔴  | ✅  | ✅   | ✅    |  ✅  |
+
+### ZcashTransaction
+* Original type: [zcash_primitives::transaction::Transaction](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/struct.Transaction.html)
+* `write` method was implemented as `to_bytes()`.
+
+| Members                              | Score | UDL | Code | Tests | Docs |
+| -------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTransaction::into_data()        | 🔴    |     |      |       |      |
+| ZcashTransaction::txid()             | 🔴    |     |      |       |      |/// The non-negative value of an individual Orchard note.
+
+| ZcashSaplingMetadata::spend_index()  | 🔴    | ✅  |  ✅  |       | ✅   |
+| ZcashSaplingMetadata::output_index() | 🔴    | ✅  |  ✅  |       | ✅   |
 ### ZcashParametersMainNetwork
 * Original type: [zcash_primitives::consensus::MainNetwork](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/consensus/struct.MainNetwork.html)
 * Marker struct, no need to implement methods.
@@ -685,7 +697,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashIncrementalWitness::filler()    | 🔵    |    |      |       |      |
 | ZcashIncrementalWitness::append()    | 🔴    | ✅ |  ✅  |       |  ✅  |
 | ZcashIncrementalWitness::root()      | 🔵    |    |      |       |      |
-| ZcashIncrementalWitness::path()      | 🔵    |    |      |       |      |
+| ZcashIncrementalWitness::path()      | 🔴    | ✅ |  ✅  |       |  ✅  |
 
 ### ZcashMemoBytes
 
@@ -697,6 +709,110 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashMemoBytes::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashMemoBytes::as_array()   | 🔵    |     |      |       |      |
 | ZcashMemoBytes::as_slice()   | 🔵    |  ✅ |  ✅  |       |  ✅  |
+
+### ZcashSaplingMerklePath
+
+* Original type: [zcash_primitives::merkle_tree::MerklePath](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/merkle_tree/struct.MerklePath.html)
+* This object was implemented for the Sapling Node specific type.
+* `auth_path` and `position` are just pure invention getters.
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingMerklePath::auth_path() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingMerklePath::position()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingMerklePath::from_path() |       |     |      |       |      |
+| ZcashSaplingMerklePath::from_slice()|       |     |      |       |      |
+| ZcashSaplingMerklePath::root()      |       |     |      |       |      |
+
+### ZcashAuthPath
+A dictionary that holds an [ZcashSaplingNode](#ZcashSaplingNode) and a boolean. 
+This is used in [ZcashSaplingMerklePath](#ZcashSaplingMerklePath)::auth_path() method
+for returning a Vec<ZcashAuthPath>, trying to mimic the original method, which returns
+a tuple.
+
+### ZcashOrchardNoteValue
+
+* Original type: [orchard::value::NoteValue](https://docs.rs/orchard/0.3.0/orchard/value/struct.NoteValue.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardNoteValue::from_raw()   | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
+| ZcashOrchardNoteValue::inner()      |       |     |      |       |      |
+
+### ZcashOrchardNoteCommitment
+
+* Original type: [orchard::note::NoteCommitment](https://docs.rs/orchard/0.3.0/orchard/note/struct.NoteCommitment.html)
+
+* No  pub methods. Just added `to_extracted_note_commitment` to be able to do the conversion.
+
+### ZcashExtractedNoteCommitment
+
+* Original type: [orchard::note::ExtractedNoteCommitment](https://docs.rs/orchard/0.3.0/orchard/note/struct.ExtractedNoteCommitment.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardNoteValue::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardNoteValue::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+### ZcashAnchor
+
+* Original type: [orchard::tree::Anchor](https://docs.rs/orchard/0.3.0/orchard/tree/struct.Anchor.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardNoteValue::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardNoteValue::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+### ZcashOrchardNote
+
+* Original type: [orchard::note::Note](https://docs.rs/orchard/0.3.0/orchard/note/struct.Note.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardNote::from_parts()      | 🔴    |  ✅ |  ✅  |   ✅ |  ✅   |
+| ZcashOrchardNote::recipient()       |       |     |      |       |      |
+| ZcashOrchardNote::value()           |       |     |      |       |      |
+| ZcashOrchardNote::rseed()           |       |     |      |       |      |
+| ZcashOrchardNote::rho()             |       |     |      |       |      |
+| ZcashOrchardNote::commitment()      |  🔴   |  ✅ |  ✅  |  ✅   |  ✅ |
+| ZcashOrchardNote::nullifier()       |       |     |      |       |      |
+
+### ZcashOrchardNullifier
+
+* Original type: [orchard::note::Nullifier](https://docs.rs/orchard/0.3.0/orchard/note/struct.Nullifier.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardNullifier::from_bytes()      | 🔴    |  ✅ |  ✅  |   ✅ |  ✅   |
+| ZcashOrchardNullifier::to_bytes()        | 🔴    |  ✅ |  ✅  |   ✅ |  ✅   |
+
+### ZcashOrchardRandomSeed
+
+* Original type: [orchard::note::RandomSeed](https://docs.rs/orchard/0.3.0/orchard/note/struct.RandomSeed.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardRandomSeed::from_bytes()      | 🔴    |  ✅ |  ✅  |   ✅  |  ✅   |
+| ZcashOrchardRandomSeed::to_bytes()        | 🔴    |  ✅ |  ✅  |       |  ✅   |
+
+### ZcashOrchardMerklePath
+
+* Original type: [orchard::tree::MerklePath](https://docs.rs/orchard/0.3.0/orchard/tree/struct.MerklePath.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardMerklePath::from_parts()| 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
+| ZcashOrchardMerklePath::root()      | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
+
+### ZcashOrchardMerkleHash
+
+* Original type: [orchard::tree::MerkleHashOrchard](https://docs.rs/orchard/0.3.0/orchard/tree/struct.MerkleHashOrchard.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardMerkleHash::from_cmx()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardMerkleHash::to_bytes()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardMerkleHash::from_bytes()| 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
 
 ## Enums
 
@@ -736,6 +852,11 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | Members | Score | UDL | Code | Tests | Docs |
 | ------- | ----- | --- | ---- | ----- | ---- |
 
+### ZcashFeeRules
+
+This is a pure invention enum. It helps to select the desired fee rules.
+See [ZcashTransactionBuilder](#zcashtransactionbuilder).
+
 ## Records
 
 ### ZcashDiversifierIndexAndScope
@@ -749,7 +870,9 @@ A pair of [ZcashUnifiedAddress](#zcashunifiedaddress) and [ZcashDiversifierIndex
 ### ZcashDiversifierIndexAndPaymentAddress
 
 A pair of [ZcashDiversifierIndex](#zcashdiversifierindex) and [ZcashPaymentAddress](#zcashpaymentaddress-sapling).
+### ZcashTransactionSaplingMetadata
 
+A pair of [ZcashTransaction](#zcashtransaction) and [ZcashSaplingMetadata](#zcashsaplingmetadata)
 ## Functions
 
 ### zcash_client_backend::encoding

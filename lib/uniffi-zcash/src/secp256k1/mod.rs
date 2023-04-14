@@ -22,3 +22,15 @@ impl From<secp256k1::SecretKey> for SecpSecretKey {
         SecpSecretKey(inner)
     }
 }
+
+impl From<SecpSecretKey> for SecretKey {
+    fn from(value: SecpSecretKey) -> Self {
+        value.0
+    }
+}
+
+impl From<&SecpSecretKey> for SecretKey {
+    fn from(value: &SecpSecretKey) -> Self {
+        value.0
+    }
+}

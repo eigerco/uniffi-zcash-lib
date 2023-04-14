@@ -165,7 +165,7 @@ fun testUnifiedAddressParsing() {
         .orchard()!!.toIvk(ZcashOrchardScope.EXTERNAL)
         .address(orchardDiversifier)
 
-    val transparent = ZcashTransparentAddress.publicKey((1..20).map { it.toUByte() })
+    val transparent = ZcashTransparentAddress.fromPublicKey((1..20).map { it.toUByte() })
 
     val source = ZcashUnifiedAddress(orchard, sapling, transparent)
     val address = source.encode(params)
@@ -218,7 +218,7 @@ fun testUnifiedAddressCreation() {
         .orchard()!!.toIvk(ZcashOrchardScope.EXTERNAL)
         .address(orchardDiversifier)
 
-    val transparent = ZcashTransparentAddress.publicKey((1..20).map { it.toUByte() })
+    val transparent = ZcashTransparentAddress.fromPublicKey((1..20).map { it.toUByte() })
 
     // At least one of orchard or sapling address must be set
     // ZcashUnifiedAddress(null, null, null)

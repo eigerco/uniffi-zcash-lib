@@ -31,3 +31,15 @@ impl ZcashMemoBytes {
         self.0.as_slice().to_owned()
     }
 }
+
+impl From<ZcashMemoBytes> for MemoBytes {
+    fn from(value: ZcashMemoBytes) -> Self {
+        value.0
+    }
+}
+
+impl From<&ZcashMemoBytes> for MemoBytes {
+    fn from(value: &ZcashMemoBytes) -> Self {
+        value.0.clone()
+    }
+}

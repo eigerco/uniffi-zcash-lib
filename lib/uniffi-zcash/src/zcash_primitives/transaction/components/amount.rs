@@ -36,6 +36,12 @@ impl From<ZcashAmount> for Amount {
     }
 }
 
+impl From<&ZcashAmount> for Amount {
+    fn from(value: &ZcashAmount) -> Self {
+        value.0
+    }
+}
+
 impl ZcashAmount {
     pub fn new(value: i64) -> crate::ZcashResult<Self> {
         let amount = Amount::from_i64(value).map_err(|_| ZcashError::ValueOutOfRange {

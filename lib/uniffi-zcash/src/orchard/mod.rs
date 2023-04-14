@@ -6,3 +6,12 @@ pub use self::address::*;
 
 mod diversifier_index;
 pub use self::diversifier_index::*;
+
+mod tree;
+pub use self::tree::*;
+
+mod note;
+pub use self::note::*;
+
+mod value;
+pub use self::value::*;

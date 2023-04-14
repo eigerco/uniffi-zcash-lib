@@ -11,5 +11,12 @@ enum ZcashError {
   "Secp256k1Error",
   "Bech32DecodeError",
   "Bs58Error",
+  "BuilderError",
+  "TransparentBuilderError",
+  "SaplingBuilderError",
+  "OrchardBuilderError",
+  "InsufficientFundsError",
+  "ChangeRequiredError",
+  "IOError",
   "Unknown",
 };

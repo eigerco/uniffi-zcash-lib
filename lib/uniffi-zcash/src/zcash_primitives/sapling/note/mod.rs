@@ -9,6 +9,7 @@ use crate::{
 use std::sync::Arc;
 use zcash_primitives::sapling::{Note, Rseed};
 
+#[derive(Clone)]
 pub struct ZcashSaplingNote(Note);
 
 impl ZcashSaplingNote {
@@ -46,6 +47,18 @@ impl ZcashSaplingNote {
 impl From<Note> for ZcashSaplingNote {
     fn from(inner: Note) -> Self {
         ZcashSaplingNote(inner)
+    }
+}
+
+impl From<ZcashSaplingNote> for Note {
+    fn from(value: ZcashSaplingNote) -> Self {
+        value.0
+    }
+}
+
+impl From<&ZcashSaplingNote> for Note {
+    fn from(value: &ZcashSaplingNote) -> Self {
+        value.0.clone()
     }
 }
 

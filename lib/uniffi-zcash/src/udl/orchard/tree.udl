@@ -1,0 +1,16 @@
+interface ZcashOrchardMerklePath {
+    [Name=from_parts, Throws=ZcashError]
+    constructor(u32 position, sequence<ZcashOrchardMerkleHash> auth_path);
+
+    ZcashAnchor root(ZcashExtractedNoteCommitment cmx);
+};
+
+interface ZcashOrchardMerkleHash {
+    [Name=from_bytes, Throws=ZcashError]
+    constructor([ByRef] sequence<u8> data);
+    
+    [Name=from_cmx]
+    constructor([ByRef] ZcashExtractedNoteCommitment cmx);
+
+    sequence<u8> to_bytes();
+};

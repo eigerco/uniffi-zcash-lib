@@ -4,4 +4,6 @@ interface ZcashIncrementalWitness {
 
     [Throws=ZcashError]
     void append(ZcashSaplingNode node);
+
+    ZcashSaplingMerklePath? path();
 };

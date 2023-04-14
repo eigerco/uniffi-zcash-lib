@@ -37,3 +37,9 @@ impl From<SpendingKey> for ZcashOrchardSpendingKey {
         Self(inner)
     }
 }
+
+impl From<&ZcashOrchardSpendingKey> for SpendingKey {
+    fn from(value: &ZcashOrchardSpendingKey) -> Self {
+        value.0
+    }
+}
