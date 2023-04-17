@@ -11,11 +11,11 @@ uniffi::build_foreign_language_testcases!(
     "tests/kotlin/orchard/address.kts",
     "tests/kotlin/orchard/diversifier_index.kts",
     "tests/kotlin/secp256k1/mod.kts",
-    // "tests/kotlin/zcash_client_backend/address/recipient_address.kts", - do at the end
+    "tests/kotlin/zcash_client_backend/address/recipient_address.kts", // todo
     "tests/kotlin/zcash_client_backend/address/unified_address.kts",
     "tests/kotlin/zcash_client_backend/keys/unified_full_viewing_key.kts",
     "tests/kotlin/zcash_client_backend/keys/unified_spending_key.kts",
-    // "tests/kotlin/zcash_client_backend/encoding.kts", - do at the end
+    "tests/kotlin/zcash_client_backend/encoding.kts", // todo
     "tests/kotlin/zcash_primitives/legacy/keys/account_priv_key.kts",
     "tests/kotlin/zcash_primitives/legacy/keys/account_pub_key.kts",
     "tests/kotlin/zcash_primitives/legacy/keys/ivk.kts",
@@ -29,12 +29,13 @@ uniffi::build_foreign_language_testcases!(
     "tests/kotlin/zcash_primitives/sapling/keys/outgoing_viewing_key_.kts",
     "tests/kotlin/zcash_primitives/sapling/keys/proof_generation_key.kts",
     "tests/kotlin/zcash_primitives/sapling/keys/viewing_key.kts",
-
-    /* "tests/kotlin/zcash_primitives/sapling/value/note.kts",
-
+    "tests/kotlin/zcash_primitives/sapling/value/commitment.kts", // todo
+    "tests/kotlin/zcash_primitives/sapling/value/note.kts", // todo
     "tests/kotlin/zcash_primitives/sapling/diversifier_.kts",
     "tests/kotlin/zcash_primitives/sapling/payment_address.kts",
-    "tests/kotlin/zcash_primitives/sapling/sapling_ivk.kts", */
+    //"tests/kotlin/zcash_primitives/sapling/sapling_ivk.kts",
+    //"tests/kotlin/zcash_primitives/zip32/sapling/extended_spending_key.kts",
+    //"tests/kotlin/zcash_primitives/zip32/diversifier_index.kts",
 
     /* // Python tests
     "tests/python/test.py",

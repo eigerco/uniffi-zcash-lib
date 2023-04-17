@@ -301,10 +301,11 @@ pub use self::value::*;---------------------------------------------------------
 
 * Original type: [zcash_primitives::sapling::Diversifier](https://docs.rs/zcash_primitives/latest/zcash_primitives/sapling/keys/struct.Diversifier.html)
 
-| Object/Method name      |    Score     |        UDL         |        Code        |       Tests        | Docs  |
-| ----------------------- | :----------: | :----------------: | :----------------: | :----------------: | :---: |
-| ::new()                 | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: |       |
-| ZcashDiversifier::g_d() |              |                    |                    |                    |       |
+| Object/Method name            |    Score     |        UDL         |        Code        |       Tests        |       Docs         |
+| ----------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
+| ZcashDiversifier::new()       | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashDiversifier::toBytes()   | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashDiversifier::g_d()       |              |                    |                    |                    |                    |
 
 ### ZcashExpandedSpendingKey (Sapling)
 
@@ -368,12 +369,12 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Object/Method name                 |    Score     |        UDL         |        Code        |       Tests        |        Docs        |
 | ---------------------------------- | :----------: | :----------------: | :----------------: | :----------------: | :----------------: |
-| ZcashPaymentAddress::decode()      |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashPaymentAddress::encode()      |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashPaymentAddress::from_parts()  | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashPaymentAddress::from_bytes()  | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashPaymentAddress::decode()      |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashPaymentAddress::encode()      |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashPaymentAddress::from_parts()  | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashPaymentAddress::from_bytes()  | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashPaymentAddress::to_bytes()    | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
-| ZcashPaymentAddress::diversifier() | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashPaymentAddress::diversifier() | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashPaymentAddress::pk_d()        | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 | ZcashPaymentAddress::create_note() | :red_circle: | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
 

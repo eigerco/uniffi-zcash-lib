@@ -2,44 +2,57 @@ import uniffi.zcash.*
 
 val supp = TestSupport.fromCsvFile()
 
-fun testSaplingPaymentAddressParsing() {
-    val seed = supp.getAsU8Array("seed")
+fun testPaymentAddressFromBytes() {
+    val expected = supp.getAsU8Array("viewing_key_payment_address")
 
-    val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
-        ZcashConsensusParameters.MAIN_NETWORK,
-        seed,
-        ZcashAccountId(0u),
-    )
+    val address = ZcashPaymentAddress.fromBytes(expected)
 
-    val saplingDiversifier = ZcashDiversifier(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
-
-    val sapling = unifiedSpendingKey.toUnifiedFullViewingKey()
-        .sapling()!!.toIvk(ZcashScope.EXTERNAL)
-        .toPaymentAddress(saplingDiversifier)
-
-    var bytes = sapling!!.toBytes()
-
-    assert(bytes == ZcashPaymentAddress.fromBytes(bytes).toBytes())
+    assert(address.toBytes() == expected)
 }
-testSaplingPaymentAddressParsing()
+testPaymentAddressFromBytes()
 
-fun testSaplingIvkToPaymentAddress() {
-    val seed = supp.getAsU8Array("seed")
+fun testPaymentAddressDecode() {
+    val expected = supp.getAsU8Array("viewing_key_payment_address")
 
-    val unifiedSpendingKey = ZcashUnifiedSpendingKey.fromSeed(
-        ZcashConsensusParameters.MAIN_NETWORK,
-        seed,
-        ZcashAccountId(0u),
-    )
+    val address = ZcashPaymentAddress.fromBytes(expected)
 
-    val saplingDiversifier = ZcashDiversifier(listOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).map { it.toUByte() })
+    val encoded = address.encode(ZcashConsensusParameters.MAIN_NETWORK)
 
-    val expected = supp.getAsU8Array("sapling_address")
+    val decoded = ZcashPaymentAddress.decode(ZcashConsensusParameters.MAIN_NETWORK, encoded)
 
-    val paymentAddress = unifiedSpendingKey.toUnifiedFullViewingKey()
-        .sapling()!!.toIvk(ZcashScope.EXTERNAL)
-        .toPaymentAddress(saplingDiversifier)!!.toBytes()
-
-    assert(paymentAddress == expected)
+    assert(decoded.toBytes() == expected)
 }
-testSaplingIvkToPaymentAddress()
+testPaymentAddressDecode()
+
+fun testPaymentAddressEncode() {
+    // covered by testPaymentAddressDecode()
+}
+testPaymentAddressEncode()
+
+fun testPaymentAddressToBytes() {
+    // covered by testPaymentAddressFromBytes()
+}
+testPaymentAddressToBytes()
+
+fun testPaymentAddressDiversifier() {
+    val bytes = supp.getAsU8Array("viewing_key_payment_address")
+
+    val address = ZcashPaymentAddress.fromBytes(bytes)
+
+    val diversifier = address.diversifier()
+
+    val expected = supp.getAsU8Array("diversifier")
+
+    assert(diversifier.toBytes() == expected)
+}
+testPaymentAddressDiversifier()
+
+fun testPaymentAddressPkD() {
+    // todo
+}
+testPaymentAddressPkD()
+
+fun testPaymentAddressCreateNote() {
+    // todo
+}
+testPaymentAddressCreateNote()
