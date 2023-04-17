@@ -882,6 +882,15 @@ a tuple.
 | ZcashOrchardMerkleHash::to_bytes()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashOrchardMerkleHash::from_bytes()| 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
 
+### ZcashTxId
+
+* Original type: [zcash_primitives::transaction::TxId](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/struct.TxId.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTxId::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxId::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
 ## Enums
 
 ### ZcashScope

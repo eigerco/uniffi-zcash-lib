@@ -13,6 +13,7 @@ use orchard::{
     keys::{SpendAuthorizingKey, SpendingKey},
     value::NoteValue,
 };
+use zcash_primitives::transaction::TxId;
 use zcash_primitives::{
     consensus::BranchId,
     transaction::{
@@ -245,6 +246,10 @@ impl ZcashTransaction {
         Ok(tx.into())
     }
 
+    pub fn txid(&self) -> Arc<ZcashTxId> {
+        Arc::new(self.0.txid().into())
+    }
+
     pub fn version(&self) -> Arc<ZcashTxVersion> {
         Arc::new(self.0.version().into())
     }
@@ -278,6 +283,26 @@ impl From<(Transaction, SaplingMetadata)> for ZcashTransactionAndSaplingMetadata
             transaction: Arc::new(transaction.into()),
             sapling_metadata: Arc::new(sapling_metadata.into()),
         }
+    }
+}
+
+pub struct ZcashTxId(TxId);
+
+impl ZcashTxId {
+    pub fn from_bytes(data: &[u8]) -> ZcashResult<Self> {
+        Ok(TxId::from_bytes(cast_slice(data)?).into())
+    }
+
+    pub fn to_bytes(&self) -> ZcashResult<Vec<u8>> {
+        let mut data = Vec::with_capacity(32);
+        self.0.write(&mut data)?;
+        Ok(data)
+    }
+}
+
+impl From<TxId> for ZcashTxId {
+    fn from(inner: TxId) -> Self {
+        ZcashTxId(inner)
     }
 }
 
