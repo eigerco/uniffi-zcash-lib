@@ -49,6 +49,14 @@ interface ZcashTransaction {
     
     [Name=from_bytes, Throws=ZcashError]
     constructor([ByRef] sequence<u8> data, ZcashBranchId consensus_branch_id);
+
+    ZcashTxVersion version();
+
+    ZcashBranchId consensus_branch_id();
+
+    u32 lock_time();
+
+    ZcashBlockHeight expiry_height();
 };
 
 dictionary ZcashTransactionAndSaplingMetadata {

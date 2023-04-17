@@ -244,6 +244,22 @@ impl ZcashTransaction {
         let tx = Transaction::read(data, consensus_branch_id.into())?;
         Ok(tx.into())
     }
+
+    pub fn version(&self) -> Arc<ZcashTxVersion> {
+        Arc::new(self.0.version().into())
+    }
+
+    pub fn consensus_branch_id(&self) -> ZcashBranchId {
+        self.0.consensus_branch_id().into()
+    }
+
+    pub fn lock_time(&self) -> u32 {
+        self.0.lock_time()
+    }
+
+    pub fn expiry_height(&self) -> Arc<ZcashBlockHeight> {
+        Arc::new(self.0.expiry_height().into())
+    }
 }
 
 impl From<Transaction> for ZcashTransaction {

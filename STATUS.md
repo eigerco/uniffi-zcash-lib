@@ -559,12 +559,15 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 * Original type: [zcash_primitives::transaction::Transaction](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/struct.Transaction.html)
 
 
-| Members                              | Score | UDL | Code | Tests | Docs |
-| -------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashTransaction::into_data()        | 🔴    |     |      |       |      |
-| ZcashTransaction::txid()             | 🔴    |     |      |       |      |
-| ZcashTransaction::read()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTransaction::write()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| Members                                | Score | UDL | Code | Tests | Docs |
+| ---------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTransaction::into_data()          | 🔴    |     |      |       |      |
+| ZcashTransaction::txid()               | 🔴    |     |      |       |      |
+| ZcashTransaction::read()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::version()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::consensus_branch_id()| 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::lock_time()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::expiry_height()      | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 * `write` method was implemented as `to_bytes()`.
 * `read` method was implemented as `from_bytes()`.
