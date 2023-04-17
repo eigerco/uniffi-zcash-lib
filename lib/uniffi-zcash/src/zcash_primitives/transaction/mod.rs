@@ -411,3 +411,91 @@ type OrchardOutputs = RwLock<
         Option<[u8; 512]>,
     )>,
 >;
+
+pub enum ZcashTxVersionSelection {
+    Sprout { v: u32 },
+    Overwinter,
+    Sapling,
+    Zip225,
+}
+
+impl From<TxVersion> for ZcashTxVersionSelection {
+    fn from(value: TxVersion) -> Self {
+        match value {
+            TxVersion::Sprout(u) => ZcashTxVersionSelection::Sprout { v: u },
+            TxVersion::Overwinter => ZcashTxVersionSelection::Overwinter,
+            TxVersion::Sapling => ZcashTxVersionSelection::Sapling,
+            TxVersion::Zip225 => ZcashTxVersionSelection::Zip225,
+        }
+    }
+}
+
+impl From<ZcashTxVersionSelection> for TxVersion {
+    fn from(value: ZcashTxVersionSelection) -> Self {
+        match value {
+            ZcashTxVersionSelection::Sprout { v } => TxVersion::Sprout(v),
+            ZcashTxVersionSelection::Overwinter => TxVersion::Overwinter,
+            ZcashTxVersionSelection::Sapling => TxVersion::Sapling,
+            ZcashTxVersionSelection::Zip225 => TxVersion::Zip225,
+        }
+    }
+}
+
+/// The set of defined transaction format versions.
+///
+/// This is serialized in the first four or eight bytes of the transaction format, and
+/// represents valid combinations of the `(overwintered, version, version_group_id)`
+/// transaction fields. Note that this is not dependent on epoch, only on transaction encoding.
+/// For example, if a particular epoch defines a new transaction version but also allows the
+/// previous version, then only the new version would be added to this enum.
+pub struct ZcashTxVersion(TxVersion);
+
+impl ZcashTxVersion {
+    pub fn selection(&self) -> ZcashTxVersionSelection {
+        self.0.into()
+    }
+
+    pub fn from_bytes(data: &[u8]) -> ZcashResult<Self> {
+        Ok(TxVersion::read(data)?.into())
+    }
+
+    pub fn header(&self) -> u32 {
+        self.0.header()
+    }
+
+    pub fn version_group_id(&self) -> u32 {
+        self.0.version_group_id()
+    }
+
+    pub fn to_bytes(&self) -> ZcashResult<Vec<u8>> {
+        let mut buffer = Vec::new();
+        self.0.write(&mut buffer)?;
+        Ok(buffer)
+    }
+
+    pub fn has_sprout(&self) -> bool {
+        self.0.has_sprout()
+    }
+
+    pub fn has_overwinter(&self) -> bool {
+        self.0.has_overwinter()
+    }
+
+    pub fn has_sapling(&self) -> bool {
+        self.0.has_sapling()
+    }
+
+    pub fn has_orchard(&self) -> bool {
+        self.0.has_orchard()
+    }
+
+    pub fn suggested_for_branch(consensus_branch_id: ZcashBranchId) -> Self {
+        TxVersion::suggested_for_branch(consensus_branch_id.into()).into()
+    }
+}
+
+impl From<TxVersion> for ZcashTxVersion {
+    fn from(inner: TxVersion) -> Self {
+        ZcashTxVersion(inner)
+    }
+}

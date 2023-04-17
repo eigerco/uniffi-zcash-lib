@@ -937,6 +937,38 @@ See [ZcashTransactionBuilder](#zcashtransactionbuilder).
 | Nu5        |  🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
 | ZFuture    |  🔵   |                       |                       |                               |
 
+
+### ZcashTxVersionSelection
+
+* Original type: [zcash_primitives::transaction::TxVersion](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/enum.TxVersion.html)
+
+| Members                     | Score | UDL | Code | Tests | Docs |
+| ----------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTxVersion::Sprout      | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::Overwinter  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::Sapling     | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::Zip225      | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::ZFuture     | 🔵    |     |      |       |      |
+
+The methods in this enum and the enum itself are contained in the following type:
+
+#### ZcashTxVersion
+
+| Members                               | Score | UDL | Code | Tests | Docs |
+| --------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTxVersion::selection()           | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::from_bytes()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::header()              | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::version_group_id()    | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::to_bytes()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::has_sprout()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::has_overwinter()      | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::has_sapling()         | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::has_orchard()         | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::suggested_for_branch()| 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+The `selection()` method is a pure invention one, that helps on retrieving the enum variant `ZcashTxVersionSelection`.
+
 ## Records
 
 ### ZcashDiversifierIndexAndScope
