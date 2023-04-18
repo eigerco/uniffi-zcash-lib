@@ -61,6 +61,8 @@ interface ZcashTransaction {
     ZcashBlockHeight expiry_height();
 
     ZcashTransparentBundle? transparent_bundle();
+    
+    ZcashSaplingBundle? sapling_bundle();
 };
 
 interface ZcashTxId {

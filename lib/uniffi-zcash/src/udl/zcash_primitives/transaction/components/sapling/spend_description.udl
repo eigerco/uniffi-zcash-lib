@@ -1,0 +1,10 @@
+interface ZcashSaplingSpendDescription {
+    
+    ZcashSaplingValueCommitment cv();
+
+    sequence<u8> anchor();
+    
+    ZcashSaplingNullifier nullifier();
+
+    ZcashSaplingPublicKey rk();
+};

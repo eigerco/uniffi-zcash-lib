@@ -18,3 +18,6 @@ pub use self::note::*;
 
 mod tree;
 pub use self::tree::*;
+
+mod redjubjub;
+pub use self::redjubjub::*;

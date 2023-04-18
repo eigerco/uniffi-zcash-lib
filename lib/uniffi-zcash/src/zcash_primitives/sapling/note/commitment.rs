@@ -32,3 +32,9 @@ impl From<ExtractedNoteCommitment> for ZcashSaplingExtractedNoteCommitment {
         ZcashSaplingExtractedNoteCommitment(inner)
     }
 }
+
+impl From<&ExtractedNoteCommitment> for ZcashSaplingExtractedNoteCommitment {
+    fn from(inner: &ExtractedNoteCommitment) -> Self {
+        ZcashSaplingExtractedNoteCommitment(*inner)
+    }
+}

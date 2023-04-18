@@ -920,6 +920,101 @@ a tuple.
 | ZcashTxId::vin()                    | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashTxId::vout()                   | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
+### ZcashSaplingBundle
+
+* Original type: [zcash_primitives::transaction::components::sapling::Bundle](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/sapling/struct.Bundle.html)
+* Implemented the authorized implementation.
+
+
+| Members                                | Score | UDL | Code | Tests | Docs |
+| ---------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingBundle::shielded_spends()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingBundle::shielded_outputs() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingBundle::value_balance()    | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingBundle::value_balance()    | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+
+### ZcashSaplingSpendDescription
+
+* Original type: [zcash_primitives::transaction::components::sapling::SpendDescription](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/sapling/struct.SpendDescription.html)
+* Implemented the authorized implementation.
+
+
+| Members                                         | Score | UDL | Code | Tests | Docs |
+| ------------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingSpendDescription::cv()              | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::anchor()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::nullifier()       | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::rk()              | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::zkproof()         |       |     |       |      |      |
+| ZcashSaplingSpendDescription::spend_auth_sig()  |       |     |       |      |      |
+
+### ZcashSaplingOutputDescription
+
+* Original type: [zcash_primitives::transaction::components::sapling::OutputDescription](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/sapling/struct.OutputDescription.html)
+* Implemented the authorized implementation.
+
+
+| Members                                         | Score | UDL | Code | Tests | Docs |
+| ------------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingSpendDescription::cv()              | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::cmu()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::ephemeral_key()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::enc_ciphertext()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::out_ciphertext()  |       |     |       |      |      |
+| ZcashSaplingSpendDescription::zkproof()         |       |     |       |      |      |
+| ZcashSaplingSpendDescription::read()            |       |     |       |      |      |
+| ZcashSaplingSpendDescription::write_v4()         |       |     |       |      |      |
+| ZcashSaplingSpendDescription::write_v5_without_proof()  |       |     |       |      |      |
+
+### ZcashSaplingValueCommitment
+
+* Original type: [zcash_primitives::sapling::value::ValueCommitment](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/sapling/value/struct.ValueCommitment.html)
+
+
+| Members                                         | Score | UDL | Code | Tests | Docs |
+| ------------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingValueCommitment::derive()           |       |     |       |      |      |
+| ZcashSaplingValueCommitment::as_inner()         |       |     |       |      |      |
+| ZcashSaplingValueCommitment::from_bytes_not_small_order() |       |     |       |      |      |
+| ZcashSaplingValueCommitment::to_bytes()         | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+### ZcashSaplingNullifier
+
+* Original type: [zcash_primitives::sapling::Nullifier](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/sapling/struct.Nullifier.html)
+
+| Members                                   | Score | UDL | Code | Tests | Docs |
+| ------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingNullifier::from_slice()       |       |     |      |      |      |
+| ZcashSaplingNullifier::to_bytes()         | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+### ZcashSaplingPublicKey
+
+* Original type: [zcash_primitives::sapling::redjubjub::PublicKey](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/sapling/redjubjub/struct.PublicKey.html)
+
+| Members                                      | Score | UDL | Code | Tests | Docs |
+| ---------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingPublicKey::from_private()        |       |     |      |      |      |
+| ZcashSaplingPublicKey::randomize()           |       |     |      |      |      |
+| ZcashSaplingPublicKey::read()                |       |     |      |      |      |
+| ZcashSaplingPublicKey::write()               |       |     |      |      |      |
+| ZcashSaplingPublicKey::verify()              |       |     |      |      |      |
+| ZcashSaplingPublicKey::verify_with_zip216()  |       |     |      |      |       |    
+| ZcashSaplingPublicKey::to_bytes()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
+
+* The `write()` method was implemented as `to_bytes()`
+
+### ZcashSaplingValueCommitment
+
+* Original type: [zcash_primitives::sapling::value::ValueCommitment](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/sapling/value/struct.ValueCommitment.html)
+
+| Members                                      | Score | UDL | Code | Tests | Docs |
+| ---------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingPublicKey::derive()              |       |     |      |      |      |
+| ZcashSaplingPublicKey::as_inner()            |       |     |      |      |      |
+| ZcashSaplingPublicKey::from_bytes_not_small_order() |       |     |      |      |      |
+| ZcashSaplingPublicKey::to_bytes()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
+  
 ## Enums
 
 ### ZcashScope

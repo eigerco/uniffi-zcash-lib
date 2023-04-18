@@ -1,6 +1,9 @@
 mod commitment;
 pub use self::commitment::*;
 
+mod nullifier;
+pub use self::nullifier::*;
+
 use crate::{
     utils::cast_slice, ZcashError, ZcashJubjubFr, ZcashPaymentAddress, ZcashResult,
     ZcashSaplingNoteValue,
