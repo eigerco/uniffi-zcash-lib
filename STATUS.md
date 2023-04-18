@@ -569,6 +569,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashTransaction::lock_time()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashTransaction::expiry_height()      | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashTransaction::fee_paid()           | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::transparent_bundle() | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 * `write` method was implemented as `to_bytes()`.
 * `read` method was implemented as `from_bytes()`.
@@ -891,6 +892,32 @@ a tuple.
 | ------------------------------------| ----- | --- | ---- | ----- | ---- |
 | ZcashTxId::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashTxId::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+
+### ZcashTxIn
+
+* Original type: [zcash_primitives::transaction::components::transparent::TxIn](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/transparent/struct.TxIn.html)
+* Implemented the authorized implementation.
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTxId::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxId::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+
+### ZcashTransparentBundle
+
+* Original type: [zcash_primitives::transaction::components::transparent::Bundle](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/transparent/struct.Bundle.html)
+* Implemented the authorized implementation.
+* `vin()` and `vout()` methods are pure invention methods, to access the pub struct fields.
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTxId::is_coinbase()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxId::map_authorization()      | 🔵    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxId::value_balance()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxId::vin()                    | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxId::vout()                   | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 ## Enums
 

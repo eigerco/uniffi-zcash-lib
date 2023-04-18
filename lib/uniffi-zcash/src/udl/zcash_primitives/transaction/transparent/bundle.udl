@@ -1,0 +1,10 @@
+interface ZcashTransparentBundle {
+    boolean is_coinbase();
+
+    sequence<ZcashTxIn> vin();
+
+    sequence<ZcashTxOut> vout();
+
+    // [Throws=ZcashError]
+    // ZcashAmount value_balance();
+};

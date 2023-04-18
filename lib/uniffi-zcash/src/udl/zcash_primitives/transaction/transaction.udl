@@ -59,6 +59,8 @@ interface ZcashTransaction {
     u32 lock_time();
 
     ZcashBlockHeight expiry_height();
+
+    ZcashTransparentBundle? transparent_bundle();
 };
 
 interface ZcashTxId {
