@@ -170,4 +170,23 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 
     let address = ivk.to_payment_address(Diversifier(diversifier)).unwrap();
     writeln!(file, "{}", format_bytes("sapling_ivk_payment_address", &address.to_bytes())).unwrap();
+
+    let esk = ExtendedSpendingKey::master(seed);
+    writeln!(file, "{}", format_bytes("extended_spending_key", &esk.to_bytes())).unwrap();
+
+    let esk_from_path = ExtendedSpendingKey::from_path(&esk, &[ChildIndex::NonHardened(0)]);
+    writeln!(file, "{}", format_bytes("esk_from_path", &esk_from_path.to_bytes())).unwrap();
+
+    let encoded = encoding::encode_extended_spending_key(MainNetwork.hrp_sapling_extended_spending_key(), &esk);
+    writeln!(file, "esk_encoded:{encoded}").unwrap();
+
+    let child = esk.derive_child(ChildIndex::NonHardened(0));
+    writeln!(file, "{}", format_bytes("extended_spending_key_child", &child.to_bytes())).unwrap();
+
+    let (index, address) = esk.default_address();
+    writeln!(file, "{}", format_bytes("esk_default_address_index", &index.0)).unwrap();
+    writeln!(file, "{}", format_bytes("esk_default_address_address", &address.to_bytes())).unwrap();
+
+    let dfvk = esk.to_diversifiable_full_viewing_key();
+    writeln!(file, "{}", format_bytes("esk_to_dfvk", &dfvk.to_bytes())).unwrap();
 }
