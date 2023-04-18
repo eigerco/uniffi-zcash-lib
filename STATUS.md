@@ -568,6 +568,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashTransaction::consensus_branch_id()| 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashTransaction::lock_time()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashTransaction::expiry_height()      | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::fee_paid()           | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 * `write` method was implemented as `to_bytes()`.
 * `read` method was implemented as `from_bytes()`.
