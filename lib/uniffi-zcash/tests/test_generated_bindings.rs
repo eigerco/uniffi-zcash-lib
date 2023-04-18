@@ -33,10 +33,9 @@ uniffi::build_foreign_language_testcases!(
     "tests/kotlin/zcash_primitives/sapling/value/note.kts", // todo
     "tests/kotlin/zcash_primitives/sapling/diversifier_.kts",
     "tests/kotlin/zcash_primitives/sapling/payment_address.kts",
-    //"tests/kotlin/zcash_primitives/sapling/sapling_ivk.kts",
-    //"tests/kotlin/zcash_primitives/zip32/sapling/extended_spending_key.kts",
-    //"tests/kotlin/zcash_primitives/zip32/diversifier_index.kts",
-
+    "tests/kotlin/zcash_primitives/sapling/sapling_ivk.kts",
+    "tests/kotlin/zcash_primitives/zip32/sapling/extended_spending_key.kts",
+    "tests/kotlin/zcash_primitives/zip32/diversifier_index_.kts"
     /* // Python tests
     "tests/python/test.py",
     "tests/python/sapling.py",

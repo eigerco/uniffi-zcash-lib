@@ -167,4 +167,7 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 
     let address = vk.to_payment_address(Diversifier(diversifier)).unwrap();
     writeln!(file, "{}", format_bytes("viewing_key_payment_address", &address.to_bytes())).unwrap();
+
+    let address = ivk.to_payment_address(Diversifier(diversifier)).unwrap();
+    writeln!(file, "{}", format_bytes("sapling_ivk_payment_address", &address.to_bytes())).unwrap();
 }
