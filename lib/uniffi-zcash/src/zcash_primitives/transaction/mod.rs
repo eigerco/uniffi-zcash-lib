@@ -269,6 +269,11 @@ impl ZcashTransaction {
     /// Returns the total fees paid by the transaction, given a function that can be used to
     /// retrieve the value of previous transactions' transparent outputs that are being spent in
     /// this transaction.
+    // pub fn fee_paid(&self) -> ZcashResult<Arc<ZcashAmount>> {
+    //     let amount = self.0.fee_paid::<BalanceError, _>(|_| Ok(Amount::zero()))?;
+    //     Ok(Arc::new(amount.into()))
+    // }
+
     pub fn transparent_bundle(&self) -> Option<Arc<ZcashTransparentBundle>> {
         self.0.transparent_bundle().map(|b| Arc::new(b.into()))  
     }

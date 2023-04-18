@@ -573,6 +573,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 * `write` method was implemented as `to_bytes()`.
 * `read` method was implemented as `from_bytes()`.
+* `fee_paid` method is commented in code. It needs a closure as parameter.
 
 ### ZcashSaplingMetadata
 | ZcashSaplingMetadata::spend_index()  | 🔴    | ✅  |  ✅  |       | ✅   |

@@ -112,6 +112,20 @@ impl ZcashTransparentBundle {
         self.0.is_coinbase()
     }
 
+    // /// The amount of value added to or removed from the transparent pool by the action of this
+    // /// bundle. A positive value represents that the containing transaction has funds being
+    // /// transferred out of the transparent pool into shielded pools or to fees; a negative value
+    // /// means that the containing transaction has funds being transferred into the transparent pool
+    // /// from the shielded pools.
+    // pub fn value_balance(&self) -> ZcashResult<Arc<ZcashAmount>> {
+    //     match self
+    //         .0
+    //         .value_balance::<BalanceError, _>(|_| Ok(Amount::zero()))
+    //     {
+    //         Ok(amount) => Ok(Arc::new(amount.into())),
+    //         Err(err) => Err(err.into()),
+    //     }
+    // }
 }
 
 impl From<&Bundle<Authorized>> for ZcashTransparentBundle {
