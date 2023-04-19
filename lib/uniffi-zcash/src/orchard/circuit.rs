@@ -1,8 +1,10 @@
 use orchard::circuit::{ProvingKey, VerifyingKey};
 
+/// The verifying key for the Orchard Action circuit.
 pub struct ZcashVerifyingKey(pub(crate) VerifyingKey);
 
 impl ZcashVerifyingKey {
+    /// Builds the verifying key.
     pub fn new() -> Self {
         VerifyingKey::build().into()
     }
@@ -20,9 +22,11 @@ impl Default for ZcashVerifyingKey {
     }
 }
 
+/// The proving key for the Orchard Action circuit.
 pub struct ZcashProvingKey(pub(crate) ProvingKey);
 
 impl ZcashProvingKey {
+    /// Builds the verifying key.
     pub fn new() -> Self {
         ProvingKey::build().into()
     }
