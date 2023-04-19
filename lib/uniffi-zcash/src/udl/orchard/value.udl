@@ -2,3 +2,7 @@ interface ZcashOrchardNoteValue {
     [Name=from_raw]
     constructor(u64 value);
 };
+
+interface ZcashOrchardValueCommitment {
+   sequence<u8> to_bytes();
+};

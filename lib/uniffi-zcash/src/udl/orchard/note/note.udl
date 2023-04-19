@@ -21,3 +21,12 @@ interface ZcashOrchardRandomSeed {
     constructor([ByRef] sequence<u8> data, ZcashOrchardNullifier rho);
     sequence<u8> to_bytes();
 };
+
+dictionary ZcashOrchardTransmittedNoteCiphertext {
+    
+    sequence<u8> epk_bytes;
+    
+    sequence<u8> enc_ciphertext;
+    
+    sequence<u8> out_ciphertext;
+};

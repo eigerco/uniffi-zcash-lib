@@ -1,0 +1,24 @@
+interface ZcashOrchardBundle {
+    sequence<ZcashOrchardAction> actions();
+    
+    ZcashOrchardFlags flags();
+
+    ZcashAmount value_balance();
+
+    ZcashAnchor anchor();
+
+};
+
+interface ZcashOrchardFlags {
+    [Name=from_parts]
+    constructor(boolean spends_enabled, boolean outputs_enabled);
+
+    [Name=from_byte, Throws=ZcashError]
+    constructor(u8 v);
+
+    boolean spends_enabled();
+
+    boolean outputs_enabled();
+
+    u8 to_byte();
+};

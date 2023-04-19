@@ -23,6 +23,7 @@ use zcash_primitives::{
     },
 };
 
+use crate::ZcashOrchardBundle;
 use crate::{
     utils::cast_slice, SecpSecretKey, ZcashAnchor, ZcashBlockHeight, ZcashBranchId,
     ZcashConsensusParameters, ZcashDiversifier, ZcashError, ZcashExtendedSpendingKey,
@@ -280,6 +281,10 @@ impl ZcashTransaction {
 
     pub fn sapling_bundle(&self) -> Option<Arc<ZcashSaplingBundle>> {
         self.0.sapling_bundle().map(|b| Arc::new(b.into()))  
+    }
+
+    pub fn orchard_bundle(&self) -> Option<Arc<ZcashOrchardBundle>> {
+        self.0.orchard_bundle().map(|b| b.into()).map(Arc::new)
     }
 }
 

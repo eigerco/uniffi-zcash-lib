@@ -1,0 +1,10 @@
+interface ZcashOrchardAction {
+
+    ZcashOrchardNullifier nullifier();
+    
+    ZcashExtractedNoteCommitment cmx();
+    
+    ZcashOrchardTransmittedNoteCiphertext encrypted_note();
+    
+    ZcashOrchardValueCommitment cv_net();
+};

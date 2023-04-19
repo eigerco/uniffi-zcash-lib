@@ -63,6 +63,8 @@ interface ZcashTransaction {
     ZcashTransparentBundle? transparent_bundle();
     
     ZcashSaplingBundle? sapling_bundle();
+    
+    ZcashOrchardBundle? orchard_bundle();
 };
 
 interface ZcashTxId {
