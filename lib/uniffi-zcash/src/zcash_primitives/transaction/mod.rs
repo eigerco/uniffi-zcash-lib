@@ -23,12 +23,12 @@ use zcash_primitives::{
 };
 
 use crate::{
-    utils::cast_slice, SecpSecretKey, ZcashAnchor, ZcashBlockHeight, ZcashConsensusParameters,
-    ZcashDiversifier, ZcashError, ZcashExtendedSpendingKey, ZcashLocalTxProver, ZcashMemoBytes,
-    ZcashOrchardAddress, ZcashOrchardFullViewingKey, ZcashOrchardMerklePath, ZcashOrchardNote,
-    ZcashOrchardOutgoingViewingKey, ZcashOrchardSpendingKey, ZcashOutgoingViewingKey,
-    ZcashPaymentAddress, ZcashResult, ZcashSaplingMerklePath, ZcashSaplingNote,
-    ZcashTransparentAddress,
+    utils::cast_slice, SecpSecretKey, ZcashAnchor, ZcashBlockHeight, ZcashBranchId,
+    ZcashConsensusParameters, ZcashDiversifier, ZcashError, ZcashExtendedSpendingKey,
+    ZcashLocalTxProver, ZcashMemoBytes, ZcashOrchardAddress, ZcashOrchardFullViewingKey,
+    ZcashOrchardMerklePath, ZcashOrchardNote, ZcashOrchardOutgoingViewingKey,
+    ZcashOrchardSpendingKey, ZcashOutgoingViewingKey, ZcashPaymentAddress, ZcashResult,
+    ZcashSaplingMerklePath, ZcashSaplingNote, ZcashTransparentAddress,
 };
 
 pub use self::components::*;
@@ -235,6 +235,14 @@ impl ZcashTransaction {
         let mut data = Vec::new();
         self.0.write(&mut data).map_err(ZcashError::from)?;
         Ok(data)
+    }
+
+    pub fn from_bytes(
+        data: &[u8],
+        consensus_branch_id: ZcashBranchId,
+    ) -> ZcashResult<ZcashTransaction> {
+        let tx = Transaction::read(data, consensus_branch_id.into())?;
+        Ok(tx.into())
     }
 }
 

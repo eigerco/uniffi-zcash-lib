@@ -1,0 +1,9 @@
+enum ZcashBranchId {
+    "Sprout",
+    "Overwinter",
+    "Sapling",
+    "Blossom",
+    "Heartwood",
+    "Canopy",
+    "Nu5",
+};

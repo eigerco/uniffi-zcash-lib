@@ -528,15 +528,22 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 ### ZcashTransaction
 * Original type: [zcash_primitives::transaction::Transaction](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/struct.Transaction.html)
-* `write` method was implemented as `to_bytes()`.
+
 
 | Members                              | Score | UDL | Code | Tests | Docs |
 | -------------------------------------| ----- | --- | ---- | ----- | ---- |
 | ZcashTransaction::into_data()        | 🔴    |     |      |       |      |
-| ZcashTransaction::txid()             | 🔴    |     |      |       |      |/// The non-negative value of an individual Orchard note.
+| ZcashTransaction::txid()             | 🔴    |     |      |       |      |
+| ZcashTransaction::read()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::write()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
+* `write` method was implemented as `to_bytes()`.
+* `read` method was implemented as `from_bytes()`.
+
+### ZcashSaplingMetadata
 | ZcashSaplingMetadata::spend_index()  | 🔴    | ✅  |  ✅  |       | ✅   |
 | ZcashSaplingMetadata::output_index() | 🔴    | ✅  |  ✅  |       | ✅   |
+
 ### ZcashParametersMainNetwork
 * Original type: [zcash_primitives::consensus::MainNetwork](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/consensus/struct.MainNetwork.html)
 * Marker struct, no need to implement methods.
@@ -856,6 +863,21 @@ a tuple.
 
 This is a pure invention enum. It helps to select the desired fee rules.
 See [ZcashTransactionBuilder](#zcashtransactionbuilder).
+
+### ZcashBranchId
+
+* Original type: [hdwallet::extended_key::KeySeed](https://docs.rs/hdwallet/latest/hdwallet/extended_key/enum.KeySeed.html)
+
+| Members    | Score | UDL                | Code               | Tests | Docs               |
+| ---------- | ----- | ------------------ | ------------------ | ----- | ------------------ |
+| Sprout     |  🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| Overwinter |  🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| Sapling    |  🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| Blossom    |  🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| Heartwood  |  🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| Canopy     |  🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| Nu5        |  🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| ZFuture    |  🔵   |                       |                       |                               |
 
 ## Records
 
