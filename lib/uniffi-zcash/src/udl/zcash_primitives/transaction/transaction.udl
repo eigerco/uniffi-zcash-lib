@@ -60,6 +60,9 @@ interface ZcashTransaction {
 
     ZcashBlockHeight expiry_height();
 
+    // [Throws=ZcashError]
+    // ZcashAmount fee_paid();
+
     ZcashTransparentBundle? transparent_bundle();
     
     ZcashSaplingBundle? sapling_bundle();

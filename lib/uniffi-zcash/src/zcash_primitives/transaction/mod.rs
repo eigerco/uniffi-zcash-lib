@@ -274,6 +274,7 @@ impl ZcashTransaction {
     //     let amount = self.0.fee_paid::<BalanceError, _>(|_| Ok(Amount::zero()))?;
     //     Ok(Arc::new(amount.into()))
     // }
+    // TODO: investigate alternative ways of exposing this to FFI, as it accepts a closure as parameter.
 
     pub fn transparent_bundle(&self) -> Option<Arc<ZcashTransparentBundle>> {
         self.0.transparent_bundle().map(|b| b.into()).map(Arc::new)
