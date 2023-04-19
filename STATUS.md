@@ -822,10 +822,10 @@ a tuple.
 
 * Original type: [orchard::note::ExtractedNoteCommitment](https://docs.rs/orchard/0.3.0/orchard/note/struct.ExtractedNoteCommitment.html)
 
-| Members                             | Score | UDL | Code | Tests | Docs |
-| ------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashOrchardNoteValue::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashOrchardNoteValue::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| Members                                    | Score | UDL | Code | Tests | Docs |
+| -------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashExtractedNoteCommitment::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashExtractedNoteCommitment::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 ### ZcashAnchor
 
@@ -833,8 +833,8 @@ a tuple.
 
 | Members                             | Score | UDL | Code | Tests | Docs |
 | ------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashOrchardNoteValue::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashOrchardNoteValue::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashAnchor::from_bytes()           | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashAnchor::to_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 ### ZcashOrchardNote
 
@@ -904,8 +904,8 @@ a tuple.
 
 | Members                             | Score | UDL | Code | Tests | Docs |
 | ------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashTxId::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTxId::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxIn::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxIn::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 
 ### ZcashTransparentBundle
@@ -914,13 +914,13 @@ a tuple.
 * Implemented the authorized implementation.
 * `vin()` and `vout()` methods are pure invention methods, to access the pub struct fields.
 
-| Members                             | Score | UDL | Code | Tests | Docs |
-| ------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashTxId::is_coinbase()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTxId::map_authorization()      | 🔵    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTxId::value_balance()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTxId::vin()                    | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTxId::vout()                   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| Members                                 | Score | UDL | Code | Tests | Docs |
+| ----------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTransparentBundle::is_coinbase()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransparentBundle::map_authorization()      | 🔵    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransparentBundle::value_balance()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransparentBundle::vin()                    | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashZcashTransparentBundleTxId::vout()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 ### ZcashSaplingBundle
 
@@ -959,15 +959,15 @@ a tuple.
 
 | Members                                         | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashSaplingSpendDescription::cv()              | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashSaplingSpendDescription::cmu()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashSaplingSpendDescription::ephemeral_key()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashSaplingSpendDescription::enc_ciphertext()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashSaplingSpendDescription::out_ciphertext()  |       |     |       |      |      |
-| ZcashSaplingSpendDescription::zkproof()         |       |     |       |      |      |
-| ZcashSaplingSpendDescription::read()            |       |     |       |      |      |
-| ZcashSaplingSpendDescription::write_v4()         |       |     |       |      |      |
-| ZcashSaplingSpendDescription::write_v5_without_proof()  |       |     |       |      |      |
+| ZcashSaplingOutputDescription::cv()              | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingOutputDescription::cmu()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingOutputDescription::ephemeral_key()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingOutputDescription::enc_ciphertext()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingOutputDescription::out_ciphertext()  |       |     |       |      |      |
+| ZcashSaplingOutputDescription::zkproof()         |       |     |       |      |      |
+| ZcashSaplingOutputDescription::read()            |       |     |       |      |      |
+| ZcashSaplingOutputDescription::write_v4()         |       |     |       |      |      |
+| ZcashSaplingOutputDescription::write_v5_without_proof()  |       |     |       |      |      |
 
 ### ZcashSaplingValueCommitment
 
@@ -1011,11 +1011,11 @@ a tuple.
 * Original type: [zcash_primitives::sapling::value::ValueCommitment](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/sapling/value/struct.ValueCommitment.html)
 
 | Members                                      | Score | UDL | Code | Tests | Docs |
-| ---------------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashSaplingPublicKey::derive()              |       |     |      |      |      |
-| ZcashSaplingPublicKey::as_inner()            |       |     |      |      |      |
-| ZcashSaplingPublicKey::from_bytes_not_small_order() |       |     |      |      |      |
-| ZcashSaplingPublicKey::to_bytes()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ---------------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingValueCommitment::derive()              |       |     |      |      |      |
+| ZcashSaplingValueCommitment::as_inner()            |       |     |      |      |      |
+| ZcashSaplingValueCommitment::from_bytes_not_small_order() |       |     |      |      |      |
+| ZcashSaplingValueCommitment::to_bytes()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
   
 ### ZcashOrchardBundle (Authorized)
 
