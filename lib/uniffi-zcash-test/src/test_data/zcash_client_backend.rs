@@ -3,7 +3,7 @@ use std::io::Write;
 use zcash_client_backend::keys::{Era, UnifiedSpendingKey};
 use zcash_primitives::{
     consensus::MainNetwork,
-    zip32::{ChildIndex, ExtendedSpendingKey, DiversifierIndex},
+    zip32::{ChildIndex, DiversifierIndex, ExtendedSpendingKey},
 };
 
 use super::format_bytes;

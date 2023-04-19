@@ -11,7 +11,7 @@ use zcash_primitives::{
         keys::{ExpandedSpendingKey, FullViewingKey},
         Diversifier,
     },
-    zip32::{ChildIndex, ExtendedSpendingKey, Scope, DiversifierIndex},
+    zip32::{ChildIndex, DiversifierIndex, ExtendedSpendingKey, Scope},
 };
 
 use super::format_bytes;

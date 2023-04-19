@@ -14,7 +14,11 @@ pub struct ZcashExternalIvk(ExternalIvk);
 
 impl ZcashExternalIvk {
     pub fn derive_address(&self, child_index: u32) -> ZcashResult<Arc<ZcashTransparentAddress>> {
-        self.0.derive_address(child_index).map_err(From::from).map(From::from).map(Arc::new)
+        self.0
+            .derive_address(child_index)
+            .map_err(From::from)
+            .map(From::from)
+            .map(Arc::new)
     }
 
     /// Searches the space of child indexes for an index that will

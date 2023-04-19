@@ -61,9 +61,7 @@ pub enum ZcashError {
     },
 
     #[error("Orchard builder error occurred: {error:?}")]
-    OrchardBuilderError {
-        error: orchard::builder::Error,
-    },
+    OrchardBuilderError { error: orchard::builder::Error },
 
     #[error("Insufficient founds error: {amount}")]
     InsufficientFundsError { amount: u64 },

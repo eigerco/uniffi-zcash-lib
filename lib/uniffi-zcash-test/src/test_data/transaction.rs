@@ -32,7 +32,7 @@ use crate::test_data::format_bytes;
 const BLOCK_HEIGHT: u32 = 2030820;
 
 pub fn write_for_transaction<W: Write>(mut file: W, seed: &[u8]) {
-    let key = UnifiedSpendingKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
+    let key = UnifiedSpendingKey::from_seed(&MainNetwork, seed, 0.into()).unwrap();
     transparent_builder_with_nonstandard_fee_example(&mut file, &key);
     transparent_builder_with_standard_fee_example(&mut file, &key);
     transparent_builder_with_zip317_standard_fee_example(&mut file, &key);
@@ -192,7 +192,6 @@ pub fn transparent_builder_with_zip317_non_standard_fee_example<W: Write>(
 
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
-    transaction.write(&mut data).unwrap();
     transaction.write(&mut data).unwrap();
     writeln!(
         file,
