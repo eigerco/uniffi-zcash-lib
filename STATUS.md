@@ -1200,7 +1200,7 @@ A pair of [ZcashDiversifierIndex](#zcashdiversifierindex) and [ZcashPaymentAddre
 
 A pair of [ZcashTransaction](#zcashtransaction) and [ZcashSaplingMetadata](#zcashsaplingmetadata)
 
-### TransmittedNoteCiphertext
+### ZcashTransmittedNoteCiphertext
 
 A 1:1 exposure of [orchard::note::TransmittedNoteCiphertext](https://docs.rs/orchard/0.3.0/orchard/note/struct.TransmittedNoteCiphertext.html)
 
