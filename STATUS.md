@@ -501,12 +501,12 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Object/Method name                              | Score        | UDL                | Code               | Tests              | Docs               |
 | ----------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| ZcashDiversifierIndex::new()                    |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashDiversifierIndex::from_u32()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashDiversifierIndex::from_u64()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashDiversifierIndex::increment()              |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashDiversifierIndex::to_u32()                 |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| ZcashDiversifierIndex::to_bytes()               |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| ZcashDiversifierIndex::new()                    |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashDiversifierIndex::from_u32()               |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashDiversifierIndex::from_u64()               |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashDiversifierIndex::increment()              |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashDiversifierIndex::to_u32()                 |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| ZcashDiversifierIndex::to_bytes()               |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 
 ### ZcashKeyIndex
 

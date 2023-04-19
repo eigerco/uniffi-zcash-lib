@@ -11,7 +11,7 @@ use zcash_primitives::{
         keys::{ExpandedSpendingKey, FullViewingKey},
         Diversifier,
     },
-    zip32::{ChildIndex, ExtendedSpendingKey, Scope},
+    zip32::{ChildIndex, ExtendedSpendingKey, Scope, DiversifierIndex},
 };
 
 use super::format_bytes;
@@ -189,4 +189,10 @@ pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
 
     let dfvk = esk.to_diversifiable_full_viewing_key();
     writeln!(file, "{}", format_bytes("esk_to_dfvk", &dfvk.to_bytes())).unwrap();
+
+    let mut index: DiversifierIndex = 0u32.into();
+    writeln!(file, "{}", format_bytes("diversifier_index", &index.0)).unwrap();
+
+    index.increment().unwrap();
+    writeln!(file, "{}", format_bytes("diversifier_index_incremented", &index.0)).unwrap();
 }
