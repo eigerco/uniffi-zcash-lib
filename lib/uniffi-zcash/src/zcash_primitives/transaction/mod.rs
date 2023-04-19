@@ -276,11 +276,11 @@ impl ZcashTransaction {
     // }
 
     pub fn transparent_bundle(&self) -> Option<Arc<ZcashTransparentBundle>> {
-        self.0.transparent_bundle().map(|b| Arc::new(b.into()))  
+        self.0.transparent_bundle().map(|b| b.into()).map(Arc::new)
     }
 
     pub fn sapling_bundle(&self) -> Option<Arc<ZcashSaplingBundle>> {
-        self.0.sapling_bundle().map(|b| Arc::new(b.into()))  
+        self.0.sapling_bundle().map(|b| b.into()).map(Arc::new)
     }
 
     pub fn orchard_bundle(&self) -> Option<Arc<ZcashOrchardBundle>> {
