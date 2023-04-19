@@ -1,6 +1,7 @@
 mod hdwallet;
 mod orchard;
 mod secp256k1;
+mod transaction;
 mod zcash_client_backend;
 mod zcash_primitives;
 
@@ -10,6 +11,7 @@ use std::io::Write;
 use self::hdwallet::write_for_hdwallet;
 use self::orchard::write_for_orchard;
 use self::secp256k1::write_for_secp256k1;
+use self::transaction::write_for_transaction;
 use self::zcash_client_backend::write_for_zcash_client_backend;
 use self::zcash_primitives::write_for_zcash_primitives;
 
@@ -33,6 +35,7 @@ pub fn generate_test_data() {
     write_for_secp256k1(&mut file, &seed);
     write_for_zcash_client_backend(&mut file, &seed);
     write_for_zcash_primitives(&mut file, &seed);
+    write_for_transaction(&mut file, &seed);
 }
 
 pub(crate) fn format_bytes(label: &str, bytes: &[u8]) -> String {

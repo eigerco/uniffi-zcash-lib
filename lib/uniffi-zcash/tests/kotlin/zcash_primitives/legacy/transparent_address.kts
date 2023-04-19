@@ -11,7 +11,7 @@ fun testTransparentAddressFromPublicKey() {
     val parsedAsPublicKey = ZcashTransparentAddress.decode(network, encodedPublicKeyAddress)
     val addrBytes = parsedAsPublicKey.toBytes()
 
-	val addr = ZcashTransparentAddress.publicKey(addrBytes)
+	val addr = ZcashTransparentAddress.fromPublicKey(addrBytes)
 
     assert(addr.toBytes() == addrBytes)
 }
@@ -23,7 +23,7 @@ fun testTransparentAddressFromScript() {
     val parsedAsScript = ZcashTransparentAddress.decode(network, encodedScriptAddress)
     val addrBytes = parsedAsScript.toBytes()
 
-    val addr = ZcashTransparentAddress.script(addrBytes)
+    val addr = ZcashTransparentAddress.fromScript(addrBytes)
 
     assert(addr.toBytes() == addrBytes)
 }

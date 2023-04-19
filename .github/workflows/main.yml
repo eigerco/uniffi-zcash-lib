@@ -47,4 +47,5 @@ jobs:
 
       - name: 🔎 Test
         run: |
+          cargo run --bin test-data
           cargo test --verbose

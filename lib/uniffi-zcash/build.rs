@@ -2,11 +2,7 @@ use std::fs::{read_to_string, OpenOptions};
 use std::io::Write;
 use std::path::Path;
 
-use uniffi_zcash_test::test_data::generate_test_data;
-
 fn main() {
-    generate_test_data();
-
     println!("cargo:rerun-if-changed=src/udl");
     println!("cargo:rerun-if-changed=../uniffi-zcash-test/src/udl");
     generate_udl_file();

@@ -37,7 +37,7 @@ fun testUnifiedAddressParsing() {
 
     val transparentAddressPublicKey = supp.getAsU8Array("transparent_address_public_key")
 
-    val transparent = ZcashTransparentAddress.publicKey(transparentAddressPublicKey)
+    val transparent = ZcashTransparentAddress.fromPublicKey(transparentAddressPublicKey)
 
     val source = ZcashUnifiedAddress(orchard, sapling, transparent)
     val address = source.encode(params)
@@ -96,7 +96,7 @@ fun testUnifiedAddressCreation() {
 
     val transparentAddressPublicKey = supp.getAsU8Array("transparent_address_public_key")
 
-    val transparent = ZcashTransparentAddress.publicKey(transparentAddressPublicKey)
+    val transparent = ZcashTransparentAddress.fromPublicKey(transparentAddressPublicKey)
 
     // At least one of orchard or sapling address must be set
     // ZcashUnifiedAddress(null, null, null)

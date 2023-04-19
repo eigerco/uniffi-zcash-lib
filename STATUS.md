@@ -602,6 +602,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                             | Score        | UDL                | Code               | Tests              | Docs               |
 | ----------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
+| ZcashExternalIvk::derive_address()  | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashExternalIvk::default_address() | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashExternalIvk::from_bytes()      | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
 | ZcashExternalIvk::to_bytes()        | :red_circle: | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
