@@ -138,13 +138,12 @@ impl From<&ZcashOrchardRandomSeed> for RandomSeed {
 
 /// An encrypted note.
 pub struct ZcashOrchardTransmittedNoteCiphertext {
-    /// The serialization of the ephemeral public key
-    pub epk_bytes: Vec<u8>, // 32 bytes
-    /// The encrypted note ciphertext
-    pub enc_ciphertext: Vec<u8>, // 580 bytes
-    /// An encrypted value that allows the holder of the outgoing cipher
-    /// key for the note to recover the note plaintext.
-    pub out_ciphertext: Vec<u8>, // 80 bytes
+    /// The serialization of the ephemeral public key (32 bytes).
+    pub epk_bytes: Vec<u8>,
+    /// The encrypted note ciphertext (580 bytes).
+    pub enc_ciphertext: Vec<u8>,
+    /// An encrypted value that allows the holder of the outgoing cipher key for the note to recover the note plaintext. (80 bytes)
+    pub out_ciphertext: Vec<u8>,
 }
 
 impl From<&TransmittedNoteCiphertext> for ZcashOrchardTransmittedNoteCiphertext {
