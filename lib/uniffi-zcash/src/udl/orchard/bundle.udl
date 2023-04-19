@@ -9,6 +9,9 @@ interface ZcashOrchardBundle {
 
     [Throws=ZcashError]
     void verify_proof([ByRef] ZcashVerifyingKey key);
+    
+    [Throws=ZcashError]
+    ZcashOrchardBundleDecryptOutput decrypt_output_with_key(u64 action_idx, [ByRef] ZcashOrchardIncomingViewingKey ivk);
 };
 
 interface ZcashOrchardFlags {
@@ -23,4 +26,10 @@ interface ZcashOrchardFlags {
     boolean outputs_enabled();
 
     u8 to_byte();
+};
+
+dictionary ZcashOrchardBundleDecryptOutput {
+    ZcashOrchardNote note;
+    ZcashOrchardAddress address;
+    sequence<u8> data;
 };

@@ -1028,7 +1028,7 @@ a tuple.
 | ZcashOrchardBundle::authorization()            |       |     |      |      |      |
 | ZcashOrchardBundle::authorizing_commitment()   |       |     |      |      |      |
 | ZcashOrchardBundle::binding_validating_key()   |       |     |      |      |      |
-| ZcashOrchardBundle::decrypt_output_with_key()  | 🔴    |     |      |      |      |
+| ZcashOrchardBundle::decrypt_output_with_key()  | 🔴    |  ✅ |  ✅  |      | ✅   |
 | ZcashOrchardBundle::decrypt_outputs_with_keys()| 🔴    |     |      |      |      |
 | ZcashOrchardBundle::flags()                    | 🔴    |  ✅ |  ✅  |      |  ✅  |
 | ZcashOrchardBundle::value_balance()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
@@ -1203,6 +1203,10 @@ A pair of [ZcashTransaction](#zcashtransaction) and [ZcashSaplingMetadata](#zcas
 ### ZcashTransmittedNoteCiphertext
 
 A 1:1 exposure of [orchard::note::TransmittedNoteCiphertext](https://docs.rs/orchard/0.3.0/orchard/note/struct.TransmittedNoteCiphertext.html)
+
+### ZcashOrchardBundleDecryptOutput
+
+A dictionary for holding the response of some [ZcashOrchardBundle](#zcashorchardbundle-authorized) methods.
 
 ## Functions
 

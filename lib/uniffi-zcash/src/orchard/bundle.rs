@@ -2,11 +2,14 @@ use std::sync::Arc;
 
 use orchard::{
     bundle::{Authorized, Flags},
-    Bundle,
+    Address, Bundle, Note,
 };
 use zcash_primitives::transaction::components::Amount;
 
-use crate::{ZcashAmount, ZcashAnchor, ZcashOrchardAction, ZcashResult, ZcashVerifyingKey};
+use crate::{
+    ZcashAmount, ZcashAnchor, ZcashOrchardAction, ZcashOrchardAddress,
+    ZcashOrchardIncomingViewingKey, ZcashOrchardNote, ZcashResult, ZcashVerifyingKey,
+};
 
 /// A bundle of actions to be applied to the ledger.
 pub struct ZcashOrchardBundle(Bundle<Authorized, Amount>);
@@ -41,13 +44,48 @@ impl ZcashOrchardBundle {
 
     /// Verifies the proof for this bundle.
     pub fn verify_proof(&self, key: &ZcashVerifyingKey) -> ZcashResult<()> {
-        self.0.verify_proof(&key.0).or(Err("Error verifying proof".into()))
+        self.0
+            .verify_proof(&key.0)
+            .or(Err("Error verifying proof".into()))
+    }
+
+    /// Performs trial decryption of the action at `action_idx` in the bundle with the
+    /// specified incoming viewing key, and returns the decrypted note plaintext
+    /// contents if successful.
+    pub fn decrypt_output_with_key(
+        &self,
+        action_idx: u64,
+        ivk: &ZcashOrchardIncomingViewingKey,
+    ) -> ZcashResult<ZcashOrchardBundleDecryptOutput> {
+        match self
+            .0
+            .decrypt_output_with_key(action_idx.try_into()?, &ivk.0)
+        {
+            Some(result) => Ok(result.into()),
+            None => Err("Cannot decrypt bundle".into()),
+        }
     }
 }
 
 impl From<&Bundle<Authorized, Amount>> for ZcashOrchardBundle {
     fn from(inner: &Bundle<Authorized, Amount>) -> Self {
         ZcashOrchardBundle(inner.clone())
+    }
+}
+
+pub struct ZcashOrchardBundleDecryptOutput {
+    pub note: Arc<ZcashOrchardNote>,
+    pub address: Arc<ZcashOrchardAddress>,
+    pub data: Vec<u8>,
+}
+
+impl From<(Note, Address, [u8; 512])> for ZcashOrchardBundleDecryptOutput {
+    fn from((note, address, data): (Note, Address, [u8; 512])) -> Self {
+        Self {
+            note: Arc::new(note.into()),
+            address: Arc::new(address.into()),
+            data: data.to_vec(),
+        }
     }
 }
 
