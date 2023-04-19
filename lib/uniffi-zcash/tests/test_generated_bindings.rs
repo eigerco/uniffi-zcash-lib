@@ -1,6 +1,6 @@
 uniffi::build_foreign_language_testcases!(
     // Kotlin tests
-    /* "tests/kotlin/test_support.kts",
+    "tests/kotlin/test_support.kts",
     "tests/kotlin/hdwallet/extended_key/extended_priv_key.kts",
     "tests/kotlin/hdwallet/key_index.kts",
     "tests/kotlin/orchard/keys/diversifier.kts",
@@ -30,12 +30,12 @@ uniffi::build_foreign_language_testcases!(
     "tests/kotlin/zcash_primitives/sapling/keys/proof_generation_key.kts",
     "tests/kotlin/zcash_primitives/sapling/keys/viewing_key.kts",
     "tests/kotlin/zcash_primitives/sapling/value/commitment.kts", // todo
-    "tests/kotlin/zcash_primitives/sapling/value/note.kts", // todo
+    "tests/kotlin/zcash_primitives/sapling/value/note.kts",       // todo
     "tests/kotlin/zcash_primitives/sapling/diversifier_.kts",
     "tests/kotlin/zcash_primitives/sapling/payment_address.kts",
     "tests/kotlin/zcash_primitives/sapling/sapling_ivk.kts",
     "tests/kotlin/zcash_primitives/zip32/sapling/extended_spending_key.kts",
-    "tests/kotlin/zcash_primitives/zip32/diversifier_index_.kts", */
+    "tests/kotlin/zcash_primitives/zip32/diversifier_index_.kts",
     // Python tests
     "tests/python/test.py",
     "tests/python/sapling.py",
