@@ -11,7 +11,7 @@ uniffi::build_foreign_language_testcases!(
     "tests/kotlin/orchard/address.kts",
     "tests/kotlin/orchard/diversifier_index.kts",
     "tests/kotlin/secp256k1/mod.kts",
-    "tests/kotlin/zcash_client_backend/address/recipient_address.kts", // todo
+    "tests/kotlin/zcash_client_backend/address/recipient_address.kts",
     "tests/kotlin/zcash_client_backend/address/unified_address.kts",
     "tests/kotlin/zcash_client_backend/keys/unified_full_viewing_key.kts",
     "tests/kotlin/zcash_client_backend/keys/unified_spending_key.kts",

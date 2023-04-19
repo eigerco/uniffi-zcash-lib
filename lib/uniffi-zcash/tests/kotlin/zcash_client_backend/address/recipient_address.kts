@@ -1,26 +1,64 @@
 import uniffi.zcash.*
 
+val supp = TestSupport.fromCsvFile()
+
 fun testRecipientAddressShielded() {
-    // todo
+    val params = ZcashConsensusParameters.MAIN_NETWORK
+
+    val source = supp.getAsString("recipient_address_shielded_source")
+
+    val shielded = ZcashPaymentAddress.decode(params, source)
+
+    val address = ZcashRecipientAddress.shielded(shielded)
+
+    val expected = supp.getAsString("recipient_address_shielded")
+
+    assert(address.encode(params) == expected)
 }
 testRecipientAddressShielded()
 
 fun testRecipientAddressTransparent() {
-    // todo
+    val params = ZcashConsensusParameters.MAIN_NETWORK
+
+    val source = supp.getAsString("recipient_address_transparent_source")
+
+    val transparent = ZcashTransparentAddress.decode(params, source)
+
+    val address = ZcashRecipientAddress.transparent(transparent)
+
+    val expected = supp.getAsString("recipient_address_transparent")
+
+    assert(address.encode(params) == expected)
 }
 testRecipientAddressTransparent()
 
 fun testRecipientAddressUnified() {
-    // todo
+    val params = ZcashConsensusParameters.MAIN_NETWORK
+
+    val source = supp.getAsString("recipient_address_unified_source")
+
+    val unified = ZcashUnifiedAddress.decode(params, source)
+
+    val address = ZcashRecipientAddress.unified(unified)
+
+    val expected = supp.getAsString("recipient_address_unified")
+
+    assert(address.encode(params) == expected)
 }
 testRecipientAddressUnified()
 
 fun testRecipientAddressDecode() {
-    // todo
+    val expected = supp.getAsString("recipient_address_unified")
+
+    val params = ZcashConsensusParameters.MAIN_NETWORK
+
+    val address = ZcashRecipientAddress.decode(params, expected)
+
+    assert(address.encode(params) == expected)
 }
-testRecipientAddressUnified()
+testRecipientAddressDecode()
 
 fun testRecipientAddressEncode() {
-    // todo
+    // covered by testRecipientAddressDecode()
 }
-testRecipientAddressUnified()
+testRecipientAddressEncode()

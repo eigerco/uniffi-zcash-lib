@@ -1,6 +1,10 @@
 use std::io::Write;
 
-use zcash_client_backend::keys::{Era, UnifiedSpendingKey};
+use zcash_client_backend::{
+    address::RecipientAddress,
+    encoding::AddressCodec,
+    keys::{Era, UnifiedSpendingKey},
+};
 use zcash_primitives::{
     consensus::MainNetwork,
     zip32::{ChildIndex, DiversifierIndex, ExtendedSpendingKey},
@@ -32,6 +36,27 @@ pub fn write_for_zcash_client_backend<W: Write>(mut file: W, seed: &[u8]) {
 
     let transparent_address_public_key = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20];
     writeln!(file, "{}", format_bytes("transparent_address_public_key", &transparent_address_public_key)).unwrap();
+
+    let recipient_address = "u1l8xunezsvhq8fgzfl7404m450nwnd76zshscn6nfys7vyz2ywyh4cc5daaq0c7q2su5lqfh23sp7fkf3kt27ve5948mzpfdvckzaect2jtte308mkwlycj2u0eac077wu70vqcetkxf";
+    let recipient_address = RecipientAddress::decode(&MainNetwork, recipient_address).unwrap();
+    if let RecipientAddress::Unified(address) = &recipient_address {
+        writeln!(file, "recipient_address_unified_source:{}", address.encode(&MainNetwork)).unwrap();
+        writeln!(file, "recipient_address_unified:{}", recipient_address.encode(&MainNetwork)).unwrap();
+
+        let sapling = address.sapling().unwrap();
+        let recipient_address: RecipientAddress = (*sapling).into();
+        assert!(matches!(recipient_address, RecipientAddress::Shielded(_)));
+        writeln!(file, "recipient_address_shielded_source:{}", sapling.encode(&MainNetwork)).unwrap();
+        writeln!(file, "recipient_address_shielded:{}", recipient_address.encode(&MainNetwork)).unwrap();
+
+        let transparent = address.transparent().unwrap();
+        let recipient_address: RecipientAddress = (*transparent).into();
+        assert!(matches!(recipient_address, RecipientAddress::Transparent(_)));
+        writeln!(file, "recipient_address_transparent_source:{}", transparent.encode(&MainNetwork)).unwrap();
+        writeln!(file, "recipient_address_transparent:{}", recipient_address.encode(&MainNetwork)).unwrap();
+    } else {
+        panic!("something wrong with the address string")
+    }
 
     let seed = [
         0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f, 0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
