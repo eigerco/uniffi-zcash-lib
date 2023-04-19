@@ -7,6 +7,8 @@ interface ZcashOrchardBundle {
 
     ZcashAnchor anchor();
 
+    [Throws=ZcashError]
+    void verify_proof([ByRef] ZcashVerifyingKey key);
 };
 
 interface ZcashOrchardFlags {

@@ -1,0 +1,7 @@
+interface ZcashVerifyingKey {
+    constructor();
+};
+
+interface ZcashProvingKey {
+    constructor();
+};

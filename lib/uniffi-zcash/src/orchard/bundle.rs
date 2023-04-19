@@ -6,7 +6,7 @@ use orchard::{
 };
 use zcash_primitives::transaction::components::Amount;
 
-use crate::{ZcashAmount, ZcashAnchor, ZcashOrchardAction, ZcashResult};
+use crate::{ZcashAmount, ZcashAnchor, ZcashOrchardAction, ZcashResult, ZcashVerifyingKey};
 
 /// A bundle of actions to be applied to the ledger.
 pub struct ZcashOrchardBundle(Bundle<Authorized, Amount>);
@@ -37,6 +37,11 @@ impl ZcashOrchardBundle {
     /// Returns the root of the Orchard commitment tree that this bundle commits to.
     pub fn anchor(&self) -> Arc<ZcashAnchor> {
         Arc::new(self.0.anchor().into())
+    }
+
+    /// Verifies the proof for this bundle.
+    pub fn verify_proof(&self, key: &ZcashVerifyingKey) -> ZcashResult<()> {
+        self.0.verify_proof(&key.0).or(Err("Error verifying proof".into()))
     }
 }
 

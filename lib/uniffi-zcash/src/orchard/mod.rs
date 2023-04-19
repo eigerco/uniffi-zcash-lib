@@ -21,3 +21,6 @@ pub use self::bundle::*;
 
 mod action;
 pub use self::action::*;
+
+mod circuit;
+pub use self::circuit::*;

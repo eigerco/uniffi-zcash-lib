@@ -1032,7 +1032,7 @@ a tuple.
 | ZcashOrchardBundle::decrypt_outputs_with_keys()| 🔴    |     |      |      |      |
 | ZcashOrchardBundle::flags()                    | 🔴    |  ✅ |  ✅  |      |  ✅  |
 | ZcashOrchardBundle::value_balance()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
-| ZcashOrchardBundle::verify_proof()             | 🔴    |     |      |      |      |
+| ZcashOrchardBundle::verify_proof()             | 🔴    |  ✅ |  ✅  |      |  ✅  |
 | ZcashOrchardBundle::recover_output_with_ovk()  | 🔴    |     |      |      |      |
 | ZcashOrchardBundle::recover_outputs_with_ovks()| 🔴    |     |      |      |      |
 | ZcashOrchardBundle::commitment()               |       |     |      |      |      |
@@ -1076,6 +1076,22 @@ a tuple.
 | ZcashOrchardValueCommitment::derive()    |       |     |      |      |      |
 | ZcashOrchardValueCommitment::from_bytes()|       |     |      |      |      |
 | ZcashOrchardValueCommitment::to_bytes()  | 🔴    |  ✅ |  ✅  |      |  ✅  |
+
+### ZcashVerifyingKey
+
+* Original type: [orchard::circuit::VerifyingKey](https://docs.rs/orchard/0.3.0/orchard/circuit/struct.VerifyingKey.html)
+
+| Members                                  | Score | UDL | Code | Tests | Docs |
+| -----------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashVerifyingKey::build()               | 🔴    |  ✅ |  ✅  |      |  ✅  |
+
+### ZcashProvingKey
+
+* Original type: [orchard::circuit::ProvingKey](https://docs.rs/orchard/0.3.0/orchard/circuit/struct.ProvingKey.html)
+
+| Members                                  | Score | UDL | Code | Tests | Docs |
+| -----------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashProvingKey::build()               | 🔴    |  ✅ |  ✅  |      |  ✅  |
 
 ## Enums
 
