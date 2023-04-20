@@ -1033,7 +1033,7 @@ a tuple.
 | ZcashOrchardBundle::flags()                    | 🔴    |  ✅ |  ✅  |      |  ✅  |
 | ZcashOrchardBundle::value_balance()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
 | ZcashOrchardBundle::verify_proof()             | 🔴    |  ✅ |  ✅  |      |  ✅  |
-| ZcashOrchardBundle::recover_output_with_ovk()  | 🔴    |     |      |      |      |
+| ZcashOrchardBundle::recover_output_with_ovk()  | 🔴    |  ✅ |  ✅  |      |  ✅  |
 | ZcashOrchardBundle::recover_outputs_with_ovks()| 🔴    |     |      |      |      |
 | ZcashOrchardBundle::commitment()               |       |     |      |      |      |
 | ZcashOrchardBundle::map_authorization()        |       |     |      |      |      |

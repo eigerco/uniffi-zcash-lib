@@ -14,6 +14,9 @@ interface ZcashOrchardBundle {
     ZcashOrchardBundleDecryptOutput decrypt_output_with_key(u64 action_idx, [ByRef] ZcashOrchardIncomingViewingKey ivk);
 
     sequence<ZcashOrchardBundleDecryptOutputForKeys> decrypt_output_with_keys(sequence<ZcashOrchardIncomingViewingKey> ivks);
+
+    [Throws=ZcashError]
+    ZcashOrchardBundleDecryptOutput recover_output_with_ovk(u64 action_idx, [ByRef] ZcashOrchardOutgoingViewingKey ovk);
 };
 
 interface ZcashOrchardFlags {

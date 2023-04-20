@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc};
 
 use orchard::{
     bundle::{Authorized, Flags},
@@ -9,7 +9,8 @@ use zcash_primitives::transaction::components::Amount;
 
 use crate::{
     ZcashAmount, ZcashAnchor, ZcashError, ZcashOrchardAction, ZcashOrchardAddress,
-    ZcashOrchardIncomingViewingKey, ZcashOrchardNote, ZcashResult, ZcashVerifyingKey,
+    ZcashOrchardIncomingViewingKey, ZcashOrchardNote, ZcashOrchardOutgoingViewingKey, ZcashResult,
+    ZcashVerifyingKey,
 };
 
 /// A bundle of actions to be applied to the ledger.
@@ -84,6 +85,23 @@ impl ZcashOrchardBundle {
             .into_iter()
             .map(|e| e.try_into().unwrap())
             .collect()
+    }
+
+    /// Attempts to decrypt the action at the specified index with the specified
+    /// outgoing viewing key, and returns the decrypted note plaintext contents
+    /// if successful.
+    pub fn recover_output_with_ovk(
+        &self,
+        action_idx: u64,
+        key: &ZcashOrchardOutgoingViewingKey,
+    ) -> ZcashResult<ZcashOrchardBundleDecryptOutput> {
+        match self
+            .0
+            .recover_output_with_ovk(action_idx.try_into()?, &key.0)
+        {
+            Some(result) => Ok(result.into()),
+            None => Err("Cannot recover output".into()),
+        }
     }
 }
 
