@@ -2,12 +2,13 @@ use std::sync::Arc;
 
 use orchard::{
     bundle::{Authorized, Flags},
+    keys::IncomingViewingKey,
     Address, Bundle, Note,
 };
 use zcash_primitives::transaction::components::Amount;
 
 use crate::{
-    ZcashAmount, ZcashAnchor, ZcashOrchardAction, ZcashOrchardAddress,
+    ZcashAmount, ZcashAnchor, ZcashError, ZcashOrchardAction, ZcashOrchardAddress,
     ZcashOrchardIncomingViewingKey, ZcashOrchardNote, ZcashResult, ZcashVerifyingKey,
 };
 
@@ -65,6 +66,25 @@ impl ZcashOrchardBundle {
             None => Err("Cannot decrypt bundle".into()),
         }
     }
+
+    /// Performs trial decryption of each action in the bundle with each of the
+    /// specified incoming viewing keys, and returns a vector of each decrypted
+    /// note plaintext contents along with the index of the action from which it
+    /// was derived.
+    pub fn decrypt_output_with_keys(
+        &self,
+        ivks: Vec<Arc<ZcashOrchardIncomingViewingKey>>,
+    ) -> Vec<ZcashOrchardBundleDecryptOutputForKeys> {
+        let keys = ivks
+            .into_iter()
+            .map(|f| f.as_ref().into())
+            .collect::<Vec<IncomingViewingKey>>();
+        self.0
+            .decrypt_outputs_with_keys(&keys)
+            .into_iter()
+            .map(|e| e.try_into().unwrap())
+            .collect()
+    }
 }
 
 impl From<&Bundle<Authorized, Amount>> for ZcashOrchardBundle {
@@ -86,6 +106,31 @@ impl From<(Note, Address, [u8; 512])> for ZcashOrchardBundleDecryptOutput {
             address: Arc::new(address.into()),
             data: data.to_vec(),
         }
+    }
+}
+
+pub struct ZcashOrchardBundleDecryptOutputForKeys {
+    pub val: u64,
+    pub key: Arc<ZcashOrchardIncomingViewingKey>,
+    pub note: Arc<ZcashOrchardNote>,
+    pub address: Arc<ZcashOrchardAddress>,
+    pub data: Vec<u8>,
+}
+
+impl TryFrom<(usize, IncomingViewingKey, Note, Address, [u8; 512])>
+    for ZcashOrchardBundleDecryptOutputForKeys
+{
+    type Error = ZcashError;
+    fn try_from(
+        value: (usize, IncomingViewingKey, Note, Address, [u8; 512]),
+    ) -> Result<Self, Self::Error> {
+        Ok(Self {
+            val: value.0.try_into()?,
+            key: Arc::new(value.1.into()),
+            note: Arc::new(value.2.into()),
+            address: Arc::new(value.3.into()),
+            data: value.4.to_vec(),
+        })
     }
 }
 

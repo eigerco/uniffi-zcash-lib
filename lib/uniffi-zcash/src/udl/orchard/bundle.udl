@@ -12,6 +12,8 @@ interface ZcashOrchardBundle {
     
     [Throws=ZcashError]
     ZcashOrchardBundleDecryptOutput decrypt_output_with_key(u64 action_idx, [ByRef] ZcashOrchardIncomingViewingKey ivk);
+
+    sequence<ZcashOrchardBundleDecryptOutputForKeys> decrypt_output_with_keys(sequence<ZcashOrchardIncomingViewingKey> ivks);
 };
 
 interface ZcashOrchardFlags {
@@ -29,6 +31,14 @@ interface ZcashOrchardFlags {
 };
 
 dictionary ZcashOrchardBundleDecryptOutput {
+    ZcashOrchardNote note;
+    ZcashOrchardAddress address;
+    sequence<u8> data;
+};
+
+dictionary ZcashOrchardBundleDecryptOutputForKeys {
+    u64 val;
+    ZcashOrchardIncomingViewingKey key;
     ZcashOrchardNote note;
     ZcashOrchardAddress address;
     sequence<u8> data;

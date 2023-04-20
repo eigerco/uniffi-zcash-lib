@@ -1028,8 +1028,8 @@ a tuple.
 | ZcashOrchardBundle::authorization()            |       |     |      |      |      |
 | ZcashOrchardBundle::authorizing_commitment()   |       |     |      |      |      |
 | ZcashOrchardBundle::binding_validating_key()   |       |     |      |      |      |
-| ZcashOrchardBundle::decrypt_output_with_key()  | 🔴    |  ✅ |  ✅  |      | ✅   |
-| ZcashOrchardBundle::decrypt_outputs_with_keys()| 🔴    |     |      |      |      |
+| ZcashOrchardBundle::decrypt_output_with_key()  | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardBundle::decrypt_outputs_with_keys()| 🔴    |  ✅ |  ✅  |      |  ✅  |
 | ZcashOrchardBundle::flags()                    | 🔴    |  ✅ |  ✅  |      |  ✅  |
 | ZcashOrchardBundle::value_balance()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
 | ZcashOrchardBundle::verify_proof()             | 🔴    |  ✅ |  ✅  |      |  ✅  |
@@ -1206,7 +1206,11 @@ A 1:1 exposure of [orchard::note::TransmittedNoteCiphertext](https://docs.rs/orc
 
 ### ZcashOrchardBundleDecryptOutput
 
-A dictionary for holding the response of some [ZcashOrchardBundle](#zcashorchardbundle-authorized) methods.
+A dictionary for holding the response of some [ZcashOrchardBundle](#zcashorchardbundle-authorized) `decrypt_output_with_key()` method.
+
+### ZcashOrchardBundleDecryptOutputForKeys
+
+A dictionary for holding the response of some [ZcashOrchardBundle](#zcashorchardbundle-authorized) `decrypt_output_with_keys` method.
 
 ## Functions
 
