@@ -30,6 +30,7 @@ group = "0.12.0"
 
 [build-dependencies]
 uniffi = { workspace = true, features = ["build"] }
+uniffi-zcash-test = { path = "../uniffi-zcash-test" }
 
 [dev-dependencies]
 uniffi = { workspace = true, features = ["bindgen-tests"] }
