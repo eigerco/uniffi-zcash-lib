@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::fs::read_to_string;
-extern crate serde_json;
 
 type KeyValMap = HashMap<String, String>;
 
@@ -11,7 +10,7 @@ pub struct TestSupport {
 impl TestSupport {
     pub fn from_csv_file() -> Self {
         let base_dir = env!("CARGO_MANIFEST_DIR");
-        let csv_path = format!("{base_dir}/tests/test_data.csv");
+        let csv_path = format!("{base_dir}/../uniffi-zcash/tests/test_data.csv");
 
         let map: KeyValMap = read_to_string(csv_path)
             .expect("cannot find test data")
@@ -29,22 +28,26 @@ impl TestSupport {
         Self { map }
     }
 
-    pub fn get_as_byte_array(&self, key: &str) -> Vec<u8> {
+    pub fn get_as_u8_array(&self, key: &str) -> Vec<u8> {
         let arr_str = &self.map[key];
         serde_json::from_str::<Vec<u8>>(arr_str).unwrap()
     }
 
-    pub fn get_as_string_array(&self, key: &str) -> Vec<String> {
-        let arr_str = &self.map[key];
-        serde_json::from_str::<Vec<String>>(arr_str).unwrap()
-    }
-
-    pub fn get_as_integer_array(&self, key: &str) -> Vec<u32> {
+    pub fn get_as_u32_array(&self, key: &str) -> Vec<u32> {
         let arr_str = &self.map[key];
         serde_json::from_str::<Vec<u32>>(arr_str).unwrap()
     }
 
-    pub fn get_as_integer(&self, key: &str) -> u32 {
+    pub fn get_as_u64_array(&self, key: &str) -> Vec<u64> {
+        let arr_str = &self.map[key];
+        serde_json::from_str::<Vec<u64>>(arr_str).unwrap()
+    }
+
+    pub fn get_as_u32(&self, key: &str) -> u32 {
+        self.map[key].parse().unwrap()
+    }
+
+    pub fn get_as_u64(&self, key: &str) -> u64 {
         self.map[key].parse().unwrap()
     }
 

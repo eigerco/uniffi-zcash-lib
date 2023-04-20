@@ -1,0 +1,16 @@
+interface TestSupport {
+  [Name=from_csv_file]
+  constructor();
+
+  sequence<u8> get_as_u8_array([ByRef] string key);
+
+  sequence<u32> get_as_u32_array([ByRef] string key);
+
+  sequence<u64> get_as_u64_array([ByRef] string key);
+
+  u32 get_as_u32([ByRef] string key);
+
+  u64 get_as_u64([ByRef] string key);
+
+  string get_as_string([ByRef] string key);
+};

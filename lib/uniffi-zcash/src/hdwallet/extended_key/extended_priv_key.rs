@@ -1,6 +1,10 @@
 use std::sync::Arc;
 
-use hdwallet::{extended_key::ExtendedPrivKey, KeySeed};
+use hdwallet::{
+    extended_key::ExtendedPrivKey,
+    traits::{Deserialize, Serialize},
+    KeySeed,
+};
 use rand::thread_rng;
 
 use crate::{ZcashKeyIndex, ZcashResult};
@@ -65,6 +69,16 @@ impl ZcashExtendedPrivKey {
             .map_err(From::from)
             .map(From::from)
             .map(Arc::new)
+    }
+
+    pub fn from_bytes(bytes: &[u8]) -> ZcashResult<Self> {
+        ExtendedPrivKey::deserialize(bytes)
+            .map_err(From::from)
+            .map(From::from)
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.0.serialize()
     }
 }
 

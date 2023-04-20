@@ -2,5 +2,5 @@ interface ZcashDiversifier {
   [Throws=ZcashError]
   constructor(sequence<u8> bytes);
 
-  // todo
+  sequence<u8> to_bytes();
 };

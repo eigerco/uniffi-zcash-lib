@@ -8,6 +8,11 @@ interface ZcashExtendedPrivKey {
   [Name=random, Throws=ZcashError]
   constructor();
 
+  [Name=from_bytes, Throws=ZcashError]
+  constructor([ByRef] sequence<u8> bytes);
+
+  sequence<u8> to_bytes();
+
   [Name=random_with_seed_size, Throws=ZcashError]
   constructor(ZcashKeySeed seed_size);
 

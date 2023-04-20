@@ -1,5 +1,7 @@
 use zcash_primitives::sapling::Diversifier;
 
+use crate::{utils, ZcashResult};
+
 pub struct ZcashDiversifier(Diversifier);
 
 impl From<&ZcashDiversifier> for Diversifier {
@@ -15,8 +17,12 @@ impl From<Diversifier> for ZcashDiversifier {
 }
 
 impl ZcashDiversifier {
-    pub fn new(bytes: Vec<u8>) -> crate::ZcashResult<Self> {
-        let array = crate::utils::cast_slice(&bytes)?;
+    pub fn new(bytes: Vec<u8>) -> ZcashResult<Self> {
+        let array = utils::cast_slice(&bytes)?;
         Ok(Diversifier(array).into())
+    }
+
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.0 .0.to_vec()
     }
 }

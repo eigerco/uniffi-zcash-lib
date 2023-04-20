@@ -91,3 +91,13 @@ This project has a dedicated crate for build and run the CLI. You can execute it
 ```bash
 cargo run -p uniffi-bindgen
 ```
+
+# Test data generation
+
+A CSV file with test data is automatically generated during build if it does not exist already.
+
+To force regeneration of this file you can either:
+
+- remove the file (located at `lib/uniffi-zcash/tests/test_data.csv`)
+- or force regeneration using environment variable: `REGENERATE_TEST_DATA=true cargo build`
+- or you could simply run `cargo run --bin test-data` instead

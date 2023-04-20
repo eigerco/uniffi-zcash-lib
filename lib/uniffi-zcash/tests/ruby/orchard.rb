@@ -5,7 +5,7 @@ class TestApk < Test::Unit::TestCase
     def test_spending_key_conversions
         zts = Zcash::TestSupport.from_csv_file()
 
-        key_bytes = zts.get_as_byte_array("orchard_spending_key")
+        key_bytes = zts.get_as_u8_array("orchard_spending_key")
 
         key = Zcash::ZcashOrchardSpendingKey.from_bytes(key_bytes)
 
@@ -21,10 +21,10 @@ class TestApk < Test::Unit::TestCase
 
         zts = Zcash::TestSupport.from_csv_file()
 
-        seed = zts.get_as_byte_array("seed")
-        coin_type = zts.get_as_integer("coin_type")
-        account = zts.get_as_integer("account")
-        expected_bytes = zts.get_as_byte_array("orchard_spending_key_from_zip32_seed")
+        seed = zts.get_as_u8_array("seed")
+        coin_type = zts.get_as_u32("coin_type")
+        account = zts.get_as_u32("account")
+        expected_bytes = zts.get_as_u8_array("orchard_spending_key_from_zip32_seed")
 
         key = Zcash::ZcashOrchardSpendingKey.from_zip32_seed(seed, coin_type, account)
 

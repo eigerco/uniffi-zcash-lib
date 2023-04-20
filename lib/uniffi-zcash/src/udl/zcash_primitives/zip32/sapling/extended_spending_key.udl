@@ -22,5 +22,4 @@ interface ZcashExtendedSpendingKey {
   ZcashExtendedSpendingKey derive_internal();
 
   ZcashDiversifiableFullViewingKey to_diversifiable_full_viewing_key();
-
 };

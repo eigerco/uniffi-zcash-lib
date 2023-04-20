@@ -1,3 +1,5 @@
+use std::io::Write;
+
 use hdwallet::rand_core::OsRng;
 use orchard::{
     builder::{InProgress, Unauthorized, Unproven},
@@ -25,30 +27,24 @@ use zcash_primitives::{
 
 use zcash_proofs::prover::LocalTxProver;
 
+use crate::test_data::format_bytes;
+
 const BLOCK_HEIGHT: u32 = 2030820;
 
-fn main() {
-    let mut seed = vec![0u8; 32];
-    seed[0] = 1u8;
-    let key = UnifiedSpendingKey::from_seed(&MainNetwork, &seed, 0.into()).unwrap();
-
-    transparent_builder_with_nonstandard_fee_example(&key);
-    println!();
-    transparent_builder_with_standard_fee_example(&key);
-    println!();
-    transparent_builder_with_zip317_standard_fee_example(&key);
-    println!();
-    transparent_builder_with_zip317_non_standard_fee_example(&key);
-    println!();
-
-    println!();
-    sapling_transaction_general_builder_example(&key);
-
-    println!();
-    orchard_transaction(&key);
+pub fn write_for_transaction<W: Write>(mut file: W, seed: &[u8]) {
+    let key = UnifiedSpendingKey::from_seed(&MainNetwork, seed, 0.into()).unwrap();
+    transparent_builder_with_nonstandard_fee_example(&mut file, &key);
+    transparent_builder_with_standard_fee_example(&mut file, &key);
+    transparent_builder_with_zip317_standard_fee_example(&mut file, &key);
+    transparent_builder_with_zip317_non_standard_fee_example(&mut file, &key);
+    sapling_transaction_general_builder_example(&mut file, &key);
+    orchard_transaction(&mut file, &key);
 }
 
-pub fn transparent_builder_with_nonstandard_fee_example(key: &UnifiedSpendingKey) {
+pub fn transparent_builder_with_nonstandard_fee_example<W: Write>(
+    mut file: W,
+    key: &UnifiedSpendingKey,
+) {
     let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
 
     // Transparent data
@@ -78,18 +74,18 @@ pub fn transparent_builder_with_nonstandard_fee_example(key: &UnifiedSpendingKey
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    println!("Transparent transaction data (from general builder, with non standard fee)");
-    println!("___________________________________________________");
-    println!(
-        "[{}]",
-        data.iter()
-            .map(|byte| byte.to_string())
-            .collect::<Vec<String>>()
-            .join(", ")
-    );
+    writeln!(
+        file,
+        "{}",
+        format_bytes("transaction_non_standard_fee", &data)
+    )
+    .unwrap();
 }
 
-pub fn transparent_builder_with_standard_fee_example(key: &UnifiedSpendingKey) {
+pub fn transparent_builder_with_standard_fee_example<W: Write>(
+    mut file: W,
+    key: &UnifiedSpendingKey,
+) {
     let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
 
     // Transparent data
@@ -119,18 +115,13 @@ pub fn transparent_builder_with_standard_fee_example(key: &UnifiedSpendingKey) {
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    println!("Transparent transaction data (from general builder, with standard fee)");
-    println!("___________________________________________________");
-    println!(
-        "[{}]",
-        data.iter()
-            .map(|byte| byte.to_string())
-            .collect::<Vec<String>>()
-            .join(", ")
-    );
+    writeln!(file, "{}", format_bytes("transaction_standard_fee", &data)).unwrap();
 }
 
-pub fn transparent_builder_with_zip317_standard_fee_example(key: &UnifiedSpendingKey) {
+pub fn transparent_builder_with_zip317_standard_fee_example<W: Write>(
+    mut file: W,
+    key: &UnifiedSpendingKey,
+) {
     let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
 
     // Transparent data
@@ -160,18 +151,18 @@ pub fn transparent_builder_with_zip317_standard_fee_example(key: &UnifiedSpendin
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    println!("Transparent transaction data (from general builder, with zip317 standard fee)");
-    println!("___________________________________________________");
-    println!(
-        "[{}]",
-        data.iter()
-            .map(|byte| byte.to_string())
-            .collect::<Vec<String>>()
-            .join(", ")
-    );
+    writeln!(
+        file,
+        "{}",
+        format_bytes("transaction_zip317_standard_fee", &data)
+    )
+    .unwrap();
 }
 
-pub fn transparent_builder_with_zip317_non_standard_fee_example(key: &UnifiedSpendingKey) {
+pub fn transparent_builder_with_zip317_non_standard_fee_example<W: Write>(
+    mut file: W,
+    key: &UnifiedSpendingKey,
+) {
     let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
 
     // Transparent data
@@ -202,18 +193,18 @@ pub fn transparent_builder_with_zip317_non_standard_fee_example(key: &UnifiedSpe
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    println!("Transparent transaction data (from general builder, with zip317 non standard fee)");
-    println!("___________________________________________________");
-    println!(
-        "[{}]",
-        data.iter()
-            .map(|byte| byte.to_string())
-            .collect::<Vec<String>>()
-            .join(", ")
-    );
+    writeln!(
+        file,
+        "{}",
+        format_bytes("transaction_zip317_non_standard_fee", &data)
+    )
+    .unwrap();
 }
 
-pub fn sapling_transaction_general_builder_example(key: &UnifiedSpendingKey) {
+pub fn sapling_transaction_general_builder_example<W: Write>(
+    mut file: W,
+    key: &UnifiedSpendingKey,
+) {
     let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
 
     let extsk = key.sapling().clone();
@@ -252,21 +243,10 @@ pub fn sapling_transaction_general_builder_example(key: &UnifiedSpendingKey) {
 
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    println!(
-        "Sapling transaction data (from general builder) len: {}",
-        data.len()
-    );
-    println!("_______________________________________________");
-    println!(
-        "[{}]",
-        data.iter()
-            .map(|byte| byte.to_string())
-            .collect::<Vec<String>>()
-            .join(", ")
-    );
+    writeln!(file, "{}", format_bytes("transaction_sapling", &data)).unwrap();
 }
 
-pub fn orchard_transaction(key: &UnifiedSpendingKey) {
+pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
     // Key derivation
     let ufvk = key.to_unified_full_viewing_key();
     let fvk = ufvk.orchard().unwrap();
@@ -328,16 +308,5 @@ pub fn orchard_transaction(key: &UnifiedSpendingKey) {
 
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    println!(
-        "Orchard transaction data (from specific builder) len: {}",
-        data.len()
-    );
-    println!("_______________________________________________");
-    println!(
-        "[{}]",
-        data.iter()
-            .map(|byte| byte.to_string())
-            .collect::<Vec<String>>()
-            .join(", ")
-    );
+    writeln!(file, "{}", format_bytes("transaction_orchard", &data)).unwrap();
 }

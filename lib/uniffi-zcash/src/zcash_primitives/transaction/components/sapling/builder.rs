@@ -15,7 +15,9 @@ impl ZcashSaplingMetadata {
     /// This means that the transaction consumer cannot assume that e.g. the first spend
     /// they added (via the first call to [`SaplingBuilder::add_spend`]) is the first
     pub fn spend_index(&self, n: u64) -> Option<u64> {
-        self.0.spend_index(n.try_into().unwrap()).map(|n| n.try_into().unwrap())
+        self.0
+            .spend_index(n.try_into().unwrap())
+            .map(|n| n.try_into().unwrap())
     }
 
     /// Returns the index within the transaction of the [`OutputDescription`] corresponding
@@ -26,7 +28,9 @@ impl ZcashSaplingMetadata {
     /// they added (via the first call to [`SaplingBuilder::add_output`]) is the first
     /// [`OutputDescription`] in the transaction.
     pub fn output_index(&self, n: u64) -> Option<u64> {
-        self.0.output_index(n.try_into().unwrap()).map(|n| n.try_into().unwrap())
+        self.0
+            .output_index(n.try_into().unwrap())
+            .map(|n| n.try_into().unwrap())
     }
 }
 

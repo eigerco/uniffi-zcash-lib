@@ -1,6 +1,25 @@
 interface ZcashExternalIvk {
-    [Throws=ZcashError]
-    ZcashTransparentAddress derive_address(u32 child_index);
+  [Name=from_bytes, Throws=ZcashError]
+  constructor([ByRef] sequence<u8> data);
+
+  [Throws=ZcashError]
+  ZcashTransparentAddress derive_address(u32 child_index);
+
+  ZcashTransparentAddressAndIndex default_address();
+
+  sequence<u8> to_bytes();
 };
 
-interface ZcashInternalIvk {};
+interface ZcashInternalIvk {
+  [Name=from_bytes, Throws=ZcashError]
+  constructor([ByRef] sequence<u8> data);
+
+  ZcashTransparentAddressAndIndex default_address();
+
+  sequence<u8> to_bytes();
+};
+
+dictionary ZcashTransparentAddressAndIndex {
+  ZcashTransparentAddress transparent_address;
+  u32 index;
+};
