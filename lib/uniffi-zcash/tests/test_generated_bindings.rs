@@ -15,7 +15,7 @@ uniffi::build_foreign_language_testcases!(
     "tests/kotlin/zcash_client_backend/address/unified_address.kts",
     "tests/kotlin/zcash_client_backend/keys/unified_full_viewing_key.kts",
     "tests/kotlin/zcash_client_backend/keys/unified_spending_key.kts",
-    "tests/kotlin/zcash_client_backend/encoding.kts", // todo
+    "tests/kotlin/zcash_client_backend/encoding.kts",
     "tests/kotlin/zcash_primitives/legacy/keys/account_priv_key.kts",
     "tests/kotlin/zcash_primitives/legacy/keys/account_pub_key.kts",
     "tests/kotlin/zcash_primitives/legacy/keys/ivk.kts",

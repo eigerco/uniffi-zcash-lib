@@ -962,13 +962,13 @@ A pair of [ZcashTransaction](#zcashtransaction) and [ZcashSaplingMetadata](#zcas
 
 | Function                                                                                                  | Score        | UDL                | Code               | Tests              | Docs               |
 | --------------------------------------------------------------------------------------------------------- | ------------ | ------------------ | ------------------ | ------------------ | ------------------ |
-| decode_extended_full_viewing_key() -> [ZcashExtendedFullViewingKey](#zcashextendedfullviewingkey-sapling) |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| decode_extended_spending_key() -> [ZcashExtendedSpendingKey](#zcashextendedspendingkey-sapling)           |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| decode_payment_address() -> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)                           |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| decode_transparent_address() -> [ZcashTransparentAddress](#zcashtransparentaddress)                       |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| encode_extended_full_viewing_key()                                                                        |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| encode_extended_spending_key()                                                                            |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| encode_payment_address()                                                                                  |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| encode_payment_address_p()                                                                                |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| encode_transparent_address()                                                                              |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
-| encode_transparent_address_p()                                                                            |              | :white_check_mark: | :white_check_mark: |                    | :white_check_mark: |
+| decode_extended_full_viewing_key() -> [ZcashExtendedFullViewingKey](#zcashextendedfullviewingkey-sapling) |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| decode_extended_spending_key() -> [ZcashExtendedSpendingKey](#zcashextendedspendingkey-sapling)           |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| decode_payment_address() -> [ZcashPaymentAddress](#zcashpaymentaddress-sapling)                           |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| decode_transparent_address() -> [ZcashTransparentAddress](#zcashtransparentaddress)                       |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| encode_extended_full_viewing_key()                                                                        |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| encode_extended_spending_key()                                                                            |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| encode_payment_address()                                                                                  |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| encode_payment_address_p()                                                                                |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| encode_transparent_address()                                                                              |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |
+| encode_transparent_address_p()                                                                            |              | :white_check_mark: | :white_check_mark: | :white_check_mark: | :white_check_mark: |

@@ -6,7 +6,7 @@ use zcash_client_backend::{
     keys::{Era, UnifiedSpendingKey},
 };
 use zcash_primitives::{
-    consensus::MainNetwork,
+    consensus::{MainNetwork, Parameters, TestNetwork},
     zip32::{ChildIndex, DiversifierIndex, ExtendedSpendingKey},
 };
 
@@ -85,6 +85,12 @@ pub fn write_for_zcash_client_backend<W: Write>(mut file: W, seed: &[u8]) {
     let ufvk_default_address_index_bytes = ufvk_default_address_index.0.to_vec();
     writeln!(file, "unified_full_viewing_key_default_address_address_encoded:{ufvk_default_address_address_encoded}").unwrap();
     writeln!(file, "{}", format_bytes("unified_full_viewing_key_default_address_index", &ufvk_default_address_index_bytes)).unwrap();
+
+    writeln!(file, "hrp_efvk:{}", MainNetwork.hrp_sapling_extended_full_viewing_key()).unwrap();
+    writeln!(file, "hrp_esk:{}", MainNetwork.hrp_sapling_extended_spending_key()).unwrap();
+    writeln!(file, "hrp_payment_address:{}", MainNetwork.hrp_sapling_payment_address()).unwrap();
+    writeln!(file, "{}", format_bytes("b58_pubkey_address_prefix", &TestNetwork.b58_pubkey_address_prefix())).unwrap();
+    writeln!(file, "{}", format_bytes("b58_script_address_prefix", &TestNetwork.b58_script_address_prefix())).unwrap();
 }
 
 fn get_ext_sk_from_path(ext_sk: &ExtendedSpendingKey) -> ExtendedSpendingKey {
