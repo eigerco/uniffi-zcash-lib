@@ -65,8 +65,3 @@ fun testAccountPubKeyExternalOvk() {
 	assert(ovk.asBytes() == ovkBytes)
 }
 testAccountPubKeyExternalOvk()
-
-fun testAccountPubKeySerialize() {
-    // covered by testAccountPubKeyNew()
-}
-testAccountPubKeySerialize()

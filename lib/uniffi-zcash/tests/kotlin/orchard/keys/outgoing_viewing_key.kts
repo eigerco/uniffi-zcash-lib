@@ -10,8 +10,3 @@ fun testOrchardOutgoingViewingKeyFromBytes() {
     assert(key.toBytes() == bytes)
 }
 testOrchardOutgoingViewingKeyFromBytes()
-
-fun testOrchardOutgoingViewingKeyToBytes() {
-    // covered by testOrchardOutgoingViewingKeyFromBytes()
-}
-testOrchardOutgoingViewingKeyToBytes()

@@ -24,16 +24,6 @@ fun testPaymentAddressDecode() {
 }
 testPaymentAddressDecode()
 
-fun testPaymentAddressEncode() {
-    // covered by testPaymentAddressDecode()
-}
-testPaymentAddressEncode()
-
-fun testPaymentAddressToBytes() {
-    // covered by testPaymentAddressFromBytes()
-}
-testPaymentAddressToBytes()
-
 fun testPaymentAddressDiversifier() {
     val bytes = supp.getAsU8Array("viewing_key_payment_address")
 

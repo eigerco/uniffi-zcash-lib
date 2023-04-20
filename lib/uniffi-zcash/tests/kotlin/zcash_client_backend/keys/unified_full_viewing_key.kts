@@ -48,21 +48,6 @@ fun testUnifiedFullViewingKeyEncode() {
 }
 testUnifiedFullViewingKeyEncode()
 
-fun testUnifiedFullViewingKeyTransparent() {
-    // covered by testUnifiedFullViewingKeyNew()
-}
-testUnifiedFullViewingKeyTransparent()
-
-fun testUnifiedFullViewingKeySapling() {
-    // covered by testUnifiedFullViewingKeyNew()
-}
-testUnifiedFullViewingKeySapling()
-
-fun testUnifiedFullViewingKeyOrchard() {
-    // covered by testUnifiedFullViewingKeyNew()
-}
-testUnifiedFullViewingKeyOrchard()
-
 fun testUnifiedFullViewingKeyAddress() {
     val encoded = supp.getAsString("unified_full_viewing_key_encoded_2")
 

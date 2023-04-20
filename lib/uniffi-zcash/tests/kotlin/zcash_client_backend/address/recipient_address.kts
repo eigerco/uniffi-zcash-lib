@@ -57,8 +57,3 @@ fun testRecipientAddressDecode() {
     assert(address.encode(params) == expected)
 }
 testRecipientAddressDecode()
-
-fun testRecipientAddressEncode() {
-    // covered by testRecipientAddressDecode()
-}
-testRecipientAddressEncode()

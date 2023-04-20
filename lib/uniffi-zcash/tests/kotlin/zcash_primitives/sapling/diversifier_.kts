@@ -10,9 +10,3 @@ fun testDiversifierNew() {
     assert(diversifier.toBytes() == expected)
 }
 testDiversifierNew()
-
-
-fun testDiversifierToBytes() {
-    // covered by testDiversifierNew()
-}
-testDiversifierToBytes()

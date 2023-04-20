@@ -14,11 +14,6 @@ fun testOrchardFullViewingKeyToBytes() {
 }
 testOrchardFullViewingKeyToBytes()
 
-fun testOrchardFullViewingKeyFromBytes() {
-    // covered by testOrchardFullViewingKeyToBytes()
-}
-testOrchardFullViewingKeyFromBytes()
-
 fun testOrchardFullViewingKeyAddressAt() {
 	val fvk = setupGetFvk()
 	val divIdx = ZcashOrchardDiversifierIndex.fromU32(4u)

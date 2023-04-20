@@ -46,16 +46,6 @@ fun testExtendedSpendingKeyDecode() {
 }
 testExtendedSpendingKeyDecode()
 
-fun testExtendedSpendingKeyEncode() {
-    // covered by testExtendedSpendingKeyDecode()
-}
-testExtendedSpendingKeyEncode()
-
-fun testExtendedSpendingKeyToBytes() {
-    // covered by testExtendedSpendingKeyFromBytes()
-}
-testExtendedSpendingKeyToBytes()
-
 fun testExtendedSpendingKeyDeriveChild() {
     val seed = supp.getAsU8Array("seed")
 

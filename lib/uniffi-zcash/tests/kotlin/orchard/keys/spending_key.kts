@@ -11,11 +11,6 @@ fun testOrchardSpendingKeyFromBytes() {
 }
 testOrchardSpendingKeyFromBytes()
 
-fun testOrchardSpendingKeyToBytes() {
-    // covered by testOrchardSpendingKeyFromBytes()
-}
-testOrchardSpendingKeyToBytes()
-
 fun testOrchardSpendingKeyToFvk() {
     val keyBytes = supp.getAsU8Array("orchard_spending_key")
 

@@ -26,8 +26,3 @@ fun testExpandedSpendingKeyProofGenerationKey() {
     // todo
 }
 testExpandedSpendingKeyProofGenerationKey()
-
-fun testExpandedSpendingKeyToBytes() {
-    // covered by testExpandedSpendingKeyFromBytes()
-}
-testExpandedSpendingKeyToBytes()

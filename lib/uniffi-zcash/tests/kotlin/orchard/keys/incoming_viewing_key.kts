@@ -11,11 +11,6 @@ fun testOrchardIncomingViewingKeyToBytes() {
 }
 testOrchardIncomingViewingKeyToBytes()
 
-fun testOrchardIncomingViewingKeyFromBytes() {
-    // covered by testIncomingViewingKeyToBytes()
-}
-testOrchardIncomingViewingKeyFromBytes()
-
 fun testOrchardIncomingViewingKeyDiversifierIndex() {
     val bytes = supp.getAsU8Array("orchard_full_viewing_key_ivk");
 

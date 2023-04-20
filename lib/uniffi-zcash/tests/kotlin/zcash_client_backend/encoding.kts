@@ -54,21 +54,6 @@ fun testDecodeTransparentAddress() {
 }
 testDecodeTransparentAddress()
 
-fun testEncodeExtendedFullViewingKey() {
-    // covered by testDecodeExtendedFullViewingKey()
-}
-testEncodeExtendedFullViewingKey()
-
-fun testEncodeExtendedSpendingKey() {
-    // covered by testDecodeExtendedSpendingKey()
-}
-testEncodeExtendedSpendingKey()
-
-fun testEncodePaymentAddress() {
-    // covered by testDecodePaymentAddress()
-}
-testEncodePaymentAddress()
-
 fun testEncodePaymentAddressP() {
     val expected = supp.getAsU8Array("viewing_key_payment_address")
 
@@ -85,11 +70,6 @@ fun testEncodePaymentAddressP() {
     assert(decoded.toBytes() == expected)
 }
 testEncodePaymentAddressP()
-
-fun testEncodeTransparentAddress() {
-    // covered by testDecodeTransparentAddress()
-}
-testEncodeTransparentAddress()
 
 fun testEncodeTransparentAddressP() {
     val expected = supp.getAsString("t_address_script")

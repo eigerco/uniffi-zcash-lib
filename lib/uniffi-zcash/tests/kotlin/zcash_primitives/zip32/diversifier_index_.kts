@@ -46,8 +46,3 @@ fun testDiversifierIndexToU32() {
     assert(index.toU32() == 5u)
 }
 testDiversifierIndexToU32()
-
-fun testDiversifierIndexToBytes() {
-    // covered by testDiversifierIndexNew()
-}
-testDiversifierIndexToBytes()

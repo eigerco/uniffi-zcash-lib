@@ -49,13 +49,3 @@ fun testTransparentAddressScriptEncodeAndDecode() {
     assert(encodedScriptAddress == parsedAsScript.encode(network))
 }
 testTransparentAddressScriptEncodeAndDecode()
-
-fun testTransparentAddressIsPublicKey() {
-    // covered by testTransparentAddressPublicKeyEncodeAndDecode()
-}
-testTransparentAddressIsPublicKey()
-
-fun testTransparentAddresIsScript() {
-    // covered by testTransparentAddressScriptEncodeAndDecode()
-}
-testTransparentAddresIsScript()

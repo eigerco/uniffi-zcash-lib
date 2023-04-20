@@ -10,11 +10,6 @@ fun testFullViewingKeyFromBytes() {
 }
 testFullViewingKeyFromBytes()
 
-fun testFullViewingKeyToBytes() {
-    // covered by testFullViewingKeyToBytes()
-}
-testFullViewingKeyToBytes()
-
 fun testFullViewingKeyFromExpandedSpendingKey() {
     val bytes = supp.getAsU8Array("extended_spending_key")
 

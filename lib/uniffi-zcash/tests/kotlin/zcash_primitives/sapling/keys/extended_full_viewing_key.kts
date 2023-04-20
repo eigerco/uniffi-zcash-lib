@@ -11,11 +11,6 @@ fun testExtendedFullViewingKeyFromBytes() {
 }
 testExtendedFullViewingKeyFromBytes()
 
-fun testExtendedFullViewingKeyToBytes() {
-    // covered by testExtendedFullViewingKeyToBytes()
-}
-testExtendedFullViewingKeyToBytes()
-
 fun testExtendedFullViewingKeyEncodeAndDecode() {
 	val network = ZcashConsensusParameters.MAIN_NETWORK
 

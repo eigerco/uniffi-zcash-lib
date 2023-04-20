@@ -28,8 +28,3 @@ fun testMemoBytesEmpty() {
     assert(ZcashMemoBytes.empty().data() == expected)
 }
 testMemoBytesEmpty()
-
-fun testMemoBytesData() {
-    // covered by testMemoBytesNew()
-}
-testMemoBytesData()

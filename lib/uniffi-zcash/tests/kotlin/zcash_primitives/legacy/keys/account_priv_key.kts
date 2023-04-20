@@ -72,11 +72,6 @@ fun testAccountPrivKeyDeriveInternalSecretKey() {
 }
 testAccountPrivKeyDeriveInternalSecretKey()
 
-fun testAccountPrivKeyToBytes() {
-    // covered by testAccountPrivKeyFromSeed()
-}
-testAccountPrivKeyToBytes()
-
 fun testAccountPrivKeyFromBytes() {
     val seed = supp.getAsU8Array("seed")
 

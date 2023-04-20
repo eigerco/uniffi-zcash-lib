@@ -11,11 +11,6 @@ fun testExtendedPrivKeyFromBytes() {
 }
 testExtendedPrivKeyFromBytes()
 
-fun testExtendedPrivKeyToBytes() {
-    // covered by testExtendedPrivKeyFromBytes()
-}
-testExtendedPrivKeyToBytes()
-
 fun testExtendedPrivKeyFromRandom() {
 	val zepk = ZcashExtendedPrivKey.random()
 

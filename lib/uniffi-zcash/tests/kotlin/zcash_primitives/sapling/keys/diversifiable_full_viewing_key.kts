@@ -12,11 +12,6 @@ fun testDiversifiableFullViewingKeyFromBytes() {
 }
 testDiversifiableFullViewingKeyFromBytes()
 
-fun testDiversifiableFullViewingKeyToBytes() {
-    // covered by testDiversifiableFullViewingKeyFromBytes()
-}
-testDiversifiableFullViewingKeyToBytes()
-
 fun testDiversifiableFullViewingKeyFvk() {
 	val bytes = supp.getAsU8Array("diversifiable_fvk")
 
