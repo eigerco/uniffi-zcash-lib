@@ -1,8 +1,8 @@
-use std::{sync::Arc};
+use std::sync::Arc;
 
 use orchard::{
     bundle::{Authorized, Flags},
-    keys::IncomingViewingKey,
+    keys::{IncomingViewingKey, OutgoingViewingKey},
     Address, Bundle, Note,
 };
 use zcash_primitives::transaction::components::Amount;
@@ -58,7 +58,7 @@ impl ZcashOrchardBundle {
         &self,
         action_idx: u64,
         ivk: &ZcashOrchardIncomingViewingKey,
-    ) -> ZcashResult<ZcashOrchardBundleDecryptOutput> {
+    ) -> ZcashResult<ZcashOrchardDecryptOutput> {
         match self
             .0
             .decrypt_output_with_key(action_idx.try_into()?, &ivk.0)
@@ -75,7 +75,7 @@ impl ZcashOrchardBundle {
     pub fn decrypt_output_with_keys(
         &self,
         ivks: Vec<Arc<ZcashOrchardIncomingViewingKey>>,
-    ) -> Vec<ZcashOrchardBundleDecryptOutputForKeys> {
+    ) -> Vec<ZcashOrchardDecryptOutputForIncomingKeys> {
         let keys = ivks
             .into_iter()
             .map(|f| f.as_ref().into())
@@ -94,7 +94,7 @@ impl ZcashOrchardBundle {
         &self,
         action_idx: u64,
         key: &ZcashOrchardOutgoingViewingKey,
-    ) -> ZcashResult<ZcashOrchardBundleDecryptOutput> {
+    ) -> ZcashResult<ZcashOrchardDecryptOutput> {
         match self
             .0
             .recover_output_with_ovk(action_idx.try_into()?, &key.0)
@@ -111,7 +111,7 @@ impl ZcashOrchardBundle {
     pub fn recover_outputs_with_ovks(
         &self,
         ovks: Vec<Arc<ZcashOrchardOutgoingViewingKey>>,
-    ) -> Vec<ZcashOrchardBundleDecryptOutputForOutgoingKeys> {
+    ) -> Vec<ZcashOrchardDecryptOutputForOutgoingKeys> {
         let keys = ovks
             .into_iter()
             .map(|key| key.as_ref().into())
@@ -130,13 +130,13 @@ impl From<&Bundle<Authorized, Amount>> for ZcashOrchardBundle {
     }
 }
 
-pub struct ZcashOrchardBundleDecryptOutput {
+pub struct ZcashOrchardDecryptOutput {
     pub note: Arc<ZcashOrchardNote>,
     pub address: Arc<ZcashOrchardAddress>,
     pub data: Vec<u8>,
 }
 
-impl From<(Note, Address, [u8; 512])> for ZcashOrchardBundleDecryptOutput {
+impl From<(Note, Address, [u8; 512])> for ZcashOrchardDecryptOutput {
     fn from((note, address, data): (Note, Address, [u8; 512])) -> Self {
         Self {
             note: Arc::new(note.into()),
@@ -146,7 +146,7 @@ impl From<(Note, Address, [u8; 512])> for ZcashOrchardBundleDecryptOutput {
     }
 }
 
-pub struct ZcashOrchardBundleDecryptOutputForKeys {
+pub struct ZcashOrchardDecryptOutputForIncomingKeys {
     pub val: u64,
     pub key: Arc<ZcashOrchardIncomingViewingKey>,
     pub note: Arc<ZcashOrchardNote>,
@@ -155,7 +155,7 @@ pub struct ZcashOrchardBundleDecryptOutputForKeys {
 }
 
 impl TryFrom<(usize, IncomingViewingKey, Note, Address, [u8; 512])>
-    for ZcashOrchardBundleDecryptOutputForKeys
+    for ZcashOrchardDecryptOutputForIncomingKeys
 {
     type Error = ZcashError;
     fn try_from(
@@ -171,7 +171,7 @@ impl TryFrom<(usize, IncomingViewingKey, Note, Address, [u8; 512])>
     }
 }
 
-pub struct ZcashOrchardBundleDecryptOutputForOutgoingKeys {
+pub struct ZcashOrchardDecryptOutputForOutgoingKeys {
     pub val: u64,
     pub key: Arc<ZcashOrchardOutgoingViewingKey>,
     pub note: Arc<ZcashOrchardNote>,
@@ -180,7 +180,7 @@ pub struct ZcashOrchardBundleDecryptOutputForOutgoingKeys {
 }
 
 impl TryFrom<(usize, OutgoingViewingKey, Note, Address, [u8; 512])>
-    for ZcashOrchardBundleDecryptOutputForOutgoingKeys
+    for ZcashOrchardDecryptOutputForOutgoingKeys
 {
     type Error = ZcashError;
     fn try_from(

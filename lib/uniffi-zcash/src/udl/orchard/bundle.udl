@@ -11,14 +11,14 @@ interface ZcashOrchardBundle {
     void verify_proof([ByRef] ZcashVerifyingKey key);
     
     [Throws=ZcashError]
-    ZcashOrchardBundleDecryptOutput decrypt_output_with_key(u64 action_idx, [ByRef] ZcashOrchardIncomingViewingKey ivk);
+    ZcashOrchardDecryptOutput decrypt_output_with_key(u64 action_idx, [ByRef] ZcashOrchardIncomingViewingKey ivk);
 
-    sequence<ZcashOrchardBundleDecryptOutputForKeys> decrypt_output_with_keys(sequence<ZcashOrchardIncomingViewingKey> ivks);
+    sequence<ZcashOrchardDecryptOutputForIncomingKeys> decrypt_output_with_keys(sequence<ZcashOrchardIncomingViewingKey> ivks);
 
     [Throws=ZcashError]
-    ZcashOrchardBundleDecryptOutput recover_output_with_ovk(u64 action_idx, [ByRef] ZcashOrchardOutgoingViewingKey ovk);
+    ZcashOrchardDecryptOutput recover_output_with_ovk(u64 action_idx, [ByRef] ZcashOrchardOutgoingViewingKey ovk);
 
-    sequence<ZcashOrchardBundleDecryptOutputForOutgoingKeys> recover_outputs_with_ovks(sequence<ZcashOrchardOutgoingViewingKey> ivks);
+    sequence<ZcashOrchardDecryptOutputForOutgoingKeys> recover_outputs_with_ovks(sequence<ZcashOrchardOutgoingViewingKey> ovks);
 };
 
 interface ZcashOrchardFlags {
@@ -35,13 +35,13 @@ interface ZcashOrchardFlags {
     u8 to_byte();
 };
 
-dictionary ZcashOrchardBundleDecryptOutput {
+dictionary ZcashOrchardDecryptOutput {
     ZcashOrchardNote note;
     ZcashOrchardAddress address;
     sequence<u8> data;
 };
 
-dictionary ZcashOrchardBundleDecryptOutputForKeys {
+dictionary ZcashOrchardDecryptOutputForIncomingKeys {
     u64 val;
     ZcashOrchardIncomingViewingKey key;
     ZcashOrchardNote note;
@@ -49,7 +49,7 @@ dictionary ZcashOrchardBundleDecryptOutputForKeys {
     sequence<u8> data;
 };
 
-dictionary ZcashOrchardBundleDecryptOutputForOutgoingKeys {
+dictionary ZcashOrchardDecryptOutputForOutgoingKeys {
     u64 val;
     ZcashOrchardOutgoingViewingKey key;
     ZcashOrchardNote note;
