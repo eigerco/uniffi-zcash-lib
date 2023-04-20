@@ -103,6 +103,25 @@ impl ZcashOrchardBundle {
             None => Err("Cannot recover output".into()),
         }
     }
+
+    /// Performs trial decryption of each action in the bundle with each of the
+    /// specified outgoing viewing keys, and returns a vector of each decrypted
+    /// note plaintext contents along with the index of the action from which it
+    /// was derived.
+    pub fn recover_outputs_with_ovks(
+        &self,
+        ovks: Vec<Arc<ZcashOrchardOutgoingViewingKey>>,
+    ) -> Vec<ZcashOrchardBundleDecryptOutputForOutgoingKeys> {
+        let keys = ovks
+            .into_iter()
+            .map(|key| key.as_ref().into())
+            .collect::<Vec<OutgoingViewingKey>>();
+        self.0
+            .recover_outputs_with_ovks(&keys)
+            .into_iter()
+            .map(|e| e.try_into().unwrap())
+            .collect()
+    }
 }
 
 impl From<&Bundle<Authorized, Amount>> for ZcashOrchardBundle {
@@ -141,6 +160,31 @@ impl TryFrom<(usize, IncomingViewingKey, Note, Address, [u8; 512])>
     type Error = ZcashError;
     fn try_from(
         value: (usize, IncomingViewingKey, Note, Address, [u8; 512]),
+    ) -> Result<Self, Self::Error> {
+        Ok(Self {
+            val: value.0.try_into()?,
+            key: Arc::new(value.1.into()),
+            note: Arc::new(value.2.into()),
+            address: Arc::new(value.3.into()),
+            data: value.4.to_vec(),
+        })
+    }
+}
+
+pub struct ZcashOrchardBundleDecryptOutputForOutgoingKeys {
+    pub val: u64,
+    pub key: Arc<ZcashOrchardOutgoingViewingKey>,
+    pub note: Arc<ZcashOrchardNote>,
+    pub address: Arc<ZcashOrchardAddress>,
+    pub data: Vec<u8>,
+}
+
+impl TryFrom<(usize, OutgoingViewingKey, Note, Address, [u8; 512])>
+    for ZcashOrchardBundleDecryptOutputForOutgoingKeys
+{
+    type Error = ZcashError;
+    fn try_from(
+        value: (usize, OutgoingViewingKey, Note, Address, [u8; 512]),
     ) -> Result<Self, Self::Error> {
         Ok(Self {
             val: value.0.try_into()?,

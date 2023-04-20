@@ -1208,7 +1208,7 @@ A 1:1 exposure of [orchard::note::TransmittedNoteCiphertext](https://docs.rs/orc
 
 A dictionary for holding the response of some [ZcashOrchardBundle](#zcashorchardbundle-authorized) methods.
 
-### ZcashOrchardBundleDecryptOutputForKeys
+### ZcashOrchardBundleDecryptOutputForOutgoingKeys
 
 A dictionary for holding the response of some [ZcashOrchardBundle](#zcashorchardbundle-authorized) methods.
 
