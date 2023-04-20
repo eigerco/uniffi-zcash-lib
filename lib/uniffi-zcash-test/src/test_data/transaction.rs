@@ -113,9 +113,33 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
     let fee_rule = fixed::FeeRule::standard();
 
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
+
+    let mut id_output = Vec::new();
+    transaction.txid().write(&mut id_output).unwrap();
+    writeln!(
+        file,
+        "{}",
+        format_bytes("transaction_standard_fee_id", &id_output)
+    )
+    .unwrap();
+
+    let mut version_output = Vec::new();
+    transaction.version().write(&mut version_output).unwrap();
+    writeln!(
+        file,
+        "{}",
+        format_bytes("transaction_standard_fee_version", &version_output)
+    )
+    .unwrap();
+
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(file, "{}", format_bytes("transaction_standard_fee", &data)).unwrap();
+    writeln!(
+        file,
+        "{}",
+        format_bytes("transaction_standard_fee", &data)
+    )
+    .unwrap();
 }
 
 pub fn transparent_builder_with_zip317_standard_fee_example<W: Write>(

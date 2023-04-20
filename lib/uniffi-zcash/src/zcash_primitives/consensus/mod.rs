@@ -10,6 +10,10 @@ impl ZcashBlockHeight {
     pub fn new(v: u32) -> Self {
         ZcashBlockHeight(BlockHeight::from_u32(v))
     }
+
+    pub fn value(&self) -> u32 {
+        self.0.into()
+    }
 }
 
 impl From<ZcashBlockHeight> for BlockHeight {

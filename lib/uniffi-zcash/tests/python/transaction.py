@@ -191,13 +191,28 @@ class OrchardTransactionBuilderTest(unittest.TestCase):
 
         self.assertEqual(len(transaction.to_bytes()), 9165)
 
-class TransactionSerializationTest(unittest.TestCase):
-    def test_transaction_from_bytes(self):
+class TransactionExplorationTest(unittest.TestCase):
+    def test_first_level_fields(self):
         zts = TestSupport.from_csv_file()
 
-        transaction_bytes = zts.get_as_u8_array("transaction_non_standard_fee")
+        tx_bytes = zts.get_as_u8_array("transaction_standard_fee")
+        tx = ZcashTransaction.from_bytes(tx_bytes, ZcashBranchId.NU5)
 
-        ZcashTransaction.from_bytes(transaction_bytes, ZcashBranchId.NU5)
+        # Id
+        id_expected_bytes = zts.get_as_u8_array("transaction_standard_fee_id")
+        self.assertEqual(id_expected_bytes, tx.txid().to_bytes())
+
+        # Version
+        version_expected_bytes = zts.get_as_u8_array(
+            "transaction_standard_fee_version")
+        self.assertEqual(version_expected_bytes, tx.version().to_bytes())
+
+        # lock time
+        self.assertEqual(0, tx.lock_time())
+
+        # expiry height
+        self.assertEqual(2030840, tx.expiry_height().value())
+
 
 if __name__ == '__main__':
     unittest.main()

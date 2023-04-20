@@ -562,12 +562,12 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | Members                                | Score | UDL | Code | Tests | Docs |
 | ---------------------------------------| ----- | --- | ---- | ----- | ---- |
 | ZcashTransaction::into_data()          | 🔴    |     |      |       |      |
-| ZcashTransaction::txid()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTransaction::read()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTransaction::version()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::txid()               | 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
+| ZcashTransaction::read()               | 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
+| ZcashTransaction::version()            | 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
 | ZcashTransaction::consensus_branch_id()| 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTransaction::lock_time()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTransaction::expiry_height()      | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::lock_time()          | 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
+| ZcashTransaction::expiry_height()      | 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
 | ZcashTransaction::fee_paid()           | 🔴    |     |      |       |       |
 | ZcashTransaction::transparent_bundle() | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashTransaction::sapling_bundle()     | 🔴    |  ✅ |  ✅  |       |  ✅  |
@@ -601,7 +601,8 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                      | Score | UDL | Code | Tests | Docs |
 | ---------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashBlockHeight::from_u32() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashBlockHeight::from_u32() | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
+| ZcashBlockHeight::value()    | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
 
 ### ZcashExternalIvk
 
@@ -893,8 +894,8 @@ a tuple.
 
 | Members                             | Score | UDL | Code | Tests | Docs |
 | ------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashTxId::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTxId::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxId::to_bytes()               | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
+| ZcashTxId::from_bytes()             | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
 
 
 ### ZcashTxIn

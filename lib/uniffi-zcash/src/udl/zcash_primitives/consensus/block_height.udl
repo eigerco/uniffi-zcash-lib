@@ -1,3 +1,5 @@
 interface ZcashBlockHeight {
     constructor(u32 v);
+
+    u32 value();
 };
