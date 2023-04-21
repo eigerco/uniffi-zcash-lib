@@ -909,6 +909,15 @@ a tuple.
 | ZcashTxIn::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashTxIn::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
+### ZcashTxOut
+
+* Original type: [zcash_primitives::transaction::components::transparent::TxOut](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/transparent/struct.TxOut.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTxOut::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxOut::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxOut::recipient_address()      | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 ### ZcashTransparentBundle
 
