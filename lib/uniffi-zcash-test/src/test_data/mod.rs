@@ -4,6 +4,7 @@ mod secp256k1;
 mod transaction;
 mod zcash_client_backend;
 mod zcash_primitives;
+mod helper;
 
 use std::fs::OpenOptions;
 use std::io::Write;
