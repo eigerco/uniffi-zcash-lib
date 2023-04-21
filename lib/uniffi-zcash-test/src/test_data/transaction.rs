@@ -19,7 +19,7 @@ use zcash_primitives::{
     sapling::Node,
     transaction::{
         builder::Builder,
-        components::{Amount, OutPoint, TxOut},
+        components::{transparent::fees::OutputView, Amount, OutPoint, TxOut},
         fees::{fixed, zip317},
         Authorized, TransactionData, TxVersion,
     },
@@ -132,14 +132,47 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
     )
     .unwrap();
 
-    let mut data = Vec::new();
-    transaction.write(&mut data).unwrap();
-    writeln!(
-        file,
-        "{}",
-        format_bytes("transaction_standard_fee", &data)
+    let mut vout_0_output = Vec::new();
+    transaction.transparent_bundle().unwrap().vout[0]
+        .write(&mut vout_0_output)
+        .unwrap();
+    super::store_bytes(&mut file, "transaction_standard_fee_vout_0", &vout_0_output).unwrap();
+
+    let a = match transaction.transparent_bundle().unwrap().vout[0]
+        .recipient_address()
+        .unwrap()
+    {
+        zcash_primitives::legacy::TransparentAddress::PublicKey(pubkey) => pubkey,
+        zcash_primitives::legacy::TransparentAddress::Script(_) => unimplemented!(),
+    };
+    super::store_bytes(
+        &mut file,
+        "transaction_standard_fee_vout_0_recipient_address",
+        &a,
     )
     .unwrap();
+
+    let mut script_output = Vec::new();
+    transaction.transparent_bundle().unwrap().vout[0]
+        .script_pubkey()
+        .write(&mut script_output)
+        .unwrap();
+    super::store_bytes(
+        &mut file,
+        "transaction_standard_fee_vout_0_script",
+        &script_output,
+    )
+    .unwrap();
+
+    let mut writer = Vec::new();
+    transaction.transparent_bundle().unwrap().vin.to_vec()[0]
+        .write(&mut writer)
+        .unwrap();
+    super::store_bytes(&mut file, "transaction_standard_fee_vin_0", &writer).unwrap();
+
+    let mut data = Vec::new();
+    transaction.write(&mut data).unwrap();
+    writeln!(file, "{}", format_bytes("transaction_standard_fee", &data)).unwrap();
 }
 
 pub fn transparent_builder_with_zip317_standard_fee_example<W: Write>(

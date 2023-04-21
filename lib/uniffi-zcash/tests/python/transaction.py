@@ -213,6 +213,43 @@ class TransactionExplorationTest(unittest.TestCase):
         # expiry height
         self.assertEqual(2030840, tx.expiry_height().value())
 
+    def test_transparent_bundle(self):
+
+        zts = TestSupport.from_csv_file()
+
+        tx_bytes = zts.get_as_u8_array("transaction_standard_fee")
+        tx = ZcashTransaction.from_bytes(tx_bytes, ZcashBranchId.NU5)
+
+        bundle = tx.transparent_bundle()
+
+        self.assertFalse(bundle.is_coinbase())
+
+        # vout
+        vout = bundle.vout()
+
+        self.assertEqual(1, len(vout))
+        self.assertEqual(200, vout[0].value().value())
+
+        vout_0_bytes = zts.get_as_u8_array(
+            "transaction_standard_fee_vout_0")
+        self.assertEqual(vout_0_bytes, vout[0].to_bytes())
+
+        vout_0_address = zts.get_as_u8_array(
+            "transaction_standard_fee_vout_0_recipient_address")
+        self.assertEqual(
+            vout_0_address, vout[0].recipient_address().to_bytes())
+
+        script_bytes = zts.get_as_u8_array(
+            "transaction_standard_fee_vout_0_script")
+        self.assertEqual(script_bytes, vout[0].script_pubkey().to_bytes())
+
+        # vin
+        vin = bundle.vin()
+
+        self.assertEqual(1, len(vin))
+        vin0_bytes = zts.get_as_u8_array("transaction_standard_fee_vin_0")
+        self.assertEqual(vin0_bytes, vin[0].to_bytes())
+
 
 if __name__ == '__main__':
     unittest.main()
