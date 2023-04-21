@@ -52,3 +52,11 @@ pub(crate) fn format_bytes(label: &str, bytes: &[u8]) -> String {
 
     format!("{label}:[{bytes_arr}]")
 }
+
+pub(crate) fn store_bytes<W: Write>(
+    mut file: W,
+    label: &str,
+    data: &[u8],
+) -> Result<(), std::io::Error> {
+    writeln!(file, "{}", format_bytes(label, &data))
+}
