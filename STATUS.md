@@ -659,8 +659,8 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                    | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashTransparentTxOut::read()              | 🔵     |     |      |       |      |
-| ZcashTransparentTxOut::write()             | 🔵     |     |      |       |      |
+| ZcashTransparentTxOut::read()              | 🔴     | ✅ | ✅   |       |  ✅  |
+| ZcashTransparentTxOut::write()             | 🔴     | ✅ | ✅   |       |  ✅  |
 
 ### ZcashAmount
 

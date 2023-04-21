@@ -1,1 +1,7 @@
-interface ZcashScript {};
+interface ZcashScript {
+    [Name=from_bytes, Throws=ZcashError]
+    constructor([ByRef] sequence<u8> data);
+
+    [Throws=ZcashError]
+    sequence<u8> to_bytes();
+};
