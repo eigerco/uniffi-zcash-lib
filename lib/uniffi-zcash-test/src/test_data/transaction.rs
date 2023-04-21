@@ -21,13 +21,11 @@ use zcash_primitives::{
         builder::Builder,
         components::{transparent::fees::OutputView, Amount, OutPoint, TxOut},
         fees::{fixed, zip317},
-        Authorized, TransactionData, TxVersion,
+        Authorized, Transaction, TransactionData, TxVersion,
     },
 };
 
 use zcash_proofs::prover::LocalTxProver;
-
-use crate::test_data::format_bytes;
 
 const BLOCK_HEIGHT: u32 = 2030820;
 
@@ -74,12 +72,7 @@ pub fn transparent_builder_with_nonstandard_fee_example<W: Write>(
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(
-        file,
-        "{}",
-        format_bytes("transaction_non_standard_fee", &data)
-    )
-    .unwrap();
+    super::store_bytes(&mut file, "transaction_non_standard_fee", &data).unwrap();
 }
 
 pub fn transparent_builder_with_standard_fee_example<W: Write>(
@@ -114,60 +107,97 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
 
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
 
-    let mut id_output = Vec::new();
-    transaction.txid().write(&mut id_output).unwrap();
-    super::store_bytes(&mut file, "transaction_standard_fee_id", &id_output).unwrap();
-
-    let mut version_output = Vec::new();
-    transaction.version().write(&mut version_output).unwrap();
-    super::store_bytes(
+    store_tx_id(&mut file, &transaction, "transaction_standard_fee_id");
+    store_tx_version(&mut file, &transaction, "transaction_standard_fee_version");
+    store_tx_t_out(
         &mut file,
-        "transaction_standard_fee_version",
-        &version_output,
-    )
-    .unwrap();
-
-    let mut vout_0_output = Vec::new();
-    transaction.transparent_bundle().unwrap().vout[0]
-        .write(&mut vout_0_output)
-        .unwrap();
-    super::store_bytes(&mut file, "transaction_standard_fee_vout_0", &vout_0_output).unwrap();
-
-    let a = match transaction.transparent_bundle().unwrap().vout[0]
-        .recipient_address()
-        .unwrap()
-    {
-        zcash_primitives::legacy::TransparentAddress::PublicKey(pubkey) => pubkey,
-        zcash_primitives::legacy::TransparentAddress::Script(_) => unimplemented!(),
-    };
-    super::store_bytes(
+        &transaction,
+        0,
+        "transaction_standard_fee_vout_0",
+    );
+    store_tx_t_out_address(
         &mut file,
+        &transaction,
+        0,
         "transaction_standard_fee_vout_0_recipient_address",
-        &a,
-    )
-    .unwrap();
-
-    let mut script_output = Vec::new();
-    transaction.transparent_bundle().unwrap().vout[0]
-        .script_pubkey()
-        .write(&mut script_output)
-        .unwrap();
-    super::store_bytes(
+    );
+    store_tx_t_out_script_pubkey(
         &mut file,
+        &transaction,
+        0,
         "transaction_standard_fee_vout_0_script",
-        &script_output,
-    )
-    .unwrap();
-
-    let mut writer = Vec::new();
-    transaction.transparent_bundle().unwrap().vin.to_vec()[0]
-        .write(&mut writer)
-        .unwrap();
-    super::store_bytes(&mut file, "transaction_standard_fee_vin_0", &writer).unwrap();
+    );
+    store_tx_t_vin(&mut file, &transaction, 0, "transaction_standard_fee_vin_0");
 
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
     super::store_bytes(&mut file, "transaction_standard_fee", &data).unwrap();
+}
+
+fn store_tx_id<W: Write>(mut file: W, tx: &Transaction, label: &str) {
+    let mut data = Vec::new();
+    tx.txid().write(&mut data).unwrap();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+fn store_tx_version<W: Write>(mut file: W, tx: &Transaction, label: &str) {
+    let mut data = Vec::new();
+    tx.version().write(&mut data).unwrap();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+fn store_tx_t_out<W: Write>(mut file: W, tx: &Transaction, idx: usize, label: &str) {
+    let mut data = Vec::new();
+    tx.transparent_bundle()
+        .unwrap()
+        .vout
+        .get(idx)
+        .unwrap()
+        .write(&mut data)
+        .unwrap();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+fn store_tx_t_out_address<W: Write>(mut file: W, tx: &Transaction, idx: usize, label: &str) {
+    let data = match tx
+        .transparent_bundle()
+        .unwrap()
+        .vout
+        .get(idx)
+        .unwrap()
+        .recipient_address()
+        .unwrap()
+    {
+        zcash_primitives::legacy::TransparentAddress::PublicKey(pubkey) => pubkey,
+        zcash_primitives::legacy::TransparentAddress::Script(script) => script,
+    };
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+fn store_tx_t_out_script_pubkey<W: Write>(mut file: W, tx: &Transaction, idx: usize, label: &str) {
+    let mut data = Vec::new();
+    tx.transparent_bundle()
+        .unwrap()
+        .vout
+        .get(idx)
+        .unwrap()
+        .script_pubkey()
+        .write(&mut data)
+        .unwrap();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+fn store_tx_t_vin<W: Write>(mut file: W, tx: &Transaction, idx: usize, label: &str) {
+    let mut data = Vec::new();
+    tx.transparent_bundle()
+        .unwrap()
+        .vin
+        .to_vec()
+        .get(idx)
+        .unwrap()
+        .write(&mut data)
+        .unwrap();
+    super::store_bytes(&mut file, label, &data).unwrap();
 }
 
 pub fn transparent_builder_with_zip317_standard_fee_example<W: Write>(
@@ -203,12 +233,7 @@ pub fn transparent_builder_with_zip317_standard_fee_example<W: Write>(
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(
-        file,
-        "{}",
-        format_bytes("transaction_zip317_standard_fee", &data)
-    )
-    .unwrap();
+    super::store_bytes(&mut file, "transaction_zip317_standard_fee", &data).unwrap();
 }
 
 pub fn transparent_builder_with_zip317_non_standard_fee_example<W: Write>(
@@ -245,12 +270,7 @@ pub fn transparent_builder_with_zip317_non_standard_fee_example<W: Write>(
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(
-        file,
-        "{}",
-        format_bytes("transaction_zip317_non_standard_fee", &data)
-    )
-    .unwrap();
+    super::store_bytes(&mut file, "transaction_zip317_non_standard_fee", &data).unwrap();
 }
 
 pub fn sapling_transaction_general_builder_example<W: Write>(
@@ -295,7 +315,7 @@ pub fn sapling_transaction_general_builder_example<W: Write>(
 
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(file, "{}", format_bytes("transaction_sapling", &data)).unwrap();
+    super::store_bytes(&mut file, "transaction_sapling", &data).unwrap();
 }
 
 pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
@@ -360,5 +380,5 @@ pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
 
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(file, "{}", format_bytes("transaction_orchard", &data)).unwrap();
+    super::store_bytes(&mut file, "transaction_orchard", &data).unwrap();
 }
