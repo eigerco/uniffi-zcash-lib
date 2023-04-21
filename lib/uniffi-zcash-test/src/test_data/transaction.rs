@@ -28,10 +28,10 @@ use zcash_primitives::{
 use zcash_proofs::prover::LocalTxProver;
 
 use super::helper::{
-    store_tx_id, store_tx_sapling_output_cmu, store_tx_sapling_output_cv,
-    store_tx_sapling_spend_anchor, store_tx_sapling_spend_cv, store_tx_sapling_spend_nullifier,
-    store_tx_sapling_spend_rk, store_tx_t_out, store_tx_t_out_address,
-    store_tx_t_out_script_pubkey, store_tx_t_vin, store_tx_version,
+    store_tx_sapling_output_cmu, store_tx_sapling_output_cv, store_tx_sapling_spend_anchor,
+    store_tx_sapling_spend_cv, store_tx_sapling_spend_nullifier, store_tx_sapling_spend_rk,
+    store_tx_t_id, store_tx_t_out, store_tx_t_out_address, store_tx_t_out_script_pubkey,
+    store_tx_t_version, store_tx_t_vin,
 };
 
 const BLOCK_HEIGHT: u32 = 2030820;
@@ -114,8 +114,8 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
 
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
 
-    store_tx_id(&mut file, &transaction, "transaction_standard_fee_id");
-    store_tx_version(&mut file, &transaction, "transaction_standard_fee_version");
+    store_tx_t_id(&mut file, &transaction, "transaction_standard_fee_id");
+    store_tx_t_version(&mut file, &transaction, "transaction_standard_fee_version");
     store_tx_t_out(
         &mut file,
         &transaction,

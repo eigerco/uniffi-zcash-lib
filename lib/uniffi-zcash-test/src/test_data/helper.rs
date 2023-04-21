@@ -2,13 +2,13 @@ use std::io::Write;
 
 use zcash_primitives::transaction::{components::transparent::fees::OutputView, Transaction};
 
-pub fn store_tx_id<W: Write>(mut file: W, tx: &Transaction, label: &str) {
+pub fn store_tx_t_id<W: Write>(mut file: W, tx: &Transaction, label: &str) {
     let mut data = Vec::new();
     tx.txid().write(&mut data).unwrap();
     super::store_bytes(&mut file, label, &data).unwrap();
 }
 
-pub fn store_tx_version<W: Write>(mut file: W, tx: &Transaction, label: &str) {
+pub fn store_tx_t_version<W: Write>(mut file: W, tx: &Transaction, label: &str) {
     let mut data = Vec::new();
     tx.version().write(&mut data).unwrap();
     super::store_bytes(&mut file, label, &data).unwrap();
