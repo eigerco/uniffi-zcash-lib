@@ -224,31 +224,39 @@ class TransactionExplorationTest(unittest.TestCase):
 
         self.assertFalse(bundle.is_coinbase())
 
-        # vout
-        vout = bundle.vout()
+    def test_sapling_bundle(self):
 
-        self.assertEqual(1, len(vout))
-        self.assertEqual(200, vout[0].value().value())
+        zts = TestSupport.from_csv_file()
 
-        vout_0_bytes = zts.get_as_u8_array(
-            "transaction_standard_fee_vout_0")
-        self.assertEqual(vout_0_bytes, vout[0].to_bytes())
+        tx_bytes = zts.get_as_u8_array("transaction_sapling")
+        tx = ZcashTransaction.from_bytes(tx_bytes, ZcashBranchId.NU5)
 
-        vout_0_address = zts.get_as_u8_array(
-            "transaction_standard_fee_vout_0_recipient_address")
-        self.assertEqual(
-            vout_0_address, vout[0].recipient_address().to_bytes())
+        bundle = tx.sapling_bundle()
 
-        script_bytes = zts.get_as_u8_array(
-            "transaction_standard_fee_vout_0_script")
-        self.assertEqual(script_bytes, vout[0].script_pubkey().to_bytes())
+        # Shielded spends
+        spends = bundle.shielded_spends()
+        self.assertEqual(1, len(spends))
+        the_spend = spends[0]
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_spend_0_cv"), the_spend.cv().to_bytes())
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_spend_0_anchor"), the_spend.anchor())
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_spend_0_nullifier"), the_spend.nullifier().to_bytes())
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_spend_0_rk"), the_spend.rk().to_bytes())
 
-        # vin
-        vin = bundle.vin()
+        # Shielded outputs
+        outputs = bundle.shielded_outputs()
+        self.assertEqual(1, len(spends))
+        the_output = outputs[0]
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_output_0_cv"), the_output.cv().to_bytes())
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_output_0_cmu"), the_output.cmu().to_bytes())
 
-        self.assertEqual(1, len(vin))
-        vin0_bytes = zts.get_as_u8_array("transaction_standard_fee_vin_0")
-        self.assertEqual(vin0_bytes, vin[0].to_bytes())
+        # Value balance
+        self.assertEqual(0, bundle.value_balance().value())
 
 
 if __name__ == '__main__':

@@ -313,9 +313,110 @@ pub fn sapling_transaction_general_builder_example<W: Write>(
     let fee_rule = fixed::FeeRule::non_standard(Amount::zero());
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
 
+    store_tx_sapling_spend_cv(&mut file, &transaction, 0, "transaction_sapling_spend_0_cv");
+    store_tx_sapling_spend_anchor(
+        &mut file,
+        &transaction,
+        0,
+        "transaction_sapling_spend_0_anchor",
+    );
+    store_tx_sapling_spend_nullifier(&mut file, &transaction, 0, "transaction_sapling_spend_0_nullifier");
+    store_tx_sapling_spend_rk(&mut file, &transaction, 0, "transaction_sapling_spend_0_rk");
+    
+    store_tx_sapling_output_cv(&mut file, &transaction, 0, "transaction_sapling_output_0_cv");
+    store_tx_sapling_output_cmu(&mut file, &transaction, 0, "transaction_sapling_output_0_cmu");
+
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
     super::store_bytes(&mut file, "transaction_sapling", &data).unwrap();
+}
+
+fn store_tx_sapling_spend_cv<W: Write>(mut file: W, tx: &Transaction, idx: usize, label: &str) {
+    let data = tx
+        .sapling_bundle()
+        .unwrap()
+        .shielded_spends()
+        .get(idx)
+        .unwrap()
+        .cv()
+        .to_bytes();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+fn store_tx_sapling_spend_anchor<W: Write>(mut file: W, tx: &Transaction, idx: usize, label: &str) {
+    let data = tx
+        .sapling_bundle()
+        .unwrap()
+        .shielded_spends()
+        .get(idx)
+        .unwrap()
+        .anchor()
+        .to_bytes();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+fn store_tx_sapling_spend_nullifier<W: Write>(
+    mut file: W,
+    tx: &Transaction,
+    idx: usize,
+    label: &str,
+) {
+    let data = tx
+        .sapling_bundle()
+        .unwrap()
+        .shielded_spends()
+        .get(idx)
+        .unwrap()
+        .nullifier()
+        .to_vec();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+fn store_tx_sapling_spend_rk<W: Write>(mut file: W, tx: &Transaction, idx: usize, label: &str) {
+    let mut data = Vec::new();
+    tx.sapling_bundle()
+        .unwrap()
+        .shielded_spends()
+        .get(idx)
+        .unwrap()
+        .rk()
+        .write(&mut data)
+        .unwrap();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+fn store_tx_sapling_output_cv<W: Write>(
+    mut file: W,
+    tx: &Transaction,
+    idx: usize,
+    label: &str,
+) {
+    let data = tx
+        .sapling_bundle()
+        .unwrap()
+        .shielded_outputs()
+        .get(idx)
+        .unwrap()
+        .cv()
+        .to_bytes();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+fn store_tx_sapling_output_cmu<W: Write>(
+    mut file: W,
+    tx: &Transaction,
+    idx: usize,
+    label: &str,
+) {
+    let data = tx
+        .sapling_bundle()
+        .unwrap()
+        .shielded_outputs()
+        .get(idx)
+        .unwrap()
+        .cmu()
+        .to_bytes();
+    super::store_bytes(&mut file, label, &data).unwrap();
 }
 
 pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
