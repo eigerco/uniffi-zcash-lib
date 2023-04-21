@@ -670,6 +670,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | -------------------------------------------- | ----- | --- | ---- | ----- | ---- |
 | ZcashAmount::zero()                          | 🔴    | ✅  | ✅   |       | ✅   |
 | ZcashAmount::from_i64()                      | 🔴    | ✅  | ✅   |       | ✅   |
+| ZcashAmount::value()                         | 🔴    | ✅  | ✅   |       | ✅   |
 | ZcashAmount::from_nonnegative_i64()          | 🔵    |     |      |       |      |
 | ZcashAmount::from_u64()                      | 🔵    |     |      |       |      |
 | ZcashAmount::from_i64_le_bytes()             | 🔵    |     |      |       |      |

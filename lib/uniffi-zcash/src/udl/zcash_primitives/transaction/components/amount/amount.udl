@@ -4,4 +4,6 @@ interface ZcashAmount {
 
   [Name=zero]
   constructor();
+
+  i64 value();
 };
