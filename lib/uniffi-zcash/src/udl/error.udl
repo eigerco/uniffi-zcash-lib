@@ -17,6 +17,7 @@ enum ZcashError {
   "OrchardBuilderError",
   "InsufficientFundsError",
   "ChangeRequiredError",
+  "BalanceError",
   "IOError",
   "Unknown",
 };

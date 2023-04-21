@@ -1,0 +1,8 @@
+interface ZcashSaplingBundle {
+
+   sequence<ZcashSaplingSpendDescription> shielded_spends();
+   
+   sequence<ZcashSaplingOutputDescription> shielded_outputs();
+   
+   ZcashAmount value_balance();
+};

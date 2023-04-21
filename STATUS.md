@@ -559,15 +559,23 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 * Original type: [zcash_primitives::transaction::Transaction](https://docs.rs/zcash_primitives/0.10.2/zcash_primitives/transaction/struct.Transaction.html)
 
 
-| Members                              | Score | UDL | Code | Tests | Docs |
-| -------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashTransaction::into_data()        | 🔴    |     |      |       |      |
-| ZcashTransaction::txid()             | 🔴    |     |      |       |      |
-| ZcashTransaction::read()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTransaction::write()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| Members                                | Score | UDL | Code | Tests | Docs |
+| ---------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTransaction::into_data()          | 🔴    |     |      |       |      |
+| ZcashTransaction::txid()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::read()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::version()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::consensus_branch_id()| 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::lock_time()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::expiry_height()      | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::fee_paid()           | 🔴    |     |      |       |       |
+| ZcashTransaction::transparent_bundle() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::sapling_bundle()     | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::orchard_bundle()     | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 * `write` method was implemented as `to_bytes()`.
 * `read` method was implemented as `from_bytes()`.
+* `fee_paid` method is commented in code. It needs a closure as parameter.
 
 ### ZcashSaplingMetadata
 | ZcashSaplingMetadata::spend_index()  | 🔴    | ✅  |  ✅  |       | ✅   |
@@ -814,10 +822,10 @@ a tuple.
 
 * Original type: [orchard::note::ExtractedNoteCommitment](https://docs.rs/orchard/0.3.0/orchard/note/struct.ExtractedNoteCommitment.html)
 
-| Members                             | Score | UDL | Code | Tests | Docs |
-| ------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashOrchardNoteValue::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashOrchardNoteValue::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| Members                                    | Score | UDL | Code | Tests | Docs |
+| -------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashExtractedNoteCommitment::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashExtractedNoteCommitment::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 ### ZcashAnchor
 
@@ -825,8 +833,8 @@ a tuple.
 
 | Members                             | Score | UDL | Code | Tests | Docs |
 | ------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashOrchardNoteValue::from_bytes() | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashOrchardNoteValue::to_bytes()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashAnchor::from_bytes()           | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashAnchor::to_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 ### ZcashOrchardNote
 
@@ -878,6 +886,212 @@ a tuple.
 | ZcashOrchardMerkleHash::from_cmx()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashOrchardMerkleHash::to_bytes()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashOrchardMerkleHash::from_bytes()| 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
+
+### ZcashTxId
+
+* Original type: [zcash_primitives::transaction::TxId](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/struct.TxId.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTxId::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxId::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+
+### ZcashTxIn
+
+* Original type: [zcash_primitives::transaction::components::transparent::TxIn](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/transparent/struct.TxIn.html)
+* Implemented the authorized implementation.
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTxIn::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxIn::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+
+### ZcashTransparentBundle
+
+* Original type: [zcash_primitives::transaction::components::transparent::Bundle](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/transparent/struct.Bundle.html)
+* Implemented the authorized implementation.
+* `vin()` and `vout()` methods are pure invention methods, to access the pub struct fields.
+
+| Members                                 | Score | UDL | Code | Tests | Docs |
+| ----------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTransparentBundle::is_coinbase()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransparentBundle::map_authorization()      | 🔵    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransparentBundle::value_balance()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransparentBundle::vin()                    | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashZcashTransparentBundleTxId::vout()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+### ZcashSaplingBundle
+
+* Original type: [zcash_primitives::transaction::components::sapling::Bundle](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/sapling/struct.Bundle.html)
+* Implemented the authorized implementation.
+
+
+| Members                                | Score | UDL | Code | Tests | Docs |
+| ---------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingBundle::shielded_spends()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingBundle::shielded_outputs() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingBundle::value_balance()    | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingBundle::value_balance()    | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+
+### ZcashSaplingSpendDescription
+
+* Original type: [zcash_primitives::transaction::components::sapling::SpendDescription](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/sapling/struct.SpendDescription.html)
+* Implemented the authorized implementation.
+
+
+| Members                                         | Score | UDL | Code | Tests | Docs |
+| ------------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingSpendDescription::cv()              | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::anchor()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::nullifier()       | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::rk()              | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingSpendDescription::zkproof()         |       |     |       |      |      |
+| ZcashSaplingSpendDescription::spend_auth_sig()  |       |     |       |      |      |
+
+### ZcashSaplingOutputDescription
+
+* Original type: [zcash_primitives::transaction::components::sapling::OutputDescription](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/sapling/struct.OutputDescription.html)
+* Implemented the authorized implementation.
+
+
+| Members                                         | Score | UDL | Code | Tests | Docs |
+| ------------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingOutputDescription::cv()              | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingOutputDescription::cmu()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingOutputDescription::ephemeral_key()   | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingOutputDescription::enc_ciphertext()  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashSaplingOutputDescription::out_ciphertext()  |       |     |       |      |      |
+| ZcashSaplingOutputDescription::zkproof()         |       |     |       |      |      |
+| ZcashSaplingOutputDescription::read()            |       |     |       |      |      |
+| ZcashSaplingOutputDescription::write_v4()         |       |     |       |      |      |
+| ZcashSaplingOutputDescription::write_v5_without_proof()  |       |     |       |      |      |
+
+### ZcashSaplingValueCommitment
+
+* Original type: [zcash_primitives::sapling::value::ValueCommitment](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/sapling/value/struct.ValueCommitment.html)
+
+
+| Members                                         | Score | UDL | Code | Tests | Docs |
+| ------------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingValueCommitment::derive()           |       |     |       |      |      |
+| ZcashSaplingValueCommitment::as_inner()         |       |     |       |      |      |
+| ZcashSaplingValueCommitment::from_bytes_not_small_order() |       |     |       |      |      |
+| ZcashSaplingValueCommitment::to_bytes()         | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+### ZcashSaplingNullifier
+
+* Original type: [zcash_primitives::sapling::Nullifier](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/sapling/struct.Nullifier.html)
+
+| Members                                   | Score | UDL | Code | Tests | Docs |
+| ------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingNullifier::from_slice()       |       |     |      |      |      |
+| ZcashSaplingNullifier::to_bytes()         | 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+### ZcashSaplingPublicKey
+
+* Original type: [zcash_primitives::sapling::redjubjub::PublicKey](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/sapling/redjubjub/struct.PublicKey.html)
+
+| Members                                      | Score | UDL | Code | Tests | Docs |
+| ---------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingPublicKey::from_private()        |       |     |      |      |      |
+| ZcashSaplingPublicKey::randomize()           |       |     |      |      |      |
+| ZcashSaplingPublicKey::read()                |       |     |      |      |      |
+| ZcashSaplingPublicKey::write()               |       |     |      |      |      |
+| ZcashSaplingPublicKey::verify()              |       |     |      |      |      |
+| ZcashSaplingPublicKey::verify_with_zip216()  |       |     |      |      |       |    
+| ZcashSaplingPublicKey::to_bytes()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
+
+* The `write()` method was implemented as `to_bytes()`
+
+### ZcashSaplingValueCommitment
+
+* Original type: [zcash_primitives::sapling::value::ValueCommitment](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/sapling/value/struct.ValueCommitment.html)
+
+| Members                                      | Score | UDL | Code | Tests | Docs |
+| ---------------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashSaplingValueCommitment::derive()              |       |     |      |      |      |
+| ZcashSaplingValueCommitment::as_inner()            |       |     |      |      |      |
+| ZcashSaplingValueCommitment::from_bytes_not_small_order() |       |     |      |      |      |
+| ZcashSaplingValueCommitment::to_bytes()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
+  
+### ZcashOrchardBundle (Authorized)
+
+* Original type: [orchard::bundle::Bundle](https://docs.rs/orchard/0.3.0/orchard/bundle/struct.Bundle.html)
+
+| Members                                        | Score | UDL | Code | Tests | Docs |
+| -----------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardBundle::actions()                  | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardBundle::anchor()                   | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardBundle::authorization()            |       |     |      |      |      |
+| ZcashOrchardBundle::authorizing_commitment()   |       |     |      |      |      |
+| ZcashOrchardBundle::binding_validating_key()   |       |     |      |      |      |
+| ZcashOrchardBundle::decrypt_output_with_key()  | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardBundle::decrypt_outputs_with_keys()| 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardBundle::flags()                    | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardBundle::value_balance()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardBundle::verify_proof()             | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardBundle::recover_output_with_ovk()  | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardBundle::recover_outputs_with_ovks()| 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardBundle::commitment()               |       |     |      |      |      |
+| ZcashOrchardBundle::map_authorization()        |       |     |      |      |      |
+
+### ZcashOrchardFlags
+
+* Original type: [orchard::bundle::Flags](https://docs.rs/orchard/0.3.0/orchard/bundle/struct.Flags.html)
+
+| Members                                    | Score | UDL | Code | Tests | Docs |
+| -------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardFlags::from_parts()            | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardFlags::spends_enabled()        | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardFlags::outputs_enabled()       | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardFlags::to_byte()               | 🔴    |  ✅ |  ✅  |      |  ✅  |
+| ZcashOrchardFlags::from_byte()             | 🔴    |  ✅ |  ✅  |      |  ✅  |
+
+### ZcashOrchardAction
+
+* Original type: [orchard::Action](https://docs.rs/orchard/0.3.0/orchard/struct.Action.html)
+
+| Members                                    | Score | UDL | Code | Tests | Docs |
+| -------------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardAction::from_parts()           |       |     |      |       |      |
+| ZcashOrchardAction::nullifier()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardAction::rk()                   |       |     |      |       |      |
+| ZcashOrchardAction::cmx()                  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardAction::encrypted_note()       | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardAction::cv_net()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashOrchardAction::authorization()        |       |     |      |       |      |
+| ZcashOrchardAction::to_instance()          |       |     |      |       |      |
+
+
+
+### ZcashOrchardValueCommitment
+
+* Original type: [orchard::value::ValueCommitment](https://docs.rs/orchard/0.3.0/orchard/value/struct.ValueCommitment.html)
+
+| Members                                  | Score | UDL | Code | Tests | Docs |
+| -----------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashOrchardValueCommitment::derive()    |       |     |      |      |      |
+| ZcashOrchardValueCommitment::from_bytes()|       |     |      |      |      |
+| ZcashOrchardValueCommitment::to_bytes()  | 🔴    |  ✅ |  ✅  |      |  ✅  |
+
+### ZcashVerifyingKey
+
+* Original type: [orchard::circuit::VerifyingKey](https://docs.rs/orchard/0.3.0/orchard/circuit/struct.VerifyingKey.html)
+
+| Members                                  | Score | UDL | Code | Tests | Docs |
+| -----------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashVerifyingKey::build()               | 🔴    |  ✅ |  ✅  |      |  ✅  |
+
+### ZcashProvingKey
+
+* Original type: [orchard::circuit::ProvingKey](https://docs.rs/orchard/0.3.0/orchard/circuit/struct.ProvingKey.html)
+
+| Members                                  | Score | UDL | Code | Tests | Docs |
+| -----------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashProvingKey::build()               | 🔴    |  ✅ |  ✅  |      |  ✅  |
 
 ## Enums
 
@@ -937,6 +1151,38 @@ See [ZcashTransactionBuilder](#zcashtransactionbuilder).
 | Nu5        |  🔴   | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
 | ZFuture    |  🔵   |                       |                       |                               |
 
+
+### ZcashTxVersionSelection
+
+* Original type: [zcash_primitives::transaction::TxVersion](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/enum.TxVersion.html)
+
+| Members                     | Score | UDL | Code | Tests | Docs |
+| ----------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTxVersion::Sprout      | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::Overwinter  | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::Sapling     | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::Zip225      | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::ZFuture     | 🔵    |     |      |       |      |
+
+The methods in this enum and the enum itself are contained in the following type:
+
+#### ZcashTxVersion
+
+| Members                               | Score | UDL | Code | Tests | Docs |
+| --------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTxVersion::selection()           | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::from_bytes()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::header()              | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::version_group_id()    | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::to_bytes()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::has_sprout()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::has_overwinter()      | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::has_sapling()         | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::has_orchard()         | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxVersion::suggested_for_branch()| 🔴    |  ✅ |  ✅  |       |  ✅  |
+
+The `selection()` method is a pure invention one, that helps on retrieving the enum variant `ZcashTxVersionSelection`.
+
 ## Records
 
 ### ZcashDiversifierIndexAndScope
@@ -953,6 +1199,23 @@ A pair of [ZcashDiversifierIndex](#zcashdiversifierindex) and [ZcashPaymentAddre
 ### ZcashTransactionSaplingMetadata
 
 A pair of [ZcashTransaction](#zcashtransaction) and [ZcashSaplingMetadata](#zcashsaplingmetadata)
+
+### ZcashTransmittedNoteCiphertext
+
+A 1:1 exposure of [orchard::note::TransmittedNoteCiphertext](https://docs.rs/orchard/0.3.0/orchard/note/struct.TransmittedNoteCiphertext.html)
+
+### ZcashOrchardBundleDecryptOutput
+
+A dictionary for holding the response of some [ZcashOrchardBundle](#zcashorchardbundle-authorized) methods.
+
+### ZcashOrchardBundleDecryptOutputForIncomingKeys
+
+A dictionary for holding the response of some [ZcashOrchardBundle](#zcashorchardbundle-authorized) methods.
+
+### ZcashOrchardBundleDecryptOutputForOutgoingKeys
+
+A dictionary for holding the response of some [ZcashOrchardBundle](#zcashorchardbundle-authorized) methods.
+
 ## Functions
 
 ### zcash_client_backend::encoding

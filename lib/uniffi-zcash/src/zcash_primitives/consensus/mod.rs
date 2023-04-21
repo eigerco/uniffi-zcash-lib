@@ -24,6 +24,12 @@ impl From<&ZcashBlockHeight> for BlockHeight {
     }
 }
 
+impl From<BlockHeight> for ZcashBlockHeight {
+    fn from(inner: BlockHeight) -> Self {
+        ZcashBlockHeight(inner)
+    }
+}
+
 pub enum ZcashBranchId {
     /// The consensus rules at the launch of Zcash.
     Sprout,
@@ -51,6 +57,20 @@ impl From<ZcashBranchId> for BranchId {
             ZcashBranchId::Heartwood => BranchId::Heartwood,
             ZcashBranchId::Canopy => BranchId::Canopy,
             ZcashBranchId::Nu5 => BranchId::Nu5,
+        }
+    }
+}
+
+impl From<BranchId> for ZcashBranchId {
+    fn from(value: BranchId) -> Self {
+        match value {
+            BranchId::Sprout => ZcashBranchId::Sprout,
+            BranchId::Overwinter => ZcashBranchId::Overwinter,
+            BranchId::Sapling => ZcashBranchId::Sapling,
+            BranchId::Blossom => ZcashBranchId::Blossom,
+            BranchId::Heartwood => ZcashBranchId::Heartwood,
+            BranchId::Canopy => ZcashBranchId::Canopy,
+            BranchId::Nu5 => ZcashBranchId::Nu5,
         }
     }
 }

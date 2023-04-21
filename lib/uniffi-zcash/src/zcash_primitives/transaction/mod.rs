@@ -13,6 +13,7 @@ use orchard::{
     keys::{SpendAuthorizingKey, SpendingKey},
     value::NoteValue,
 };
+use zcash_primitives::transaction::TxId;
 use zcash_primitives::{
     consensus::BranchId,
     transaction::{
@@ -22,6 +23,7 @@ use zcash_primitives::{
     },
 };
 
+use crate::ZcashOrchardBundle;
 use crate::{
     utils::cast_slice, SecpSecretKey, ZcashAnchor, ZcashBlockHeight, ZcashBranchId,
     ZcashConsensusParameters, ZcashDiversifier, ZcashError, ZcashExtendedSpendingKey,
@@ -244,6 +246,47 @@ impl ZcashTransaction {
         let tx = Transaction::read(data, consensus_branch_id.into())?;
         Ok(tx.into())
     }
+
+    pub fn txid(&self) -> Arc<ZcashTxId> {
+        Arc::new(self.0.txid().into())
+    }
+
+    pub fn version(&self) -> Arc<ZcashTxVersion> {
+        Arc::new(self.0.version().into())
+    }
+
+    pub fn consensus_branch_id(&self) -> ZcashBranchId {
+        self.0.consensus_branch_id().into()
+    }
+
+    pub fn lock_time(&self) -> u32 {
+        self.0.lock_time()
+    }
+
+    pub fn expiry_height(&self) -> Arc<ZcashBlockHeight> {
+        Arc::new(self.0.expiry_height().into())
+    }
+
+    /// Returns the total fees paid by the transaction, given a function that can be used to
+    /// retrieve the value of previous transactions' transparent outputs that are being spent in
+    /// this transaction.
+    // pub fn fee_paid(&self) -> ZcashResult<Arc<ZcashAmount>> {
+    //     let amount = self.0.fee_paid::<BalanceError, _>(|_| Ok(Amount::zero()))?;
+    //     Ok(Arc::new(amount.into()))
+    // }
+    // TODO: investigate alternative ways of exposing this to FFI, as it accepts a closure as parameter.
+
+    pub fn transparent_bundle(&self) -> Option<Arc<ZcashTransparentBundle>> {
+        self.0.transparent_bundle().map(|b| b.into()).map(Arc::new)
+    }
+
+    pub fn sapling_bundle(&self) -> Option<Arc<ZcashSaplingBundle>> {
+        self.0.sapling_bundle().map(|b| b.into()).map(Arc::new)
+    }
+
+    pub fn orchard_bundle(&self) -> Option<Arc<ZcashOrchardBundle>> {
+        self.0.orchard_bundle().map(|b| b.into()).map(Arc::new)
+    }
 }
 
 impl From<Transaction> for ZcashTransaction {
@@ -262,6 +305,26 @@ impl From<(Transaction, SaplingMetadata)> for ZcashTransactionAndSaplingMetadata
             transaction: Arc::new(transaction.into()),
             sapling_metadata: Arc::new(sapling_metadata.into()),
         }
+    }
+}
+
+pub struct ZcashTxId(TxId);
+
+impl ZcashTxId {
+    pub fn from_bytes(data: &[u8]) -> ZcashResult<Self> {
+        Ok(TxId::from_bytes(cast_slice(data)?).into())
+    }
+
+    pub fn to_bytes(&self) -> ZcashResult<Vec<u8>> {
+        let mut data = Vec::with_capacity(32);
+        self.0.write(&mut data)?;
+        Ok(data)
+    }
+}
+
+impl From<TxId> for ZcashTxId {
+    fn from(inner: TxId) -> Self {
+        ZcashTxId(inner)
     }
 }
 
@@ -411,3 +474,91 @@ type OrchardOutputs = RwLock<
         Option<[u8; 512]>,
     )>,
 >;
+
+pub enum ZcashTxVersionSelection {
+    Sprout { v: u32 },
+    Overwinter,
+    Sapling,
+    Zip225,
+}
+
+impl From<TxVersion> for ZcashTxVersionSelection {
+    fn from(value: TxVersion) -> Self {
+        match value {
+            TxVersion::Sprout(u) => ZcashTxVersionSelection::Sprout { v: u },
+            TxVersion::Overwinter => ZcashTxVersionSelection::Overwinter,
+            TxVersion::Sapling => ZcashTxVersionSelection::Sapling,
+            TxVersion::Zip225 => ZcashTxVersionSelection::Zip225,
+        }
+    }
+}
+
+impl From<ZcashTxVersionSelection> for TxVersion {
+    fn from(value: ZcashTxVersionSelection) -> Self {
+        match value {
+            ZcashTxVersionSelection::Sprout { v } => TxVersion::Sprout(v),
+            ZcashTxVersionSelection::Overwinter => TxVersion::Overwinter,
+            ZcashTxVersionSelection::Sapling => TxVersion::Sapling,
+            ZcashTxVersionSelection::Zip225 => TxVersion::Zip225,
+        }
+    }
+}
+
+/// The set of defined transaction format versions.
+///
+/// This is serialized in the first four or eight bytes of the transaction format, and
+/// represents valid combinations of the `(overwintered, version, version_group_id)`
+/// transaction fields. Note that this is not dependent on epoch, only on transaction encoding.
+/// For example, if a particular epoch defines a new transaction version but also allows the
+/// previous version, then only the new version would be added to this enum.
+pub struct ZcashTxVersion(TxVersion);
+
+impl ZcashTxVersion {
+    pub fn selection(&self) -> ZcashTxVersionSelection {
+        self.0.into()
+    }
+
+    pub fn from_bytes(data: &[u8]) -> ZcashResult<Self> {
+        Ok(TxVersion::read(data)?.into())
+    }
+
+    pub fn header(&self) -> u32 {
+        self.0.header()
+    }
+
+    pub fn version_group_id(&self) -> u32 {
+        self.0.version_group_id()
+    }
+
+    pub fn to_bytes(&self) -> ZcashResult<Vec<u8>> {
+        let mut buffer = Vec::new();
+        self.0.write(&mut buffer)?;
+        Ok(buffer)
+    }
+
+    pub fn has_sprout(&self) -> bool {
+        self.0.has_sprout()
+    }
+
+    pub fn has_overwinter(&self) -> bool {
+        self.0.has_overwinter()
+    }
+
+    pub fn has_sapling(&self) -> bool {
+        self.0.has_sapling()
+    }
+
+    pub fn has_orchard(&self) -> bool {
+        self.0.has_orchard()
+    }
+
+    pub fn suggested_for_branch(consensus_branch_id: ZcashBranchId) -> Self {
+        TxVersion::suggested_for_branch(consensus_branch_id.into()).into()
+    }
+}
+
+impl From<TxVersion> for ZcashTxVersion {
+    fn from(inner: TxVersion) -> Self {
+        ZcashTxVersion(inner)
+    }
+}

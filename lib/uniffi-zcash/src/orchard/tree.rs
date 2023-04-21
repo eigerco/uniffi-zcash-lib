@@ -22,6 +22,13 @@ impl ZcashAnchor {
     }
 }
 
+
+impl From<&Anchor> for ZcashAnchor {
+    fn from(inner: &Anchor) -> Self {
+        ZcashAnchor(*inner)
+    }
+}
+
 impl From<Anchor> for ZcashAnchor {
     fn from(inner: Anchor) -> Self {
         ZcashAnchor(inner)

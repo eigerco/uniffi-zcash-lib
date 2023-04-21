@@ -12,7 +12,7 @@ use crate::{
 ///
 /// This key is useful in situations where you only need the capability to detect inbound
 /// payments, such as merchant terminals.
-pub struct ZcashOrchardIncomingViewingKey(IncomingViewingKey);
+pub struct ZcashOrchardIncomingViewingKey(pub(crate) IncomingViewingKey);
 
 impl ZcashOrchardIncomingViewingKey {
     /// Serializes an Orchard incoming viewing key to its raw encoding as specified in [Zcash Protocol Spec § 5.6.4.3: Orchard Raw Incoming Viewing Keys][orchardrawinviewingkeys]
@@ -59,5 +59,12 @@ impl ZcashOrchardIncomingViewingKey {
 impl From<IncomingViewingKey> for ZcashOrchardIncomingViewingKey {
     fn from(key: IncomingViewingKey) -> Self {
         Self(key)
+    }
+}
+
+
+impl From<&ZcashOrchardIncomingViewingKey> for IncomingViewingKey {
+    fn from(value: &ZcashOrchardIncomingViewingKey) -> Self {
+        value.0.clone()
     }
 }

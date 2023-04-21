@@ -49,6 +49,32 @@ interface ZcashTransaction {
     
     [Name=from_bytes, Throws=ZcashError]
     constructor([ByRef] sequence<u8> data, ZcashBranchId consensus_branch_id);
+
+    ZcashTxId txid();
+
+    ZcashTxVersion version();
+
+    ZcashBranchId consensus_branch_id();
+
+    u32 lock_time();
+
+    ZcashBlockHeight expiry_height();
+
+    // [Throws=ZcashError]
+    // ZcashAmount fee_paid();
+
+    ZcashTransparentBundle? transparent_bundle();
+    
+    ZcashSaplingBundle? sapling_bundle();
+    
+    ZcashOrchardBundle? orchard_bundle();
+};
+
+interface ZcashTxId {
+    [Name=from_bytes, Throws=ZcashError]
+    constructor([ByRef] sequence<u8> data);
+    [Throws=ZcashError]
+    sequence<u8> to_bytes();
 };
 
 dictionary ZcashTransactionAndSaplingMetadata {
@@ -83,4 +109,38 @@ interface ZcashOrchardTransactionBuilder {
        sequence<ZcashOrchardSpendingKey> keys,
        sequence<u8> sighash
     );
+};
+
+[Enum]
+interface ZcashTxVersionSelection {
+    Sprout(u32 v);
+    Overwinter();
+    Sapling();
+    Zip225();
+};
+
+interface ZcashTxVersion {
+
+    ZcashTxVersionSelection selection();
+    
+    [Name=from_bytes, Throws=ZcashError]
+    constructor([ByRef] sequence<u8> data);
+
+    [Name=suggested_for_branch]
+    constructor(ZcashBranchId consensus_branch_id);
+
+    u32 header();
+
+    u32 version_group_id();
+
+    [Throws=ZcashError]
+    sequence<u8> to_bytes();
+
+    boolean has_sprout();
+
+    boolean has_overwinter();
+
+    boolean has_sapling();
+
+    boolean has_orchard();
 };

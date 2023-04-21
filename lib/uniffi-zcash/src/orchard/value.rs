@@ -1,4 +1,4 @@
-use orchard::value::NoteValue;
+use orchard::value::{NoteValue, ValueCommitment};
 
 /// The non-negative value of an individual Orchard note.
 pub struct ZcashOrchardNoteValue(NoteValue);
@@ -22,5 +22,19 @@ impl From<NoteValue> for ZcashOrchardNoteValue {
 impl From<&ZcashOrchardNoteValue> for NoteValue {
     fn from(value: &ZcashOrchardNoteValue) -> Self {
         value.0
+    }
+}
+
+pub struct ZcashOrchardValueCommitment(ValueCommitment);
+
+impl ZcashOrchardValueCommitment {
+    pub fn to_bytes(&self) -> Vec<u8> {
+        self.0.to_bytes().to_vec()
+    }
+}
+
+impl From<&ValueCommitment> for ZcashOrchardValueCommitment {
+    fn from(inner: &ValueCommitment) -> Self {
+        ZcashOrchardValueCommitment(inner.clone())
     }
 }

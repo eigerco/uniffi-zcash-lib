@@ -1,0 +1,4 @@
+interface ZcashTxIn {
+    [Throws=ZcashError]
+    sequence<u8> to_bytes();
+};

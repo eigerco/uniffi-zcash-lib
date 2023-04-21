@@ -30,6 +30,12 @@ impl From<Amount> for ZcashAmount {
     }
 }
 
+impl From<&Amount> for ZcashAmount {
+    fn from(value: &Amount) -> Self {
+        ZcashAmount(*value)
+    }
+}
+
 impl From<ZcashAmount> for Amount {
     fn from(value: ZcashAmount) -> Self {
         value.0

@@ -1,7 +1,7 @@
 use std::{convert::Infallible, num::TryFromIntError};
 
 use orchard::zip32;
-use zcash_primitives::transaction::{self, fees};
+use zcash_primitives::transaction::{self, components::amount::BalanceError, fees};
 
 /// Zcash error.
 #[derive(Debug, thiserror::Error)]
@@ -65,6 +65,9 @@ pub enum ZcashError {
 
     #[error("Insufficient founds error: {amount}")]
     InsufficientFundsError { amount: u64 },
+
+    #[error("Balance error: {error:?}")]
+    BalanceError { error: BalanceError },
 
     #[error("Change required error: {amount}")]
     ChangeRequiredError { amount: u64 },
@@ -187,6 +190,12 @@ impl From<transaction::components::sapling::builder::Error> for ZcashError {
 impl From<orchard::builder::Error> for ZcashError {
     fn from(error: orchard::builder::Error) -> Self {
         ZcashError::OrchardBuilderError { error }
+    }
+}
+
+impl From<BalanceError> for ZcashError {
+    fn from(error: BalanceError) -> Self {
+        ZcashError::BalanceError { error }
     }
 }
 

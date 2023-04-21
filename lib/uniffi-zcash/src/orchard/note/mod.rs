@@ -4,7 +4,7 @@ pub use self::commitment::*;
 use std::sync::Arc;
 
 use orchard::{
-    note::{Nullifier, RandomSeed},
+    note::{Nullifier, RandomSeed, TransmittedNoteCiphertext},
     Note,
 };
 
@@ -90,6 +90,12 @@ impl From<Nullifier> for ZcashOrchardNullifier {
     }
 }
 
+impl From<&Nullifier> for ZcashOrchardNullifier {
+    fn from(inner: &Nullifier) -> Self {
+        ZcashOrchardNullifier(*inner)
+    }
+}
+
 impl From<&ZcashOrchardNullifier> for Nullifier {
     fn from(value: &ZcashOrchardNullifier) -> Self {
         value.0
@@ -127,5 +133,25 @@ impl From<RandomSeed> for ZcashOrchardRandomSeed {
 impl From<&ZcashOrchardRandomSeed> for RandomSeed {
     fn from(value: &ZcashOrchardRandomSeed) -> Self {
         value.0
+    }
+}
+
+/// An encrypted note.
+pub struct ZcashOrchardTransmittedNoteCiphertext {
+    /// The serialization of the ephemeral public key (32 bytes).
+    pub epk_bytes: Vec<u8>,
+    /// The encrypted note ciphertext (580 bytes).
+    pub enc_ciphertext: Vec<u8>,
+    /// An encrypted value that allows the holder of the outgoing cipher key for the note to recover the note plaintext. (80 bytes)
+    pub out_ciphertext: Vec<u8>,
+}
+
+impl From<&TransmittedNoteCiphertext> for ZcashOrchardTransmittedNoteCiphertext {
+    fn from(value: &TransmittedNoteCiphertext) -> Self {
+        Self {
+            epk_bytes: value.epk_bytes.into(),
+            enc_ciphertext: value.enc_ciphertext.into(),
+            out_ciphertext: value.out_ciphertext.into(),
+        }
     }
 }
