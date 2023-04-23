@@ -191,6 +191,14 @@ class OrchardTransactionBuilderTest(unittest.TestCase):
 
         self.assertEqual(len(transaction.to_bytes()), 9165)
 
+class TransactionSerializationTest(unittest.TestCase):
+    def test_transaction_from_bytes(self):
+        zts = TestSupport.from_csv_file()
+
+        transaction_bytes = zts.get_as_u8_array("transaction_non_standard_fee")
+
+        ZcashTransaction.from_bytes(transaction_bytes, ZcashBranchId.NU5)
+
 class TransactionExplorationTest(unittest.TestCase):
     def test_first_level_fields(self):
         zts = TestSupport.from_csv_file()
@@ -223,6 +231,32 @@ class TransactionExplorationTest(unittest.TestCase):
         bundle = tx.transparent_bundle()
 
         self.assertFalse(bundle.is_coinbase())
+
+        # vout
+        vout = bundle.vout()
+
+        self.assertEqual(1, len(vout))
+        self.assertEqual(200, vout[0].value().value())
+
+        vout_0_bytes = zts.get_as_u8_array(
+            "transaction_standard_fee_vout_0")
+        self.assertEqual(vout_0_bytes, vout[0].to_bytes())
+
+        vout_0_address = zts.get_as_u8_array(
+            "transaction_standard_fee_vout_0_recipient_address")
+        self.assertEqual(
+            vout_0_address, vout[0].recipient_address().to_bytes())
+
+        script_bytes = zts.get_as_u8_array(
+            "transaction_standard_fee_vout_0_script")
+        self.assertEqual(script_bytes, vout[0].script_pubkey().to_bytes())
+
+        # vin
+        vin = bundle.vin()
+
+        self.assertEqual(1, len(vin))
+        vin0_bytes = zts.get_as_u8_array("transaction_standard_fee_vin_0")
+        self.assertEqual(vin0_bytes, vin[0].to_bytes())
 
     def test_sapling_bundle(self):
 
