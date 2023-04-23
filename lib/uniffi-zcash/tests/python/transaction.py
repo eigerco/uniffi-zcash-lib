@@ -292,6 +292,36 @@ class TransactionExplorationTest(unittest.TestCase):
         # Value balance
         self.assertEqual(0, bundle.value_balance().value())
 
+    def test_orchard_bundle(self):
+
+        zts = TestSupport.from_csv_file()
+
+        tx_bytes = zts.get_as_u8_array("transaction_orchard")
+        tx = ZcashTransaction.from_bytes(tx_bytes, ZcashBranchId.NU5)
+
+        bundle = tx.orchard_bundle()
+
+        # Actions
+        actions = bundle.actions()
+        self.assertEqual(2, len(actions))
+
+        the_action = actions[1]
+
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_nullifier"), the_action.nullifier().to_bytes())
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_cmx"), the_action.cmx().to_bytes())
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_encrypted_note_epk_bytes"), the_action.encrypted_note().epk_bytes)
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_encrypted_note_enc_ciphertext"), the_action.encrypted_note().enc_ciphertext)
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_encrypted_note_out_ciphertext"), the_action.encrypted_note().out_ciphertext)
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_cv_net"), the_action.cv_net().to_bytes())
+
+        # Flags
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_flags"), [bundle.flags().to_byte()])
+
+        # Value balance
+        self.assertEqual(0, bundle.value_balance().value())
+
+        # Anchor
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_anchor"), bundle.anchor().to_bytes())
 
 if __name__ == '__main__':
     unittest.main()

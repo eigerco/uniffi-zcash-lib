@@ -165,3 +165,118 @@ pub fn store_tx_sapling_output_cmu<W: Write>(
         .to_bytes();
     super::store_bytes(&mut file, label, &data).unwrap();
 }
+
+pub fn store_tx_orchard_action_nullifier<W: Write>(
+    mut file: W,
+    tx: &Transaction,
+    idx: usize,
+    label: &str,
+) {
+    let data = tx
+        .orchard_bundle()
+        .unwrap()
+        .actions()
+        .get(idx)
+        .unwrap()
+        .nullifier()
+        .to_bytes();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+pub fn store_tx_orchard_action_cmx<W: Write>(
+    mut file: W,
+    tx: &Transaction,
+    idx: usize,
+    label: &str,
+) {
+    let data = tx
+        .orchard_bundle()
+        .unwrap()
+        .actions()
+        .get(idx)
+        .unwrap()
+        .cmx()
+        .to_bytes();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+pub fn store_tx_orchard_action_encrypted_note<W: Write>(mut file: W, tx: &Transaction, idx: usize) {
+    let encrypted_note = tx
+        .orchard_bundle()
+        .unwrap()
+        .actions()
+        .get(idx)
+        .unwrap()
+        .encrypted_note();
+
+    super::store_bytes(
+        &mut file,
+        format!("transaction_orchard_action{}_encrypted_note_epk_bytes", idx).as_str(),
+        &encrypted_note.epk_bytes,
+    )
+    .unwrap();
+    super::store_bytes(
+        &mut file,
+        format!(
+            "transaction_orchard_action{}_encrypted_note_enc_ciphertext",
+            idx
+        )
+        .as_str(),
+        &encrypted_note.enc_ciphertext,
+    )
+    .unwrap();
+    super::store_bytes(
+        &mut file,
+        format!(
+            "transaction_orchard_action{}_encrypted_note_out_ciphertext",
+            idx
+        )
+        .as_str(),
+        &encrypted_note.out_ciphertext,
+    )
+    .unwrap();
+}
+
+
+pub fn store_tx_orchard_action_cv_net<W: Write>(
+    mut file: W,
+    tx: &Transaction,
+    idx: usize,
+    label: &str,
+) {
+    let data = tx
+        .orchard_bundle()
+        .unwrap()
+        .actions()
+        .get(idx)
+        .unwrap()
+        .cv_net()
+        .to_bytes();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+pub fn store_tx_orchard_flags<W: Write>(
+    mut file: W,
+    tx: &Transaction,
+    label: &str,
+) {
+    let data = [tx
+        .orchard_bundle()
+        .unwrap()
+        .flags()
+        .to_byte()];
+    super::store_bytes(&mut file, label, &data).unwrap();
+}
+
+pub fn store_tx_orchard_anchor<W: Write>(
+    mut file: W,
+    tx: &Transaction,
+    label: &str,
+) {
+    let data = tx
+        .orchard_bundle()
+        .unwrap()
+        .anchor()        
+        .to_bytes();
+    super::store_bytes(&mut file, label, &data).unwrap();
+}

@@ -28,10 +28,11 @@ use zcash_primitives::{
 use zcash_proofs::prover::LocalTxProver;
 
 use super::helper::{
-    store_tx_sapling_output_cmu, store_tx_sapling_output_cv, store_tx_sapling_spend_anchor,
-    store_tx_sapling_spend_cv, store_tx_sapling_spend_nullifier, store_tx_sapling_spend_rk,
-    store_tx_t_id, store_tx_t_out, store_tx_t_out_address, store_tx_t_out_script_pubkey,
-    store_tx_t_version, store_tx_t_vin,
+    store_tx_orchard_action_cmx, store_tx_orchard_action_encrypted_note,
+    store_tx_orchard_action_nullifier, store_tx_sapling_output_cmu, store_tx_sapling_output_cv,
+    store_tx_sapling_spend_anchor, store_tx_sapling_spend_cv, store_tx_sapling_spend_nullifier,
+    store_tx_sapling_spend_rk, store_tx_t_id, store_tx_t_out, store_tx_t_out_address,
+    store_tx_t_out_script_pubkey, store_tx_t_version, store_tx_t_vin, store_tx_orchard_action_cv_net, store_tx_orchard_flags, store_tx_orchard_anchor,
 };
 
 const BLOCK_HEIGHT: u32 = 2030820;
@@ -347,6 +348,37 @@ pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
 
     let transaction = transaction_data.freeze().unwrap();
 
+    store_tx_orchard_action_nullifier(
+        &mut file,
+        &transaction,
+        1,
+        "transaction_orchard_action1_nullifier",
+    );
+
+    store_tx_orchard_action_cmx(
+        &mut file,
+        &transaction,
+        1,
+        "transaction_orchard_action1_cmx",
+    );
+    store_tx_orchard_action_encrypted_note(&mut file, &transaction, 1);
+    store_tx_orchard_action_cv_net(
+        &mut file,
+        &transaction,
+        1,
+        "transaction_orchard_action1_cv_net",
+    );
+    store_tx_orchard_flags(
+        &mut file,
+        &transaction,
+        "transaction_orchard_flags",
+    );
+    store_tx_orchard_anchor(
+        &mut file,
+        &transaction,
+        "transaction_orchard_anchor",
+    );
+    
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
     super::store_bytes(&mut file, "transaction_orchard", &data).unwrap();
