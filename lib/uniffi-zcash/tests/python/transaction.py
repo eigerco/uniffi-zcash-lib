@@ -307,12 +307,12 @@ class TransactionExplorationTest(unittest.TestCase):
 
         the_action = actions[1]
 
-        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_nullifier"), the_action.nullifier().to_bytes())
-        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_cmx"), the_action.cmx().to_bytes())
-        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_encrypted_note_epk_bytes"), the_action.encrypted_note().epk_bytes)
-        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_encrypted_note_enc_ciphertext"), the_action.encrypted_note().enc_ciphertext)
-        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_encrypted_note_out_ciphertext"), the_action.encrypted_note().out_ciphertext)
-        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action1_cv_net"), the_action.cv_net().to_bytes())
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_nullifier"), the_action.nullifier().to_bytes())
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_cmx"), the_action.cmx().to_bytes())
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_encrypted_note_epk_bytes"), the_action.encrypted_note().epk_bytes)
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_encrypted_note_enc_ciphertext"), the_action.encrypted_note().enc_ciphertext)
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_encrypted_note_out_ciphertext"), the_action.encrypted_note().out_ciphertext)
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_cv_net"), the_action.cv_net().to_bytes())
 
         # Flags
         self.assertEqual(zts.get_as_u8_array("transaction_orchard_flags"), [bundle.flags().to_byte()])

@@ -28,11 +28,12 @@ use zcash_primitives::{
 use zcash_proofs::prover::LocalTxProver;
 
 use super::helper::{
-    store_tx_orchard_action_cmx, store_tx_orchard_action_encrypted_note,
-    store_tx_orchard_action_nullifier, store_tx_sapling_output_cmu, store_tx_sapling_output_cv,
-    store_tx_sapling_spend_anchor, store_tx_sapling_spend_cv, store_tx_sapling_spend_nullifier,
-    store_tx_sapling_spend_rk, store_tx_t_id, store_tx_t_out, store_tx_t_out_address,
-    store_tx_t_out_script_pubkey, store_tx_t_version, store_tx_t_vin, store_tx_orchard_action_cv_net, store_tx_orchard_flags, store_tx_orchard_anchor,
+    store_tx_orchard_action_cmx, store_tx_orchard_action_cv_net,
+    store_tx_orchard_action_encrypted_note, store_tx_orchard_action_nullifier,
+    store_tx_orchard_anchor, store_tx_orchard_flags, store_tx_sapling_output_cmu,
+    store_tx_sapling_output_cv, store_tx_sapling_spend_anchor, store_tx_sapling_spend_cv,
+    store_tx_sapling_spend_nullifier, store_tx_sapling_spend_rk, store_tx_t_id, store_tx_t_out,
+    store_tx_t_out_address, store_tx_t_out_script_pubkey, store_tx_t_version, store_tx_t_vin,
 };
 
 const BLOCK_HEIGHT: u32 = 2030820;
@@ -115,27 +116,12 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
 
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
 
-    store_tx_t_id(&mut file, &transaction, "transaction_standard_fee_id");
-    store_tx_t_version(&mut file, &transaction, "transaction_standard_fee_version");
-    store_tx_t_out(
-        &mut file,
-        &transaction,
-        0,
-        "transaction_standard_fee_vout_0",
-    );
-    store_tx_t_out_address(
-        &mut file,
-        &transaction,
-        0,
-        "transaction_standard_fee_vout_0_recipient_address",
-    );
-    store_tx_t_out_script_pubkey(
-        &mut file,
-        &transaction,
-        0,
-        "transaction_standard_fee_vout_0_script",
-    );
-    store_tx_t_vin(&mut file, &transaction, 0, "transaction_standard_fee_vin_0");
+    store_tx_t_id(&mut file, &transaction);
+    store_tx_t_version(&mut file, &transaction);
+    store_tx_t_out(&mut file, &transaction, 0);
+    store_tx_t_out_address(&mut file, &transaction, 0);
+    store_tx_t_out_script_pubkey(&mut file, &transaction, 0);
+    store_tx_t_vin(&mut file, &transaction, 0);
 
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
@@ -255,33 +241,13 @@ pub fn sapling_transaction_general_builder_example<W: Write>(
     let fee_rule = fixed::FeeRule::non_standard(Amount::zero());
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
 
-    store_tx_sapling_spend_cv(&mut file, &transaction, 0, "transaction_sapling_spend_0_cv");
-    store_tx_sapling_spend_anchor(
-        &mut file,
-        &transaction,
-        0,
-        "transaction_sapling_spend_0_anchor",
-    );
-    store_tx_sapling_spend_nullifier(
-        &mut file,
-        &transaction,
-        0,
-        "transaction_sapling_spend_0_nullifier",
-    );
-    store_tx_sapling_spend_rk(&mut file, &transaction, 0, "transaction_sapling_spend_0_rk");
+    store_tx_sapling_spend_cv(&mut file, &transaction, 0);
+    store_tx_sapling_spend_anchor(&mut file, &transaction, 0);
+    store_tx_sapling_spend_nullifier(&mut file, &transaction, 0);
+    store_tx_sapling_spend_rk(&mut file, &transaction, 0);
 
-    store_tx_sapling_output_cv(
-        &mut file,
-        &transaction,
-        0,
-        "transaction_sapling_output_0_cv",
-    );
-    store_tx_sapling_output_cmu(
-        &mut file,
-        &transaction,
-        0,
-        "transaction_sapling_output_0_cmu",
-    );
+    store_tx_sapling_output_cv(&mut file, &transaction, 0);
+    store_tx_sapling_output_cmu(&mut file, &transaction, 0);
 
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
@@ -348,37 +314,13 @@ pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
 
     let transaction = transaction_data.freeze().unwrap();
 
-    store_tx_orchard_action_nullifier(
-        &mut file,
-        &transaction,
-        1,
-        "transaction_orchard_action1_nullifier",
-    );
-
-    store_tx_orchard_action_cmx(
-        &mut file,
-        &transaction,
-        1,
-        "transaction_orchard_action1_cmx",
-    );
+    store_tx_orchard_action_nullifier(&mut file, &transaction, 1);
+    store_tx_orchard_action_cmx(&mut file, &transaction, 1);
     store_tx_orchard_action_encrypted_note(&mut file, &transaction, 1);
-    store_tx_orchard_action_cv_net(
-        &mut file,
-        &transaction,
-        1,
-        "transaction_orchard_action1_cv_net",
-    );
-    store_tx_orchard_flags(
-        &mut file,
-        &transaction,
-        "transaction_orchard_flags",
-    );
-    store_tx_orchard_anchor(
-        &mut file,
-        &transaction,
-        "transaction_orchard_anchor",
-    );
-    
+    store_tx_orchard_action_cv_net(&mut file, &transaction, 1);
+    store_tx_orchard_flags(&mut file, &transaction);
+    store_tx_orchard_anchor(&mut file, &transaction);
+
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
     super::store_bytes(&mut file, "transaction_orchard", &data).unwrap();
