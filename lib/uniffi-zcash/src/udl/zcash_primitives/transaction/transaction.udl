@@ -98,8 +98,8 @@ interface ZcashOrchardTransactionBuilder {
     );
     
     [Throws=ZcashError]
-    void add_output(
-        ZcashOrchardOutgoingViewingKey ovk,
+    void add_recipient(
+        ZcashOrchardOutgoingViewingKey? ovk,
         ZcashOrchardAddress recipient,
         u64 value,
         sequence<u8>? memo
