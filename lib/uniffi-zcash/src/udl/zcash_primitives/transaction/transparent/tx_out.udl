@@ -6,5 +6,8 @@ interface ZcashTxOut {
 
     ZcashScript script_pubkey();
 
+    [Throws=ZcashError]
+    sequence<u8> to_bytes();
+
     ZcashTransparentAddress? recipient_address();
 };

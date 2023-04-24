@@ -4,6 +4,7 @@ mod secp256k1;
 mod transaction;
 mod zcash_client_backend;
 mod zcash_primitives;
+mod helper;
 
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -51,4 +52,12 @@ pub(crate) fn format_bytes(label: &str, bytes: &[u8]) -> String {
         .join(",");
 
     format!("{label}:[{bytes_arr}]")
+}
+
+pub(crate) fn store_bytes<W: Write>(
+    mut file: W,
+    label: &str,
+    data: &[u8],
+) -> Result<(), std::io::Error> {
+    writeln!(file, "{}", format_bytes(label, &data))
 }

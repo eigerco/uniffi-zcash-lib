@@ -27,7 +27,14 @@ use zcash_primitives::{
 
 use zcash_proofs::prover::LocalTxProver;
 
-use crate::test_data::format_bytes;
+use super::helper::{
+    store_tx_orchard_action_cmx, store_tx_orchard_action_cv_net,
+    store_tx_orchard_action_encrypted_note, store_tx_orchard_action_nullifier,
+    store_tx_orchard_anchor, store_tx_orchard_flags, store_tx_sapling_output_cmu,
+    store_tx_sapling_output_cv, store_tx_sapling_spend_anchor, store_tx_sapling_spend_cv,
+    store_tx_sapling_spend_nullifier, store_tx_sapling_spend_rk, store_tx_t_id, store_tx_t_out,
+    store_tx_t_out_address, store_tx_t_out_script_pubkey, store_tx_t_version, store_tx_t_vin,
+};
 
 const BLOCK_HEIGHT: u32 = 2030820;
 
@@ -74,12 +81,7 @@ pub fn transparent_builder_with_nonstandard_fee_example<W: Write>(
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(
-        file,
-        "{}",
-        format_bytes("transaction_non_standard_fee", &data)
-    )
-    .unwrap();
+    super::store_bytes(&mut file, "transaction_non_standard_fee", &data).unwrap();
 }
 
 pub fn transparent_builder_with_standard_fee_example<W: Write>(
@@ -113,9 +115,17 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
     let fee_rule = fixed::FeeRule::standard();
 
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
+
+    store_tx_t_id(&mut file, &transaction);
+    store_tx_t_version(&mut file, &transaction);
+    store_tx_t_out(&mut file, &transaction, 0);
+    store_tx_t_out_address(&mut file, &transaction, 0);
+    store_tx_t_out_script_pubkey(&mut file, &transaction, 0);
+    store_tx_t_vin(&mut file, &transaction, 0);
+
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(file, "{}", format_bytes("transaction_standard_fee", &data)).unwrap();
+    super::store_bytes(&mut file, "transaction_standard_fee", &data).unwrap();
 }
 
 pub fn transparent_builder_with_zip317_standard_fee_example<W: Write>(
@@ -151,12 +161,7 @@ pub fn transparent_builder_with_zip317_standard_fee_example<W: Write>(
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(
-        file,
-        "{}",
-        format_bytes("transaction_zip317_standard_fee", &data)
-    )
-    .unwrap();
+    super::store_bytes(&mut file, "transaction_zip317_standard_fee", &data).unwrap();
 }
 
 pub fn transparent_builder_with_zip317_non_standard_fee_example<W: Write>(
@@ -193,12 +198,7 @@ pub fn transparent_builder_with_zip317_non_standard_fee_example<W: Write>(
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(
-        file,
-        "{}",
-        format_bytes("transaction_zip317_non_standard_fee", &data)
-    )
-    .unwrap();
+    super::store_bytes(&mut file, "transaction_zip317_non_standard_fee", &data).unwrap();
 }
 
 pub fn sapling_transaction_general_builder_example<W: Write>(
@@ -241,9 +241,17 @@ pub fn sapling_transaction_general_builder_example<W: Write>(
     let fee_rule = fixed::FeeRule::non_standard(Amount::zero());
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
 
+    store_tx_sapling_spend_cv(&mut file, &transaction, 0);
+    store_tx_sapling_spend_anchor(&mut file, &transaction, 0);
+    store_tx_sapling_spend_nullifier(&mut file, &transaction, 0);
+    store_tx_sapling_spend_rk(&mut file, &transaction, 0);
+
+    store_tx_sapling_output_cv(&mut file, &transaction, 0);
+    store_tx_sapling_output_cmu(&mut file, &transaction, 0);
+
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(file, "{}", format_bytes("transaction_sapling", &data)).unwrap();
+    super::store_bytes(&mut file, "transaction_sapling", &data).unwrap();
 }
 
 pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
@@ -306,7 +314,14 @@ pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
 
     let transaction = transaction_data.freeze().unwrap();
 
+    store_tx_orchard_action_nullifier(&mut file, &transaction, 1);
+    store_tx_orchard_action_cmx(&mut file, &transaction, 1);
+    store_tx_orchard_action_encrypted_note(&mut file, &transaction, 1);
+    store_tx_orchard_action_cv_net(&mut file, &transaction, 1);
+    store_tx_orchard_flags(&mut file, &transaction);
+    store_tx_orchard_anchor(&mut file, &transaction);
+
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
-    writeln!(file, "{}", format_bytes("transaction_orchard", &data)).unwrap();
+    super::store_bytes(&mut file, "transaction_orchard", &data).unwrap();
 }

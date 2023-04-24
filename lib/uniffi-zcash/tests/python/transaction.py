@@ -199,5 +199,129 @@ class TransactionSerializationTest(unittest.TestCase):
 
         ZcashTransaction.from_bytes(transaction_bytes, ZcashBranchId.NU5)
 
+class TransactionExplorationTest(unittest.TestCase):
+    def test_first_level_fields(self):
+        zts = TestSupport.from_csv_file()
+
+        tx_bytes = zts.get_as_u8_array("transaction_standard_fee")
+        tx = ZcashTransaction.from_bytes(tx_bytes, ZcashBranchId.NU5)
+
+        # Id
+        id_expected_bytes = zts.get_as_u8_array("transaction_standard_fee_id")
+        self.assertEqual(id_expected_bytes, tx.txid().to_bytes())
+
+        # Version
+        version_expected_bytes = zts.get_as_u8_array(
+            "transaction_standard_fee_version")
+        self.assertEqual(version_expected_bytes, tx.version().to_bytes())
+
+        # lock time
+        self.assertEqual(0, tx.lock_time())
+
+        # expiry height
+        self.assertEqual(2030840, tx.expiry_height().value())
+
+    def test_transparent_bundle(self):
+
+        zts = TestSupport.from_csv_file()
+
+        tx_bytes = zts.get_as_u8_array("transaction_standard_fee")
+        tx = ZcashTransaction.from_bytes(tx_bytes, ZcashBranchId.NU5)
+
+        bundle = tx.transparent_bundle()
+
+        self.assertFalse(bundle.is_coinbase())
+
+        # vout
+        vout = bundle.vout()
+
+        self.assertEqual(1, len(vout))
+        self.assertEqual(200, vout[0].value().value())
+
+        vout_0_bytes = zts.get_as_u8_array(
+            "transaction_standard_fee_vout_0")
+        self.assertEqual(vout_0_bytes, vout[0].to_bytes())
+
+        vout_0_address = zts.get_as_u8_array(
+            "transaction_standard_fee_vout_0_recipient_address")
+        self.assertEqual(
+            vout_0_address, vout[0].recipient_address().to_bytes())
+
+        script_bytes = zts.get_as_u8_array(
+            "transaction_standard_fee_vout_0_script")
+        self.assertEqual(script_bytes, vout[0].script_pubkey().to_bytes())
+
+        # vin
+        vin = bundle.vin()
+
+        self.assertEqual(1, len(vin))
+        vin0_bytes = zts.get_as_u8_array("transaction_standard_fee_vin_0")
+        self.assertEqual(vin0_bytes, vin[0].to_bytes())
+
+    def test_sapling_bundle(self):
+
+        zts = TestSupport.from_csv_file()
+
+        tx_bytes = zts.get_as_u8_array("transaction_sapling")
+        tx = ZcashTransaction.from_bytes(tx_bytes, ZcashBranchId.NU5)
+
+        bundle = tx.sapling_bundle()
+
+        # Shielded spends
+        spends = bundle.shielded_spends()
+        self.assertEqual(1, len(spends))
+        the_spend = spends[0]
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_spend_0_cv"), the_spend.cv().to_bytes())
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_spend_0_anchor"), the_spend.anchor())
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_spend_0_nullifier"), the_spend.nullifier().to_bytes())
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_spend_0_rk"), the_spend.rk().to_bytes())
+
+        # Shielded outputs
+        outputs = bundle.shielded_outputs()
+        self.assertEqual(1, len(spends))
+        the_output = outputs[0]
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_output_0_cv"), the_output.cv().to_bytes())
+        self.assertEqual(zts.get_as_u8_array(
+            "transaction_sapling_output_0_cmu"), the_output.cmu().to_bytes())
+
+        # Value balance
+        self.assertEqual(0, bundle.value_balance().value())
+
+    def test_orchard_bundle(self):
+
+        zts = TestSupport.from_csv_file()
+
+        tx_bytes = zts.get_as_u8_array("transaction_orchard")
+        tx = ZcashTransaction.from_bytes(tx_bytes, ZcashBranchId.NU5)
+
+        bundle = tx.orchard_bundle()
+
+        # Actions
+        actions = bundle.actions()
+        self.assertEqual(2, len(actions))
+
+        the_action = actions[1]
+
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_nullifier"), the_action.nullifier().to_bytes())
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_cmx"), the_action.cmx().to_bytes())
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_encrypted_note_epk_bytes"), the_action.encrypted_note().epk_bytes)
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_encrypted_note_enc_ciphertext"), the_action.encrypted_note().enc_ciphertext)
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_encrypted_note_out_ciphertext"), the_action.encrypted_note().out_ciphertext)
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_action_1_cv_net"), the_action.cv_net().to_bytes())
+
+        # Flags
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_flags"), [bundle.flags().to_byte()])
+
+        # Value balance
+        self.assertEqual(0, bundle.value_balance().value())
+
+        # Anchor
+        self.assertEqual(zts.get_as_u8_array("transaction_orchard_anchor"), bundle.anchor().to_bytes())
+
 if __name__ == '__main__':
     unittest.main()

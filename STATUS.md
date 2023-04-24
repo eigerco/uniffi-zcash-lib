@@ -562,12 +562,12 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | Members                                | Score | UDL | Code | Tests | Docs |
 | ---------------------------------------| ----- | --- | ---- | ----- | ---- |
 | ZcashTransaction::into_data()          | 🔴    |     |      |       |      |
-| ZcashTransaction::txid()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTransaction::read()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTransaction::version()            | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::txid()               | 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
+| ZcashTransaction::read()               | 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
+| ZcashTransaction::version()            | 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
 | ZcashTransaction::consensus_branch_id()| 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTransaction::lock_time()          | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTransaction::expiry_height()      | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTransaction::lock_time()          | 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
+| ZcashTransaction::expiry_height()      | 🔴    |  ✅ |  ✅  |  ✅   |  ✅  |
 | ZcashTransaction::fee_paid()           | 🔴    |     |      |       |       |
 | ZcashTransaction::transparent_bundle() | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashTransaction::sapling_bundle()     | 🔴    |  ✅ |  ✅  |       |  ✅  |
@@ -601,7 +601,8 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                      | Score | UDL | Code | Tests | Docs |
 | ---------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashBlockHeight::from_u32() | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashBlockHeight::from_u32() | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
+| ZcashBlockHeight::value()    | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
 
 ### ZcashExternalIvk
 
@@ -658,8 +659,8 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                    | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashTransparentTxOut::read()              | 🔵     |     |      |       |      |
-| ZcashTransparentTxOut::write()             | 🔵     |     |      |       |      |
+| ZcashTransparentTxOut::read()              | 🔴     | ✅ | ✅   |       |  ✅  |
+| ZcashTransparentTxOut::write()             | 🔴     | ✅ | ✅   |       |  ✅  |
 
 ### ZcashAmount
 
@@ -669,6 +670,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | -------------------------------------------- | ----- | --- | ---- | ----- | ---- |
 | ZcashAmount::zero()                          | 🔴    | ✅  | ✅   |       | ✅   |
 | ZcashAmount::from_i64()                      | 🔴    | ✅  | ✅   |       | ✅   |
+| ZcashAmount::value()                         | 🔴    | ✅  | ✅   |       | ✅   |
 | ZcashAmount::from_nonnegative_i64()          | 🔵    |     |      |       |      |
 | ZcashAmount::from_u64()                      | 🔵    |     |      |       |      |
 | ZcashAmount::from_i64_le_bytes()             | 🔵    |     |      |       |      |
@@ -893,8 +895,8 @@ a tuple.
 
 | Members                             | Score | UDL | Code | Tests | Docs |
 | ------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashTxId::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
-| ZcashTxId::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxId::to_bytes()               | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
+| ZcashTxId::from_bytes()             | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
 
 
 ### ZcashTxIn
@@ -907,6 +909,15 @@ a tuple.
 | ZcashTxIn::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
 | ZcashTxIn::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
+### ZcashTxOut
+
+* Original type: [zcash_primitives::transaction::components::transparent::TxOut](https://docs.rs/zcash_primitives/0.10.0/zcash_primitives/transaction/components/transparent/struct.TxOut.html)
+
+| Members                             | Score | UDL | Code | Tests | Docs |
+| ------------------------------------| ----- | --- | ---- | ----- | ---- |
+| ZcashTxOut::to_bytes()               | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxOut::from_bytes()             | 🔴    |  ✅ |  ✅  |       |  ✅  |
+| ZcashTxOut::recipient_address()      | 🔴    |  ✅ |  ✅  |       |  ✅  |
 
 ### ZcashTransparentBundle
 

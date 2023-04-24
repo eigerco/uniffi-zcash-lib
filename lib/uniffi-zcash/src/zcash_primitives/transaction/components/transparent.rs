@@ -51,6 +51,12 @@ impl ZcashTxOut {
         Arc::new(self.0.script_pubkey.clone().into())
     }
 
+    pub fn to_bytes(&self) -> ZcashResult<Vec<u8>> {
+        let mut data = Vec::new();
+        self.0.write(&mut data).unwrap();
+        Ok(data)
+    }
+
     /// Returns the address to which the TxOut was sent, if this is a valid P2SH or P2PKH output.
     pub fn recipient_address(&self) -> Option<Arc<ZcashTransparentAddress>> {
         self.0.recipient_address().map(From::from).map(Arc::new)

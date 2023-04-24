@@ -49,6 +49,9 @@ impl From<&ZcashAmount> for Amount {
 }
 
 impl ZcashAmount {
+    /// Creates an Amount from an i64.
+    ///
+    /// Returns an error if the amount is outside the range `{-MAX_MONEY..MAX_MONEY}`.
     pub fn new(value: i64) -> crate::ZcashResult<Self> {
         let amount = Amount::from_i64(value).map_err(|_| ZcashError::ValueOutOfRange {
             val: value,
@@ -59,7 +62,13 @@ impl ZcashAmount {
         Ok(ZcashAmount(amount))
     }
 
+    /// Returns a zero-valued Amount.
     pub fn zero() -> Self {
         ZcashAmount(Amount::zero())
+    }
+
+    /// Returns the value of the amount as i64.
+    pub fn value(&self) -> i64 {
+        self.0.into()
     }
 }
