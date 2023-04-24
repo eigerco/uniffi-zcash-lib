@@ -87,7 +87,8 @@ interface ZcashOrchardTransactionBuilder {
         ZcashConsensusParameters parameters, 
         ZcashBlockHeight target_height, 
         ZcashBlockHeight expiry_height,
-        ZcashAnchor anchor
+        ZcashAnchor anchor,
+        ZcashOrchardFlags flags
     );
 
     void add_spend(

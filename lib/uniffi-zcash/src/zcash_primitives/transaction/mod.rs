@@ -9,7 +9,6 @@ use std::sync::{Arc, RwLock};
 use hdwallet::rand_core::OsRng;
 use orchard::{
     builder::{InProgress, Unauthorized, Unproven},
-    bundle::Flags,
     keys::{SpendAuthorizingKey, SpendingKey},
     value::NoteValue,
 };
@@ -24,6 +23,7 @@ use zcash_primitives::{
 };
 
 use crate::ZcashOrchardBundle;
+use crate::ZcashOrchardFlags;
 use crate::{
     utils::cast_slice, SecpSecretKey, ZcashAnchor, ZcashBlockHeight, ZcashBranchId,
     ZcashConsensusParameters, ZcashDiversifier, ZcashError, ZcashExtendedSpendingKey,
@@ -333,6 +333,7 @@ pub struct ZcashOrchardTransactionBuilder {
     target_height: Arc<ZcashBlockHeight>,
     expiry_height: Arc<ZcashBlockHeight>,
     anchor: Arc<ZcashAnchor>,
+    flags: Arc<ZcashOrchardFlags>,
     spends: OrchardSpends,
     outputs: OrchardOutputs,
 }
@@ -343,12 +344,14 @@ impl ZcashOrchardTransactionBuilder {
         target_height: Arc<ZcashBlockHeight>,
         expiry_height: Arc<ZcashBlockHeight>,
         anchor: Arc<ZcashAnchor>,
+        flags: Arc<ZcashOrchardFlags>
     ) -> Self {
         Self {
             parameters,
             target_height,
             expiry_height,
             anchor,
+            flags,
             spends: RwLock::new(Vec::new()),
             outputs: RwLock::new(Vec::new()),
         }
@@ -388,7 +391,7 @@ impl ZcashOrchardTransactionBuilder {
         sighash: Vec<u8>,
     ) -> ZcashResult<Arc<ZcashTransaction>> {
         let mut builder = orchard::builder::Builder::new(
-            Flags::from_parts(true, true),
+            self.flags.as_ref().into(),
             self.anchor.as_ref().into(),
         );
 

@@ -182,8 +182,9 @@ class OrchardTransactionBuilderTest(unittest.TestCase):
 
 
         anchor = merkle_path.root(note.commitment().to_extracted_note_commitment())
+        flags = ZcashOrchardFlags.from_parts(True, True)
 
-        builder = ZcashOrchardTransactionBuilder(ZcashConsensusParameters.MAIN_NETWORK, ZcashBlockHeight(2030820), ZcashBlockHeight(2030820+100), anchor)
+        builder = ZcashOrchardTransactionBuilder(ZcashConsensusParameters.MAIN_NETWORK, ZcashBlockHeight(2030820), ZcashBlockHeight(2030820+100), anchor, flags)
         builder.add_spend(fvk, note, merkle_path)
         builder.add_output(ovk, address, 15, None)
 
