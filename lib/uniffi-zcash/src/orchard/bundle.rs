@@ -245,6 +245,12 @@ impl ZcashOrchardFlags {
     }
 }
 
+impl From<&ZcashOrchardFlags> for Flags {
+    fn from(value: &ZcashOrchardFlags) -> Self {
+        value.0
+    }
+}
+
 impl From<Flags> for ZcashOrchardFlags {
     fn from(inner: Flags) -> Self {
         ZcashOrchardFlags(inner)

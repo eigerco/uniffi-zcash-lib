@@ -552,7 +552,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | -------------------------------------------------------- | ----- | --- | ---- | ----- | ---- |
 | ZcashOrchardTransactionBuilder::new()                    |   🔴  | ✅  | ✅   | ✅    |  ✅  |
 | ZcashOrchardTransactionBuilder::add_spend()              |   🔴  | ✅  | ✅   | ✅    |  ✅  |
-| ZcashOrchardTransactionBuilder::add_output()             |   🔴  | ✅  | ✅   | ✅    |  ✅  |
+| ZcashOrchardTransactionBuilder::add_recipient()             |   🔴  | ✅  | ✅   | ✅    |  ✅  |
 | ZcashOrchardTransactionBuilder::build()                  |   🔴  | ✅  | ✅   | ✅    |  ✅  |
 
 ### ZcashTransaction

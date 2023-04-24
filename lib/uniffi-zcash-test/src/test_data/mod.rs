@@ -59,5 +59,5 @@ pub(crate) fn store_bytes<W: Write>(
     label: &str,
     data: &[u8],
 ) -> Result<(), std::io::Error> {
-    writeln!(file, "{}", format_bytes(label, &data))
+    writeln!(file, "{}", format_bytes(label, data))
 }

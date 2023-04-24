@@ -9,7 +9,6 @@ use std::sync::{Arc, RwLock};
 use hdwallet::rand_core::OsRng;
 use orchard::{
     builder::{InProgress, Unauthorized, Unproven},
-    bundle::Flags,
     keys::{SpendAuthorizingKey, SpendingKey},
     value::NoteValue,
 };
@@ -24,6 +23,7 @@ use zcash_primitives::{
 };
 
 use crate::ZcashOrchardBundle;
+use crate::ZcashOrchardFlags;
 use crate::{
     utils::cast_slice, SecpSecretKey, ZcashAnchor, ZcashBlockHeight, ZcashBranchId,
     ZcashConsensusParameters, ZcashDiversifier, ZcashError, ZcashExtendedSpendingKey,
@@ -333,6 +333,7 @@ pub struct ZcashOrchardTransactionBuilder {
     target_height: Arc<ZcashBlockHeight>,
     expiry_height: Arc<ZcashBlockHeight>,
     anchor: Arc<ZcashAnchor>,
+    flags: Arc<ZcashOrchardFlags>,
     spends: OrchardSpends,
     outputs: OrchardOutputs,
 }
@@ -343,12 +344,14 @@ impl ZcashOrchardTransactionBuilder {
         target_height: Arc<ZcashBlockHeight>,
         expiry_height: Arc<ZcashBlockHeight>,
         anchor: Arc<ZcashAnchor>,
+        flags: Arc<ZcashOrchardFlags>
     ) -> Self {
         Self {
             parameters,
             target_height,
             expiry_height,
             anchor,
+            flags,
             spends: RwLock::new(Vec::new()),
             outputs: RwLock::new(Vec::new()),
         }
@@ -363,9 +366,9 @@ impl ZcashOrchardTransactionBuilder {
         self.spends.write().unwrap().push((fvk, note, merkle_path))
     }
 
-    pub fn add_output(
+    pub fn add_recipient(
         &self,
-        ovk: Arc<ZcashOrchardOutgoingViewingKey>,
+        ovk: Option<Arc<ZcashOrchardOutgoingViewingKey>>,
         recipient: Arc<ZcashOrchardAddress>,
         value: u64,
         memo: Option<Vec<u8>>,
@@ -388,7 +391,7 @@ impl ZcashOrchardTransactionBuilder {
         sighash: Vec<u8>,
     ) -> ZcashResult<Arc<ZcashTransaction>> {
         let mut builder = orchard::builder::Builder::new(
-            Flags::from_parts(true, true),
+            self.flags.as_ref().into(),
             self.anchor.as_ref().into(),
         );
 
@@ -410,7 +413,7 @@ impl ZcashOrchardTransactionBuilder {
             .iter()
             .try_for_each(|(ovk, recipient, value, memo)| {
                 builder.add_recipient(
-                    Some(ovk.as_ref().into()),
+                    ovk.clone().map(|k| k.as_ref().into()),
                     recipient.as_ref().into(),
                     NoteValue::from_raw(*value),
                     *memo,
@@ -468,7 +471,7 @@ type OrchardSpends = RwLock<
 
 type OrchardOutputs = RwLock<
     Vec<(
-        Arc<ZcashOrchardOutgoingViewingKey>,
+        Option<Arc<ZcashOrchardOutgoingViewingKey>>,
         Arc<ZcashOrchardAddress>,
         u64,
         Option<[u8; 512]>,
