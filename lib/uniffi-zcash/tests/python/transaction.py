@@ -8,13 +8,9 @@ class TransactionBuilderTest(unittest.TestCase):
 
         expected_transaction_bytes = zts.get_as_u8_array(
             "transaction_non_standard_fee")
-        key_seed = zts.get_as_u8_array("seed")
-
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
-
+            
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
         address = key.transparent().to_account_pubkey(
         ).derive_external_ivk().derive_address(0)
 
@@ -43,12 +39,9 @@ class TransactionBuilderTest(unittest.TestCase):
 
         expected_transaction_bytes = zts.get_as_u8_array(
             "transaction_standard_fee")
-        key_seed = zts.get_as_u8_array("seed")
 
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
 
         address = key.transparent().to_account_pubkey(
         ).derive_external_ivk().derive_address(0)
@@ -78,13 +71,9 @@ class TransactionBuilderTest(unittest.TestCase):
 
         expected_transaction_bytes = zts.get_as_u8_array(
             "transaction_zip317_standard_fee")
-        key_seed = zts.get_as_u8_array("seed")
 
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
-
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
         address = key.transparent().to_account_pubkey(
         ).derive_external_ivk().derive_address(0)
 
@@ -113,12 +102,9 @@ class TransactionBuilderTest(unittest.TestCase):
 
         expected_transaction_bytes = zts.get_as_u8_array(
             "transaction_zip317_non_standard_fee")
-        key_seed = zts.get_as_u8_array("seed")
 
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
 
         address = key.transparent().to_account_pubkey(
         ).derive_external_ivk().derive_address(0)
@@ -146,12 +132,8 @@ class TransactionBuilderTest(unittest.TestCase):
     def test_sapling_with_non_standard_fees(self):
         zts = TestSupport.from_csv_file()
 
-        key_seed = zts.get_as_u8_array("seed")
-
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
 
         extsk = key.sapling()
         payment_address = extsk.default_address().address
@@ -183,12 +165,8 @@ class OrchardTransactionBuilderTest(unittest.TestCase):
     def test_transaction_generation(self):
         zts = TestSupport.from_csv_file()
 
-        key_seed = zts.get_as_u8_array("seed")
-
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
 
         ufvk = key.to_unified_full_viewing_key()
         fvk = ufvk.orchard()
@@ -242,13 +220,9 @@ class TransactionExplorationTest(unittest.TestCase):
 
         expected_transaction_bytes = zts.get_as_u8_array(
             "transaction_non_standard_fee")
-        key_seed = zts.get_as_u8_array("seed")
 
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
-
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
         address = key.transparent().to_account_pubkey(
         ).derive_external_ivk().derive_address(0)
 
@@ -277,12 +251,9 @@ class TransactionExplorationTest(unittest.TestCase):
 
         expected_transaction_bytes = zts.get_as_u8_array(
             "transaction_standard_fee")
-        key_seed = zts.get_as_u8_array("seed")
 
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
 
         address = key.transparent().to_account_pubkey(
         ).derive_external_ivk().derive_address(0)
@@ -312,13 +283,9 @@ class TransactionExplorationTest(unittest.TestCase):
 
         expected_transaction_bytes = zts.get_as_u8_array(
             "transaction_zip317_standard_fee")
-        key_seed = zts.get_as_u8_array("seed")
 
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
-
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
         address = key.transparent().to_account_pubkey(
         ).derive_external_ivk().derive_address(0)
 
@@ -347,13 +314,9 @@ class TransactionExplorationTest(unittest.TestCase):
 
         expected_transaction_bytes = zts.get_as_u8_array(
             "transaction_zip317_non_standard_fee")
-        key_seed = zts.get_as_u8_array("seed")
 
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
-
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
         address = key.transparent().to_account_pubkey(
         ).derive_external_ivk().derive_address(0)
 
@@ -380,13 +343,8 @@ class TransactionExplorationTest(unittest.TestCase):
     def test_sapling_with_non_standard_fees(self):
         zts = TestSupport.from_csv_file()
 
-        key_seed = zts.get_as_u8_array("seed")
-
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
-
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
         extsk = key.sapling()
         payment_address = extsk.default_address().address
         rseed = ZcashRseed.AFTER_ZIP212([0] * 32)
@@ -417,13 +375,8 @@ class OrchardTransactionBuilderTest(unittest.TestCase):
     def test_transaction_generation(self):
         zts = TestSupport.from_csv_file()
 
-        key_seed = zts.get_as_u8_array("seed")
-
-        key = ZcashUnifiedSpendingKey.from_seed(
-            ZcashConsensusParameters.MAIN_NETWORK,
-            key_seed,
-            ZcashAccountId(0))
-
+        key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
+                                                 zts.get_as_u8_array("unified_spending_key"))
         ufvk = key.to_unified_full_viewing_key()
         fvk = ufvk.orchard()
         ovk = fvk.to_ovk(ZcashOrchardScope.EXTERNAL)
@@ -717,7 +670,7 @@ class TransactionExplorationTest(unittest.TestCase):
         # Anchor
         self.assertEqual(zts.get_as_u8_array(
             "transaction_orchard_anchor"), bundle.anchor().to_bytes())
-            
+
     def test_orchard_bundle_crypto(self):
         zts = TestSupport.from_csv_file()
 
