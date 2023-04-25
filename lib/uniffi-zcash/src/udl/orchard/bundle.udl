@@ -42,7 +42,7 @@ dictionary ZcashOrchardDecryptOutput {
 };
 
 dictionary ZcashOrchardDecryptOutputForIncomingKeys {
-    u64 val;
+    u64 idx;
     ZcashOrchardIncomingViewingKey key;
     ZcashOrchardNote note;
     ZcashOrchardAddress address;
@@ -50,7 +50,7 @@ dictionary ZcashOrchardDecryptOutputForIncomingKeys {
 };
 
 dictionary ZcashOrchardDecryptOutputForOutgoingKeys {
-    u64 val;
+    u64 idx;
     ZcashOrchardOutgoingViewingKey key;
     ZcashOrchardNote note;
     ZcashOrchardAddress address;
