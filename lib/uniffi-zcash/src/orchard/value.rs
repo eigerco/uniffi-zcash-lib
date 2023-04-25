@@ -11,6 +11,11 @@ impl ZcashOrchardNoteValue {
     pub fn from_raw(value: u64) -> Self {
         NoteValue::from_raw(value).into()
     }
+    
+    /// Returns the raw underlying value.
+    pub fn value(&self) -> u64 {
+        self.0.inner()
+    }
 }
 
 impl From<NoteValue> for ZcashOrchardNoteValue {

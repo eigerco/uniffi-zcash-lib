@@ -43,6 +43,14 @@ impl ZcashOrchardNote {
         }
     }
 
+    pub fn recipient(&self) -> Arc<ZcashOrchardAddress> {
+        Arc::new(self.0.recipient().into())
+    }
+
+    pub fn value (&self) -> Arc<ZcashOrchardNoteValue> {
+        Arc::new(self.0.value().into())
+    }
+
     /// Derives the commitment to this note.
     ///
     /// Defined in [Zcash Protocol Spec § 3.2: Notes][notes].
