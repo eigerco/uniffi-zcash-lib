@@ -299,8 +299,14 @@ pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
     let mut builder =
         orchard::builder::Builder::new(Flags::from_parts(spends_enabled, outputs_enabled), anchor);
 
+    let mut memo = [0u8; 512]; // https://zips.z.cash/zip-0302
+    memo[0] = b't';
+    memo[1] = b'e';
+    memo[2] = b's';
+    memo[3] = b't';
+
     builder
-        .add_recipient(Some(ovk), address, note_value, None)
+        .add_recipient(Some(ovk), address, note_value, Some(memo))
         .unwrap();
 
     builder.add_spend(fvk.clone(), note, merkle_path).unwrap();
