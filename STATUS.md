@@ -385,7 +385,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ------------------------------------------ | :----------: | :----------------: | :----------------: | :---: | :----------------: |
 | ZcashSaplingNote::from_parts()             | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
 | ZcashSaplingNote::recipient()              |              |                    |                    |       |                    |
-| ZcashSaplingNote::value()                  |              |                    |                    |       |                    |
+| ZcashSaplingNote::value()                  | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
 | ZcashSaplingNote::rseed()                  |              |                    |                    |       |                    |
 | ZcashSaplingNote::nf()                     |              |                    |                    |       |                    |
 | ZcashSaplingNote::cmu()                    | :red_circle: | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
