@@ -1,5 +1,6 @@
 use std::io::Write;
 
+use zcash_client_backend::keys::UnifiedSpendingKey;
 use zcash_primitives::transaction::{components::transparent::fees::OutputView, Transaction};
 
 pub fn store_tx_t_id<W: Write>(mut file: W, tx: &Transaction) {
@@ -188,7 +189,11 @@ pub fn store_tx_orchard_action_encrypted_note<W: Write>(mut file: W, tx: &Transa
 
     super::store_bytes(
         &mut file,
-        format!("transaction_orchard_action_{}_encrypted_note_epk_bytes", idx).as_str(),
+        format!(
+            "transaction_orchard_action_{}_encrypted_note_epk_bytes",
+            idx
+        )
+        .as_str(),
         &encrypted_note.epk_bytes,
     )
     .unwrap();
@@ -235,4 +240,23 @@ pub fn store_tx_orchard_flags<W: Write>(mut file: W, tx: &Transaction) {
 pub fn store_tx_orchard_anchor<W: Write>(mut file: W, tx: &Transaction) {
     let data = tx.orchard_bundle().unwrap().anchor().to_bytes();
     super::store_bytes(&mut file, "transaction_orchard_anchor", &data).unwrap();
+}
+
+pub fn store_tx_orchard_decrypted_memo<W: Write>(
+    mut file: W,
+    tx: &Transaction,
+    key: &UnifiedSpendingKey,
+) {
+    let result = tx
+        .orchard_bundle()
+        .unwrap()
+        .decrypt_output_with_key(
+            0,
+            &key.to_unified_full_viewing_key()
+                .orchard()
+                .unwrap()
+                .to_ivk(orchard::keys::Scope::Internal),
+        )
+        .unwrap();
+    super::store_bytes(&mut file, "transaction_orchard_decrypted_memo", &result.2).unwrap();
 }

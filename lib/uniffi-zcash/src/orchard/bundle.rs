@@ -147,7 +147,7 @@ impl From<(Note, Address, [u8; 512])> for ZcashOrchardDecryptOutput {
 }
 
 pub struct ZcashOrchardDecryptOutputForIncomingKeys {
-    pub val: u64,
+    pub idx: u64,
     pub key: Arc<ZcashOrchardIncomingViewingKey>,
     pub note: Arc<ZcashOrchardNote>,
     pub address: Arc<ZcashOrchardAddress>,
@@ -162,7 +162,7 @@ impl TryFrom<(usize, IncomingViewingKey, Note, Address, [u8; 512])>
         value: (usize, IncomingViewingKey, Note, Address, [u8; 512]),
     ) -> Result<Self, Self::Error> {
         Ok(Self {
-            val: value.0.try_into()?,
+            idx: value.0.try_into()?,
             key: Arc::new(value.1.into()),
             note: Arc::new(value.2.into()),
             address: Arc::new(value.3.into()),
@@ -172,7 +172,7 @@ impl TryFrom<(usize, IncomingViewingKey, Note, Address, [u8; 512])>
 }
 
 pub struct ZcashOrchardDecryptOutputForOutgoingKeys {
-    pub val: u64,
+    pub idx: u64,
     pub key: Arc<ZcashOrchardOutgoingViewingKey>,
     pub note: Arc<ZcashOrchardNote>,
     pub address: Arc<ZcashOrchardAddress>,
@@ -187,7 +187,7 @@ impl TryFrom<(usize, OutgoingViewingKey, Note, Address, [u8; 512])>
         value: (usize, OutgoingViewingKey, Note, Address, [u8; 512]),
     ) -> Result<Self, Self::Error> {
         Ok(Self {
-            val: value.0.try_into()?,
+            idx: value.0.try_into()?,
             key: Arc::new(value.1.into()),
             note: Arc::new(value.2.into()),
             address: Arc::new(value.3.into()),

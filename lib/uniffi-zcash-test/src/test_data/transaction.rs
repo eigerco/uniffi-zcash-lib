@@ -10,7 +10,7 @@ use orchard::{
     value::NoteValue,
     Note,
 };
-use zcash_client_backend::keys::UnifiedSpendingKey;
+use zcash_client_backend::keys::{Era, UnifiedSpendingKey};
 use zcash_primitives::{
     consensus::{BlockHeight, BranchId, MainNetwork},
     legacy::keys::IncomingViewingKey,
@@ -27,19 +27,30 @@ use zcash_primitives::{
 
 use zcash_proofs::prover::LocalTxProver;
 
-use super::helper::{
-    store_tx_orchard_action_cmx, store_tx_orchard_action_cv_net,
-    store_tx_orchard_action_encrypted_note, store_tx_orchard_action_nullifier,
-    store_tx_orchard_anchor, store_tx_orchard_flags, store_tx_sapling_output_cmu,
-    store_tx_sapling_output_cv, store_tx_sapling_spend_anchor, store_tx_sapling_spend_cv,
-    store_tx_sapling_spend_nullifier, store_tx_sapling_spend_rk, store_tx_t_id, store_tx_t_out,
-    store_tx_t_out_address, store_tx_t_out_script_pubkey, store_tx_t_version, store_tx_t_vin,
+use super::{
+    helper::{
+        store_tx_orchard_action_cmx, store_tx_orchard_action_cv_net,
+        store_tx_orchard_action_encrypted_note, store_tx_orchard_action_nullifier,
+        store_tx_orchard_anchor, store_tx_orchard_decrypted_memo, store_tx_orchard_flags,
+        store_tx_sapling_output_cmu, store_tx_sapling_output_cv, store_tx_sapling_spend_anchor,
+        store_tx_sapling_spend_cv, store_tx_sapling_spend_nullifier, store_tx_sapling_spend_rk,
+        store_tx_t_id, store_tx_t_out, store_tx_t_out_address, store_tx_t_out_script_pubkey,
+        store_tx_t_version, store_tx_t_vin,
+    },
+    store_bytes,
 };
 
 const BLOCK_HEIGHT: u32 = 2030820;
 
 pub fn write_for_transaction<W: Write>(mut file: W, seed: &[u8]) {
     let key = UnifiedSpendingKey::from_seed(&MainNetwork, seed, 0.into()).unwrap();
+    store_bytes(
+        &mut file,
+        "unified_spending_key",
+        &key.to_bytes(Era::Orchard),
+    )
+    .unwrap();
+
     transparent_builder_with_nonstandard_fee_example(&mut file, &key);
     transparent_builder_with_standard_fee_example(&mut file, &key);
     transparent_builder_with_zip317_standard_fee_example(&mut file, &key);
@@ -263,6 +274,13 @@ pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
         .to_ivk(orchard::keys::Scope::Internal)
         .address(Diversifier::from_bytes([0u8; 11]));
 
+    store_bytes(
+        &mut file,
+        "transaction_orchard_address",
+        &address.to_raw_address_bytes(),
+    )
+    .unwrap();
+
     // Note construction
     let note_value = NoteValue::from_raw(15);
     let nullifier = Nullifier::from_bytes(&[0u8; 32]).unwrap();
@@ -320,6 +338,8 @@ pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
     store_tx_orchard_action_cv_net(&mut file, &transaction, 1);
     store_tx_orchard_flags(&mut file, &transaction);
     store_tx_orchard_anchor(&mut file, &transaction);
+
+    store_tx_orchard_decrypted_memo(&mut file, &transaction, &key);
 
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();

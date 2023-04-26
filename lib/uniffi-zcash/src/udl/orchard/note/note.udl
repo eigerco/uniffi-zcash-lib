@@ -7,6 +7,10 @@ interface ZcashOrchardNote {
         ZcashOrchardRandomSeed rseed
     );
 
+    ZcashOrchardAddress recipient();
+
+    ZcashOrchardNoteValue value();
+
     ZcashOrchardNoteCommitment commitment();
 };
 

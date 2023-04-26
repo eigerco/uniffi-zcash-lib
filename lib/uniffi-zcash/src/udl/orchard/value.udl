@@ -1,6 +1,8 @@
 interface ZcashOrchardNoteValue {
     [Name=from_raw]
     constructor(u64 value);
+
+    u64 value();
 };
 
 interface ZcashOrchardValueCommitment {

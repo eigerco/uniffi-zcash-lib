@@ -811,8 +811,8 @@ a tuple.
 
 | Members                             | Score | UDL | Code | Tests | Docs |
 | ------------------------------------| ----- | --- | ---- | ----- | ---- |
-| ZcashOrchardNoteValue::from_raw()   | 🔴    |  ✅ |  ✅  |   ✅  |  ✅  |
-| ZcashOrchardNoteValue::inner()      |       |     |      |       |      |
+| ZcashOrchardNoteValue::from_raw()   | 🔴    |  ✅ | ✅  |   ✅  |  ✅  |
+| ZcashOrchardNoteValue::inner()      | 🔴    |  ✅ | ✅     |  ✅  | ✅     |
 
 ### ZcashOrchardNoteCommitment
 
@@ -845,8 +845,8 @@ a tuple.
 | Members                             | Score | UDL | Code | Tests | Docs |
 | ------------------------------------| ----- | --- | ---- | ----- | ---- |
 | ZcashOrchardNote::from_parts()      | 🔴    |  ✅ |  ✅  |   ✅ |  ✅   |
-| ZcashOrchardNote::recipient()       |       |     |      |       |      |
-| ZcashOrchardNote::value()           |       |     |      |       |      |
+| ZcashOrchardNote::recipient()       | 🔴    |  ✅ |  ✅  |  ✅  |  ✅   |
+| ZcashOrchardNote::value()           |  🔴    | ✅ |  ✅  |  ✅  |  ✅   |
 | ZcashOrchardNote::rseed()           |       |     |      |       |      |
 | ZcashOrchardNote::rho()             |       |     |      |       |      |
 | ZcashOrchardNote::commitment()      |  🔴   |  ✅ |  ✅  |  ✅   |  ✅ |
