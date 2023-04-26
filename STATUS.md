@@ -569,9 +569,9 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 | ZcashTransaction::lock_time()           | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashTransaction::expiry_height()       | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashTransaction::fee_paid()            | 🔴     |     |      |       |      |
-| ZcashTransaction::transparent_bundle()  | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashTransaction::sapling_bundle()      | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashTransaction::orchard_bundle()      | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashTransaction::transparent_bundle()  | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashTransaction::sapling_bundle()      | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashTransaction::orchard_bundle()      | 🔴     | ✅   | ✅    | ✅     | ✅    |
 
 * `write` method was implemented as `to_bytes()`.
 * `read` method was implemented as `from_bytes()`.
@@ -647,9 +647,9 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                    | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashTransparentTxOut::read()              | 🔵     | ✅   | ✅    |       | ✅    |
+| ZcashTransparentTxOut::read()              | 🔵     | ✅   | ✅    | ✅     | ✅    |
 | ZcashTransparentTxOut::write()             | 🔵     |     |      |       |      |
-| ZcashTransparentTxOut::recipient_address() | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashTransparentTxOut::recipient_address() | 🔴     | ✅   | ✅    | ✅     | ✅    |
 
 * Additionally Added methods `value()` and `script_pubkey()` getters to access struct properties.
 
@@ -668,9 +668,9 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                      | Score | UDL | Code | Tests | Docs |
 | -------------------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashAmount::zero()                          | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashAmount::from_i64()                      | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashAmount::value()                         | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashAmount::zero()                          | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashAmount::from_i64()                      | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashAmount::value()                         | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashAmount::from_nonnegative_i64()          | 🔵     |     |      |       |      |
 | ZcashAmount::from_u64()                      | 🔵     |     |      |       |      |
 | ZcashAmount::from_i64_le_bytes()             | 🔵     |     |      |       |      |
@@ -700,10 +700,10 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                     | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashLocalTxProver::new()                   | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashLocalTxProver::new()                   | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashLocalTxProver::from_bytes()            | 🔴     | ✅   | ✅    |       | ✅    |
 | ZcashLocalTxProver::with_default_location() | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashLocalTxProver::bundled()               | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashLocalTxProver::bundled()               | 🔴     | ✅   | ✅    | ✅     | ✅    |
 
 ### ZcashFixedFeeRule
 
@@ -711,9 +711,9 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                      | Score | UDL | Code | Tests | Docs |
 | ---------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashFeeRule::non_standard() | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashFeeRule::standard()     | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashFeeRule::fixed_fee()    | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashFeeRule::non_standard() | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashFeeRule::standard()     | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashFeeRule::fixed_fee()    | 🔴     | ✅   | ✅    | ✅     | ✅    |
 
 ### ZcashZip317FeeRule
 
@@ -721,9 +721,9 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                                    | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashFeeRule::non_standard()               | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashFeeRule::standard()                   | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashFeeRule::marginal_fee()               | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashFeeRule::non_standard()               | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashFeeRule::standard()                   | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashFeeRule::marginal_fee()               | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashFeeRule::p2pkh_standard_input_size()  | 🔵     |     |      |       |      |
 | ZcashFeeRule::p2pkh_standard_output_size() | 🔵     |     |      |       |      |
 ### ZcashRseed
@@ -741,13 +741,13 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                              | Score | UDL | Code | Tests | Docs |
 | ------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashCommitmentTree::empty()         | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashCommitmentTree::empty()         | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashCommitmentTree::from_frontier() | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::to_frontier()   | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::size()          | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::read()          | 🔵     |     |      |       |      |
 | ZcashCommitmentTree::write()         | 🔵     |     |      |       |      |
-| ZcashCommitmentTree::append()        | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashCommitmentTree::append()        | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashCommitmentTree::root()          | 🔵     |     |      |       |      |
 
 ### ZcashSaplingNode
@@ -756,7 +756,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                         | Score | UDL | Code | Tests | Docs |
 | ------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashSaplingNode::from_cmu()    | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashSaplingNode::from_cmu()    | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashSaplingNode::from_scalar() | 🔵     |     |      |       |      |
 
 ### ZcashIncrementalWitness
@@ -765,7 +765,7 @@ Original type: [zcash_primitives::sapling::keys::OutgoingViewingKey](https://doc
 
 | Members                              | Score | UDL | Code | Tests | Docs |
 | ------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashIncrementalWitness::from_tree() | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashIncrementalWitness::from_tree() | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashIncrementalWitness::read()      | 🔵     |     |      |       |      |
 | ZcashIncrementalWitness::write()     | 🔵     |     |      |       |      |
 | ZcashIncrementalWitness::position()  | 🔵     |     |      |       |      |
@@ -826,8 +826,8 @@ a tuple.
 
 | Members                                    | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashExtractedNoteCommitment::from_bytes() | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashExtractedNoteCommitment::to_bytes()   | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashExtractedNoteCommitment::from_bytes() | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashExtractedNoteCommitment::to_bytes()   | 🔴     | ✅   | ✅    | ✅     | ✅    |
 
 ### ZcashAnchor
 
@@ -835,8 +835,8 @@ a tuple.
 
 | Members                   | Score | UDL | Code | Tests | Docs |
 | ------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashAnchor::from_bytes() | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashAnchor::to_bytes()   | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashAnchor::from_bytes() | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashAnchor::to_bytes()   | 🔴     | ✅   | ✅    | ✅     | ✅    |
 
 ### ZcashOrchardNote
 
@@ -927,11 +927,11 @@ a tuple.
 
 | Members                                     | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashTransparentBundle::is_coinbase()       | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashTransparentBundle::is_coinbase()       | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashTransparentBundle::map_authorization() | 🔵     | ✅   | ✅    |       | ✅    |
 | ZcashTransparentBundle::value_balance()     | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashTransparentBundle::vin()               | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashZcashTransparentBundleTxId::vout()     | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashTransparentBundle::vin()               | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashZcashTransparentBundleTxId::vout()     | 🔴     | ✅   | ✅    | ✅     | ✅    |
 
 ### ZcashSaplingBundle
 
@@ -941,10 +941,9 @@ a tuple.
 
 | Members                                | Score | UDL | Code | Tests | Docs |
 | -------------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashSaplingBundle::shielded_spends()  | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashSaplingBundle::shielded_outputs() | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashSaplingBundle::value_balance()    | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashSaplingBundle::value_balance()    | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashSaplingBundle::shielded_spends()  | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashSaplingBundle::shielded_outputs() | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashSaplingBundle::value_balance()    | 🔴     | ✅   | ✅    | ✅     | ✅    |
 
 
 ### ZcashSaplingSpendDescription
@@ -955,10 +954,10 @@ a tuple.
 
 | Members                                        | Score | UDL | Code | Tests | Docs |
 | ---------------------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashSaplingSpendDescription::cv()             | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashSaplingSpendDescription::anchor()         | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashSaplingSpendDescription::nullifier()      | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashSaplingSpendDescription::rk()             | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashSaplingSpendDescription::cv()             | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashSaplingSpendDescription::anchor()         | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashSaplingSpendDescription::nullifier()      | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashSaplingSpendDescription::rk()             | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashSaplingSpendDescription::zkproof()        |       |     |      |       |      |
 | ZcashSaplingSpendDescription::spend_auth_sig() |       |     |      |       |      |
 
@@ -970,11 +969,11 @@ a tuple.
 
 | Members                                                 | Score | UDL | Code | Tests | Docs |
 | ------------------------------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashSaplingOutputDescription::cv()                     | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashSaplingOutputDescription::cmu()                    | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashSaplingOutputDescription::cv()                     | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashSaplingOutputDescription::cmu()                    | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashSaplingOutputDescription::ephemeral_key()          | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashSaplingOutputDescription::enc_ciphertext()         | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashSaplingOutputDescription::out_ciphertext()         |       |     |      |       |      |
+| ZcashSaplingOutputDescription::enc_ciphertext()         | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashSaplingOutputDescription::out_ciphertext()         |       |     |      | ✅     |      |
 | ZcashSaplingOutputDescription::zkproof()                |       |     |      |       |      |
 | ZcashSaplingOutputDescription::read()                   |       |     |      |       |      |
 | ZcashSaplingOutputDescription::write_v4()               |       |     |      |       |      |
@@ -1034,18 +1033,18 @@ a tuple.
 
 | Members                                         | Score | UDL | Code | Tests | Docs |
 | ----------------------------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashOrchardBundle::actions()                   | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardBundle::anchor()                    | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashOrchardBundle::actions()                   | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardBundle::anchor()                    | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashOrchardBundle::authorization()             |       |     |      |       |      |
 | ZcashOrchardBundle::authorizing_commitment()    |       |     |      |       |      |
 | ZcashOrchardBundle::binding_validating_key()    |       |     |      |       |      |
-| ZcashOrchardBundle::decrypt_output_with_key()   | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardBundle::decrypt_outputs_with_keys() | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardBundle::flags()                     | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardBundle::value_balance()             | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardBundle::verify_proof()              | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardBundle::recover_output_with_ovk()   | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardBundle::recover_outputs_with_ovks() | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashOrchardBundle::decrypt_output_with_key()   | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardBundle::decrypt_outputs_with_keys() | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardBundle::flags()                     | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardBundle::value_balance()             | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardBundle::verify_proof()              | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardBundle::recover_output_with_ovk()   | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardBundle::recover_outputs_with_ovks() | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashOrchardBundle::commitment()                |       |     |      |       |      |
 | ZcashOrchardBundle::map_authorization()         |       |     |      |       |      |
 
@@ -1055,11 +1054,11 @@ a tuple.
 
 | Members                              | Score | UDL | Code | Tests | Docs |
 | ------------------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashOrchardFlags::from_parts()      | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardFlags::spends_enabled()  | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardFlags::outputs_enabled() | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardFlags::to_byte()         | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardFlags::from_byte()       | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashOrchardFlags::from_parts()      | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardFlags::spends_enabled()  | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardFlags::outputs_enabled() | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardFlags::to_byte()         | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardFlags::from_byte()       | 🔴     | ✅   | ✅    | ✅     | ✅    |
 
 ### ZcashOrchardAction
 
@@ -1068,11 +1067,11 @@ a tuple.
 | Members                              | Score | UDL | Code | Tests | Docs |
 | ------------------------------------ | ----- | --- | ---- | ----- | ---- |
 | ZcashOrchardAction::from_parts()     |       |     |      |       |      |
-| ZcashOrchardAction::nullifier()      | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardAction::rk()             |       |     |      |       |      |
+| ZcashOrchardAction::nullifier()      | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardAction::rk()             |       |     |      | ✅     |      |
 | ZcashOrchardAction::cmx()            | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardAction::encrypted_note() | 🔴     | ✅   | ✅    |       | ✅    |
-| ZcashOrchardAction::cv_net()         | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashOrchardAction::encrypted_note() | 🔴     | ✅   | ✅    | ✅     | ✅    |
+| ZcashOrchardAction::cv_net()         | 🔴     | ✅   | ✅    | ✅     | ✅    |
 | ZcashOrchardAction::authorization()  |       |     |      |       |      |
 | ZcashOrchardAction::to_instance()    |       |     |      |       |      |
 
@@ -1094,7 +1093,7 @@ a tuple.
 
 | Members                    | Score | UDL | Code | Tests | Docs |
 | -------------------------- | ----- | --- | ---- | ----- | ---- |
-| ZcashVerifyingKey::build() | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashVerifyingKey::build() | 🔴     | ✅   | ✅    | ✅     | ✅    |
 
 ### ZcashProvingKey
 
@@ -1102,7 +1101,7 @@ a tuple.
 
 | Members                  | Score | UDL | Code | Tests | Docs |
 | ------------------------ | ----- | --- | ---- | ----- | ---- |
-| ZcashProvingKey::build() | 🔴     | ✅   | ✅    |       | ✅    |
+| ZcashProvingKey::build() | 🔴     | ✅   | ✅    | ✅     | ✅    |
 
 ## Enums
 
@@ -1130,7 +1129,7 @@ a tuple.
 
 | Members | Score | UDL                | Code               | Tests | Docs               |
 | ------- | ----- | ------------------ | ------------------ | ----- | ------------------ |
-| S128    |       | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
+| S128    |       | :white_check_mark: | :white_check_mark: |  ✅     | :white_check_mark: |
 | S256    |       | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
 | S512    |       | :white_check_mark: | :white_check_mark: |       | :white_check_mark: |
 
