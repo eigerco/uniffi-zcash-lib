@@ -674,8 +674,6 @@ class TransactionExplorationTest(unittest.TestCase):
     def test_orchard_bundle_crypto(self):
         zts = TestSupport.from_csv_file()
 
-        key_seed = zts.get_as_u8_array("seed")
-
         key = ZcashUnifiedSpendingKey.from_bytes(ZcashKeysEra.ORCHARD,
                                                  zts.get_as_u8_array("unified_spending_key"))
 
