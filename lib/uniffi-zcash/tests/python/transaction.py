@@ -693,7 +693,7 @@ class TransactionExplorationTest(unittest.TestCase):
         self.assertEqual(zts.get_as_u8_array(
             "transaction_orchard_address"), output.address.to_raw_address_bytes())
         self.assertEqual(zts.get_as_u8_array(
-            "transaction_orchard_decrypted_memo"), output.data)
+            "transaction_orchard_memo"), output.data)
 
         # Decrypt output with IVKs
         outputs = bundle.decrypt_output_with_keys([ivk])
@@ -705,7 +705,7 @@ class TransactionExplorationTest(unittest.TestCase):
         self.assertEqual(zts.get_as_u8_array(
             "transaction_orchard_address"), the_output.address.to_raw_address_bytes())
         self.assertEqual(zts.get_as_u8_array(
-            "transaction_orchard_decrypted_memo"), the_output.data)
+            "transaction_orchard_memo"), the_output.data)
 
         # Decrypt output with OVK
         ovk = key.to_unified_full_viewing_key().orchard().to_ovk(ZcashOrchardScope.EXTERNAL)
@@ -714,7 +714,7 @@ class TransactionExplorationTest(unittest.TestCase):
         self.assertEqual(zts.get_as_u8_array(
             "transaction_orchard_address"), output.address.to_raw_address_bytes())
         self.assertEqual(zts.get_as_u8_array(
-            "transaction_orchard_decrypted_memo"), output.data)
+            "transaction_orchard_memo"), output.data)
 
         # Decrypt output with OVKs
         outputs = bundle.recover_outputs_with_ovks([ovk])
@@ -726,7 +726,7 @@ class TransactionExplorationTest(unittest.TestCase):
         self.assertEqual(zts.get_as_u8_array(
             "transaction_orchard_address"), the_output.address.to_raw_address_bytes())
         self.assertEqual(zts.get_as_u8_array(
-            "transaction_orchard_decrypted_memo"), the_output.data)
+            "transaction_orchard_memo"), the_output.data)
 
 
 if __name__ == '__main__':
