@@ -31,11 +31,10 @@ use super::{
     helper::{
         store_tx_orchard_action_cmx, store_tx_orchard_action_cv_net,
         store_tx_orchard_action_encrypted_note, store_tx_orchard_action_nullifier,
-        store_tx_orchard_anchor, store_tx_orchard_decrypted_memo, store_tx_orchard_flags,
-        store_tx_sapling_output_cmu, store_tx_sapling_output_cv, store_tx_sapling_spend_anchor,
-        store_tx_sapling_spend_cv, store_tx_sapling_spend_nullifier, store_tx_sapling_spend_rk,
-        store_tx_t_id, store_tx_t_out, store_tx_t_out_address, store_tx_t_out_script_pubkey,
-        store_tx_t_version, store_tx_t_vin,
+        store_tx_orchard_anchor, store_tx_orchard_flags, store_tx_sapling_output_cmu,
+        store_tx_sapling_output_cv, store_tx_sapling_spend_anchor, store_tx_sapling_spend_cv,
+        store_tx_sapling_spend_nullifier, store_tx_sapling_spend_rk, store_tx_t_id, store_tx_t_out,
+        store_tx_t_out_address, store_tx_t_out_script_pubkey, store_tx_t_version, store_tx_t_vin,
     },
     store_bytes,
 };
@@ -304,6 +303,7 @@ pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
     memo[1] = b'e';
     memo[2] = b's';
     memo[3] = b't';
+    super::store_bytes(&mut file, "transaction_orchard_memo", &memo).unwrap();
 
     builder
         .add_recipient(Some(ovk), address, note_value, Some(memo))
@@ -344,8 +344,6 @@ pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
     store_tx_orchard_action_cv_net(&mut file, &transaction, 1);
     store_tx_orchard_flags(&mut file, &transaction);
     store_tx_orchard_anchor(&mut file, &transaction);
-
-    store_tx_orchard_decrypted_memo(&mut file, &transaction, &key);
 
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
