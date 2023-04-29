@@ -45,6 +45,7 @@ uniffi::build_foreign_language_testcases!(
     "tests/ruby/test.rb",
     "tests/ruby/sapling.rb",
     "tests/ruby/orchard.rb",
+    "tests/ruby/transaction.rb",
     // Swift tests
     "tests/swift/test.swift",
     "tests/swift/sapling.swift",
