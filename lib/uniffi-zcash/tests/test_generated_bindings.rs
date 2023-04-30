@@ -50,5 +50,6 @@ uniffi::build_foreign_language_testcases!(
     // Swift tests
     "tests/swift/test.swift",
     "tests/swift/sapling.swift",
-    "tests/swift/orchard.swift"
+    "tests/swift/orchard.swift",
+    "tests/swift/transaction.swift",
 );
