@@ -1,10 +1,10 @@
-use std::io::Write;
+use std::{fs, io::Write, path::Path};
 
 use hdwallet::rand_core::OsRng;
 use orchard::{
     builder::{InProgress, Unauthorized, Unproven},
     bundle::Flags,
-    keys::Diversifier,
+    keys::{Diversifier, Scope},
     note::{Nullifier, RandomSeed},
     tree::{MerkleHashOrchard, MerklePath},
     value::NoteValue,
@@ -12,7 +12,7 @@ use orchard::{
 };
 use zcash_client_backend::keys::{Era, UnifiedSpendingKey};
 use zcash_primitives::{
-    consensus::{BlockHeight, BranchId, MainNetwork},
+    consensus::{BlockHeight, BranchId, MainNetwork, TestNetwork},
     legacy::keys::IncomingViewingKey,
     memo::MemoBytes,
     merkle_tree::{CommitmentTree, IncrementalWitness},
@@ -21,7 +21,7 @@ use zcash_primitives::{
         builder::Builder,
         components::{Amount, OutPoint, TxOut},
         fees::{fixed, zip317},
-        Authorized, TransactionData, TxVersion,
+        Authorized, Transaction, TransactionData, TxVersion,
     },
 };
 
@@ -41,6 +41,8 @@ use super::{
 
 const BLOCK_HEIGHT: u32 = 2030820;
 
+const TESTNET_SEED: &str = "blast pride spell forum shoe fix noise decade gadget belt behind trust then use disagree begin title bonus pair drive toast fossil emerge left";
+
 pub fn write_for_transaction<W: Write>(mut file: W, seed: &[u8]) {
     let key = UnifiedSpendingKey::from_seed(&MainNetwork, seed, 0.into()).unwrap();
     store_bytes(
@@ -56,6 +58,9 @@ pub fn write_for_transaction<W: Write>(mut file: W, seed: &[u8]) {
     transparent_builder_with_zip317_non_standard_fee_example(&mut file, &key);
     sapling_transaction_general_builder_example(&mut file, &key);
     orchard_transaction(&mut file, &key);
+
+    // Testnet account related data. See https://github.com/eigerco/uniffi-zcash-lib/issues/120.
+    testnet_orchard_transaction(&mut file, TESTNET_SEED)
 }
 
 pub fn transparent_builder_with_nonstandard_fee_example<W: Write>(
@@ -348,4 +353,48 @@ pub fn orchard_transaction<W: Write>(mut file: W, key: &UnifiedSpendingKey) {
     let mut data = Vec::new();
     transaction.write(&mut data).unwrap();
     super::store_bytes(&mut file, "transaction_orchard", &data).unwrap();
+}
+
+pub fn testnet_orchard_transaction<W: Write>(mut file: W, mnemo_seed: &str) {
+    // Store wallet seed
+    let mnemonic = bip39::Mnemonic::parse(mnemo_seed).unwrap();
+    let seed = mnemonic.to_seed(""); // No passphrase
+    super::store_bytes(&mut file, "testnet_wallet_seed", &seed).unwrap();
+
+    // Store the unified spending key
+    let key = UnifiedSpendingKey::from_seed(&TestNetwork, &seed, 0.into()).unwrap();
+    super::store_bytes(
+        &mut file,
+        "testnet_unified_spending_key",
+        &key.to_bytes(Era::Orchard),
+    )
+    .unwrap();
+
+    // Parse the testnet tx data and store it.
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("src/test_data/testnet_orchard_tx.hex");
+    let tx_data = hex::decode(fs::read_to_string(path.as_path()).unwrap()).unwrap();
+    let parsed_tx = Transaction::read(tx_data.as_slice(), BranchId::Nu5).unwrap();
+    super::store_bytes(&mut file, "testnet_transaction_orchard", &tx_data).unwrap();
+
+    // Decrypt and store tx outputs.
+    let ivk = key
+        .to_unified_full_viewing_key()
+        .orchard()
+        .unwrap()
+        .to_ivk(Scope::Internal);
+
+    let (_, address, memo) = parsed_tx
+        .orchard_bundle()
+        .unwrap()
+        .decrypt_output_with_key(0, &ivk)
+        .unwrap();
+
+    super::store_bytes(
+        &mut file,
+        "testnet_transaction_orchard_address",
+        address.to_raw_address_bytes().as_slice(),
+    )
+    .unwrap();
+
+    super::store_bytes(&mut file, "testnet_transaction_orchard_memo", &memo).unwrap();
 }

@@ -1,6 +1,5 @@
 use std::io::Write;
 
-use zcash_client_backend::keys::UnifiedSpendingKey;
 use zcash_primitives::transaction::{components::transparent::fees::OutputView, Transaction};
 
 pub fn store_tx_t_id<W: Write>(mut file: W, tx: &Transaction) {
