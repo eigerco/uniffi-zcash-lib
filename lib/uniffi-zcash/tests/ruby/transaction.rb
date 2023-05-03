@@ -181,12 +181,12 @@ class OrchardTransactionBuilderTest < Test::Unit::TestCase
 
         anchor = merkle_path.root(
             note.commitment().to_extracted_note_commitment())
-        flags = Zcash::ZcashOrchardFlags::from_parts(TRUE, TRUE)
+        flags = Zcash::ZcashOrchardFlags::from_parts(true, true)
 
         builder = Zcash::ZcashOrchardTransactionBuilder.new(Zcash::ZcashConsensusParameters::MAIN_NETWORK, Zcash::ZcashBlockHeight.new(
             2030820), Zcash::ZcashBlockHeight.new(2030820+100), anchor, flags)
         builder.add_spend(fvk, note, merkle_path)
-        builder.add_recipient(ovk, address, 15, NIL)
+        builder.add_recipient(ovk, address, 15, nil)
 
         transaction = builder.build([key.orchard()], [0]*32)
 
