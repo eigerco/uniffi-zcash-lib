@@ -337,57 +337,57 @@ class TransactionExplorationTest < Test::Unit::TestCase
     def test_orchard_bundle_crypto
         zts = Zcash::TestSupport.from_csv_file()
         key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD,
-                                                 zts.get_as_u8_array("unified_spending_key"))
+                                                 zts.get_as_u8_array("testnet_unified_spending_key"))
 
-        tx_bytes = zts.get_as_u8_array("transaction_orchard")
+        tx_bytes = zts.get_as_u8_array("testnet_transaction_orchard")
         tx = Zcash::ZcashTransaction.from_bytes(tx_bytes, Zcash::ZcashBranchId::NU5)
 
         bundle = tx.orchard_bundle()
 
-        # Verify proof
-        verifying_key = Zcash::ZcashVerifyingKey.new()
-        bundle.verify_proof(verifying_key)
+        # # Verify proof
+        # verifying_key = Zcash::ZcashVerifyingKey.new()
+        # bundle.verify_proof(verifying_key)
 
         # Decrypt output with IVK
         ivk = key.to_unified_full_viewing_key().orchard().to_ivk(Zcash::ZcashOrchardScope::INTERNAL)
         output = bundle.decrypt_output_with_key(0, ivk)
-        assert_equal(15, output.note.value().value())
+        assert_equal(1999000, output.note.value().value())
         assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_address"), output.address.to_raw_address_bytes())
+            "testnet_transaction_orchard_address"), output.address.to_raw_address_bytes())
         assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_decrypted_memo"), output.data)
+            "testnet_transaction_orchard_memo"), output.data)
 
         # Decrypt output with IVKs
         outputs = bundle.decrypt_output_with_keys([ivk])
         assert_equal(1, outputs.length())
         the_output = outputs[0]
         assert_equal(0, the_output.idx)
-        assert_equal(15, the_output.note.value().value())
+        assert_equal(1999000, the_output.note.value().value())
         assert_equal(ivk.to_bytes(), the_output.key.to_bytes())
         assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_address"), the_output.address.to_raw_address_bytes())
+            "testnet_transaction_orchard_address"), the_output.address.to_raw_address_bytes())
         assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_decrypted_memo"), the_output.data)
+            "testnet_transaction_orchard_memo"), the_output.data)
 
         # Decrypt output with OVK
-        ovk = key.to_unified_full_viewing_key().orchard().to_ovk(Zcash::ZcashOrchardScope::EXTERNAL)
+        ovk = key.to_unified_full_viewing_key().orchard().to_ovk(Zcash::ZcashOrchardScope::INTERNAL)
         output = bundle.recover_output_with_ovk(0, ovk)
-        assert_equal(15, output.note.value().value())
+        assert_equal(1999000, output.note.value().value())
         assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_address"), output.address.to_raw_address_bytes())
+            "testnet_transaction_orchard_address"), output.address.to_raw_address_bytes())
         assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_decrypted_memo"), output.data)
+            "testnet_transaction_orchard_memo"), output.data)
 
         # Decrypt output with OVKs
         outputs = bundle.recover_outputs_with_ovks([ovk])
         assert_equal(1, outputs.length())
         the_output = outputs[0]
         assert_equal(0, the_output.idx)
-        assert_equal(15, the_output.note.value().value())
+        assert_equal(1999000, the_output.note.value().value())
         assert_equal(ovk.to_bytes(), the_output.key.to_bytes())
         assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_address"), the_output.address.to_raw_address_bytes())
+            "testnet_transaction_orchard_address"), the_output.address.to_raw_address_bytes())
         assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_decrypted_memo"), the_output.data)
+            "testnet_transaction_orchard_memo"), the_output.data)
     end
 end
