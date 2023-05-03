@@ -10,3 +10,4 @@ lib/Cargo.lock
 **/*.rs.bk
 
 lib/uniffi-zcash/src/zcash.udl
+bindings
