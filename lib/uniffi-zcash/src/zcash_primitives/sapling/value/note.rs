@@ -7,7 +7,8 @@ impl ZcashSaplingNoteValue {
     pub fn from_raw(data: u64) -> Self {
         NoteValue::from_raw(data).into()
     }
-
+    
+    /// Returns the raw underlying value.
     pub fn inner(&self) -> u64 {
         self.0.inner()
     }

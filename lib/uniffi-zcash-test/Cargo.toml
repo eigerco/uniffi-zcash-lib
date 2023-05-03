@@ -16,6 +16,11 @@ hdwallet = "0.3.1"
 orchard = "0.3.0"
 group = "0.12.0"
 zcash_primitives = { version = "0.10.0", features = ["transparent-inputs"] }
-zcash_client_backend = { version = "0.7.0", features = ["transparent-inputs", "unstable"] }
+zcash_client_backend = { version = "0.7.0", features = [
+    "transparent-inputs",
+    "unstable",
+] }
 zcash_proofs = { version = "0.10.0", features = ["bundled-prover"] }
 serde_json = "1"
+hex = "0.4.3"
+bip39 = "2.0.0"

@@ -41,6 +41,11 @@ impl ZcashSaplingNote {
         .into())
     }
 
+    /// Returns the value of this note.
+    pub fn value(&self) -> Arc<ZcashSaplingNoteValue> {
+        Arc::new(self.0.value().into())
+    }
+
     /// Computes the note commitment
     pub fn cmu(&self) -> Arc<ZcashSaplingExtractedNoteCommitment> {
         Arc::new(self.0.cmu().into())
