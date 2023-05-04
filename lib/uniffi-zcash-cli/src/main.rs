@@ -42,6 +42,8 @@ fn main() -> CLIResult<()> {
                     .arg("uniffi-bindgen")
                     .arg("generate")
                     .arg(udl_path.clone())
+                    .arg("--config")
+                    .arg(root_dir.join("uniffi-bindgen/uniffi.toml"))
                     .arg("--language")
                     .arg(lang)
                     .arg("--out-dir")
