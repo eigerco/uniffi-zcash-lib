@@ -43,7 +43,7 @@ fn main() -> CLIResult<()> {
             let target_bindings_path = root_dir.join("bindings");
 
             // Generate the dynamic libraries.
-            println!("{}", "Generating shared library ...");
+            println!("Generating shared library ...");
             std::process::Command::new("cargo")
                 .arg("build")
                 .arg("--release")
@@ -55,7 +55,7 @@ fn main() -> CLIResult<()> {
 
             let mut zcash_so_file = File::open(target_path.join("libuniffi_zcash.so"))?;
 
-            println!("{}", "Generating language bindings ...");
+            println!("Generating language bindings ...");
             SupportedLangs::iter().try_for_each(|lang| {
                 std::process::Command::new("cargo")
                     .arg("run")
