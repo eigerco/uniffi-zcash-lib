@@ -10,7 +10,7 @@ use clap::Command;
 
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator, VariantNames};
 
-#[derive(Debug, Display, EnumString, EnumIter, EnumVariantNames)]
+#[derive(Debug, Clone, Copy, Display, EnumString, EnumIter, EnumVariantNames)]
 #[strum(serialize_all = "kebab_case")]
 enum SupportedLangs {
     #[strum(serialize = "python")]
@@ -81,7 +81,32 @@ fn main() -> CLIResult<()> {
                         copy_so_file_for(lang, target_bindings_path.clone(), &mut zcash_so_file)
                     }
                     SupportedLangs::Swift => {
-                        copy_so_file_for(lang, target_bindings_path.clone(), &mut zcash_so_file)
+                        copy_so_file_for(lang, target_bindings_path.clone(), &mut zcash_so_file)?;
+
+                        let bindings_dir = target_bindings_path.join(lang.to_string());
+                        // Needs to generate a swift module first
+                        // See https://mozilla.github.io/uniffi-rs/swift/module.html
+                        std::process::Command::new("swiftc")
+                            .arg("-module-name")
+                            .arg("zcash")
+                            .arg("-emit-library")
+                            .arg("-o")
+                            .arg(bindings_dir.join("libuniffi_zcash.dylib"))
+                            .arg("-emit-module")
+                            .arg("-emit-module-path")
+                            .arg(bindings_dir.clone())
+                            .arg("-L")
+                            .arg(target_path.clone())
+                            .arg(format!("-l{}", "uniffi_zcash"))
+                            .arg("-Xcc")
+                            .arg(format!(
+                                "-fmodule-map-file={}",
+                                bindings_dir.join("zcashFFI.modulemap").to_string_lossy()
+                            ))
+                            .arg(bindings_dir.join("zcash.swift"))
+                            .spawn()?
+                            .wait_with_output()?;
+                        Ok(())
                     }
                     SupportedLangs::Ruby => {
                         copy_so_file_for(lang, target_bindings_path.clone(), &mut zcash_so_file)
