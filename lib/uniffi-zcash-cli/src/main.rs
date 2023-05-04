@@ -51,7 +51,9 @@ fn main() -> CLIResult<()> {
                 .spawn()?
                 .wait_with_output()?;
 
-            let mut zcash_so_file = File::open(root_dir.join("target/release/libuniffi_zcash.so"))?;
+            let target_path = root_dir.join("target/release");
+
+            let mut zcash_so_file = File::open(target_path.join("libuniffi_zcash.so"))?;
 
             println!("{}", "Generating language bindings ...");
             SupportedLangs::iter().try_for_each(|lang| {
