@@ -1,8 +1,27 @@
-use std::{error::Error, fmt::Display, fs::File, io::Seek, path::PathBuf};
+use std::{
+    error::Error,
+    fmt::Display,
+    fs::File,
+    io::{Read, Seek},
+    path::PathBuf,
+};
 
 use clap::Command;
 
-const SUPPORTED_LANGUAGES: [&str; 4] = ["python", "kotlin", "swift", "ruby"];
+use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator, VariantNames};
+
+#[derive(Debug, Display, EnumString, EnumIter, EnumVariantNames)]
+#[strum(serialize_all = "kebab_case")]
+enum SupportedLangs {
+    #[strum(serialize = "python")]
+    Python,
+    #[strum(serialize = "kotlin")]
+    Kotlin,
+    #[strum(serialize = "swift")]
+    Swift,
+    #[strum(serialize = "ruby")]
+    Ruby,
+}
 
 fn main() -> CLIResult<()> {
     let matches = Command::new("UniFFI Zcash CLI")
@@ -11,7 +30,7 @@ fn main() -> CLIResult<()> {
         .subcommand_required(true)
         .subcommand(Command::new("generate").about(format!(
             "Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory",
-            SUPPORTED_LANGUAGES.join(",")
+            SupportedLangs::VARIANTS.join(",")
         )))
         .get_matches();
 
@@ -35,7 +54,7 @@ fn main() -> CLIResult<()> {
             let mut zcash_so_file = File::open(root_dir.join("target/release/libuniffi_zcash.so"))?;
 
             println!("{}", "Generating language bindings ...");
-            SUPPORTED_LANGUAGES.iter().try_for_each(|lang| {
+            SupportedLangs::iter().try_for_each(|lang| {
                 std::process::Command::new("cargo")
                     .arg("run")
                     .arg("-p")
@@ -45,20 +64,46 @@ fn main() -> CLIResult<()> {
                     .arg("--config")
                     .arg(root_dir.join("uniffi-bindgen/uniffi.toml"))
                     .arg("--language")
-                    .arg(lang)
+                    .arg(lang.to_string())
                     .arg("--out-dir")
-                    .arg(target_bindings_path.join(lang))
+                    .arg(target_bindings_path.join(lang.to_string()))
                     .spawn()?
                     .wait_with_output()?;
-                let mut lang_so_file =
-                    File::create(target_bindings_path.join(lang).join("libuniffi_zcash.so"))?;
-                zcash_so_file.rewind()?;
-                std::io::copy(&mut zcash_so_file, &mut lang_so_file)?;
-                Ok(())
+
+                // Language specific build stuff
+                match lang {
+                    SupportedLangs::Python => {
+                        copy_so_file_for(lang, target_bindings_path.clone(), &mut zcash_so_file)
+                    }
+                    SupportedLangs::Kotlin => {
+                        copy_so_file_for(lang, target_bindings_path.clone(), &mut zcash_so_file)
+                    }
+                    SupportedLangs::Swift => {
+                        copy_so_file_for(lang, target_bindings_path.clone(), &mut zcash_so_file)
+                    }
+                    SupportedLangs::Ruby => {
+                        copy_so_file_for(lang, target_bindings_path.clone(), &mut zcash_so_file)
+                    }
+                }
             })
         }
         _ => Err("Command not found. See help.".into()),
     }
+}
+
+fn copy_so_file_for<SR: Read + Seek>(
+    lang: SupportedLangs,
+    bindings_path: PathBuf,
+    zcash_so_file: &mut SR,
+) -> CLIResult<()> {
+    let mut lang_so_file = File::create(
+        bindings_path
+            .join(lang.to_string())
+            .join("libuniffi_zcash.so"),
+    )?;
+    zcash_so_file.rewind()?;
+    std::io::copy(zcash_so_file, &mut lang_so_file)?;
+    Ok(())
 }
 
 fn project_root_dir() -> CLIResult<PathBuf> {
