@@ -28,7 +28,7 @@ fn main() -> CLIResult<()> {
         )))
         .get_matches();
 
-    let root_dir = project_root_dir()?;
+    let root_dir = workspace_root_dir()?;
 
     match matches.subcommand() {
         Some(("generate", _)) => {
@@ -112,7 +112,7 @@ fn main() -> CLIResult<()> {
     }
 }
 
-fn project_root_dir() -> CLIResult<PathBuf> {
+fn workspace_root_dir() -> CLIResult<PathBuf> {
     let err_msg = "Cannot find parent path.";
     Ok(std::env::current_exe()?
         .parent()
