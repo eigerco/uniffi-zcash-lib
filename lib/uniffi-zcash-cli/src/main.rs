@@ -1,4 +1,9 @@
-use std::{error::Error, fmt::Display, fs::copy, path::PathBuf};
+use std::{
+    error::Error,
+    fmt::Display,
+    fs::{copy, remove_dir_all, rename},
+    path::PathBuf,
+};
 
 use clap::Command;
 
@@ -36,6 +41,8 @@ fn main() -> CLIResult<()> {
             let udl_path = root_dir.join("uniffi-zcash/src/zcash.udl");
             let target_bindings_path = root_dir.join("bindings");
             let target_path = root_dir.join("target/release");
+
+            _ = remove_dir_all(&target_bindings_path);
 
             // Generate the dynamic libraries.
             println!("Generating shared library ...");
@@ -77,7 +84,15 @@ fn main() -> CLIResult<()> {
                 // Language specific build stuff
                 match lang {
                     SupportedLangs::Python => Ok(()),
-                    SupportedLangs::Kotlin => Ok(()),
+                    SupportedLangs::Kotlin => {
+                        let inner_dir = bindings_dir.join("uniffi/zcash");
+                        rename(
+                            bindings_dir.join("libuniffi_zcash.so"),
+                            inner_dir.join("libuniffi_zcash.so"),
+                        )?;
+                        copy(root_dir.join("jna.jar"), inner_dir.join("jna.jar"))?;
+                        Ok(())
+                    }
                     SupportedLangs::Swift => {
                         println!("Generating swift module ...");
                         // Needs to generate a swift module first
