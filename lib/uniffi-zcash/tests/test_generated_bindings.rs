@@ -36,6 +36,7 @@ uniffi::build_foreign_language_testcases!(
     "tests/kotlin/zcash_primitives/sapling/sapling_ivk.kts",
     "tests/kotlin/zcash_primitives/zip32/sapling/extended_spending_key.kts",
     "tests/kotlin/zcash_primitives/zip32/diversifier_index_.kts",
+    "tests/kotlin/transaction.kts",
     // Python tests
     "tests/python/test.py",
     "tests/python/sapling.py",
@@ -45,8 +46,10 @@ uniffi::build_foreign_language_testcases!(
     "tests/ruby/test.rb",
     "tests/ruby/sapling.rb",
     "tests/ruby/orchard.rb",
+    "tests/ruby/transaction.rb",
     // Swift tests
     "tests/swift/test.swift",
     "tests/swift/sapling.swift",
-    "tests/swift/orchard.swift"
+    "tests/swift/orchard.swift",
+    "tests/swift/transaction.swift",
 );
