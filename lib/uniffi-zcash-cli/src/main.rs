@@ -113,16 +113,42 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
                     .arg("install")
                     .arg("--user")
                     .arg("--upgrade")
-                    .arg("setuptools")
-                    .arg("wheel")
+                    .arg("build")
                     .spawn()?
                     .wait_with_output()?;
 
                 std::process::Command::new("python")
-                    .arg("setup.py")
-                    .arg("sdist")
-                    .arg("bdist_wheel")
+                    .arg("-m")
+                    .arg("build")
+                    .current_dir(&lang_pack_dir)
+                    .spawn()?
+                    .wait_with_output()?;
+            }
+            // Install lib and test.
+            {
+                std::process::Command::new("python")
+                    .arg("-m")
+                    .arg("pip")
+                    .arg("install")
+                    .arg("--force-reinstall")
+                    .arg(".")
                     .current_dir(lang_pack_dir)
+                    .spawn()?
+                    .wait_with_output()?;
+
+                let test_app_path = Path::new("/tmp/zcash_uniffi_python_test_app");
+                _ = remove_dir_all(test_app_path);
+                create_dir_all(test_app_path)?;
+
+                dir::copy(
+                    package_template_dir.join("python_test_app"),
+                    test_app_path,
+                    &CopyOptions::new().content_only(true),
+                )?;
+
+                std::process::Command::new("python")
+                    .arg("app.py")
+                    .current_dir(test_app_path)
                     .spawn()?
                     .wait_with_output()?;
             }
