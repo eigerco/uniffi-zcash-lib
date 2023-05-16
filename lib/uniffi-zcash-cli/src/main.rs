@@ -27,7 +27,7 @@ fn main() -> CLIResult<()> {
         .version(env!("CARGO_PKG_VERSION"))
         .about("A CLI for managing internal repo workflows")
         .subcommand_required(true)
-        .subcommand(Command::new("generate").about(format!(
+        .subcommand(Command::new("bindgen").about(format!(
             "Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory",
             SupportedLangs::VARIANTS.join(",")
         )))
@@ -36,7 +36,7 @@ fn main() -> CLIResult<()> {
     let root_dir = workspace_root_dir()?;
 
     match matches.subcommand() {
-        Some(("generate", _)) => {
+        Some(("bindgen", _)) => {
             let shared_lib_path = generate_shared_lib(&root_dir)?;
             generate_bindings(&root_dir, &shared_lib_path)?;
             Ok(())
