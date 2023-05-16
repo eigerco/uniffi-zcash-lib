@@ -14,6 +14,7 @@ use fs_extra::{
     file::read_to_string,
 };
 use handlebars::Handlebars;
+use serde::Serialize;
 use serde_json::json;
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator, VariantNames};
 
@@ -136,7 +137,68 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
             }
             Ok(())
         }
-        SupportedLangs::Kotlin => Ok(()),
+        SupportedLangs::Kotlin => {
+            dir::copy(
+                package_template_dir.join(lang.to_string()),
+                &packaging_dir,
+                &CopyOptions::new(),
+            )?;
+
+            let lang_pack_dir = packaging_dir.join(lang.to_string());
+
+            // Copy all needed files from previously generated bindings operation
+            {
+                let bindings = bindings_path.join(lang.to_string());
+                let bindings_code = bindings.join("uniffi/zcash");
+                copy(
+                    bindings_code.join("libuniffi_zcash.so"),
+                    lang_pack_dir.join("lib/libs/libuniffi_zcash.so"),
+                )?;
+                copy(
+                    bindings_code.join("zcash.kt"),
+                    lang_pack_dir.join("lib/src/main/kotlin/zcash/Zcash.kt"),
+                )?;
+            }
+
+            // Modify in place the build.gradle.kts in order to set version in the template.
+            {
+                let gradle_path = lang_pack_dir.join("lib/build.gradle.kts");
+                in_file_template_replace(gradle_path, &json!({ "version": version }))?;
+            }
+
+            // Publish to local Maven, check everything is ok. Next step will exercise the dependency.
+            {
+                std::process::Command::new("gradle")
+                    .arg("publishToMavenLocal")
+                    .current_dir(&lang_pack_dir)
+                    .spawn()?
+                    .wait_with_output()?;
+            }
+
+            // Execute the little, built in APP test. Ensure all the build chain is ok.
+            {
+                let test_app_path = Path::new("/tmp/zcash_uniffi_kotlin_test_app");
+                _ = remove_dir_all(test_app_path);
+                create_dir_all(test_app_path)?;
+
+                dir::copy(
+                    package_template_dir.join("kotlin_test_app"),
+                    test_app_path,
+                    &CopyOptions::new().content_only(true),
+                )?;
+
+                in_file_template_replace(
+                    test_app_path.join("app/build.gradle.kts"),
+                    &json!({ "version": version }),
+                )?;
+                std::process::Command::new("gradle")
+                    .arg("run")
+                    .current_dir(test_app_path)
+                    .spawn()?
+                    .wait_with_output()?;
+            }
+            Ok(())
+        }
         SupportedLangs::Swift => Ok(()),
         SupportedLangs::Ruby => {
             dir::copy(
@@ -186,6 +248,23 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
             Ok(())
         }
     })
+}
+
+// Overwrites the provided file by rendering the provided data on it.
+fn in_file_template_replace<P, T>(file_path: P, data: &T) -> CLIResult<()>
+where
+    P: AsRef<Path>,
+    T: Serialize,
+{
+    let content = read_to_string(&file_path)?;
+    let reg = Handlebars::new();
+    let rendered = reg.render_template(&content, data)?;
+    let mut file = OpenOptions::new()
+        .write(true)
+        .truncate(true)
+        .open(&file_path)?;
+    file.write_all(rendered.as_bytes())?;
+    Ok(())
 }
 
 fn workspace_root_dir() -> CLIResult<PathBuf> {
