@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="test-uniffi-zcash",
-    version="{version}",
+    version="{{version}}",
     author="zcash",
     description="Zcash librustzcash python FFI layer",
     long_description=long_description,
@@ -17,5 +17,5 @@ setuptools.setup(
         "Programming Language :: Python",
         "Programming Language :: C"
     ],                                     
-    package_data=\{"zcash": ["libuniffi_zcash.so"]}
+    package_data={"zcash": ["libuniffi_zcash.so"]}
 )

@@ -13,9 +13,9 @@ use fs_extra::{
     dir::{self, CopyOptions},
     file::read_to_string,
 };
-use serde::Serialize;
+use handlebars::Handlebars;
+use serde_json::json;
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator, VariantNames};
-use tinytemplate::TinyTemplate;
 
 #[derive(Debug, Clone, Copy, Display, EnumString, EnumIter, EnumVariantNames)]
 #[strum(serialize_all = "kebab_case")]
@@ -103,14 +103,9 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
                 let setup_py_path = lang_pack_dir.join("setup.py");
                 let setup_py_content = read_to_string(&setup_py_path)?;
 
-                let mut tt = TinyTemplate::new();
-                tt.add_template("setup.py", &setup_py_content)?;
-                let versioned_setup_py = tt.render(
-                    "setup.py",
-                    &Publication {
-                        version: version.to_string(),
-                    },
-                )?;
+                let reg = Handlebars::new();
+                let versioned_setup_py =
+                    reg.render_template(&setup_py_content, &json!({ "version": version }))?;
                 let mut setup_py = OpenOptions::new()
                     .write(true)
                     .truncate(true)
@@ -169,16 +164,9 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
             {
                 let gemspec_path = lang_pack_dir.join("zcash.gemspec");
                 let gemspec_content = read_to_string(&gemspec_path)?;
-
-                let mut tt = TinyTemplate::new();
-                tt.add_template("zcash.gemspec", &gemspec_content)?;
-                let versioned_setup_py = tt.render(
-                    "zcash.gemspec",
-                    &Publication {
-                        version: version.to_string(),
-                    },
-                )?;
-
+                let reg = Handlebars::new();
+                let versioned_setup_py =
+                    reg.render_template(&gemspec_content, &json!({ "version": version }))?;
                 let mut gemspec = OpenOptions::new()
                     .write(true)
                     .truncate(true)
@@ -198,11 +186,6 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
             Ok(())
         }
     })
-}
-
-#[derive(Serialize)]
-struct Publication {
-    version: String,
 }
 
 fn workspace_root_dir() -> CLIResult<PathBuf> {
@@ -349,8 +332,8 @@ impl From<fs_extra::error::Error> for CLIError {
     }
 }
 
-impl From<tinytemplate::error::Error> for CLIError {
-    fn from(value: tinytemplate::error::Error) -> Self {
+impl From<handlebars::RenderError> for CLIError {
+    fn from(value: handlebars::RenderError) -> Self {
         Self {
             message: value.to_string(),
         }

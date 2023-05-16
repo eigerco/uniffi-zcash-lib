@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
     s.name        = "zcash"
-    s.version     = "{version}"
+    s.version     = "{{version}}"
     s.summary     = "The librustzcash ruby FFI binding"
     s.description = "A library for interacting with the librustzcash lib, a privacy oriented cryptocurrency"
     s.authors     = ["test"]
