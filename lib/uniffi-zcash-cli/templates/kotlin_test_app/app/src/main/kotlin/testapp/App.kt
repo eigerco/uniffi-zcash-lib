@@ -15,5 +15,5 @@ class App {
 fun main() {
     val app = App()
     app.callAmount()
-    println("Kotlin test application succesfully executed ✅")
+    println("Kotlin test application successfully executed ✅")
 }
