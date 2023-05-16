@@ -5,7 +5,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use clap::Command;
+use clap::{parser::MatchesError, Arg, Command};
 
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator, VariantNames};
 
@@ -31,6 +31,11 @@ fn main() -> CLIResult<()> {
             "Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory",
             SupportedLangs::VARIANTS.join(",")
         )))
+        .subcommand(Command::new("release").about(format!(
+            "Prepares a release given a version (semantic versioning), creating all languages ({}) specific packages. It needs to be executed after the bindgen command",
+            SupportedLangs::VARIANTS.join(",")
+        ))
+        .arg(Arg::new("version").required(true)))
         .get_matches();
 
     let root_dir = workspace_root_dir()?;
@@ -39,6 +44,11 @@ fn main() -> CLIResult<()> {
         Some(("bindgen", _)) => {
             let shared_lib_path = generate_shared_lib(&root_dir)?;
             generate_bindings(&root_dir, &shared_lib_path)?;
+            Ok(())
+        }
+        Some(("release", args)) => {
+            let version = args.try_get_one::<String>("version")?.unwrap();
+            println!("{}", version);
             Ok(())
         }
         _ => Err("Command not found. See help.".into()),
@@ -168,6 +178,14 @@ impl From<&str> for CLIError {
 impl From<std::io::Error> for CLIError {
     fn from(value: std::io::Error) -> Self {
         CLIError {
+            message: value.to_string(),
+        }
+    }
+}
+
+impl From<MatchesError> for CLIError {
+    fn from(value: MatchesError) -> Self {
+        Self {
             message: value.to_string(),
         }
     }
