@@ -117,10 +117,9 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
                     .open(&setup_py_path)?;
                 setup_py.write_all(versioned_setup_py.as_bytes())?;
             }
-            
+
             // Prepare python distribution files
             {
-                
                 std::process::Command::new("python")
                     .arg("-m")
                     .arg("pip")
@@ -144,7 +143,60 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
         }
         SupportedLangs::Kotlin => Ok(()),
         SupportedLangs::Swift => Ok(()),
-        SupportedLangs::Ruby => Ok(()),
+        SupportedLangs::Ruby => {
+            dir::copy(
+                package_template_dir.join(lang.to_string()),
+                &packaging_dir,
+                &CopyOptions::new(),
+            )?;
+
+            let lang_pack_dir = packaging_dir.join(lang.to_string());
+
+            // Copy all needed files from previously generated bindings operation
+            {
+                let bindings = bindings_path.join(lang.to_string());
+                copy(
+                    bindings.join("libuniffi_zcash.so"),
+                    lang_pack_dir.join("lib/libuniffi_zcash.so"),
+                )?;
+                copy(
+                    bindings.join("zcash.rb"),
+                    lang_pack_dir.join("lib/zcash.rb"),
+                )?;
+            }
+
+            // Modify in place the gemspec in order to set version in the template.
+            {
+                let gemspec_path = lang_pack_dir.join("zcash.gemspec");
+                let gemspec_content = read_to_string(&gemspec_path)?;
+
+                let mut tt = TinyTemplate::new();
+                tt.add_template("zcash.gemspec", &gemspec_content)?;
+                let versioned_setup_py = tt.render(
+                    "zcash.gemspec",
+                    &Publication {
+                        version: version.to_string(),
+                    },
+                )?;
+
+                let mut gemspec = OpenOptions::new()
+                    .write(true)
+                    .truncate(true)
+                    .open(&gemspec_path)?;
+                gemspec.write_all(versioned_setup_py.as_bytes())?;
+            }
+
+            // Prepare Ruby distribution files
+            {
+                std::process::Command::new("gem")
+                    .arg("build")
+                    .arg("zcash.gemspec")
+                    .current_dir(lang_pack_dir)
+                    .spawn()?
+                    .wait_with_output()?;
+            }
+            Ok(())
+        }
     })
 }
 
