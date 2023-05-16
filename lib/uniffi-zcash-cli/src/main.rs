@@ -102,16 +102,7 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
             // Modify in place setup.py in order to set version in the template.
             {
                 let setup_py_path = lang_pack_dir.join("setup.py");
-                let setup_py_content = read_to_string(&setup_py_path)?;
-
-                let reg = Handlebars::new();
-                let versioned_setup_py =
-                    reg.render_template(&setup_py_content, &json!({ "version": version }))?;
-                let mut setup_py = OpenOptions::new()
-                    .write(true)
-                    .truncate(true)
-                    .open(&setup_py_path)?;
-                setup_py.write_all(versioned_setup_py.as_bytes())?;
+                in_file_template_replace(setup_py_path, &json!({ "version": version }))?;
             }
 
             // Prepare python distribution files
@@ -225,15 +216,7 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
             // Modify in place the gemspec in order to set version in the template.
             {
                 let gemspec_path = lang_pack_dir.join("zcash.gemspec");
-                let gemspec_content = read_to_string(&gemspec_path)?;
-                let reg = Handlebars::new();
-                let versioned_gemspec =
-                    reg.render_template(&gemspec_content, &json!({ "version": version }))?;
-                let mut gemspec = OpenOptions::new()
-                    .write(true)
-                    .truncate(true)
-                    .open(&gemspec_path)?;
-                gemspec.write_all(versioned_gemspec.as_bytes())?;
+                in_file_template_replace(gemspec_path, &json!({ "version": version }))?;
             }
 
             // Prepare Ruby distribution files
