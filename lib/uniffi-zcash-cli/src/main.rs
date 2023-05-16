@@ -165,13 +165,13 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
                 let gemspec_path = lang_pack_dir.join("zcash.gemspec");
                 let gemspec_content = read_to_string(&gemspec_path)?;
                 let reg = Handlebars::new();
-                let versioned_setup_py =
+                let versioned_gemspec =
                     reg.render_template(&gemspec_content, &json!({ "version": version }))?;
                 let mut gemspec = OpenOptions::new()
                     .write(true)
                     .truncate(true)
                     .open(&gemspec_path)?;
-                gemspec.write_all(versioned_setup_py.as_bytes())?;
+                gemspec.write_all(versioned_gemspec.as_bytes())?;
             }
 
             // Prepare Ruby distribution files
