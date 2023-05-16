@@ -45,6 +45,29 @@ fn main() -> CLIResult<()> {
     }
 }
 
+fn workspace_root_dir() -> CLIResult<PathBuf> {
+    let err_msg = "Cannot find parent path.";
+    Ok(std::env::current_exe()?
+        .parent()
+        .ok_or(err_msg)?
+        .parent()
+        .ok_or(err_msg)?
+        .parent()
+        .ok_or(err_msg)?
+        .to_owned())
+}
+
+fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
+    println!("Generating shared library ...");
+    std::process::Command::new("cargo")
+        .arg("build")
+        .arg("--release")
+        .current_dir(root_dir)
+        .spawn()?
+        .wait_with_output()?;
+    Ok(root_dir.join("target/release/libuniffi_zcash.so"))
+}
+
 fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
     // Define paths
     let udl_path = root_dir.join("uniffi-zcash/src/zcash.udl");
@@ -74,7 +97,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
             .join(lang.to_string())
             .join("libuniffi_zcash.so");
 
-        copy(&shared_lib, shared_lib_dest_path)?;
+        copy(shared_lib, shared_lib_dest_path)?;
 
         let bindings_dir = target_bindings_path.join(lang.to_string());
 
@@ -92,8 +115,8 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
             }
             SupportedLangs::Swift => {
                 println!("Generating swift module ...");
-                // Needs to generate a swift module first
-                // See https://mozilla.github.io/uniffi-rs/swift/module.html
+                // We are generating this module for completion, but we are probably not going
+                // to use it. See https://mozilla.github.io/uniffi-rs/swift/module.html
                 std::process::Command::new("swiftc")
                     .arg("-module-name")
                     .arg("zcash")
@@ -119,29 +142,6 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
             SupportedLangs::Ruby => Ok(()),
         }
     })
-}
-
-fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
-    println!("Generating shared library ...");
-    std::process::Command::new("cargo")
-        .arg("build")
-        .arg("--release")
-        .current_dir(root_dir)
-        .spawn()?
-        .wait_with_output()?;
-    Ok(root_dir.join("target/release/libuniffi_zcash.so"))
-}
-
-fn workspace_root_dir() -> CLIResult<PathBuf> {
-    let err_msg = "Cannot find parent path.";
-    Ok(std::env::current_exe()?
-        .parent()
-        .ok_or(err_msg)?
-        .parent()
-        .ok_or(err_msg)?
-        .parent()
-        .ok_or(err_msg)?
-        .to_owned())
 }
 
 #[derive(Debug)]
