@@ -39,6 +39,7 @@ fn main() -> CLIResult<()> {
         .get_matches();
 
     let root_dir = workspace_root_dir()?;
+    set_current_dir(&root_dir)?;
 
     match matches.subcommand() {
         Some(("bindgen", _)) => {
