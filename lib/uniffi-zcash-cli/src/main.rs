@@ -1,13 +1,21 @@
 use std::{
+    env::set_current_dir,
     error::Error,
     fmt::Display,
-    fs::{copy, remove_dir_all, rename},
+    fs::{self, copy, create_dir_all, remove_dir_all, rename, OpenOptions},
+    io::Write,
     path::{Path, PathBuf},
 };
 
 use clap::{parser::MatchesError, Arg, Command};
 
+use fs_extra::{
+    dir::{self, CopyOptions},
+    file::read_to_string,
+};
+use serde::Serialize;
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator, VariantNames};
+use tinytemplate::TinyTemplate;
 
 #[derive(Debug, Clone, Copy, Display, EnumString, EnumIter, EnumVariantNames)]
 #[strum(serialize_all = "kebab_case")]
@@ -49,11 +57,100 @@ fn main() -> CLIResult<()> {
         }
         Some(("release", args)) => {
             let version = args.try_get_one::<String>("version")?.unwrap();
-            println!("{}", version);
+            prepare_release(&root_dir, version)?;
             Ok(())
         }
         _ => Err("Command not found. See help.".into()),
     }
+}
+
+fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
+    let bindings_path = root_dir.join("bindings");
+    if !bindings_path.exists() {
+        return Err("This command depends on the output of bindgen . Execute it first.".into());
+    }
+    let packaging_dir = root_dir.join("packages");
+    let package_template_dir = root_dir.join("uniffi-zcash-cli/templates");
+
+    _ = remove_dir_all(&packaging_dir);
+    create_dir_all(&packaging_dir)?;
+
+    SupportedLangs::iter().try_for_each(|lang| match lang {
+        SupportedLangs::Python => {
+            dir::copy(
+                package_template_dir.join(lang.to_string()),
+                &packaging_dir,
+                &CopyOptions::new(),
+            )?;
+
+            let lang_pack_dir = packaging_dir.join(lang.to_string());
+
+            // Copy all needed files from previously generated bindings operation
+            {
+                let bindings = bindings_path.join(lang.to_string());
+                copy(
+                    bindings.join("libuniffi_zcash.so"),
+                    lang_pack_dir.join("zcash/libuniffi_zcash.so"),
+                )?;
+                copy(
+                    bindings.join("zcash.py"),
+                    lang_pack_dir.join("zcash/zcash.py"),
+                )?;
+            }
+
+            // Modify in place setup.py in order to set version in the template.
+            {
+                let setup_py_path = lang_pack_dir.join("setup.py");
+                let setup_py_content = read_to_string(&setup_py_path)?;
+
+                let mut tt = TinyTemplate::new();
+                tt.add_template("setup.py", &setup_py_content)?;
+                let versioned_setup_py = tt.render(
+                    "setup.py",
+                    &Publication {
+                        version: version.to_string(),
+                    },
+                )?;
+                let mut setup_py = OpenOptions::new()
+                    .write(true)
+                    .truncate(true)
+                    .open(&setup_py_path)?;
+                setup_py.write_all(versioned_setup_py.as_bytes())?;
+            }
+            
+            // Prepare python distribution files
+            {
+                
+                std::process::Command::new("python")
+                    .arg("-m")
+                    .arg("pip")
+                    .arg("install")
+                    .arg("--user")
+                    .arg("--upgrade")
+                    .arg("setuptools")
+                    .arg("wheel")
+                    .spawn()?
+                    .wait_with_output()?;
+
+                std::process::Command::new("python")
+                    .arg("setup.py")
+                    .arg("sdist")
+                    .arg("bdist_wheel")
+                    .current_dir(lang_pack_dir)
+                    .spawn()?
+                    .wait_with_output()?;
+            }
+            Ok(())
+        }
+        SupportedLangs::Kotlin => Ok(()),
+        SupportedLangs::Swift => Ok(()),
+        SupportedLangs::Ruby => Ok(()),
+    })
+}
+
+#[derive(Serialize)]
+struct Publication {
+    version: String,
 }
 
 fn workspace_root_dir() -> CLIResult<PathBuf> {
@@ -108,7 +205,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
             .join(lang.to_string())
             .join("libuniffi_zcash.so");
 
-        copy(shared_lib, shared_lib_dest_path)?;
+        fs::copy(shared_lib, shared_lib_dest_path)?;
 
         let bindings_dir = target_bindings_path.join(lang.to_string());
 
@@ -121,7 +218,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
                     bindings_dir.join("libuniffi_zcash.so"),
                     inner_dir.join("libuniffi_zcash.so"),
                 )?;
-                copy(root_dir.join("jna.jar"), inner_dir.join("jna.jar"))?;
+                fs::copy(root_dir.join("jna.jar"), inner_dir.join("jna.jar"))?;
                 Ok(())
             }
             SupportedLangs::Swift => {
@@ -186,6 +283,22 @@ impl From<std::io::Error> for CLIError {
 
 impl From<MatchesError> for CLIError {
     fn from(value: MatchesError) -> Self {
+        Self {
+            message: value.to_string(),
+        }
+    }
+}
+
+impl From<fs_extra::error::Error> for CLIError {
+    fn from(value: fs_extra::error::Error) -> Self {
+        Self {
+            message: value.to_string(),
+        }
+    }
+}
+
+impl From<tinytemplate::error::Error> for CLIError {
+    fn from(value: tinytemplate::error::Error) -> Self {
         Self {
             message: value.to_string(),
         }

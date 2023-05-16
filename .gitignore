@@ -11,3 +11,4 @@ lib/Cargo.lock
 
 lib/uniffi-zcash/src/zcash.udl
 bindings
+packages
