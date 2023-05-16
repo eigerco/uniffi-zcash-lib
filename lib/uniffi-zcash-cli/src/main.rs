@@ -36,29 +36,21 @@ fn main() -> CLIResult<()> {
     let root_dir = workspace_root_dir()?;
 
     match matches.subcommand() {
-        Some(("generate", _)) => generate_bindings(&root_dir),
+        Some(("generate", _)) => {
+            let shared_lib_path = generate_shared_lib(&root_dir)?;
+            generate_bindings(&root_dir, &shared_lib_path)?;
+            Ok(())
+        }
         _ => Err("Command not found. See help.".into()),
     }
 }
 
-fn generate_bindings(root_dir: &Path) -> CLIResult<()> {
+fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
     // Define paths
     let udl_path = root_dir.join("uniffi-zcash/src/zcash.udl");
     let target_bindings_path = root_dir.join("bindings");
-    let target_path = root_dir.join("target/release");
 
     _ = remove_dir_all(&target_bindings_path);
-
-    // Generate the dynamic libraries.
-    println!("Generating shared library ...");
-    std::process::Command::new("cargo")
-        .arg("build")
-        .arg("--release")
-        .current_dir(root_dir)
-        .spawn()?
-        .wait_with_output()?;
-
-    let zcash_shared_lib_path = target_path.join("libuniffi_zcash.so");
 
     println!("Generating language bindings ...");
     SupportedLangs::iter().try_for_each(|lang| {
@@ -82,7 +74,7 @@ fn generate_bindings(root_dir: &Path) -> CLIResult<()> {
             .join(lang.to_string())
             .join("libuniffi_zcash.so");
 
-        copy(&zcash_shared_lib_path, shared_lib_dest_path)?;
+        copy(&shared_lib, shared_lib_dest_path)?;
 
         let bindings_dir = target_bindings_path.join(lang.to_string());
 
@@ -112,7 +104,7 @@ fn generate_bindings(root_dir: &Path) -> CLIResult<()> {
                     .arg("-emit-module-path")
                     .arg(&bindings_dir)
                     .arg("-L")
-                    .arg(&target_path)
+                    .arg(root_dir.join("target/release"))
                     .arg(format!("-l{}", "uniffi_zcash"))
                     .arg("-Xcc")
                     .arg(format!(
@@ -127,6 +119,17 @@ fn generate_bindings(root_dir: &Path) -> CLIResult<()> {
             SupportedLangs::Ruby => Ok(()),
         }
     })
+}
+
+fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
+    println!("Generating shared library ...");
+    std::process::Command::new("cargo")
+        .arg("build")
+        .arg("--release")
+        .current_dir(root_dir)
+        .spawn()?
+        .wait_with_output()?;
+    Ok(root_dir.join("target/release/libuniffi_zcash.so"))
 }
 
 fn workspace_root_dir() -> CLIResult<PathBuf> {
