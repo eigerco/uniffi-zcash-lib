@@ -4,7 +4,7 @@ use std::{
     fmt::Display,
     fs::{self, copy, create_dir_all, remove_dir_all, rename, OpenOptions},
     io::Write,
-    path::{Path, PathBuf},
+    path::{self, Path, PathBuf},
 };
 
 use clap::{parser::MatchesError, Arg, Command};
@@ -17,6 +17,7 @@ use handlebars::Handlebars;
 use serde::Serialize;
 use serde_json::json;
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator, VariantNames};
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy, Display, EnumString, EnumIter, EnumVariantNames)]
 #[strum(serialize_all = "kebab_case")]
@@ -136,13 +137,11 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
                     .spawn()?
                     .wait_with_output()?;
 
-                let test_app_path = Path::new("/tmp/zcash_uniffi_python_test_app");
-                _ = remove_dir_all(test_app_path);
-                create_dir_all(test_app_path)?;
+                let test_app_path = tmp_folder()?;
 
                 dir::copy(
                     package_template_dir.join("python_test_app"),
-                    test_app_path,
+                    &test_app_path,
                     &CopyOptions::new().content_only(true),
                 )?;
 
@@ -194,13 +193,11 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
 
             // Execute the little, built in APP test. Ensure all the build chain is ok.
             {
-                let test_app_path = Path::new("/tmp/zcash_uniffi_kotlin_test_app");
-                _ = remove_dir_all(test_app_path);
-                create_dir_all(test_app_path)?;
+                let test_app_path = tmp_folder()?;
 
                 dir::copy(
                     package_template_dir.join("kotlin_test_app"),
-                    test_app_path,
+                    &test_app_path,
                     &CopyOptions::new().content_only(true),
                 )?;
 
@@ -286,13 +283,10 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
                     .spawn()?
                     .wait_with_output()?;
 
-                let test_app_path = Path::new("/tmp/zcash_uniffi_ruby_test_app");
-                _ = remove_dir_all(test_app_path);
-                create_dir_all(test_app_path)?;
-
+                let test_app_path = tmp_folder()?;
                 dir::copy(
                     package_template_dir.join("ruby_test_app"),
-                    test_app_path,
+                    &test_app_path,
                     &CopyOptions::new().content_only(true),
                 )?;
 
@@ -307,7 +301,18 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
     })
 }
 
-// Overwrites the provided file by rendering the provided data on it.
+/// Generates a collision free /tmp folder
+fn tmp_folder() -> CLIResult<PathBuf> {
+    let uuid = Uuid::new_v4();
+    let name = format!("zcash_uniffi_{}", uuid);
+    let path_buff = Path::new(path::MAIN_SEPARATOR_STR)
+        .join("tmp")
+        .join(name);
+    create_dir_all(&path_buff)?;
+    Ok(path_buff)
+}
+
+/// Overwrites the provided file by rendering the provided data on it.
 fn in_file_template_replace<P, T>(file_path: P, data: &T) -> CLIResult<()>
 where
     P: AsRef<Path>,
