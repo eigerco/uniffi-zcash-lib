@@ -4,7 +4,7 @@ use std::{
     fmt::Display,
     fs::{self, copy, create_dir_all, remove_dir_all, rename, OpenOptions},
     io::Write,
-    path::{self, Path, PathBuf},
+    path::{Path, PathBuf},
 };
 
 use clap::{parser::MatchesError, Arg, Command};
@@ -41,11 +41,24 @@ fn main() -> CLIResult<()> {
             "Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory",
             SupportedLangs::VARIANTS.join(",")
         )))
-        .subcommand(Command::new("release").about(format!(
+        .subcommand(
+            Command::new("release").about(format!(
             "Prepares a release given a version (semantic versioning), creating all languages ({}) specific packages. It needs to be executed after the bindgen command",
-            SupportedLangs::VARIANTS.join(",")
-        ))
-        .arg(Arg::new("version").required(true)))
+            SupportedLangs::VARIANTS.join(",")))
+            .arg(
+                Arg::new("version")
+                .short('v')
+                .long("version")
+                .required(true)
+            )
+            .arg(
+                Arg::new("swift_repo_url")
+                .long("swift-repo-url")
+                .required(true)
+                .env("SWIFT_GIT_REPO_URL")
+                .help("For auth, use a Github personal access token.\nSee https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\nExample: https://<github-username>:<github-token>@github.com/<your-repository>.git")
+            )
+        )
         .get_matches();
 
     let root_dir = workspace_root_dir()?;
@@ -59,14 +72,15 @@ fn main() -> CLIResult<()> {
         }
         Some(("release", args)) => {
             let version = args.try_get_one::<String>("version")?.unwrap();
-            prepare_release(&root_dir, version)?;
+            let swift_repo_url = args.try_get_one::<String>("swift_repo_url")?.unwrap();
+            prepare_release(&root_dir, version, swift_repo_url)?;
             Ok(())
         }
         _ => Err("Command not found. See help.".into()),
     }
 }
 
-fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
+fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIResult<()> {
     let bindings_path = root_dir.join("bindings");
     if !bindings_path.exists() {
         return Err("This command depends on the output of bindgen . Execute it first.".into());
@@ -218,7 +232,92 @@ fn prepare_release(root_dir: &Path, version: &str) -> CLIResult<()> {
             }
             Ok(())
         }
-        SupportedLangs::Swift => Ok(()),
+        SupportedLangs::Swift => {
+            let lang_pack_dir = packaging_dir.join(lang.to_string()).join("Zcash");
+            {
+                std::process::Command::new("git")
+                    .arg("clone")
+                    .arg(swift_repo_url)
+                    .arg(&lang_pack_dir)
+                    .spawn()?
+                    .wait_with_output()?;
+            }
+            
+            {
+                dir::copy(
+                    package_template_dir.join(lang.to_string()),
+                    &lang_pack_dir,
+                    &CopyOptions::new().overwrite(true).content_only(true),
+                )?;
+            }
+
+            // Copy all needed files from previously generated bindings operation
+            {
+                let bindings = bindings_path.join(lang.to_string());
+                copy(
+                    bindings.join("libuniffi_zcash.so"),
+                    lang_pack_dir.join("Sources").join("zcashFFI").join("libuniffi_zcash.so"),
+                )?;
+                copy(
+                    bindings.join("zcashFFI.h"),
+                    lang_pack_dir.join("Sources").join("zcashFFI").join("uniffi_zcash.h"),
+                )?;
+                copy(
+                    bindings.join("zcash.swift"),
+                    lang_pack_dir.join("Sources").join("Zcash").join("zcash.swift"),
+                )?;
+            }
+            // Commit and tag the version
+            {
+                std::process::Command::new("git")
+                .arg("add")
+                .arg(".")
+                .current_dir(&lang_pack_dir)
+                .spawn()?
+                .wait()?;
+
+                std::process::Command::new("git")
+                .arg("commit")
+                .arg("-m")
+                .arg(format!("Version {}", version))
+                .current_dir(&lang_pack_dir)
+                .spawn()?
+                .wait()?;
+
+                std::process::Command::new("git")
+                .arg("tag")
+                .arg(version)
+                .current_dir(&lang_pack_dir)
+                .spawn()?
+                .wait()?;
+            }
+
+            // Execute the test app for testing all generated stuff.
+            {
+                let test_app_path = tmp_folder()?;
+
+                dir::copy(
+                    package_template_dir.join("swift_test_app"),
+                    &test_app_path,
+                    &CopyOptions::new().content_only(true),
+                )?;
+
+                // Use the previously generated git package for testing against.
+                let data = &json!({ "version": version, "git_repo_path": &lang_pack_dir});
+                in_file_template_replace(test_app_path.join("Package.swift"), data)?;
+
+                let generated_shared_lib_path = lang_pack_dir.join("Sources").join("zcashFFI");
+                std::process::Command::new("swift")
+                    .current_dir(test_app_path)
+                    .arg("run")
+                    .arg("-Xlinker")
+                    .arg(format!("-L{}", generated_shared_lib_path.as_path().to_string_lossy()))
+                    .env("LD_LIBRARY_PATH", generated_shared_lib_path)
+                    .spawn()?
+                    .wait()?;
+            }
+            Ok(())
+        },
         SupportedLangs::Ruby => {
             dir::copy(
                 package_template_dir.join(lang.to_string()),
