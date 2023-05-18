@@ -154,14 +154,14 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                     .arg("--upgrade")
                     .arg("build")
                     .spawn()?
-                    .wait_with_output()?;
+                    .wait()?;
 
                 std::process::Command::new("python")
                     .arg("-m")
                     .arg("build")
                     .current_dir(&lang_pack_dir)
                     .spawn()?
-                    .wait_with_output()?;
+                    .wait()?;
             }
             // Install lib and test.
             {
@@ -173,7 +173,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                     .arg(".")
                     .current_dir(lang_pack_dir)
                     .spawn()?
-                    .wait_with_output()?;
+                    .wait()?;
 
                 let test_app_path = tmp_folder()?;
 
@@ -187,7 +187,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                     .arg("app.py")
                     .current_dir(test_app_path)
                     .spawn()?
-                    .wait_with_output()?;
+                    .wait()?;
             }
             Ok(())
         }
@@ -231,7 +231,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                     .arg("publishToMavenLocal")
                     .current_dir(&lang_pack_dir)
                     .spawn()?
-                    .wait_with_output()?;
+                    .wait()?;
             }
 
             // Execute the little, built in APP test. Ensure all the build chain is ok.
@@ -252,7 +252,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                     .arg("run")
                     .current_dir(test_app_path)
                     .spawn()?
-                    .wait_with_output()?;
+                    .wait()?;
             }
             Ok(())
         }
@@ -264,7 +264,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                     .arg(swift_repo_url)
                     .arg(&lang_pack_dir)
                     .spawn()?
-                    .wait_with_output()?;
+                    .wait()?;
             }
             
             {
@@ -399,7 +399,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                     .arg("zcash.gemspec")
                     .current_dir(&lang_pack_dir)
                     .spawn()?
-                    .wait_with_output()?;
+                    .wait()?;
             }
 
             // Install and test
@@ -409,7 +409,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                     .arg(format!("./zcash-{}.gem", version))
                     .current_dir(lang_pack_dir)
                     .spawn()?
-                    .wait_with_output()?;
+                    .wait()?;
 
                 let test_app_path = tmp_folder()?;
                 dir::copy(
@@ -422,7 +422,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                     .arg("app.rb")
                     .current_dir(test_app_path)
                     .spawn()?
-                    .wait_with_output()?;
+                    .wait()?;
             }
             Ok(())
         }
@@ -474,7 +474,7 @@ fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
         .arg("--release")
         .current_dir(root_dir)
         .spawn()?
-        .wait_with_output()?;
+        .wait()?;
     Ok(root_dir
         .join("target")
         .join("release")
@@ -504,7 +504,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
             .arg("--out-dir")
             .arg(target_bindings_path.join(lang.to_string()))
             .spawn()?
-            .wait_with_output()?;
+            .wait()?;
 
         let shared_lib_dest_path = target_bindings_path
             .join(lang.to_string())
@@ -549,7 +549,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
                     ))
                     .arg(bindings_dir.join("zcash.swift"))
                     .spawn()?
-                    .wait_with_output()?;
+                    .wait()?;
                 Ok(())
             }
             SupportedLangs::Ruby => Ok(()),
