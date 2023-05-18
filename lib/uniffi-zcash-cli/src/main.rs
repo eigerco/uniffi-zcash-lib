@@ -10,12 +10,13 @@ use fs_extra::{
     dir::{self, CopyOptions},
     file::read_to_string,
 };
-
-use handlebars::Handlebars;
-use serde::Serialize;
+use helper::{workspace_root_dir, in_file_template_replace};
 use serde_json::json;
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator};
 use uuid::Uuid;
+
+mod cli;
+mod helper;
 
 #[derive(Debug, Clone, Copy, Display, EnumString, EnumIter, EnumVariantNames)]
 #[strum(serialize_all = "kebab_case")]
@@ -29,8 +30,6 @@ enum SupportedLangs {
     #[strum(serialize = "ruby")]
     Ruby,
 }
-
-mod cli;
 
 fn main() -> CLIResult<()> {
     let matches = get_matches();
@@ -386,35 +385,6 @@ fn tmp_folder() -> CLIResult<PathBuf> {
     let path_buff = std::env::temp_dir().join(name);
     create_dir_all(&path_buff)?;
     Ok(path_buff)
-}
-
-/// Overwrites the provided file by rendering the provided data on it.
-fn in_file_template_replace<P, T>(file_path: P, data: &T) -> CLIResult<()>
-where
-    P: AsRef<Path>,
-    T: Serialize,
-{
-    let content = read_to_string(&file_path)?;
-    let reg = Handlebars::new();
-    let rendered = reg.render_template(&content, data)?;
-    let mut file = OpenOptions::new()
-        .write(true)
-        .truncate(true)
-        .open(&file_path)?;
-    file.write_all(rendered.as_bytes())?;
-    Ok(())
-}
-
-fn workspace_root_dir() -> CLIResult<PathBuf> {
-    let err_msg = "Cannot find parent path.";
-    Ok(std::env::current_exe()?
-        .parent()
-        .ok_or(err_msg)?
-        .parent()
-        .ok_or(err_msg)?
-        .parent()
-        .ok_or(err_msg)?
-        .to_owned())
 }
 
 fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
