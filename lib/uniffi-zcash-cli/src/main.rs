@@ -2,7 +2,7 @@ use std::{
     env::set_current_dir,
     fs::{self, copy, create_dir_all, remove_dir_all, rename, OpenOptions},
     io::Write,
-    path::{Path, PathBuf},
+    path::{Path, PathBuf}, process::Command,
 };
 
 use cli::{get_matches, CLIResult};
@@ -93,7 +93,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             
 
             // Prepare python distribution files
-            cmd_success(std::process::Command::new("python")
+            cmd_success(Command::new("python")
                 .arg("-m")
                 .arg("pip")
                 .arg("install")
@@ -104,7 +104,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 .wait()
             )?;
 
-            cmd_success(std::process::Command::new("python")
+            cmd_success(Command::new("python")
                 .arg("-m")
                 .arg("build")
                 .current_dir(&lang_pack_dir)
@@ -113,7 +113,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             )?;
             
             // Install lib and test.
-            cmd_success(std::process::Command::new("python")
+            cmd_success(Command::new("python")
                 .arg("-m")
                 .arg("pip")
                 .arg("install")
@@ -132,7 +132,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 &CopyOptions::new().content_only(true),
             )?;
             
-            cmd_success(std::process::Command::new("python")
+            cmd_success(Command::new("python")
                 .arg("app.py")
                 .current_dir(test_app_path)
                 .spawn()?
@@ -172,7 +172,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             in_file_template_replace(gradle_path, &json!({ "version": version }))?;
             
             // Publish to local Maven, check everything is ok. Next step will exercise the dependency.     
-            cmd_success(std::process::Command::new("gradle")
+            cmd_success(Command::new("gradle")
                 .arg("publishToMavenLocal")
                 .current_dir(&lang_pack_dir)
                 .spawn()?
@@ -192,7 +192,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 test_app_path.join("app").join("build.gradle.kts"),
                 &json!({ "version": version }),
             )?;
-            cmd_success(std::process::Command::new("gradle")
+            cmd_success(Command::new("gradle")
                 .arg("run")
                 .current_dir(test_app_path)
                 .spawn()?
@@ -204,7 +204,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
         SupportedLangs::Swift => {
             let lang_pack_dir = packaging_dir.join(lang.to_string()).join("Zcash");
             
-            cmd_success(std::process::Command::new("git")
+            cmd_success(Command::new("git")
                 .arg("clone")
                 .arg(swift_repo_url)
                 .arg(&lang_pack_dir)
@@ -234,7 +234,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             )?;
             
             // Commit and tag the version
-            cmd_success(std::process::Command::new("git")
+            cmd_success(Command::new("git")
                 .arg("add")
                 .arg(".")
                 .current_dir(&lang_pack_dir)
@@ -242,7 +242,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 .wait()
             )?;
 
-            cmd_success(std::process::Command::new("git")
+            cmd_success(Command::new("git")
                 .arg("commit")
                 .arg("-m")
                 .arg(format!("Version {}", version))
@@ -251,7 +251,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 .wait()
             )?;
 
-            cmd_success(std::process::Command::new("git")
+            cmd_success(Command::new("git")
                 .arg("tag")
                 .arg(version)
                 .current_dir(&lang_pack_dir)
@@ -273,7 +273,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             in_file_template_replace(test_app_path.join("Package.swift"), data)?;
 
             let generated_shared_lib_path = lang_pack_dir.join("Sources").join("zcashFFI");
-            cmd_success(std::process::Command::new("swift")
+            cmd_success(Command::new("swift")
                 .current_dir(test_app_path)
                 .arg("run")
                 .arg("-Xlinker")
@@ -335,7 +335,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
 
             // Prepare Ruby distribution files
             
-            cmd_success(std::process::Command::new("gem")
+            cmd_success(Command::new("gem")
                 .arg("build")
                 .arg("zcash.gemspec")
                 .current_dir(&lang_pack_dir)
@@ -346,7 +346,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
 
             // Install and test
             
-            cmd_success(std::process::Command::new("gem")
+            cmd_success(Command::new("gem")
                 .arg("install")
                 .arg(format!("./zcash-{}.gem", version))
                 .current_dir(lang_pack_dir)
@@ -361,7 +361,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 &CopyOptions::new().content_only(true),
             )?;
 
-            cmd_success(std::process::Command::new("ruby")
+            cmd_success(Command::new("ruby")
                 .arg("app.rb")
                 .current_dir(test_app_path)
                 .spawn()?
@@ -384,7 +384,7 @@ fn tmp_folder() -> CLIResult<PathBuf> {
 
 fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
     println!("Generating shared library ...");
-    cmd_success(std::process::Command::new("cargo")
+    cmd_success(Command::new("cargo")
         .arg("build")
         .arg("--release")
         .current_dir(root_dir)
@@ -407,7 +407,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
     println!("Generating language bindings ...");
     SupportedLangs::iter().try_for_each(|lang| {
         println!("Generating language bindings for {}", lang);
-        cmd_success(std::process::Command::new("cargo")
+        cmd_success(Command::new("cargo")
             .arg("run")
             .arg("-p")
             .arg("uniffi-bindgen")
@@ -447,7 +447,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
                 println!("Generating swift module ...");
                 // We are generating this module for completion, but we are probably not going
                 // to use it. See https://mozilla.github.io/uniffi-rs/swift/module.html
-                cmd_success(std::process::Command::new("swiftc")
+                cmd_success(Command::new("swiftc")
                     .arg("-module-name")
                     .arg("zcash")
                     .arg("-emit-library")
