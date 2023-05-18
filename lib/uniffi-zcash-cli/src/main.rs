@@ -7,7 +7,7 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use clap::{parser::MatchesError, Arg, Command};
+use clap::{parser::MatchesError, Arg, Command, builder::ValueParser};
 
 use fs_extra::{
     dir::{self, CopyOptions},
@@ -50,6 +50,7 @@ fn main() -> CLIResult<()> {
                 .short('v')
                 .long("version")
                 .required(true)
+                .value_parser(validator_semver())
             )
             .arg(
                 Arg::new("swift_repo_url")
@@ -79,6 +80,29 @@ fn main() -> CLIResult<()> {
         _ => Err("Command not found. See help.".into()),
     }
 }
+
+/// See https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+const REGEX_SEMVER: &str = r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$";
+/// It generates a validator for semantic versioning
+pub fn validator_semver() -> ValueParser {
+    validator_regex(REGEX_SEMVER, "semver: https://semver.org")
+}
+
+/// Creates a clap validator (using ValueParser API) with a regex.
+/// # Arguments
+/// 
+/// * `regex`   - The regex to test against.
+/// * `err_msg` - Is a human friendly message to show in case the parser fails.
+pub fn validator_regex(regex: &'static str, err_msg: &'static str) -> ValueParser {
+    ValueParser::from(move |input: &str| -> CLIResult<String> {
+        let reg = regex::Regex::new(regex).unwrap();
+        match reg.is_match(input) {
+            true => Ok(input.to_owned()),
+            false => Err(format!("Value \"{}\" is not matching format: {}", input, err_msg).into()),
+        }
+    })
+}
+
 
 fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIResult<()> {
     let bindings_path = root_dir.join("bindings");
@@ -551,6 +575,12 @@ impl From<&str> for CLIError {
         CLIError {
             message: value.to_string(),
         }
+    }
+}
+
+impl From<String> for CLIError {
+    fn from(value: String) -> Self {
+        Self { message: value }
     }
 }
 
