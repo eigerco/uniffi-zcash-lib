@@ -203,9 +203,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 .arg(&lang_pack_dir)
                 .spawn()?
                 .wait()?;
-        
-        
-        
+
             dir::copy(
                 package_template_dir.join(lang.to_string()),
                 &lang_pack_dir,
@@ -249,8 +247,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             .current_dir(&lang_pack_dir)
             .spawn()?
             .wait()?;
-            
-
+        
             // Execute the test app for testing all generated stuff.
             let test_app_path = tmp_folder()?;
 
