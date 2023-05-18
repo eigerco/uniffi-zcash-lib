@@ -1,7 +1,8 @@
 use std::{
     fs::{read_to_string, OpenOptions},
-    io::Write,
+    io::{self, Write},
     path::{Path, PathBuf},
+    process::ExitStatus,
 };
 
 use handlebars::Handlebars;
@@ -36,4 +37,18 @@ pub fn workspace_root_dir() -> CLIResult<PathBuf> {
         .parent()
         .ok_or(err_msg)?
         .to_owned())
+}
+
+/// Wraps a call to [`std::process::Command::wait()`] . In case
+/// of error, it returns the status code as error, so users can use ? 
+/// easily to return immediately.
+pub fn cmd_success(cmd_result: io::Result<ExitStatus>) -> CLIResult<()> {
+    let status = cmd_result?;
+    match status.success() {
+        true => Ok(()),
+        false => match status.code() {
+            Some(code) => Err(format!("Command exited with non zero error: {}", code).into()),
+            None => Err("Process terminated by signal".into()),
+        },
+    }
 }

@@ -10,7 +10,8 @@ use fs_extra::{
     dir::{self, CopyOptions},
     file::read_to_string,
 };
-use helper::{workspace_root_dir, in_file_template_replace};
+
+use helper::{workspace_root_dir, in_file_template_replace, cmd_success};
 use serde_json::json;
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator};
 use uuid::Uuid;
@@ -92,7 +93,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             
 
             // Prepare python distribution files
-            std::process::Command::new("python")
+            cmd_success(std::process::Command::new("python")
                 .arg("-m")
                 .arg("pip")
                 .arg("install")
@@ -100,17 +101,19 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 .arg("--upgrade")
                 .arg("build")
                 .spawn()?
-                .wait()?;
+                .wait()
+            )?;
 
-            std::process::Command::new("python")
+            cmd_success(std::process::Command::new("python")
                 .arg("-m")
                 .arg("build")
                 .current_dir(&lang_pack_dir)
                 .spawn()?
-                .wait()?;
+                .wait()
+            )?;
             
             // Install lib and test.
-            std::process::Command::new("python")
+            cmd_success(std::process::Command::new("python")
                 .arg("-m")
                 .arg("pip")
                 .arg("install")
@@ -118,7 +121,8 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 .arg(".")
                 .current_dir(lang_pack_dir)
                 .spawn()?
-                .wait()?;
+                .wait()
+            )?;
 
             let test_app_path = tmp_folder()?;
 
@@ -128,11 +132,12 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 &CopyOptions::new().content_only(true),
             )?;
             
-            std::process::Command::new("python")
+            cmd_success(std::process::Command::new("python")
                 .arg("app.py")
                 .current_dir(test_app_path)
                 .spawn()?
-                .wait()?;
+                .wait()
+            )?;
 
             Ok(())
         }
@@ -167,11 +172,12 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             in_file_template_replace(gradle_path, &json!({ "version": version }))?;
             
             // Publish to local Maven, check everything is ok. Next step will exercise the dependency.     
-            std::process::Command::new("gradle")
+            cmd_success(std::process::Command::new("gradle")
                 .arg("publishToMavenLocal")
                 .current_dir(&lang_pack_dir)
                 .spawn()?
-                .wait()?;
+                .wait()
+            )?;
             
             // Execute the little, built in APP test. Ensure all the build chain is ok.
             let test_app_path = tmp_folder()?;
@@ -186,23 +192,25 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 test_app_path.join("app").join("build.gradle.kts"),
                 &json!({ "version": version }),
             )?;
-            std::process::Command::new("gradle")
+            cmd_success(std::process::Command::new("gradle")
                 .arg("run")
                 .current_dir(test_app_path)
                 .spawn()?
-                .wait()?;
+                .wait()
+            )?;
             
             Ok(())
         }
         SupportedLangs::Swift => {
             let lang_pack_dir = packaging_dir.join(lang.to_string()).join("Zcash");
             
-            std::process::Command::new("git")
+            cmd_success(std::process::Command::new("git")
                 .arg("clone")
                 .arg(swift_repo_url)
                 .arg(&lang_pack_dir)
                 .spawn()?
-                .wait()?;
+                .wait()
+            )?;
 
             dir::copy(
                 package_template_dir.join(lang.to_string()),
@@ -226,27 +234,30 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             )?;
             
             // Commit and tag the version
-            std::process::Command::new("git")
-            .arg("add")
-            .arg(".")
-            .current_dir(&lang_pack_dir)
-            .spawn()?
-            .wait()?;
+            cmd_success(std::process::Command::new("git")
+                .arg("add")
+                .arg(".")
+                .current_dir(&lang_pack_dir)
+                .spawn()?
+                .wait()
+            )?;
 
-            std::process::Command::new("git")
-            .arg("commit")
-            .arg("-m")
-            .arg(format!("Version {}", version))
-            .current_dir(&lang_pack_dir)
-            .spawn()?
-            .wait()?;
+            cmd_success(std::process::Command::new("git")
+                .arg("commit")
+                .arg("-m")
+                .arg(format!("Version {}", version))
+                .current_dir(&lang_pack_dir)
+                .spawn()?
+                .wait()
+            )?;
 
-            std::process::Command::new("git")
-            .arg("tag")
-            .arg(version)
-            .current_dir(&lang_pack_dir)
-            .spawn()?
-            .wait()?;
+            cmd_success(std::process::Command::new("git")
+                .arg("tag")
+                .arg(version)
+                .current_dir(&lang_pack_dir)
+                .spawn()?
+                .wait()
+            )?;
         
             // Execute the test app for testing all generated stuff.
             let test_app_path = tmp_folder()?;
@@ -262,14 +273,15 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             in_file_template_replace(test_app_path.join("Package.swift"), data)?;
 
             let generated_shared_lib_path = lang_pack_dir.join("Sources").join("zcashFFI");
-            std::process::Command::new("swift")
+            cmd_success(std::process::Command::new("swift")
                 .current_dir(test_app_path)
                 .arg("run")
                 .arg("-Xlinker")
                 .arg(format!("-L{}", generated_shared_lib_path.as_path().to_string_lossy()))
                 .env("LD_LIBRARY_PATH", generated_shared_lib_path)
                 .spawn()?
-                .wait()?;
+                .wait()
+            )?;
             
             Ok(())
         },
@@ -323,22 +335,24 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
 
             // Prepare Ruby distribution files
             
-            std::process::Command::new("gem")
+            cmd_success(std::process::Command::new("gem")
                 .arg("build")
                 .arg("zcash.gemspec")
                 .current_dir(&lang_pack_dir)
                 .spawn()?
-                .wait()?;
+                .wait()
+            )?;
             
 
             // Install and test
             
-            std::process::Command::new("gem")
+            cmd_success(std::process::Command::new("gem")
                 .arg("install")
                 .arg(format!("./zcash-{}.gem", version))
                 .current_dir(lang_pack_dir)
                 .spawn()?
-                .wait()?;
+                .wait()
+            )?;
 
             let test_app_path = tmp_folder()?;
             dir::copy(
@@ -347,11 +361,12 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
                 &CopyOptions::new().content_only(true),
             )?;
 
-            std::process::Command::new("ruby")
+            cmd_success(std::process::Command::new("ruby")
                 .arg("app.rb")
                 .current_dir(test_app_path)
                 .spawn()?
-                .wait()?;
+                .wait()
+            )?;
             
             Ok(())
         }
@@ -369,12 +384,13 @@ fn tmp_folder() -> CLIResult<PathBuf> {
 
 fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
     println!("Generating shared library ...");
-    std::process::Command::new("cargo")
+    cmd_success(std::process::Command::new("cargo")
         .arg("build")
         .arg("--release")
         .current_dir(root_dir)
         .spawn()?
-        .wait()?;
+        .wait()
+    )?;
     Ok(root_dir
         .join("target")
         .join("release")
@@ -391,7 +407,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
     println!("Generating language bindings ...");
     SupportedLangs::iter().try_for_each(|lang| {
         println!("Generating language bindings for {}", lang);
-        std::process::Command::new("cargo")
+        cmd_success(std::process::Command::new("cargo")
             .arg("run")
             .arg("-p")
             .arg("uniffi-bindgen")
@@ -404,7 +420,8 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
             .arg("--out-dir")
             .arg(target_bindings_path.join(lang.to_string()))
             .spawn()?
-            .wait()?;
+            .wait()
+        )?;
 
         let shared_lib_dest_path = target_bindings_path
             .join(lang.to_string())
@@ -430,7 +447,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
                 println!("Generating swift module ...");
                 // We are generating this module for completion, but we are probably not going
                 // to use it. See https://mozilla.github.io/uniffi-rs/swift/module.html
-                std::process::Command::new("swiftc")
+                cmd_success(std::process::Command::new("swiftc")
                     .arg("-module-name")
                     .arg("zcash")
                     .arg("-emit-library")
@@ -449,7 +466,8 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
                     ))
                     .arg(bindings_dir.join("zcash.swift"))
                     .spawn()?
-                    .wait()?;
+                    .wait()
+                )?;
                 Ok(())
             }
             SupportedLangs::Ruby => Ok(()),
