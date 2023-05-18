@@ -75,69 +75,65 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             let lang_pack_dir = packaging_dir.join(lang.to_string());
 
             // Copy all needed files from previously generated bindings operation
-            {
-                let bindings = bindings_path.join(lang.to_string());
-                copy(
-                    bindings.join("libuniffi_zcash.so"),
-                    lang_pack_dir.join("zcash").join("libuniffi_zcash.so"),
-                )?;
-                copy(
-                    bindings.join("zcash.py"),
-                    lang_pack_dir.join("zcash").join("zcash.py"),
-                )?;
-            }
+            let bindings = bindings_path.join(lang.to_string());
+            copy(
+                bindings.join("libuniffi_zcash.so"),
+                lang_pack_dir.join("zcash").join("libuniffi_zcash.so"),
+            )?;
+            copy(
+                bindings.join("zcash.py"),
+                lang_pack_dir.join("zcash").join("zcash.py"),
+            )?;
+            
 
             // Modify in place setup.py in order to set version in the template.
-            {
-                let setup_py_path = lang_pack_dir.join("setup.py");
-                in_file_template_replace(setup_py_path, &json!({ "version": version }))?;
-            }
+            let setup_py_path = lang_pack_dir.join("setup.py");
+            in_file_template_replace(setup_py_path, &json!({ "version": version }))?;
+            
 
             // Prepare python distribution files
-            {
-                std::process::Command::new("python")
-                    .arg("-m")
-                    .arg("pip")
-                    .arg("install")
-                    .arg("--user")
-                    .arg("--upgrade")
-                    .arg("build")
-                    .spawn()?
-                    .wait()?;
+            std::process::Command::new("python")
+                .arg("-m")
+                .arg("pip")
+                .arg("install")
+                .arg("--user")
+                .arg("--upgrade")
+                .arg("build")
+                .spawn()?
+                .wait()?;
 
-                std::process::Command::new("python")
-                    .arg("-m")
-                    .arg("build")
-                    .current_dir(&lang_pack_dir)
-                    .spawn()?
-                    .wait()?;
-            }
+            std::process::Command::new("python")
+                .arg("-m")
+                .arg("build")
+                .current_dir(&lang_pack_dir)
+                .spawn()?
+                .wait()?;
+            
             // Install lib and test.
-            {
-                std::process::Command::new("python")
-                    .arg("-m")
-                    .arg("pip")
-                    .arg("install")
-                    .arg("--force-reinstall")
-                    .arg(".")
-                    .current_dir(lang_pack_dir)
-                    .spawn()?
-                    .wait()?;
+            std::process::Command::new("python")
+                .arg("-m")
+                .arg("pip")
+                .arg("install")
+                .arg("--force-reinstall")
+                .arg(".")
+                .current_dir(lang_pack_dir)
+                .spawn()?
+                .wait()?;
 
-                let test_app_path = tmp_folder()?;
+            let test_app_path = tmp_folder()?;
 
-                dir::copy(
-                    package_template_dir.join("python_test_app"),
-                    &test_app_path,
-                    &CopyOptions::new().content_only(true),
-                )?;
+            dir::copy(
+                package_template_dir.join("python_test_app"),
+                &test_app_path,
+                &CopyOptions::new().content_only(true),
+            )?;
+            
+            std::process::Command::new("python")
+                .arg("app.py")
+                .current_dir(test_app_path)
+                .spawn()?
+                .wait()?;
 
-                std::process::Command::new("python")
-                    .arg("app.py")
-                    .current_dir(test_app_path)
-                    .spawn()?
-                    .wait()?;
-            }
             Ok(())
         }
         SupportedLangs::Kotlin => {
@@ -150,145 +146,134 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             let lang_pack_dir = packaging_dir.join(lang.to_string());
 
             // Copy all needed files from previously generated bindings operation
-            {
-                let bindings = bindings_path.join(lang.to_string());
-                let bindings_code = bindings.join("uniffi").join("zcash");
-                copy(
-                    bindings_code.join("libuniffi_zcash.so"),
-                    lang_pack_dir.join("lib").join("libs").join("libuniffi_zcash.so"),
-                )?;
-                copy(
-                    bindings_code.join("zcash.kt"),
-                    lang_pack_dir.join("lib")
-                    .join("src")
-                    .join("main")
-                    .join("kotlin")
-                    .join("zcash")
-                    .join("Zcash.kt"),
-                )?;
-            }
-
+            let bindings = bindings_path.join(lang.to_string());
+            let bindings_code = bindings.join("uniffi").join("zcash");
+            copy(
+                bindings_code.join("libuniffi_zcash.so"),
+                lang_pack_dir.join("lib").join("libs").join("libuniffi_zcash.so"),
+            )?;
+            copy(
+                bindings_code.join("zcash.kt"),
+                lang_pack_dir.join("lib")
+                .join("src")
+                .join("main")
+                .join("kotlin")
+                .join("zcash")
+                .join("Zcash.kt"),
+            )?;
+            
             // Modify in place the build.gradle.kts in order to set version in the template.
-            {
-                let gradle_path = lang_pack_dir.join("lib").join("build.gradle.kts");
-                in_file_template_replace(gradle_path, &json!({ "version": version }))?;
-            }
-
-            // Publish to local Maven, check everything is ok. Next step will exercise the dependency.
-            {
-                std::process::Command::new("gradle")
-                    .arg("publishToMavenLocal")
-                    .current_dir(&lang_pack_dir)
-                    .spawn()?
-                    .wait()?;
-            }
-
+            let gradle_path = lang_pack_dir.join("lib").join("build.gradle.kts");
+            in_file_template_replace(gradle_path, &json!({ "version": version }))?;
+            
+            // Publish to local Maven, check everything is ok. Next step will exercise the dependency.     
+            std::process::Command::new("gradle")
+                .arg("publishToMavenLocal")
+                .current_dir(&lang_pack_dir)
+                .spawn()?
+                .wait()?;
+            
             // Execute the little, built in APP test. Ensure all the build chain is ok.
-            {
-                let test_app_path = tmp_folder()?;
+            let test_app_path = tmp_folder()?;
 
-                dir::copy(
-                    package_template_dir.join("kotlin_test_app"),
-                    &test_app_path,
-                    &CopyOptions::new().content_only(true),
-                )?;
+            dir::copy(
+                package_template_dir.join("kotlin_test_app"),
+                &test_app_path,
+                &CopyOptions::new().content_only(true),
+            )?;
 
-                in_file_template_replace(
-                    test_app_path.join("app").join("build.gradle.kts"),
-                    &json!({ "version": version }),
-                )?;
-                std::process::Command::new("gradle")
-                    .arg("run")
-                    .current_dir(test_app_path)
-                    .spawn()?
-                    .wait()?;
-            }
+            in_file_template_replace(
+                test_app_path.join("app").join("build.gradle.kts"),
+                &json!({ "version": version }),
+            )?;
+            std::process::Command::new("gradle")
+                .arg("run")
+                .current_dir(test_app_path)
+                .spawn()?
+                .wait()?;
+            
             Ok(())
         }
         SupportedLangs::Swift => {
             let lang_pack_dir = packaging_dir.join(lang.to_string()).join("Zcash");
-            {
-                std::process::Command::new("git")
-                    .arg("clone")
-                    .arg(swift_repo_url)
-                    .arg(&lang_pack_dir)
-                    .spawn()?
-                    .wait()?;
-            }
             
-            {
-                dir::copy(
-                    package_template_dir.join(lang.to_string()),
-                    &lang_pack_dir,
-                    &CopyOptions::new().overwrite(true).content_only(true),
-                )?;
-            }
+            std::process::Command::new("git")
+                .arg("clone")
+                .arg(swift_repo_url)
+                .arg(&lang_pack_dir)
+                .spawn()?
+                .wait()?;
+        
+        
+        
+            dir::copy(
+                package_template_dir.join(lang.to_string()),
+                &lang_pack_dir,
+                &CopyOptions::new().overwrite(true).content_only(true),
+            )?;            
 
             // Copy all needed files from previously generated bindings operation
-            {
-                let bindings = bindings_path.join(lang.to_string());
-                copy(
-                    bindings.join("libuniffi_zcash.so"),
-                    lang_pack_dir.join("Sources").join("zcashFFI").join("libuniffi_zcash.so"),
-                )?;
-                copy(
-                    bindings.join("zcashFFI.h"),
-                    lang_pack_dir.join("Sources").join("zcashFFI").join("uniffi_zcash.h"),
-                )?;
-                copy(
-                    bindings.join("zcash.swift"),
-                    lang_pack_dir.join("Sources").join("Zcash").join("zcash.swift"),
-                )?;
-            }
+            let bindings = bindings_path.join(lang.to_string());
+            copy(
+                bindings.join("libuniffi_zcash.so"),
+                lang_pack_dir.join("Sources").join("zcashFFI").join("libuniffi_zcash.so"),
+            )?;
+            copy(
+                bindings.join("zcashFFI.h"),
+                lang_pack_dir.join("Sources").join("zcashFFI").join("uniffi_zcash.h"),
+            )?;
+            copy(
+                bindings.join("zcash.swift"),
+                lang_pack_dir.join("Sources").join("Zcash").join("zcash.swift"),
+            )?;
+            
             // Commit and tag the version
-            {
-                std::process::Command::new("git")
-                .arg("add")
-                .arg(".")
-                .current_dir(&lang_pack_dir)
-                .spawn()?
-                .wait()?;
+            std::process::Command::new("git")
+            .arg("add")
+            .arg(".")
+            .current_dir(&lang_pack_dir)
+            .spawn()?
+            .wait()?;
 
-                std::process::Command::new("git")
-                .arg("commit")
-                .arg("-m")
-                .arg(format!("Version {}", version))
-                .current_dir(&lang_pack_dir)
-                .spawn()?
-                .wait()?;
+            std::process::Command::new("git")
+            .arg("commit")
+            .arg("-m")
+            .arg(format!("Version {}", version))
+            .current_dir(&lang_pack_dir)
+            .spawn()?
+            .wait()?;
 
-                std::process::Command::new("git")
-                .arg("tag")
-                .arg(version)
-                .current_dir(&lang_pack_dir)
-                .spawn()?
-                .wait()?;
-            }
+            std::process::Command::new("git")
+            .arg("tag")
+            .arg(version)
+            .current_dir(&lang_pack_dir)
+            .spawn()?
+            .wait()?;
+            
 
             // Execute the test app for testing all generated stuff.
-            {
-                let test_app_path = tmp_folder()?;
+            let test_app_path = tmp_folder()?;
 
-                dir::copy(
-                    package_template_dir.join("swift_test_app"),
-                    &test_app_path,
-                    &CopyOptions::new().content_only(true),
-                )?;
+            dir::copy(
+                package_template_dir.join("swift_test_app"),
+                &test_app_path,
+                &CopyOptions::new().content_only(true),
+            )?;
 
-                // Use the previously generated git package for testing against.
-                let data = &json!({ "version": version, "git_repo_path": &lang_pack_dir});
-                in_file_template_replace(test_app_path.join("Package.swift"), data)?;
+            // Use the previously generated git package for testing against.
+            let data = &json!({ "version": version, "git_repo_path": &lang_pack_dir});
+            in_file_template_replace(test_app_path.join("Package.swift"), data)?;
 
-                let generated_shared_lib_path = lang_pack_dir.join("Sources").join("zcashFFI");
-                std::process::Command::new("swift")
-                    .current_dir(test_app_path)
-                    .arg("run")
-                    .arg("-Xlinker")
-                    .arg(format!("-L{}", generated_shared_lib_path.as_path().to_string_lossy()))
-                    .env("LD_LIBRARY_PATH", generated_shared_lib_path)
-                    .spawn()?
-                    .wait()?;
-            }
+            let generated_shared_lib_path = lang_pack_dir.join("Sources").join("zcashFFI");
+            std::process::Command::new("swift")
+                .current_dir(test_app_path)
+                .arg("run")
+                .arg("-Xlinker")
+                .arg(format!("-L{}", generated_shared_lib_path.as_path().to_string_lossy()))
+                .env("LD_LIBRARY_PATH", generated_shared_lib_path)
+                .spawn()?
+                .wait()?;
+            
             Ok(())
         },
         SupportedLangs::Ruby => {
@@ -301,23 +286,21 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             let lang_pack_dir = packaging_dir.join(lang.to_string());
 
             // Copy all needed files from previously generated bindings operation
-            {
-                let bindings = bindings_path.join(lang.to_string());
-                copy(
-                    bindings.join("libuniffi_zcash.so"),
-                    lang_pack_dir.join("lib").join("libuniffi_zcash.so"),
-                )?;
-                copy(
-                    bindings.join("zcash.rb"),
-                    lang_pack_dir.join("lib").join("zcash.rb"),
-                )?;
-            }
+            let bindings = bindings_path.join(lang.to_string());
+            copy(
+                bindings.join("libuniffi_zcash.so"),
+                lang_pack_dir.join("lib").join("libuniffi_zcash.so"),
+            )?;
+            copy(
+                bindings.join("zcash.rb"),
+                lang_pack_dir.join("lib").join("zcash.rb"),
+            )?;        
 
             // Modify in place the gemspec in order to set version in the template.
-            {
-                let gemspec_path = lang_pack_dir.join("zcash.gemspec");
-                in_file_template_replace(gemspec_path, &json!({ "version": version }))?;
-            }
+            
+            let gemspec_path = lang_pack_dir.join("zcash.gemspec");
+            in_file_template_replace(gemspec_path, &json!({ "version": version }))?;
+            
 
             // Super hack 🔥. In order to be able to load shared library (.so) provided in the gem,
             // we need either to provide to the "ffi_lib" function loader (see zcash.rb) an absolute path
@@ -327,52 +310,52 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             // caller file (zcash.rb) as reference, calculating the absolute path from its path.
             // But the zcash.rb file is generated by UniFFI and its out of our control.
             // So, we search and replace after the "bindgen" command generates it:
-            {
-                let binding_file = lang_pack_dir.join("lib").join("zcash.rb");
-                let content = read_to_string(&binding_file)?;
-                let result = content.replace(
-                    "ffi_lib 'libuniffi_zcash.so'",
-                    "ffi_lib File.join(File.dirname(File.expand_path(__FILE__)), '/libuniffi_zcash.so')",
-                );
-                let mut file = OpenOptions::new()
-                    .write(true)
-                    .truncate(true)
-                    .open(binding_file)?;
-                file.write_all(result.as_bytes())?;
-            }
+            
+            let binding_file = lang_pack_dir.join("lib").join("zcash.rb");
+            let content = read_to_string(&binding_file)?;
+            let result = content.replace(
+                "ffi_lib 'libuniffi_zcash.so'",
+                "ffi_lib File.join(File.dirname(File.expand_path(__FILE__)), '/libuniffi_zcash.so')",
+            );
+            let mut file = OpenOptions::new()
+                .write(true)
+                .truncate(true)
+                .open(binding_file)?;
+            file.write_all(result.as_bytes())?;
+            
 
             // Prepare Ruby distribution files
-            {
-                std::process::Command::new("gem")
-                    .arg("build")
-                    .arg("zcash.gemspec")
-                    .current_dir(&lang_pack_dir)
-                    .spawn()?
-                    .wait()?;
-            }
+            
+            std::process::Command::new("gem")
+                .arg("build")
+                .arg("zcash.gemspec")
+                .current_dir(&lang_pack_dir)
+                .spawn()?
+                .wait()?;
+            
 
             // Install and test
-            {
-                std::process::Command::new("gem")
-                    .arg("install")
-                    .arg(format!("./zcash-{}.gem", version))
-                    .current_dir(lang_pack_dir)
-                    .spawn()?
-                    .wait()?;
+            
+            std::process::Command::new("gem")
+                .arg("install")
+                .arg(format!("./zcash-{}.gem", version))
+                .current_dir(lang_pack_dir)
+                .spawn()?
+                .wait()?;
 
-                let test_app_path = tmp_folder()?;
-                dir::copy(
-                    package_template_dir.join("ruby_test_app"),
-                    &test_app_path,
-                    &CopyOptions::new().content_only(true),
-                )?;
+            let test_app_path = tmp_folder()?;
+            dir::copy(
+                package_template_dir.join("ruby_test_app"),
+                &test_app_path,
+                &CopyOptions::new().content_only(true),
+            )?;
 
-                std::process::Command::new("ruby")
-                    .arg("app.rb")
-                    .current_dir(test_app_path)
-                    .spawn()?
-                    .wait()?;
-            }
+            std::process::Command::new("ruby")
+                .arg("app.rb")
+                .current_dir(test_app_path)
+                .spawn()?
+                .wait()?;
+            
             Ok(())
         }
     })
