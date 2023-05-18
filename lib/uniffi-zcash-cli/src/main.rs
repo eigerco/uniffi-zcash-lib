@@ -1,22 +1,20 @@
 use std::{
     env::set_current_dir,
-    error::Error,
-    fmt::Display,
     fs::{self, copy, create_dir_all, remove_dir_all, rename, OpenOptions},
     io::Write,
     path::{Path, PathBuf},
 };
 
-use clap::{parser::MatchesError, Arg, Command, builder::ValueParser};
-
+use cli::{get_matches, CLIResult};
 use fs_extra::{
     dir::{self, CopyOptions},
     file::read_to_string,
 };
+
 use handlebars::Handlebars;
 use serde::Serialize;
 use serde_json::json;
-use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator, VariantNames};
+use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator};
 use uuid::Uuid;
 
 #[derive(Debug, Clone, Copy, Display, EnumString, EnumIter, EnumVariantNames)]
@@ -32,35 +30,10 @@ enum SupportedLangs {
     Ruby,
 }
 
+mod cli;
+
 fn main() -> CLIResult<()> {
-    let matches = Command::new("UniFFI Zcash CLI")
-        .version(env!("CARGO_PKG_VERSION"))
-        .about("A CLI for managing internal repo workflows")
-        .subcommand_required(true)
-        .subcommand(Command::new("bindgen").about(format!(
-            "Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory",
-            SupportedLangs::VARIANTS.join(",")
-        )))
-        .subcommand(
-            Command::new("release").about(format!(
-            "Prepares a release given a version (semantic versioning), creating all languages ({}) specific packages. It needs to be executed after the bindgen command",
-            SupportedLangs::VARIANTS.join(",")))
-            .arg(
-                Arg::new("version")
-                .short('v')
-                .long("version")
-                .required(true)
-                .value_parser(validator_semver())
-            )
-            .arg(
-                Arg::new("swift_repo_url")
-                .long("swift-repo-url")
-                .required(true)
-                .env("SWIFT_GIT_REPO_URL")
-                .help("For auth, use a Github personal access token.\nSee https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\nExample: https://<github-username>:<github-token>@github.com/<your-repository>.git")
-            )
-        )
-        .get_matches();
+    let matches = get_matches();
 
     let root_dir = workspace_root_dir()?;
     set_current_dir(&root_dir)?;
@@ -80,29 +53,6 @@ fn main() -> CLIResult<()> {
         _ => Err("Command not found. See help.".into()),
     }
 }
-
-/// See https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
-const REGEX_SEMVER: &str = r"^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+([0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$";
-/// It generates a validator for semantic versioning
-pub fn validator_semver() -> ValueParser {
-    validator_regex(REGEX_SEMVER, "semver: https://semver.org")
-}
-
-/// Creates a clap validator (using ValueParser API) with a regex.
-/// # Arguments
-/// 
-/// * `regex`   - The regex to test against.
-/// * `err_msg` - Is a human friendly message to show in case the parser fails.
-pub fn validator_regex(regex: &'static str, err_msg: &'static str) -> ValueParser {
-    ValueParser::from(move |input: &str| -> CLIResult<String> {
-        let reg = regex::Regex::new(regex).unwrap();
-        match reg.is_match(input) {
-            true => Ok(input.to_owned()),
-            false => Err(format!("Value \"{}\" is not matching format: {}", input, err_msg).into()),
-        }
-    })
-}
-
 
 fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIResult<()> {
     let bindings_path = root_dir.join("bindings");
@@ -556,64 +506,3 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
         }
     })
 }
-
-#[derive(Debug)]
-struct CLIError {
-    message: String,
-}
-
-impl Error for CLIError {}
-
-impl Display for CLIError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(&self.message)
-    }
-}
-
-impl From<&str> for CLIError {
-    fn from(value: &str) -> Self {
-        CLIError {
-            message: value.to_string(),
-        }
-    }
-}
-
-impl From<String> for CLIError {
-    fn from(value: String) -> Self {
-        Self { message: value }
-    }
-}
-
-impl From<std::io::Error> for CLIError {
-    fn from(value: std::io::Error) -> Self {
-        CLIError {
-            message: value.to_string(),
-        }
-    }
-}
-
-impl From<MatchesError> for CLIError {
-    fn from(value: MatchesError) -> Self {
-        Self {
-            message: value.to_string(),
-        }
-    }
-}
-
-impl From<fs_extra::error::Error> for CLIError {
-    fn from(value: fs_extra::error::Error) -> Self {
-        Self {
-            message: value.to_string(),
-        }
-    }
-}
-
-impl From<handlebars::RenderError> for CLIError {
-    fn from(value: handlebars::RenderError) -> Self {
-        Self {
-            message: value.to_string(),
-        }
-    }
-}
-
-type CLIResult<T> = Result<T, CLIError>;
