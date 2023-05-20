@@ -1,8 +1,8 @@
-use std::str::FromStr;
-use clap::{builder::ValueParser, Arg, ArgAction, ArgMatches, Command};
-use strum::VariantNames;
-use crate::SupportedLang;
 use self::error::CLIError;
+use crate::SupportedLang;
+use clap::{builder::ValueParser, Arg, ArgAction, ArgMatches, Command};
+use std::str::FromStr;
+use strum::VariantNames;
 
 pub mod error;
 
@@ -20,13 +20,7 @@ pub fn get_matches() -> ArgMatches {
             Command::new("release").about(format!(
             "Prepares a release given a version (semantic versioning), creating all languages ({}) specific packages. It needs to be executed after the bindgen command",
             SupportedLang::VARIANTS.join(",")))
-            .arg(
-                Arg::new("version")
-                .short('v')
-                .long("version")
-                .required(true)
-                .value_parser(validator_semver())
-            )
+            .arg(arg_version())
             .arg(
                 Arg::new("swift_repo_url")
                 .long("swift-repo-url")
@@ -68,6 +62,20 @@ pub fn get_matches() -> ArgMatches {
                 .required(true)
                 .env("PYTHON_REGISTRY_TOKEN")
                 .help("The pypi token, including the prefix 'pypi'.")
+            )
+            .arg(
+                Arg::new("ruby_registry_url")
+                .long("ruby-registry-url")
+                .required(true)
+                .env("RUBY_REGISTRY_URL")
+                .help("The http[s] URL of the target ruby package index. i.e https://rubygems.org")
+            )
+            .arg(
+                Arg::new("ruby_registry_token")
+                .long("ruby-registry-token")
+                .required(true)
+                .env("RUBY_REGISTRY_TOKEN")
+                .help("The ruby API key.")
             )
         )
         .get_matches()

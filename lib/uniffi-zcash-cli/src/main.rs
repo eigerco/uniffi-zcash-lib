@@ -58,9 +58,14 @@ fn main() -> CLIResult<()> {
         }
         Some(("publish", args)) => {
             let config = PublishConfig{
+
+                version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
                 only_for_language: args.try_get_one::<SupportedLang>("only_for_language")?.map(From::from),
                 python_registry_url: args.try_get_one::<String>("python_registry_url")?.unwrap().to_owned(),
                 python_registry_token: args.try_get_one::<String>("python_registry_token")?.unwrap().to_owned(),
+                ruby_registry_url: args.try_get_one::<String>("ruby_registry_url")?.unwrap().to_owned(),
+                ruby_registry_token: args.try_get_one::<String>("ruby_registry_token")?.unwrap().to_owned(),
+            
             };
             publish(&root_dir, &config)?;
             Ok(())
@@ -531,14 +536,28 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
             Ok(())
         },
         SupportedLang::Ruby => {
-            println!("ruby!");
-            Ok(())
+            let lang_package_path = packages_path.join(lang.to_string());
+            // Publish the artifact.
+            let mut publish_cmd = Command::new("gem");
+            publish_cmd
+                .arg("push")
+                .arg(format!("zcash-{}.gem", &cfg.version))
+                .arg("--norc")
+                .arg("--host")
+                .arg(&cfg.ruby_registry_url)
+                .env("GEM_HOST_API_KEY", &cfg.ruby_registry_token)
+                .current_dir(&lang_package_path);
+
+            Ok(cmd_retry("Ruby publication", Exponential::from_millis(1000), 10, publish_cmd)?)
         },
     })
 }
 
 struct PublishConfig {
+    version: String,
     only_for_language: Option<SupportedLang>,
     python_registry_url: String,
-    python_registry_token: String
+    python_registry_token: String,
+    ruby_registry_url: String,
+    ruby_registry_token: String,
 }
