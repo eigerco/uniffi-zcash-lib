@@ -60,3 +60,9 @@ impl From<handlebars::RenderError> for CLIError {
         }
     }
 }
+
+impl From<retry::Error<CLIError>> for CLIError {
+    fn from(value: retry::Error<CLIError>) -> Self {
+        value.error
+    }
+}

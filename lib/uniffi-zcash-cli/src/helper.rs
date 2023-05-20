@@ -2,10 +2,12 @@ use std::{
     fs::{read_to_string, OpenOptions},
     io::{self, Write},
     path::{Path, PathBuf},
-    process::ExitStatus,
+    process::{Command, ExitStatus},
+    time::Duration,
 };
 
 use handlebars::Handlebars;
+use retry::{retry_with_index, OperationResult};
 use serde::Serialize;
 
 use crate::cli::CLIResult;
@@ -51,4 +53,32 @@ pub fn cmd_success(cmd_result: io::Result<ExitStatus>) -> CLIResult<()> {
             None => Err("Process terminated by signal".into()),
         },
     }
+}
+
+/// Wraps the retry library and adapts it to our specific use
+/// of commands. It does not pretend to decouple foreign types.
+pub fn cmd_retry<I>(name: &str, interval: I, max_retries: u64, mut cmd: Command) -> CLIResult<()>
+where
+    I: IntoIterator<Item = Duration>,
+{
+    Ok(retry_with_index(interval, |current_try| {
+        if current_try > max_retries {
+            let message = format!(
+                "Command {}: Max tries of {} reached, aborting ...",
+                name, current_try
+            );
+            return OperationResult::Err(message.as_str().into());
+        }
+
+        let cmd = cmd.spawn();
+
+        if let Err(err) = cmd {
+            return OperationResult::Err(err.to_string().into());
+        }
+
+        match cmd_success(cmd.unwrap().wait()) {
+            Ok(ok) => OperationResult::Ok(ok),
+            Err(err) => OperationResult::Retry(err),
+        }
+    })?)
 }
