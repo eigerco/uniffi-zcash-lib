@@ -42,7 +42,7 @@ pub fn workspace_root_dir() -> CLIResult<PathBuf> {
 }
 
 /// Wraps a call to [`std::process::Command::wait()`] . In case
-/// of error, it returns the status code as error, so users can use ? 
+/// of error, it returns the status code as error, so users can use ?
 /// easily to return immediately.
 pub fn cmd_success(cmd_result: io::Result<ExitStatus>) -> CLIResult<()> {
     let status = cmd_result?;
