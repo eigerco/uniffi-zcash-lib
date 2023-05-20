@@ -5,7 +5,7 @@ use crate::SupportedLangs;
 
 use self::error::CLIError;
 
-mod error;
+pub mod error;
 
 pub fn get_matches() -> ArgMatches {
     Command::new("UniFFI Zcash CLI")

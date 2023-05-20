@@ -4,7 +4,7 @@ use clap::parser::MatchesError;
 
 #[derive(Debug)]
 pub struct CLIError {
-    message: String,
+    pub message: String,
 }
 
 impl Error for CLIError {}
