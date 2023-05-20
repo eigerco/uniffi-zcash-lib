@@ -1,0 +1,6 @@
+PYTHON_REGISTRY_TOKEN=admin
+PYTHON_REGISTRY_URL=http://localhost:3141/root/pypi/+simple/
+RUBY_REGISTRY_TOKEN=admin
+RUBY_REGISTRY_URL=http://localhost:9292/
+KOTLIN_REGISTRY_URL=http://localhost:8080/releases
+KOTLIN_REGISTRY_TOKEN=admin:secret
