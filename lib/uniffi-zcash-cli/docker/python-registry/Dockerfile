@@ -15,5 +15,5 @@ RUN devpi-gen-config
 
 EXPOSE 3141
 
-CMD ["supervisord", "-n", "-c", "gen-config/supervisord.conf"]
+CMD ["/usr/local/bin/devpi-server", "--listen", "0.0.0.0:3141"]
 
