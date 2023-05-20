@@ -60,7 +60,7 @@ pub fn get_matches() -> ArgMatches {
                 .long("python-registry-url")
                 .required(true)
                 .env("PYTHON_REGISTRY_URL")
-                .help("The http[s] URL of the target python package index. i.e ")
+                .help("The http[s] URL of the target python package index. i.e https://upload.pypi.org/legacy/")
             )
             .arg(
                 Arg::new("python_registry_token")
