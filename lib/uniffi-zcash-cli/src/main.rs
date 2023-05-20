@@ -397,7 +397,7 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
     }
     SupportedLang::iter().filter(|l| {
         if let Some(lang) = cfg.only_for_language {
-            return *l == lang
+            *l == lang
         }else{
             true
         }
