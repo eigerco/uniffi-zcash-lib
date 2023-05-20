@@ -13,8 +13,6 @@ services:
       - 9292:9292
 
   kotlin-registry:
-    image: dzikoysk/reposilite:3.4.3
+    image: "xetusoss/archiva:v2.2.9"
     ports:
       - 8080:8080
-    environment:
-      - REPOSILITE_OPTS=--token admin:secret
