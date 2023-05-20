@@ -65,6 +65,9 @@ fn main() -> CLIResult<()> {
                 python_registry_token: args.try_get_one::<String>("python_registry_token")?.unwrap().to_owned(),
                 ruby_registry_url: args.try_get_one::<String>("ruby_registry_url")?.unwrap().to_owned(),
                 ruby_registry_token: args.try_get_one::<String>("ruby_registry_token")?.unwrap().to_owned(),
+                kotlin_registry_url: args.try_get_one::<String>("kotlin_registry_url")?.unwrap().to_owned(),
+                kotlin_registry_username: args.try_get_one::<String>("kotlin_registry_username")?.unwrap().to_owned(),
+                kotlin_registry_password: args.try_get_one::<String>("kotlin_registry_password")?.unwrap().to_owned(),
             
             };
             publish(&root_dir, &config)?;
@@ -528,8 +531,18 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
             Ok(cmd_retry("Python publication", Exponential::from_millis(1000), 10, publish_cmd)?)
         },
         SupportedLang::Kotlin => {
-            println!("kotlin!");
-            Ok(())
+
+            let lang_package_path = packages_path.join(lang.to_string());
+
+            let mut publish_cmd = Command::new("./gradlew");
+            publish_cmd
+                .arg("publish")
+                .env("KOTLIN_REGISTRY_URL", &cfg.kotlin_registry_url)
+                .env("KOTLIN_REGISTRY_USERNAME", &cfg.kotlin_registry_username)
+                .env("KOTLIN_REGISTRY_PASSWORD", &cfg.kotlin_registry_password)
+                .current_dir(&lang_package_path);
+
+            Ok(cmd_retry("Kotlin publication", Exponential::from_millis(1000), 10, publish_cmd)?)
         },
         SupportedLang::Swift => {
             println!("swift!");
@@ -560,4 +573,7 @@ struct PublishConfig {
     python_registry_token: String,
     ruby_registry_url: String,
     ruby_registry_token: String,
+    kotlin_registry_url: String,
+    kotlin_registry_username: String,
+    kotlin_registry_password: String,
 }

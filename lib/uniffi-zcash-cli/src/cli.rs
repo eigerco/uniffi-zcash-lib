@@ -79,6 +79,28 @@ pub fn get_matches() -> ArgMatches {
                 .env("RUBY_REGISTRY_TOKEN")
                 .help("The ruby API key.")
             )
+            // Kotlin
+            .arg(
+                Arg::new("kotlin_registry_url")
+                .long("kotlin-registry-url")
+                .required(true)
+                .env("KOTLIN_REGISTRY_URL")
+                .help("The http[s] URL of the target kotlin package index. i.e https://kotlingems.org")
+            )
+            .arg(
+                Arg::new("kotlin_registry_username")
+                .long("kotlin-registry-username")
+                .required(true)
+                .env("KOTLIN_REGISTRY_USERNAME")
+                .help("The kotlin registry username, if using token, probably set this to 'token' .")
+            )
+            .arg(
+                Arg::new("kotlin_registry_password")
+                .long("kotlin-registry-password")
+                .required(true)
+                .env("KOTLIN_REGISTRY_PASSWORD")
+                .help("The kotlin registry password, can be also a token.")
+            )
         )
         .get_matches()
 }

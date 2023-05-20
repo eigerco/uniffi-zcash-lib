@@ -51,12 +51,11 @@ publishing {
 	}
    }
    repositories {
-     // Below auth config should be adjusted/used for production publishing.
      maven {
-        url = uri("https://example.com/repository/maven")
+        url = uri(System.getenv("KOTLIN_REGISTRY_URL")) // https://example.com/repository/maven
         credentials {
-            username = "token" // Use "token" as the username for API token authentication
-            password = System.getenv("MAVEN_REPO_API_TOKEN")
+            username = System.getenv("KOTLIN_REGISTRY_USERNAME") // Use "token" as the username for API token authentication
+            password = System.getenv("KOTLIN_REGISTRY_PASSWORD")
         }
      }
   }
