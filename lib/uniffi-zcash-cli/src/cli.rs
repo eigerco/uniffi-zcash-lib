@@ -40,6 +40,7 @@ pub fn get_matches() -> ArgMatches {
             "Publish the previously generated packages (See release command) in all supported languages ({}) registries",
             SupportedLang::VARIANTS.join(",")
             ))
+            .arg(arg_version())
             .arg(
                 Arg::new("confirmation")
                 .short('y')
@@ -70,6 +71,14 @@ pub fn get_matches() -> ArgMatches {
             )
         )
         .get_matches()
+}
+
+fn arg_version() -> Arg {
+    Arg::new("version")
+        .short('v')
+        .long("version")
+        .required(true)
+        .value_parser(validator_semver())
 }
 
 /// See https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
