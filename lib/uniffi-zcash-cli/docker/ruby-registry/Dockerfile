@@ -13,5 +13,5 @@ COPY ./config.ru .
 
 EXPOSE 9292
 
-CMD ["rackup"]
+CMD ["rackup", "-o", "0.0.0.0"]
 
