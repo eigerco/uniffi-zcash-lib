@@ -54,7 +54,20 @@ pub fn get_matches() -> ArgMatches {
                 .value_parser(validator_language())
                 .help(format!("Defines if the publish operation should be done only for one language ({}) .Useful in case of partial uploads)", SupportedLang::VARIANTS.join(",")))
             )
-            
+            .arg(
+                Arg::new("python_registry_url")
+                .long("python-registry-url")
+                .required(true)
+                .env("PYTHON_REGISTRY_URL")
+                .help("The http[s] URL of the target python package index. i.e ")
+            )
+            .arg(
+                Arg::new("python_registry_token")
+                .long("python-registry-token")
+                .required(true)
+                .env("PYTHON_REGISTRY_TOKEN")
+                .help("The pypi token, including the prefix 'pypi'.")
+            )
         )
         .get_matches()
 }

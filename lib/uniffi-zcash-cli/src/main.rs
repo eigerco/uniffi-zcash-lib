@@ -11,7 +11,8 @@ use fs_extra::{
     file::read_to_string,
 };
 
-use helper::{workspace_root_dir, in_file_template_replace, cmd_success, tmp_folder};
+use helper::{workspace_root_dir, in_file_template_replace, cmd_success, tmp_folder, cmd_retry};
+use retry::delay::Exponential;
 use serde_json::json;
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator};
 
@@ -58,6 +59,8 @@ fn main() -> CLIResult<()> {
         Some(("publish", args)) => {
             let config = PublishConfig{
                 only_for_language: args.try_get_one::<SupportedLang>("only_for_language")?.map(From::from),
+                python_registry_url: args.try_get_one::<String>("python_registry_url")?.unwrap().to_owned(),
+                python_registry_token: args.try_get_one::<String>("python_registry_token")?.unwrap().to_owned(),
             };
             publish(&root_dir, &config)?;
             Ok(())
@@ -491,8 +494,33 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
         }
     }).try_for_each(|lang| match lang {
         SupportedLang::Python => {
-            println!("python!");
-            Ok(())
+            let lang_package_path = packages_path.join(lang.to_string());
+            
+            // Ensure deps are installed.
+            cmd_success(Command::new("python")
+                .arg("-m")
+                .arg("pip")
+                .arg("install")
+                .arg("--user")
+                .arg("--upgrade")
+                .arg("twine")
+                .spawn()?
+                .wait()
+            )?;
+
+            // Publish the artifact.
+            let mut publish_cmd = Command::new("python");
+            publish_cmd
+                .arg("-m")
+                .arg("twine")
+                .arg("upload")
+                .env("TWINE_REPOSITORY_URL", &cfg.python_registry_url)
+                .env("TWINE_USERNAME", "__token__")
+                .env("TWINE_PASSWORD", &cfg.python_registry_token)
+                .arg("dist/*")
+                .current_dir(&lang_package_path);
+
+            Ok(cmd_retry("Python publication", Exponential::from_millis(1000), 10, publish_cmd)?)
         },
         SupportedLang::Kotlin => {
             println!("kotlin!");
@@ -511,4 +539,6 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
 
 struct PublishConfig {
     only_for_language: Option<SupportedLang>,
+    python_registry_url: String,
+    python_registry_token: String
 }
