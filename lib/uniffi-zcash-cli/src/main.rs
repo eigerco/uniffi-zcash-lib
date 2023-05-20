@@ -21,7 +21,7 @@ mod helper;
 
 #[derive(Debug, Clone, Copy, Display, EnumString, EnumIter, EnumVariantNames, PartialEq)]
 #[strum(serialize_all = "kebab_case")]
-enum SupportedLangs {
+enum SupportedLang {
     #[strum(serialize = "python")]
     Python,
     #[strum(serialize = "kotlin")]
@@ -32,8 +32,8 @@ enum SupportedLangs {
     Ruby,
 }
 
-impl From<&SupportedLangs> for SupportedLangs {
-    fn from(value: &SupportedLangs) -> Self {
+impl From<&SupportedLang> for SupportedLang {
+    fn from(value: &SupportedLang) -> Self {
         value.to_owned()
     }
 }
@@ -58,7 +58,7 @@ fn main() -> CLIResult<()> {
         }
         Some(("publish", args)) => {
             let config = PublishConfig{
-                only_for_language: args.try_get_one::<SupportedLangs>("only_for_language")?.map(From::from),
+                only_for_language: args.try_get_one::<SupportedLang>("only_for_language")?.map(From::from),
             };
             publish(&root_dir, &config)?;
             Ok(())
@@ -68,7 +68,7 @@ fn main() -> CLIResult<()> {
 }
 
 struct PublishConfig {
-    only_for_language: Option<SupportedLangs>,
+    only_for_language: Option<SupportedLang>,
 }
 
 fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIResult<()> {
@@ -82,8 +82,8 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
     _ = remove_dir_all(&packaging_dir);
     create_dir_all(&packaging_dir)?;
 
-    SupportedLangs::iter().try_for_each(|lang| match lang {
-        SupportedLangs::Python => {
+    SupportedLang::iter().try_for_each(|lang| match lang {
+        SupportedLang::Python => {
             dir::copy(
                 package_template_dir.join(lang.to_string()),
                 &packaging_dir,
@@ -158,7 +158,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
 
             Ok(())
         }
-        SupportedLangs::Kotlin => {
+        SupportedLang::Kotlin => {
             dir::copy(
                 package_template_dir.join(lang.to_string()),
                 &packaging_dir,
@@ -218,7 +218,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             
             Ok(())
         }
-        SupportedLangs::Swift => {
+        SupportedLang::Swift => {
             let lang_pack_dir = packaging_dir.join(lang.to_string()).join("Zcash");
             
             cmd_success(Command::new("git")
@@ -302,7 +302,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             
             Ok(())
         },
-        SupportedLangs::Ruby => {
+        SupportedLang::Ruby => {
             dir::copy(
                 package_template_dir.join(lang.to_string()),
                 &packaging_dir,
@@ -395,26 +395,26 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
     if !packages_path.exists() {
         return Err("This command depends on the output of: release . Execute it first.".into());
     }
-    SupportedLangs::iter().filter(|l| {
+    SupportedLang::iter().filter(|l| {
         if let Some(lang) = cfg.only_for_language {
             return *l == lang
         }else{
             true
         }
     }).try_for_each(|lang| match lang {
-        SupportedLangs::Python => {
+        SupportedLang::Python => {
             println!("python!");
             Ok(())
         },
-        SupportedLangs::Kotlin => {
+        SupportedLang::Kotlin => {
             println!("kotlin!");
             Ok(())
         },
-        SupportedLangs::Swift => {
+        SupportedLang::Swift => {
             println!("swift!");
             Ok(())
         },
-        SupportedLangs::Ruby => {
+        SupportedLang::Ruby => {
             println!("ruby!");
             Ok(())
         },
@@ -453,7 +453,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
     _ = remove_dir_all(&target_bindings_path);
 
     println!("Generating language bindings ...");
-    SupportedLangs::iter().try_for_each(|lang| {
+    SupportedLang::iter().try_for_each(|lang| {
         println!("Generating language bindings for {}", lang);
         cmd_success(Command::new("cargo")
             .arg("run")
@@ -481,8 +481,8 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
 
         // Language specific build stuff
         match lang {
-            SupportedLangs::Python => Ok(()),
-            SupportedLangs::Kotlin => {
+            SupportedLang::Python => Ok(()),
+            SupportedLang::Kotlin => {
                 let inner_dir = bindings_dir.join("uniffi").join("zcash");
                 rename(
                     bindings_dir.join("libuniffi_zcash.so"),
@@ -491,7 +491,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
                 fs::copy(root_dir.join("jna.jar"), inner_dir.join("jna.jar"))?;
                 Ok(())
             }
-            SupportedLangs::Swift => {
+            SupportedLang::Swift => {
                 println!("Generating swift module ...");
                 // We are generating this module for completion, but we are probably not going
                 // to use it. See https://mozilla.github.io/uniffi-rs/swift/module.html
@@ -518,7 +518,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
                 )?;
                 Ok(())
             }
-            SupportedLangs::Ruby => Ok(()),
+            SupportedLang::Ruby => Ok(()),
         }
     })
 }

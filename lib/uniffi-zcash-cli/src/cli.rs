@@ -1,7 +1,7 @@
 use std::str::FromStr;
 use clap::{builder::ValueParser, Arg, ArgAction, ArgMatches, Command};
 use strum::VariantNames;
-use crate::SupportedLangs;
+use crate::SupportedLang;
 use self::error::CLIError;
 
 pub mod error;
@@ -14,12 +14,12 @@ pub fn get_matches() -> ArgMatches {
         .subcommand(
             Command::new("bindgen").about(format!(
             "Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory",
-            SupportedLangs::VARIANTS.join(",")
+            SupportedLang::VARIANTS.join(",")
         )))
         .subcommand(
             Command::new("release").about(format!(
             "Prepares a release given a version (semantic versioning), creating all languages ({}) specific packages. It needs to be executed after the bindgen command",
-            SupportedLangs::VARIANTS.join(",")))
+            SupportedLang::VARIANTS.join(",")))
             .arg(
                 Arg::new("version")
                 .short('v')
@@ -38,7 +38,7 @@ pub fn get_matches() -> ArgMatches {
         .subcommand(
             Command::new("publish").about(format!(
             "Publish the previously generated packages (See release command) in all supported languages ({}) registries",
-            SupportedLangs::VARIANTS.join(",")
+            SupportedLang::VARIANTS.join(",")
             ))
             .arg(
                 Arg::new("confirmation")
@@ -52,7 +52,7 @@ pub fn get_matches() -> ArgMatches {
                 .long("only-for-language")
                 .env("ONLY_FOR_LANGUAGE")
                 .value_parser(validator_language())
-                .help(format!("Defines if the publish operation should be done only for one language ({}) .Useful in case of partial uploads)", SupportedLangs::VARIANTS.join(",")))
+                .help(format!("Defines if the publish operation should be done only for one language ({}) .Useful in case of partial uploads)", SupportedLang::VARIANTS.join(",")))
             )
             
         )
@@ -83,8 +83,8 @@ pub fn validator_regex(regex: &'static str, err_msg: &'static str) -> ValueParse
 
 /// Checks that provided string matches an internal supported language.
 pub fn validator_language() -> ValueParser {
-    ValueParser::from(move|input: &str| -> CLIResult<SupportedLangs> {
-        SupportedLangs::from_str(input).map_err(From::from)
+    ValueParser::from(move|input: &str| -> CLIResult<SupportedLang> {
+        SupportedLang::from_str(input).map_err(From::from)
     })
 }
 
