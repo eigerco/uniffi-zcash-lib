@@ -49,6 +49,7 @@ pub fn get_matches() -> ArgMatches {
                 .value_parser(validator_language())
                 .help(format!("Defines if the publish operation should be done only for one language ({}) .Useful in case of partial uploads)", SupportedLang::VARIANTS.join(",")))
             )
+            // Python
             .arg(
                 Arg::new("python_registry_url")
                 .long("python-registry-url")
@@ -63,6 +64,7 @@ pub fn get_matches() -> ArgMatches {
                 .env("PYTHON_REGISTRY_TOKEN")
                 .help("The pypi token, including the prefix 'pypi'.")
             )
+            // Ruby
             .arg(
                 Arg::new("ruby_registry_url")
                 .long("ruby-registry-url")
