@@ -1,5 +1,5 @@
 use std::{
-    fs::{read_to_string, OpenOptions},
+    fs::{create_dir_all, read_to_string, OpenOptions},
     io::{self, Write},
     path::{Path, PathBuf},
     process::{Command, ExitStatus},
@@ -9,6 +9,7 @@ use std::{
 use handlebars::Handlebars;
 use retry::{retry_with_index, OperationResult};
 use serde::Serialize;
+use uuid::Uuid;
 
 use crate::cli::CLIResult;
 
@@ -81,4 +82,13 @@ where
             Err(err) => OperationResult::Retry(err),
         }
     })?)
+}
+
+/// Generates a collision free /tmp folder
+pub fn tmp_folder() -> CLIResult<PathBuf> {
+    let uuid = Uuid::new_v4();
+    let name = format!("zcash_uniffi_{}", uuid);
+    let path_buff = std::env::temp_dir().join(name);
+    create_dir_all(&path_buff)?;
+    Ok(path_buff)
 }

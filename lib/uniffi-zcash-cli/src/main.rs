@@ -11,10 +11,9 @@ use fs_extra::{
     file::read_to_string,
 };
 
-use helper::{workspace_root_dir, in_file_template_replace, cmd_success};
+use helper::{workspace_root_dir, in_file_template_replace, cmd_success, tmp_folder};
 use serde_json::json;
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator};
-use uuid::Uuid;
 
 mod cli;
 mod helper;
@@ -419,15 +418,6 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
             Ok(())
         },
     })
-}
-
-/// Generates a collision free /tmp folder
-fn tmp_folder() -> CLIResult<PathBuf> {
-    let uuid = Uuid::new_v4();
-    let name = format!("zcash_uniffi_{}", uuid);
-    let path_buff = std::env::temp_dir().join(name);
-    create_dir_all(&path_buff)?;
-    Ok(path_buff)
 }
 
 fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
