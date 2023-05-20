@@ -1,8 +1,7 @@
-use clap::{builder::ValueParser, Arg, ArgMatches, Command};
+use std::str::FromStr;
+use clap::{builder::ValueParser, Arg, ArgAction, ArgMatches, Command};
 use strum::VariantNames;
-
 use crate::SupportedLangs;
-
 use self::error::CLIError;
 
 pub mod error;
@@ -12,7 +11,8 @@ pub fn get_matches() -> ArgMatches {
         .version(env!("CARGO_PKG_VERSION"))
         .about("A CLI for managing internal repo workflows")
         .subcommand_required(true)
-        .subcommand(Command::new("bindgen").about(format!(
+        .subcommand(
+            Command::new("bindgen").about(format!(
             "Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory",
             SupportedLangs::VARIANTS.join(",")
         )))
@@ -34,6 +34,27 @@ pub fn get_matches() -> ArgMatches {
                 .env("SWIFT_GIT_REPO_URL")
                 .help("For auth, use a Github personal access token.\nSee https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\nExample: https://<github-username>:<github-token>@github.com/<your-repository>.git")
             )
+        )
+        .subcommand(
+            Command::new("publish").about(format!(
+            "Publish the previously generated packages (See release command) in all supported languages ({}) registries",
+            SupportedLangs::VARIANTS.join(",")
+            ))
+            .arg(
+                Arg::new("confirmation")
+                .short('y')
+                .action(ArgAction::SetTrue)
+                .required(true)
+                .help("This is just a flag for security. Somehow a confirmation that YES, im sure what im doing. I want to publish.")
+            )
+            .arg(
+                Arg::new("only_for_language")
+                .long("only-for-language")
+                .env("ONLY_FOR_LANGUAGE")
+                .value_parser(validator_language())
+                .help(format!("Defines if the publish operation should be done only for one language ({}) .Useful in case of partial uploads)", SupportedLangs::VARIANTS.join(",")))
+            )
+            
         )
         .get_matches()
 }
@@ -57,6 +78,13 @@ pub fn validator_regex(regex: &'static str, err_msg: &'static str) -> ValueParse
             true => Ok(input.to_owned()),
             false => Err(format!("Value \"{}\" is not matching format: {}", input, err_msg).into()),
         }
+    })
+}
+
+/// Checks that provided string matches an internal supported language.
+pub fn validator_language() -> ValueParser {
+    ValueParser::from(move|input: &str| -> CLIResult<SupportedLangs> {
+        SupportedLangs::from_str(input).map_err(From::from)
     })
 }
 

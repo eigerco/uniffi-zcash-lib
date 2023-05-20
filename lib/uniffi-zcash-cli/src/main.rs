@@ -19,7 +19,7 @@ use uuid::Uuid;
 mod cli;
 mod helper;
 
-#[derive(Debug, Clone, Copy, Display, EnumString, EnumIter, EnumVariantNames)]
+#[derive(Debug, Clone, Copy, Display, EnumString, EnumIter, EnumVariantNames, PartialEq)]
 #[strum(serialize_all = "kebab_case")]
 enum SupportedLangs {
     #[strum(serialize = "python")]
@@ -30,6 +30,12 @@ enum SupportedLangs {
     Swift,
     #[strum(serialize = "ruby")]
     Ruby,
+}
+
+impl From<&SupportedLangs> for SupportedLangs {
+    fn from(value: &SupportedLangs) -> Self {
+        value.to_owned()
+    }
 }
 
 fn main() -> CLIResult<()> {
@@ -50,8 +56,19 @@ fn main() -> CLIResult<()> {
             prepare_release(&root_dir, version, swift_repo_url)?;
             Ok(())
         }
+        Some(("publish", args)) => {
+            let config = PublishConfig{
+                only_for_language: args.try_get_one::<SupportedLangs>("only_for_language")?.map(From::from),
+            };
+            publish(&root_dir, &config)?;
+            Ok(())
+        }
         _ => Err("Command not found. See help.".into()),
     }
+}
+
+struct PublishConfig {
+    only_for_language: Option<SupportedLangs>,
 }
 
 fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIResult<()> {
@@ -370,6 +387,37 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             
             Ok(())
         }
+    })
+}
+
+fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
+    let packages_path = root_dir.join("packages");
+    if !packages_path.exists() {
+        return Err("This command depends on the output of: release . Execute it first.".into());
+    }
+    SupportedLangs::iter().filter(|l| {
+        if let Some(lang) = cfg.only_for_language {
+            return *l == lang
+        }else{
+            true
+        }
+    }).try_for_each(|lang| match lang {
+        SupportedLangs::Python => {
+            println!("python!");
+            Ok(())
+        },
+        SupportedLangs::Kotlin => {
+            println!("kotlin!");
+            Ok(())
+        },
+        SupportedLangs::Swift => {
+            println!("swift!");
+            Ok(())
+        },
+        SupportedLangs::Ruby => {
+            println!("ruby!");
+            Ok(())
+        },
     })
 }
 
