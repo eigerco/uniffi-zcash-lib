@@ -105,7 +105,7 @@ pub fn validator_regex(regex: &'static str, err_msg: &'static str) -> ValueParse
 
 /// Checks that provided string matches an internal supported language.
 pub fn validator_language() -> ValueParser {
-    ValueParser::from(move|input: &str| -> CLIResult<SupportedLang> {
+    ValueParser::from(move |input: &str| -> CLIResult<SupportedLang> {
         SupportedLang::from_str(input).map_err(From::from)
     })
 }
