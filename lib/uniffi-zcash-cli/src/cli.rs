@@ -52,11 +52,18 @@ pub fn get_matches() -> ArgMatches {
                 .help("The http[s] URL of the target python package index. i.e https://upload.pypi.org/legacy/")
             )
             .arg(
-                Arg::new("python_registry_token")
-                .long("python-registry-token")
+                Arg::new("python_registry_username")
+                .long("python-registry-username")
                 .required(true)
-                .env("PYTHON_REGISTRY_TOKEN")
-                .help("The pypi token, including the prefix 'pypi'.")
+                .env("PYTHON_REGISTRY_USERNAME")
+                .help("The pypi username. Should be '__token__' if using token auth.")
+            )
+            .arg(
+                Arg::new("python_registry_password")
+                .long("python-registry-password")
+                .required(true)
+                .env("PYTHON_REGISTRY_PASSWORD")
+                .help("The pypi password. In case of token auth, including the prefix 'pypi'.")
             )
             // Ruby
             .arg(

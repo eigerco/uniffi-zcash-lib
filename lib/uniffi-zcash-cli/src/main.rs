@@ -62,7 +62,8 @@ fn main() -> CLIResult<()> {
                 version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
                 only_for_language: args.try_get_one::<SupportedLang>("only_for_language")?.map(From::from),
                 python_registry_url: args.try_get_one::<String>("python_registry_url")?.unwrap().to_owned(),
-                python_registry_token: args.try_get_one::<String>("python_registry_token")?.unwrap().to_owned(),
+                python_registry_username: args.try_get_one::<String>("python_registry_username")?.unwrap().to_owned(),
+                python_registry_password: args.try_get_one::<String>("python_registry_password")?.unwrap().to_owned(),
                 ruby_registry_url: args.try_get_one::<String>("ruby_registry_url")?.unwrap().to_owned(),
                 ruby_registry_token: args.try_get_one::<String>("ruby_registry_token")?.unwrap().to_owned(),
                 kotlin_registry_url: args.try_get_one::<String>("kotlin_registry_url")?.unwrap().to_owned(),
@@ -527,8 +528,8 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
                 .arg("upload")
                 .arg("dist/*")
                 .env("TWINE_REPOSITORY_URL", &cfg.python_registry_url)
-                .env("TWINE_USERNAME", "__token__")
-                .env("TWINE_PASSWORD", &cfg.python_registry_token)
+                .env("TWINE_USERNAME", &cfg.python_registry_username)
+                .env("TWINE_PASSWORD", &cfg.python_registry_password)
                 .current_dir(&lang_package_path);
 
             Ok(cmd_retry("Python publication", Exponential::from_millis(1000), 10, publish_cmd)?)
@@ -619,7 +620,8 @@ struct PublishConfig {
     version: String,
     only_for_language: Option<SupportedLang>,
     python_registry_url: String,
-    python_registry_token: String,
+    python_registry_username: String,
+    python_registry_password: String,
     ruby_registry_url: String,
     ruby_registry_token: String,
     kotlin_registry_url: String,
