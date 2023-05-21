@@ -79,7 +79,7 @@ pub fn get_matches() -> ArgMatches {
                 .long("kotlin-registry-url")
                 .required(true)
                 .env("KOTLIN_REGISTRY_URL")
-                .help("The http[s] URL of the target kotlin package index. i.e https://kotlingems.org")
+                .help("The http[s] URL of the target kotlin package index. i.e https://repo.maven.apache.org/maven2/")
             )
             .arg(
                 Arg::new("kotlin_registry_username")
