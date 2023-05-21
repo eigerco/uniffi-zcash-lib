@@ -52,8 +52,8 @@ fn main() -> CLIResult<()> {
         }
         Some(("release", args)) => {
             let version = args.try_get_one::<String>("version")?.unwrap();
-            let swift_repo_url = args.try_get_one::<String>("swift_repo_url")?.unwrap();
-            prepare_release(&root_dir, version, swift_repo_url)?;
+            let swift_git_repo_url = args.try_get_one::<String>("swift_git_repo_url")?.unwrap();
+            prepare_release(&root_dir, version, swift_git_repo_url)?;
             Ok(())
         }
         Some(("publish", args)) => {
@@ -170,7 +170,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
     })
 }
 
-fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIResult<()> {
+    fn prepare_release(root_dir: &Path, version: &str, swift_git_repo_url: &str) -> CLIResult<()> {
     let bindings_path = root_dir.join("bindings");
     if !bindings_path.exists() {
         return Err("This command depends on the output of bindgen . Execute it first.".into());
@@ -322,7 +322,7 @@ fn prepare_release(root_dir: &Path, version: &str, swift_repo_url: &str) -> CLIR
             
             cmd_success(Command::new("git")
                 .arg("clone")
-                .arg(swift_repo_url)
+                .arg(swift_git_repo_url)
                 .arg(&lang_pack_dir)
                 .spawn()?
                 .wait()

@@ -21,13 +21,7 @@ pub fn get_matches() -> ArgMatches {
             "Prepares a release given a version (semantic versioning), creating all languages ({}) specific packages. It needs to be executed after the bindgen command",
             SupportedLang::VARIANTS.join(",")))
             .arg(arg_version())
-            .arg(
-                Arg::new("swift_repo_url")
-                .long("swift-repo-url")
-                .required(true)
-                .env("SWIFT_GIT_REPO_URL")
-                .help("For auth, use a Github personal access token.\nSee https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\nExample: https://<github-username>:<github-token>@github.com/<your-repository>.git")
-            )
+            .arg(arg_swift_git_repo_url())
         )
         .subcommand(
             Command::new("publish").about(format!(
@@ -111,6 +105,14 @@ fn arg_version() -> Arg {
         .long("version")
         .required(true)
         .value_parser(validator_semver())
+}
+
+fn arg_swift_git_repo_url() -> Arg {
+    Arg::new("swift_git_repo_url")
+    .long("swift-git-repo-url")
+    .required(true)
+    .env("SWIFT_GIT_REPO_URL")
+    .help("For auth, use a Github personal access token.\nSee https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token\nExample: https://<github-username>:<github-token>@github.com/<your-repository>.git")
 }
 
 /// See https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
