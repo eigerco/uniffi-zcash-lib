@@ -95,6 +95,24 @@ pub fn get_matches() -> ArgMatches {
                 .env("KOTLIN_REGISTRY_PASSWORD")
                 .help("The kotlin registry password, can be also a token.")
             )
+            // Swift
+            .arg(arg_swift_git_repo_url())
+            /* TODO: Uncomment this code (and the one in the publish subcommand) if you want to also publish in swift package registry.
+            .arg(
+                Arg::new("swift_registry_url")
+                .long("swift-registry-url")
+                .required(true)
+                .env("SWIFT_REGISTRY_URL")
+                .help("The swift registry url. i.e https://swiftpackageindex.com/")
+            )
+            .arg(
+                Arg::new("swift_registry_token")
+                .long("swift-registry-token")
+                .required(true)
+                .env("SWIFT_REGISTRY_TOKEN")
+                .help("The swift registry token.")
+            )
+            */
         )
         .get_matches()
 }

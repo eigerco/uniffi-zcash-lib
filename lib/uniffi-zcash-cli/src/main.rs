@@ -68,7 +68,10 @@ fn main() -> CLIResult<()> {
                 kotlin_registry_url: args.try_get_one::<String>("kotlin_registry_url")?.unwrap().to_owned(),
                 kotlin_registry_username: args.try_get_one::<String>("kotlin_registry_username")?.unwrap().to_owned(),
                 kotlin_registry_password: args.try_get_one::<String>("kotlin_registry_password")?.unwrap().to_owned(),
-            
+
+                swift_git_repo_url: args.try_get_one::<String>("swift_git_repo_url")?.unwrap().to_owned(),
+                // swift_registry_url: args.try_get_one::<String>("swift_registry_url")?.unwrap().to_owned(),
+                // swift_registry_token: args.try_get_one::<String>("swift_registry_token")?.unwrap().to_owned()
             };
             publish(&root_dir, &config)?;
             Ok(())
@@ -516,16 +519,16 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
                 .wait()
             )?;
 
-            // Publish the artifact.
+            // Publish the artifact. See twine --help options.
             let mut publish_cmd = Command::new("python");
             publish_cmd
                 .arg("-m")
                 .arg("twine")
                 .arg("upload")
+                .arg("dist/*")
                 .env("TWINE_REPOSITORY_URL", &cfg.python_registry_url)
                 .env("TWINE_USERNAME", "__token__")
                 .env("TWINE_PASSWORD", &cfg.python_registry_token)
-                .arg("dist/*")
                 .current_dir(&lang_package_path);
 
             Ok(cmd_retry("Python publication", Exponential::from_millis(1000), 10, publish_cmd)?)
@@ -545,12 +548,58 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
             Ok(cmd_retry("Kotlin publication", Exponential::from_millis(1000), 10, publish_cmd)?)
         },
         SupportedLang::Swift => {
-            println!("swift!");
-            Ok(())
+            let lang_package_path = packages_path.join(lang.to_string()).join("Zcash");
+
+            // Publish the artifact to git.
+            let mut git_publish_cmd = Command::new("git");
+            git_publish_cmd
+                .arg("push")
+                .arg("--progress")
+                .arg(&cfg.swift_git_repo_url)
+                .current_dir(&lang_package_path);
+
+            cmd_retry("Swift Git push", Exponential::from_millis(1000), 10, git_publish_cmd)?;
+
+            // Push the tags to git.
+            let mut git_tags_cmd = Command::new("git");
+            git_tags_cmd
+                .arg("push")
+                .arg("--tags")
+                .arg(&cfg.swift_git_repo_url)
+                .current_dir(&lang_package_path);
+
+            Ok(cmd_retry("Swift push tags", Exponential::from_millis(1000), 10, git_tags_cmd)?)
+        /* 
+            TODO: Uncomment this code if you want to publish in the swift package registry.
+
+            // Log-in into swift package registry via token. See https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageRegistryUsage.md#registry-authentication
+            cmd_success(Command::new("swift")
+                .arg("package-registry")
+                .arg(&cfg.swift_registry_url)
+                .arg("--token")
+                .arg(&cfg.swift_registry_token)
+                .arg("--no-confirm")
+                .spawn()?
+                .wait()
+            )?;
+
+            // Publish the artifact to swift package registry. See https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageRegistryUsage.md#publishing-to-registry
+            let mut swift_reg_publish_cmd = Command::new("swift");
+            swift_reg_publish_cmd
+                .arg("package-registry")
+                .arg("publish")
+                .arg(&cfg.version)
+                .arg("--url")
+                .arg(&cfg.swift_registry_url)
+                .current_dir(&lang_package_path);
+
+            Ok(cmd_retry("Swift registry publish", Exponential::from_millis(1000), 10, swift_reg_publish_cmd)?)
+        */
         },
         SupportedLang::Ruby => {
             let lang_package_path = packages_path.join(lang.to_string());
-            // Publish the artifact.
+            
+            // Publish the artifact. See https://guides.rubygems.org/publishing/
             let mut publish_cmd = Command::new("gem");
             publish_cmd
                 .arg("push")
@@ -576,4 +625,7 @@ struct PublishConfig {
     kotlin_registry_url: String,
     kotlin_registry_username: String,
     kotlin_registry_password: String,
+    swift_git_repo_url: String,
+    // swift_registry_url: String,
+    // swift_registry_token: String,
 }
