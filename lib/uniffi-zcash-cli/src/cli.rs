@@ -25,11 +25,21 @@ pub fn get_matches() -> ArgMatches {
             SupportedLang::VARIANTS.join(",")
         )))
         .subcommand(
-            Command::new("release").about(format!(
-            "Prepares a release given a version (semantic versioning), creating all languages ({}) specific packages. It needs to be executed after the bindgen command",
-            SupportedLang::VARIANTS.join(",")))
-            .arg(arg_version())
-            .arg(arg_swift_git_repo_url())
+            Command::new("release")
+            .about("Prepares a release for a given a version (semantic versioning). It needs to be executed after the 'bindgen' command.")
+            .subcommand(Command::new("python").about("Prepares release for Python.")
+                .arg(arg_version())
+            )
+            .subcommand(Command::new("ruby").about("Prepares release for Ruby.")
+                .arg(arg_version())           
+            )
+            .subcommand(Command::new("kotlin").about("Prepares release for Kotlin.")
+                .arg(arg_version())
+            )   
+            .subcommand(Command::new("swift").about("Prepares release for Swift.")
+                .arg(arg_version())
+                .arg(arg_swift_git_repo_url())
+            )
         )
         .subcommand(
             Command::new("publish")

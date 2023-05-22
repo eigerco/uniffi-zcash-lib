@@ -1,5 +1,5 @@
 use std::{
-    fs::{create_dir_all, read_to_string, OpenOptions},
+    fs::{create_dir_all, read_to_string, remove_dir_all, OpenOptions},
     io::{self, Write},
     path::{Path, PathBuf},
     process::{Command, ExitStatus},
@@ -91,4 +91,9 @@ pub fn tmp_folder() -> CLIResult<PathBuf> {
     let path_buff = std::env::temp_dir().join(name);
     create_dir_all(&path_buff)?;
     Ok(path_buff)
+}
+
+pub fn clean_dir(dir: &PathBuf) -> CLIResult<()> {
+    _ = remove_dir_all(dir);
+    Ok(create_dir_all(dir)?)
 }
