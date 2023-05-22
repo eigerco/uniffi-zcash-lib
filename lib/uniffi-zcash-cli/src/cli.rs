@@ -10,20 +10,19 @@ pub fn get_matches() -> ArgMatches {
         .version(env!("CARGO_PKG_VERSION"))
         .about("A CLI for managing internal repo workflows")
         .subcommand_required(true)
-        .arg(
-            Arg::new("enabled_languages")
-            .long("enabled-languages")
-            .env("ENABLED_LANGUAGES")
-            .value_delimiter(',')
-            .value_parser(PossibleValuesParser::new(SupportedLang::VARIANTS))
-            .required(false)
-            .default_values(SupportedLang::VARIANTS)
-        )
         .subcommand(
-            Command::new("bindgen").about(format!(
-            "Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory",
-            SupportedLang::VARIANTS.join(",")
-        )))
+            Command::new("bindgen")
+            .about(format!("Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory", SupportedLang::VARIANTS.join(",")))
+            .arg(
+                Arg::new("languages")
+                .long("languages")
+                .env("LANGUAGES")
+                .value_delimiter(',')
+                .value_parser(PossibleValuesParser::new(SupportedLang::VARIANTS))
+                .required(false)
+                .default_values(SupportedLang::VARIANTS)
+            )
+        )
         .subcommand(
             Command::new("release")
             .about("Prepares a release for a given a version (semantic versioning). It needs to be executed after the 'bindgen' command.")
