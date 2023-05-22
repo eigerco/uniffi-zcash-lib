@@ -1,5 +1,5 @@
 PYTHON_REGISTRY_URL=http://localhost:3141/root/pypi/+simple/
-PYTHON_REGISTRY_USER=__token__
+PYTHON_REGISTRY_USERNAME=__token__
 PYTHON_REGISTRY_PASSWORD=admin
 
 RUBY_REGISTRY_URL=http://localhost:9292/
