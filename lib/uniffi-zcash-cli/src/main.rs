@@ -11,13 +11,14 @@ use fs_extra::{
     file::read_to_string,
 };
 
-use helper::{workspace_root_dir, in_file_template_replace, cmd_success, tmp_folder, cmd_retry};
-use retry::delay::Exponential;
+use helper::{workspace_root_dir, in_file_template_replace, cmd_success, tmp_folder};
+
 use serde_json::json;
 use strum::{Display, EnumIter, EnumString, EnumVariantNames, IntoEnumIterator};
 
 mod cli;
 mod helper;
+mod publish;
 
 #[derive(Debug, Clone, Copy, Display, EnumString, EnumIter, EnumVariantNames, PartialEq)]
 #[strum(serialize_all = "kebab_case")]
@@ -42,6 +43,7 @@ fn main() -> CLIResult<()> {
     let matches = get_matches();
 
     let root_dir = workspace_root_dir()?;
+    let packages_dir = root_dir.join("packages");
     set_current_dir(&root_dir)?;
 
     let enabled_languages =  matches.try_get_many::<String>("enabled_languages")?.unwrap()
@@ -61,24 +63,63 @@ fn main() -> CLIResult<()> {
             Ok(())
         }
         Some(("publish", args)) => {
-            let config = PublishConfig{
-                enabled_languages: enabled_languages.to_owned(),
-                version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
-                python_registry_url: args.try_get_one::<String>("python_registry_url")?.unwrap().to_owned(),
-                python_registry_username: args.try_get_one::<String>("python_registry_username")?.unwrap().to_owned(),
-                python_registry_password: args.try_get_one::<String>("python_registry_password")?.unwrap().to_owned(),
-                ruby_registry_url: args.try_get_one::<String>("ruby_registry_url")?.unwrap().to_owned(),
-                ruby_registry_token: args.try_get_one::<String>("ruby_registry_token")?.unwrap().to_owned(),
-                kotlin_registry_url: args.try_get_one::<String>("kotlin_registry_url")?.unwrap().to_owned(),
-                kotlin_registry_username: args.try_get_one::<String>("kotlin_registry_username")?.unwrap().to_owned(),
-                kotlin_registry_password: args.try_get_one::<String>("kotlin_registry_password")?.unwrap().to_owned(),
+            match args.subcommand() {
+                Some(("python", args)) => {
+                    let cfg = publish::PythonConfig{                        
+                        lang_package_path: packages_dir.join("python"),
+                        registry_url: args.try_get_one::<String>("registry_url")?.unwrap().to_owned(),
+                        registry_username: args.try_get_one::<String>("registry_username")?.unwrap().to_owned(),
+                        registry_password: args.try_get_one::<String>("registry_password")?.unwrap().to_owned(),
+                    };
+                    cfg.lang_package_path.try_exists()?;
+                    Ok(publish::python(&cfg)?)
+                }
+                Some(("ruby", args)) => {
+                    let cfg = publish::RubyConfig{
+                        lang_package_path: packages_dir.join("ruby"),
+                        version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
+                        registry_url: args.try_get_one::<String>("registry_url")?.unwrap().to_owned(),
+                        registry_token: args.try_get_one::<String>("registry_token")?.unwrap().to_owned()
+                    };
+                    cfg.lang_package_path.try_exists()?;
+                    Ok(publish::ruby(&cfg)?)
+                }
+                Some(("kotlin", args)) => {
+                    let cfg = publish::KotlinConfig{
+                        lang_package_path: packages_dir.join("kotlin"),
+                        registry_url: args.try_get_one::<String>("registry_url")?.unwrap().to_owned(),
+                        registry_username: args.try_get_one::<String>("registry_username")?.unwrap().to_owned(),
+                        registry_password: args.try_get_one::<String>("registry_password")?.unwrap().to_owned(),
+                    };
+                    cfg.lang_package_path.try_exists()?;
+                    Ok(publish::kotlin(&cfg)?)
+                }
+                Some(("swift", args)) => {
 
-                swift_git_repo_url: args.try_get_one::<String>("swift_git_repo_url")?.unwrap().to_owned(),
-                // swift_registry_url: args.try_get_one::<String>("swift_registry_url")?.unwrap().to_owned(),
-                // swift_registry_token: args.try_get_one::<String>("swift_registry_token")?.unwrap().to_owned()
-            };
-            publish(&root_dir, &config)?;
-            Ok(())
+                    match args.subcommand() {
+                        Some(("git-repo", args)) => {
+                            let cfg = publish::SwiftRepoConfig{
+                                lang_package_path: packages_dir.join("swift"),
+                                git_repo_url: args.try_get_one::<String>("git_repo_url")?.unwrap().to_owned(),
+                            };
+                            cfg.lang_package_path.try_exists()?;
+                            Ok(publish::swift_repo(&cfg)?)
+                        }
+                        Some(("registry", args)) => {
+                            let cfg = publish::SwiftRegistryConfig{
+                                lang_package_path: packages_dir.join("swift"),
+                                version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
+                                registry_url: args.try_get_one::<String>("registry_url")?.unwrap().to_owned(),
+                                registry_token: args.try_get_one::<String>("registry_token")?.unwrap().to_owned(),
+                            };
+                            cfg.lang_package_path.try_exists()?;
+                            Ok(publish::swift_registry(&cfg)?)
+                        }
+                        _ => Err("Command not found. See help.".into())
+                    }
+                }
+                _ => Err("Command not found. See help.".into()),
+            }
         }
         _ => Err("Command not found. See help.".into()),
     }
@@ -499,139 +540,4 @@ fn prepare_release(root_dir: &Path, version: &str, swift_git_repo_url: &str, ena
             Ok(())
         }
     })
-}
-
-fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
-    let packages_path = root_dir.join("packages");
-    if !packages_path.exists() {
-        return Err("This command depends on the output of: release . Execute it first.".into());
-    }
-    SupportedLang::iter()
-    .filter(|sl| cfg.enabled_languages.contains(&sl.to_string()))
-    .try_for_each(|lang| match lang {
-        SupportedLang::Python => {
-            let lang_package_path = packages_path.join(lang.to_string());
-            
-            // Ensure deps are installed.
-            cmd_success(Command::new("python")
-                .arg("-m")
-                .arg("pip")
-                .arg("install")
-                .arg("--user")
-                .arg("--upgrade")
-                .arg("twine")
-                .spawn()?
-                .wait()
-            )?;
-
-            // Publish the artifact. See twine --help options.
-            let mut publish_cmd = Command::new("python");
-            publish_cmd
-                .arg("-m")
-                .arg("twine")
-                .arg("upload")
-                .arg("dist/*")
-                .env("TWINE_REPOSITORY_URL", &cfg.python_registry_url)
-                .env("TWINE_USERNAME", &cfg.python_registry_username)
-                .env("TWINE_PASSWORD", &cfg.python_registry_password)
-                .current_dir(&lang_package_path);
-
-            Ok(cmd_retry("Python publication", Exponential::from_millis(1000), 10, publish_cmd)?)
-        },
-        SupportedLang::Kotlin => {
-
-            let lang_package_path = packages_path.join(lang.to_string());
-
-            let mut publish_cmd = Command::new("./gradlew");
-            publish_cmd
-                .arg("publish")
-                .env("KOTLIN_REGISTRY_URL", &cfg.kotlin_registry_url)
-                .env("KOTLIN_REGISTRY_USERNAME", &cfg.kotlin_registry_username)
-                .env("KOTLIN_REGISTRY_PASSWORD", &cfg.kotlin_registry_password)
-                .current_dir(&lang_package_path);
-
-            Ok(cmd_retry("Kotlin publication", Exponential::from_millis(1000), 10, publish_cmd)?)
-        },
-        SupportedLang::Swift => {
-            let lang_package_path = packages_path.join(lang.to_string()).join("Zcash");
-
-            // Publish the artifact to git.
-            let mut git_publish_cmd = Command::new("git");
-            git_publish_cmd
-                .arg("push")
-                .arg("--progress")
-                .arg(&cfg.swift_git_repo_url)
-                .current_dir(&lang_package_path);
-
-            cmd_retry("Swift Git push", Exponential::from_millis(1000), 10, git_publish_cmd)?;
-
-            // Push the tags to git.
-            let mut git_tags_cmd = Command::new("git");
-            git_tags_cmd
-                .arg("push")
-                .arg("--tags")
-                .arg(&cfg.swift_git_repo_url)
-                .current_dir(&lang_package_path);
-
-            Ok(cmd_retry("Swift push tags", Exponential::from_millis(1000), 10, git_tags_cmd)?)
-        /* 
-            TODO: Uncomment this code if you want to publish in the swift package registry.
-
-            // Log-in into swift package registry via token. See https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageRegistryUsage.md#registry-authentication
-            cmd_success(Command::new("swift")
-                .arg("package-registry")
-                .arg(&cfg.swift_registry_url)
-                .arg("--token")
-                .arg(&cfg.swift_registry_token)
-                .arg("--no-confirm")
-                .spawn()?
-                .wait()
-            )?;
-
-            // Publish the artifact to swift package registry. See https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageRegistryUsage.md#publishing-to-registry
-            let mut swift_reg_publish_cmd = Command::new("swift");
-            swift_reg_publish_cmd
-                .arg("package-registry")
-                .arg("publish")
-                .arg(&cfg.version)
-                .arg("--url")
-                .arg(&cfg.swift_registry_url)
-                .current_dir(&lang_package_path);
-
-            Ok(cmd_retry("Swift registry publish", Exponential::from_millis(1000), 10, swift_reg_publish_cmd)?)
-        */
-        },
-        SupportedLang::Ruby => {
-            let lang_package_path = packages_path.join(lang.to_string());
-            
-            // Publish the artifact. See https://guides.rubygems.org/publishing/
-            let mut publish_cmd = Command::new("gem");
-            publish_cmd
-                .arg("push")
-                .arg(format!("zcash-{}.gem", &cfg.version))
-                .arg("--norc")
-                .arg("--host")
-                .arg(&cfg.ruby_registry_url)
-                .env("GEM_HOST_API_KEY", &cfg.ruby_registry_token)
-                .current_dir(&lang_package_path);
-
-            Ok(cmd_retry("Ruby publication", Exponential::from_millis(1000), 10, publish_cmd)?)
-        },
-    })
-}
-
-struct PublishConfig {
-    enabled_languages: Vec<String>,
-    version: String,
-    python_registry_url: String,
-    python_registry_username: String,
-    python_registry_password: String,
-    ruby_registry_url: String,
-    ruby_registry_token: String,
-    kotlin_registry_url: String,
-    kotlin_registry_username: String,
-    kotlin_registry_password: String,
-    swift_git_repo_url: String,
-    // swift_registry_url: String,
-    // swift_registry_token: String,
 }
