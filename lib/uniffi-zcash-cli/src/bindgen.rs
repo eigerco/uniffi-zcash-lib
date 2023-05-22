@@ -3,9 +3,10 @@ use std::{
     path::{Path, PathBuf},
     process::Command,
 };
-use strum::IntoEnumIterator;
 
-use crate::{cli::CLIResult, helper::cmd_success, SupportedLang};
+use crate::{
+    cli::CLIResult, helper::cmd_success, KOTLIN, PYTHON, RUBY, SUPPORTED_LANGUAGES, SWIFT,
+};
 
 pub fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
     println!("Generating shared library ...");
@@ -35,7 +36,8 @@ pub fn generate_bindings(
     _ = remove_dir_all(&target_bindings_path);
 
     println!("Generating language bindings ...");
-    SupportedLang::iter()
+    SUPPORTED_LANGUAGES
+        .into_iter()
         .filter(|sl| enabled_languages.contains(&sl.to_string()))
         .try_for_each(|lang| {
             println!("Generating language bindings for {}", lang);
@@ -49,25 +51,25 @@ pub fn generate_bindings(
                     .arg("--config")
                     .arg(root_dir.join("uniffi-bindgen").join("uniffi.toml"))
                     .arg("--language")
-                    .arg(lang.to_string())
+                    .arg(lang)
                     .arg("--out-dir")
-                    .arg(target_bindings_path.join(lang.to_string()))
+                    .arg(target_bindings_path.join(lang))
                     .spawn()?
                     .wait(),
             )?;
 
             let shared_lib_dest_path = target_bindings_path
-                .join(lang.to_string())
+                .join(lang)
                 .join("libuniffi_zcash.so");
 
             fs::copy(shared_lib, shared_lib_dest_path)?;
 
-            let bindings_dir = target_bindings_path.join(lang.to_string());
+            let bindings_dir = target_bindings_path.join(lang);
 
             // Language specific build stuff
             match lang {
-                SupportedLang::Python => Ok(()),
-                SupportedLang::Kotlin => {
+                PYTHON => Ok(()),
+                KOTLIN => {
                     let inner_dir = bindings_dir.join("uniffi").join("zcash");
                     rename(
                         bindings_dir.join("libuniffi_zcash.so"),
@@ -76,7 +78,7 @@ pub fn generate_bindings(
                     fs::copy(root_dir.join("jna.jar"), inner_dir.join("jna.jar"))?;
                     Ok(())
                 }
-                SupportedLang::Swift => {
+                SWIFT => {
                     println!("Generating swift module ...");
                     // We are generating this module for completion, but we are probably not going
                     // to use it. See https://mozilla.github.io/uniffi-rs/swift/module.html
@@ -104,7 +106,8 @@ pub fn generate_bindings(
                     )?;
                     Ok(())
                 }
-                SupportedLang::Ruby => Ok(()),
+                RUBY => Ok(()),
+                &_ => panic!("Unrecognized language (programming error). A language was added, but has no support in code !"),
             }
         })
 }

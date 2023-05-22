@@ -1,7 +1,6 @@
 use self::error::CLIError;
-use crate::SupportedLang;
+use crate::SUPPORTED_LANGUAGES;
 use clap::{builder::{ValueParser, PossibleValuesParser}, Arg, ArgMatches, Command};
-use strum::VariantNames;
 
 pub mod error;
 
@@ -12,15 +11,15 @@ pub fn get_matches() -> ArgMatches {
         .subcommand_required(true)
         .subcommand(
             Command::new("bindgen")
-            .about(format!("Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory", SupportedLang::VARIANTS.join(",")))
+            .about(format!("Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory", SUPPORTED_LANGUAGES.join(",")))
             .arg(
                 Arg::new("languages")
                 .long("languages")
                 .env("LANGUAGES")
                 .value_delimiter(',')
-                .value_parser(PossibleValuesParser::new(SupportedLang::VARIANTS))
+                .value_parser(PossibleValuesParser::new(SUPPORTED_LANGUAGES))
                 .required(false)
-                .default_values(SupportedLang::VARIANTS)
+                .default_values(SUPPORTED_LANGUAGES)
             )
         )
         .subcommand(

@@ -5,32 +5,18 @@ use cli::{get_matches, CLIResult};
 
 use helper::workspace_root_dir;
 
-use strum::{Display, EnumIter, EnumString, EnumVariantNames};
-
 mod bindgen;
 mod cli;
 mod helper;
 mod publish;
 mod release;
 
-#[derive(Debug, Clone, Copy, Display, EnumString, EnumIter, EnumVariantNames, PartialEq)]
-#[strum(serialize_all = "kebab_case")]
-enum SupportedLang {
-    #[strum(serialize = "python")]
-    Python,
-    #[strum(serialize = "kotlin")]
-    Kotlin,
-    #[strum(serialize = "swift")]
-    Swift,
-    #[strum(serialize = "ruby")]
-    Ruby,
-}
+const PYTHON: &str = "python";
+const RUBY: &str = "ruby";
+const KOTLIN: &str = "kotlin";
+const SWIFT: &str = "swift";
 
-impl From<&SupportedLang> for SupportedLang {
-    fn from(value: &SupportedLang) -> Self {
-        value.to_owned()
-    }
-}
+const SUPPORTED_LANGUAGES: [&str; 4] = [PYTHON, RUBY, KOTLIN, SWIFT];
 
 fn main() -> CLIResult<()> {
     let matches = get_matches();
@@ -54,51 +40,47 @@ fn main() -> CLIResult<()> {
         Some(("release", args)) => {
             let package_template_dir = root_dir.join("uniffi-zcash-cli").join("templates");
             match args.subcommand() {
-                Some(("python", args)) => {
-                    let lang = "python";
+                Some((PYTHON, args)) => {
                     let cfg = release::PythonConfig {
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
-                        package_template_dir: package_template_dir.join(lang),
+                        package_template_dir: package_template_dir.join(PYTHON),
                         test_app_template_dir: package_template_dir.join("python_test_app"),
-                        bindings_dir: bindings_dir.join(lang),
-                        package_dir: packages_dir.join(lang),
+                        bindings_dir: bindings_dir.join(PYTHON),
+                        package_dir: packages_dir.join(PYTHON),
                     };
                     Ok(release::python(&cfg)?)
                 }
-                Some(("ruby", args)) => {
-                    let lang = "ruby";
+                Some((RUBY, args)) => {
                     let cfg = release::RubyConfig {
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
-                        package_template_dir: package_template_dir.join(lang),
+                        package_template_dir: package_template_dir.join(RUBY),
                         test_app_template_dir: package_template_dir.join("ruby_test_app"),
-                        bindings_dir: bindings_dir.join(lang),
-                        package_dir: packages_dir.join(lang),
+                        bindings_dir: bindings_dir.join(RUBY),
+                        package_dir: packages_dir.join(RUBY),
                     };
                     Ok(release::ruby(&cfg)?)
                 }
-                Some(("kotlin", args)) => {
-                    let lang = "kotlin";
+                Some((KOTLIN, args)) => {
                     let cfg = release::KotlinConfig {
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
-                        package_template_dir: package_template_dir.join(lang),
+                        package_template_dir: package_template_dir.join(KOTLIN),
                         test_app_template_dir: package_template_dir.join("kotlin_test_app"),
-                        bindings_dir: bindings_dir.join(lang),
-                        package_dir: packages_dir.join(lang),
+                        bindings_dir: bindings_dir.join(KOTLIN),
+                        package_dir: packages_dir.join(KOTLIN),
                     };
                     Ok(release::kotlin(&cfg)?)
                 }
-                Some(("swift", args)) => {
-                    let lang = "swift";
+                Some((SWIFT, args)) => {
                     let cfg = release::SwiftConfig {
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
                         git_repo_url: args
                             .try_get_one::<String>("git_repo_url")?
                             .unwrap()
                             .to_owned(),
-                        package_template_dir: package_template_dir.join(lang),
+                        package_template_dir: package_template_dir.join(SWIFT),
                         test_app_template_dir: package_template_dir.join("swift_test_app"),
-                        bindings_dir: bindings_dir.join(lang),
-                        package_dir: packages_dir.join(lang),
+                        bindings_dir: bindings_dir.join(SWIFT),
+                        package_dir: packages_dir.join(SWIFT),
                     };
                     Ok(release::swift(&cfg)?)
                 }
@@ -106,9 +88,9 @@ fn main() -> CLIResult<()> {
             }
         }
         Some(("publish", args)) => match args.subcommand() {
-            Some(("python", args)) => {
+            Some((PYTHON, args)) => {
                 let cfg = publish::PythonConfig {
-                    lang_package_path: packages_dir.join("python"),
+                    lang_package_path: packages_dir.join(PYTHON),
                     registry_url: args
                         .try_get_one::<String>("registry_url")?
                         .unwrap()
@@ -125,9 +107,9 @@ fn main() -> CLIResult<()> {
                 cfg.lang_package_path.try_exists()?;
                 Ok(publish::python(&cfg)?)
             }
-            Some(("ruby", args)) => {
+            Some((RUBY, args)) => {
                 let cfg = publish::RubyConfig {
-                    lang_package_path: packages_dir.join("ruby"),
+                    lang_package_path: packages_dir.join(RUBY),
                     version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
                     registry_url: args
                         .try_get_one::<String>("registry_url")?
@@ -141,9 +123,9 @@ fn main() -> CLIResult<()> {
                 cfg.lang_package_path.try_exists()?;
                 Ok(publish::ruby(&cfg)?)
             }
-            Some(("kotlin", args)) => {
+            Some((KOTLIN, args)) => {
                 let cfg = publish::KotlinConfig {
-                    lang_package_path: packages_dir.join("kotlin"),
+                    lang_package_path: packages_dir.join(KOTLIN),
                     registry_url: args
                         .try_get_one::<String>("registry_url")?
                         .unwrap()
@@ -160,10 +142,10 @@ fn main() -> CLIResult<()> {
                 cfg.lang_package_path.try_exists()?;
                 Ok(publish::kotlin(&cfg)?)
             }
-            Some(("swift", args)) => match args.subcommand() {
+            Some((SWIFT, args)) => match args.subcommand() {
                 Some(("git-repo", args)) => {
                     let cfg = publish::SwiftRepoConfig {
-                        lang_package_path: packages_dir.join("swift").join("Zcash"),
+                        lang_package_path: packages_dir.join(SWIFT).join("Zcash"),
                         git_repo_url: args
                             .try_get_one::<String>("git_repo_url")?
                             .unwrap()
@@ -174,7 +156,7 @@ fn main() -> CLIResult<()> {
                 }
                 Some(("registry", args)) => {
                     let cfg = publish::SwiftRegistryConfig {
-                        lang_package_path: packages_dir.join("swift").join("Zcash"),
+                        lang_package_path: packages_dir.join(SWIFT).join("Zcash"),
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
                         registry_url: args
                             .try_get_one::<String>("registry_url")?

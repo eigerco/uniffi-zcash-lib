@@ -1,7 +1,6 @@
 use std::{error::Error, fmt::Display};
 
 use clap::parser::MatchesError;
-use strum::ParseError;
 
 #[derive(Debug)]
 pub struct CLIError {
@@ -65,13 +64,5 @@ impl From<handlebars::RenderError> for CLIError {
 impl From<retry::Error<CLIError>> for CLIError {
     fn from(value: retry::Error<CLIError>) -> Self {
         value.error
-    }
-}
-
-impl From<ParseError> for CLIError {
-    fn from(value: ParseError) -> Self {
-        Self {
-            message: value.to_string(),
-        }
     }
 }
