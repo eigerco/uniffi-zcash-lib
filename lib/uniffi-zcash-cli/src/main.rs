@@ -44,23 +44,26 @@ fn main() -> CLIResult<()> {
     let root_dir = workspace_root_dir()?;
     set_current_dir(&root_dir)?;
 
+    let enabled_languages =  matches.try_get_many::<String>("enabled_languages")?.unwrap()
+    .map(Clone::clone)
+    .collect(); 
+        
     match matches.subcommand() {
         Some(("bindgen", _)) => {
             let shared_lib_path = generate_shared_lib(&root_dir)?;
-            generate_bindings(&root_dir, &shared_lib_path)?;
+            generate_bindings(&root_dir, &shared_lib_path, &enabled_languages)?;
             Ok(())
         }
         Some(("release", args)) => {
             let version = args.try_get_one::<String>("version")?.unwrap();
             let swift_git_repo_url = args.try_get_one::<String>("swift_git_repo_url")?.unwrap();
-            prepare_release(&root_dir, version, swift_git_repo_url)?;
+            prepare_release(&root_dir, version, swift_git_repo_url, &enabled_languages)?;
             Ok(())
         }
         Some(("publish", args)) => {
             let config = PublishConfig{
-
+                enabled_languages: enabled_languages.to_owned(),
                 version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
-                only_for_language: args.try_get_one::<SupportedLang>("only_for_language")?.map(From::from),
                 python_registry_url: args.try_get_one::<String>("python_registry_url")?.unwrap().to_owned(),
                 python_registry_username: args.try_get_one::<String>("python_registry_username")?.unwrap().to_owned(),
                 python_registry_password: args.try_get_one::<String>("python_registry_password")?.unwrap().to_owned(),
@@ -96,7 +99,7 @@ fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
         .join("libuniffi_zcash.so"))
 }
 
-fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
+fn generate_bindings(root_dir: &Path, shared_lib: &Path, enabled_languages: &Vec<String>) -> CLIResult<()> {
     // Define paths
     let udl_path = root_dir.join("uniffi-zcash").join("src").join("zcash.udl");
     let target_bindings_path = root_dir.join("bindings");
@@ -104,7 +107,10 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
     _ = remove_dir_all(&target_bindings_path);
 
     println!("Generating language bindings ...");
-    SupportedLang::iter().try_for_each(|lang| {
+    SupportedLang::iter()
+    .filter(|sl| enabled_languages.contains(&sl.to_string()))
+    .try_for_each(|lang| {
+
         println!("Generating language bindings for {}", lang);
         cmd_success(Command::new("cargo")
             .arg("run")
@@ -174,7 +180,7 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
     })
 }
 
-    fn prepare_release(root_dir: &Path, version: &str, swift_git_repo_url: &str) -> CLIResult<()> {
+fn prepare_release(root_dir: &Path, version: &str, swift_git_repo_url: &str, enabled_languages: &Vec<String>) -> CLIResult<()> {
     let bindings_path = root_dir.join("bindings");
     if !bindings_path.exists() {
         return Err("This command depends on the output of bindgen . Execute it first.".into());
@@ -185,7 +191,9 @@ fn generate_bindings(root_dir: &Path, shared_lib: &Path) -> CLIResult<()> {
     _ = remove_dir_all(&packaging_dir);
     create_dir_all(&packaging_dir)?;
 
-    SupportedLang::iter().try_for_each(|lang| match lang {
+    SupportedLang::iter()
+    .filter(|sl| enabled_languages.contains(&sl.to_string()))
+    .try_for_each(|lang| match lang {
         SupportedLang::Python => {
             dir::copy(
                 package_template_dir.join(lang.to_string()),
@@ -498,13 +506,9 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
     if !packages_path.exists() {
         return Err("This command depends on the output of: release . Execute it first.".into());
     }
-    SupportedLang::iter().filter(|l| {
-        if let Some(lang) = cfg.only_for_language {
-            *l == lang
-        }else{
-            true
-        }
-    }).try_for_each(|lang| match lang {
+    SupportedLang::iter()
+    .filter(|sl| cfg.enabled_languages.contains(&sl.to_string()))
+    .try_for_each(|lang| match lang {
         SupportedLang::Python => {
             let lang_package_path = packages_path.join(lang.to_string());
             
@@ -617,8 +621,8 @@ fn publish(root_dir: &Path, cfg: &PublishConfig) -> CLIResult<()> {
 }
 
 struct PublishConfig {
+    enabled_languages: Vec<String>,
     version: String,
-    only_for_language: Option<SupportedLang>,
     python_registry_url: String,
     python_registry_username: String,
     python_registry_password: String,

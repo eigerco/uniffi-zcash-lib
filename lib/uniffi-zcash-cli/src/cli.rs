@@ -1,6 +1,6 @@
 use self::error::CLIError;
 use crate::SupportedLang;
-use clap::{builder::ValueParser, Arg, ArgAction, ArgMatches, Command};
+use clap::{builder::{ValueParser, PossibleValuesParser}, Arg, ArgAction, ArgMatches, Command};
 use std::str::FromStr;
 use strum::VariantNames;
 
@@ -11,6 +11,15 @@ pub fn get_matches() -> ArgMatches {
         .version(env!("CARGO_PKG_VERSION"))
         .about("A CLI for managing internal repo workflows")
         .subcommand_required(true)
+        .arg(
+            Arg::new("enabled_languages")
+            .long("enabled-languages")
+            .env("ENABLED_LANGUAGES")
+            .value_delimiter(',')
+            .value_parser(PossibleValuesParser::new(SupportedLang::VARIANTS))
+            .required(false)
+            .default_values(SupportedLang::VARIANTS)
+        )
         .subcommand(
             Command::new("bindgen").about(format!(
             "Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory",
@@ -35,13 +44,6 @@ pub fn get_matches() -> ArgMatches {
                 .action(ArgAction::SetTrue)
                 .required(true)
                 .help("This is just a flag for security. Somehow a confirmation that YES, im sure what im doing. I want to publish.")
-            )
-            .arg(
-                Arg::new("only_for_language")
-                .long("only-for-language")
-                .env("ONLY_FOR_LANGUAGE")
-                .value_parser(validator_language())
-                .help(format!("Defines if the publish operation should be done only for one language ({}) .Useful in case of partial uploads)", SupportedLang::VARIANTS.join(",")))
             )
             // Python
             .arg(
