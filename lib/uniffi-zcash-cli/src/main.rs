@@ -145,7 +145,7 @@ fn main() -> CLIResult<()> {
             Some((SWIFT, args)) => match args.subcommand() {
                 Some(("git-repo", args)) => {
                     let cfg = publish::SwiftRepoConfig {
-                        lang_package_path: packages_dir.join(SWIFT).join("Zcash"),
+                        lang_package_path: packages_dir.join(SWIFT),
                         git_repo_url: args
                             .try_get_one::<String>("git_repo_url")?
                             .unwrap()
@@ -156,7 +156,7 @@ fn main() -> CLIResult<()> {
                 }
                 Some(("registry", args)) => {
                     let cfg = publish::SwiftRegistryConfig {
-                        lang_package_path: packages_dir.join(SWIFT).join("Zcash"),
+                        lang_package_path: packages_dir.join(SWIFT),
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
                         registry_url: args
                             .try_get_one::<String>("registry_url")?

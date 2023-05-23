@@ -1,5 +1,9 @@
-use std::{path::PathBuf, process::Command};
+use std::{
+    path::{Path, PathBuf},
+    process::Command,
+};
 
+use fs_extra::file::read_to_string;
 use retry::delay::Exponential;
 
 use crate::{
@@ -100,13 +104,20 @@ pub struct KotlinConfig {
 }
 
 pub fn swift_repo(config: &SwiftRepoConfig) -> CLIResult<()> {
+    
+
+    // Get the pointer to the tmp folder generated in the previous release step
+    let tmp_package_path =
+        Path::new(read_to_string(config.lang_package_path.join("processing_at.txt"))?.as_str())
+            .join("Zcash");
+    
     // Publish the artifact to git.
     let mut git_publish_cmd = Command::new("git");
     git_publish_cmd
         .arg("push")
         .arg("--progress")
         .arg(&config.git_repo_url)
-        .current_dir(&config.lang_package_path);
+        .current_dir(&tmp_package_path);
 
     cmd_retry(
         "Swift Git push",
@@ -121,7 +132,7 @@ pub fn swift_repo(config: &SwiftRepoConfig) -> CLIResult<()> {
         .arg("push")
         .arg("--tags")
         .arg(&config.git_repo_url)
-        .current_dir(&config.lang_package_path);
+        .current_dir(&tmp_package_path);
 
     cmd_retry(
         "Swift push tags",
@@ -137,6 +148,7 @@ pub struct SwiftRepoConfig {
 }
 
 pub fn swift_registry(config: &SwiftRegistryConfig) -> CLIResult<()> {
+    
     // Log-in into swift package registry via token. See https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageRegistryUsage.md#registry-authentication
     cmd_success(
         Command::new("swift")
@@ -149,6 +161,11 @@ pub fn swift_registry(config: &SwiftRegistryConfig) -> CLIResult<()> {
             .wait(),
     )?;
 
+    // Get the pointer to the tmp folder generated in the previous release step
+    let tmp_package_path =
+        Path::new(read_to_string(config.lang_package_path.join("processing_at.txt"))?.as_str())
+            .join("Zcash");
+
     // Publish the artifact to swift package registry. See https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageRegistryUsage.md#publishing-to-registry
     let mut publish_cmd = Command::new("swift");
     publish_cmd
@@ -157,7 +174,7 @@ pub fn swift_registry(config: &SwiftRegistryConfig) -> CLIResult<()> {
         .arg(&config.version)
         .arg("--url")
         .arg(&config.registry_url)
-        .current_dir(&config.lang_package_path);
+        .current_dir(&tmp_package_path);
 
     cmd_retry(
         "Swift registry publish",

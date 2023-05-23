@@ -266,7 +266,20 @@ pub fn swift(cfg: &SwiftConfig) -> CLIResult<()> {
     cfg.bindings_dir.try_exists()?;
     clean_dir(&cfg.package_dir)?;
 
-    let package_subfolder = cfg.package_dir.join("Zcash");
+    // Generate a /tmp subfolder , so git does not have problems git the parent
+    // project repository. From here all operations will be done in that folder.
+    let tmp_package_dir = tmp_folder()?;
+
+    // We will leave a pointer (a text file) to properly signalize we are operating
+    // outside the working tree, by adding the absolute path to the temporary subfolder.
+    let mut pointer = OpenOptions::new()
+        .create(true)
+        .write(true)
+        .truncate(true)
+        .open(&cfg.package_dir.join("processing_at.txt"))?;
+    pointer.write_all(tmp_package_dir.to_str().unwrap().as_bytes())?;
+
+    let package_subfolder = tmp_package_dir.join("Zcash");
 
     create_dir_all(&package_subfolder)?;
 
