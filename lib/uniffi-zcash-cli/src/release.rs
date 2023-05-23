@@ -268,7 +268,8 @@ pub fn swift(cfg: &SwiftConfig) -> CLIResult<()> {
 
     // Generate a /tmp subfolder , so git does not have problems git the parent
     // project repository. From here all operations will be done in that folder.
-    let tmp_package_dir = tmp_folder()?;
+    let tmp_package_dir = std::env::temp_dir().join("zcash_uniffi_swift_package_build");
+    clean_dir(&tmp_package_dir)?;
 
     // We will leave a pointer (a text file) to properly signalize we are operating
     // outside the working tree, by adding the absolute path to the temporary subfolder.
