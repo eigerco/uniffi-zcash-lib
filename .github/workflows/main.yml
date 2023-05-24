@@ -259,8 +259,8 @@ jobs:
       - name: Save artifacts for Swift package
         uses: actions/upload-artifact@v2
         with:
-          name: package-ruby-data-${{ github.run_number }}
+          name: package-swift-data-${{ github.run_number }}
           path: |
-            "lib/packages/swift"
-            "/tmp/zcash_uniffi_swift_package_build"
+            lib/packages/swift
+            /tmp/zcash_uniffi_swift_package_build
           if-no-files-found: error
