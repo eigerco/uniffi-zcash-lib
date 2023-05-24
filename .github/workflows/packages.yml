@@ -176,9 +176,9 @@ jobs:
 
       - name: Kotlin package generation (dummy release)
         env:
-          KOTLIN_REGISTRY_URL: ${{ inputs.KOTLIN_REGISTRY_URL }}
-          KOTLIN_REGISTRY_USERNAME: ${{ secrets.KOTLIN_REGISTRY_USERNAME }}
-          KOTLIN_REGISTRY_PASSWORD: ${{ secrets.KOTLIN_REGISTRY_PASSWORD }}
+          KOTLIN_REGISTRY_URL: ${{ inputs.kotlin-registry-url }}
+          KOTLIN_REGISTRY_USERNAME: ${{ secrets.kotlin-registry-username }}
+          KOTLIN_REGISTRY_PASSWORD: ${{ secrets.kotlin-registry-password }}
         run: |
           cargo run -p uniffi-zcash-cli release kotlin -v ${{ inputs.version }}
 
@@ -220,11 +220,11 @@ jobs:
 
       - name: Swift package generation (dummy release)
         env:
-          SWIFT_GIT_REPO_URL: ${{ secrets.SWIFT_GIT_REPO_URL }}
+          SWIFT_GIT_REPO_URL: ${{ secrets.swift-git-repo-url }}
         ## Below Git settings needs to be adjusted
         run: |
-          git config --global user.email ${{ secrets.GIT_CI_EMAIL }}
-          git config --global user.name ${{ secrets.GIT_CI_NAME }}
+          git config --global user.name ${{ secrets.git-ci-user }}
+          git config --global user.email ${{ secrets.git-ci-email }}
           cargo run -p uniffi-zcash-cli release swift -v ${{ inputs.version }}
 
       - name: Save artifacts for Swift package
