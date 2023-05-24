@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  python-registry:
+    build:
+      context: "./python-registry"
+    ports:
+      - 3141:3141
+
+  ruby-registry:
+    build:
+      context: "./ruby-registry"
+    ports:
+      - 9292:9292
+
+  kotlin-registry:
+    image: "xetusoss/archiva:v2.2.9"
+    ports:
+      - 8080:8080

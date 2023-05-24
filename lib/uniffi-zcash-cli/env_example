@@ -1,0 +1,16 @@
+PYTHON_REGISTRY_URL=http://localhost:3141/root/pypi/+simple/
+PYTHON_REGISTRY_USERNAME=__token__
+PYTHON_REGISTRY_PASSWORD=admin
+
+RUBY_REGISTRY_URL=http://localhost:9292/
+RUBY_REGISTRY_TOKEN=<token>
+
+KOTLIN_REGISTRY_URL=http://localhost:8080/repository/internal/
+KOTLIN_REGISTRY_USERNAME=token
+KOTLIN_REGISTRY_PASSWORD=<password/token>
+
+SWIFT_GIT_REPO_URL=https://user:ghp_token@github.com/user/myrepo.git
+
+# This implementation needs to be customized/uncommented in code.
+# SWIFT_REGISTRY_URL=https://swiftpackageindex.com/
+# SWIFT_REGISTRY_TOKEN=<token>
