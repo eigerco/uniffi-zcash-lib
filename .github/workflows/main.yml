@@ -250,7 +250,10 @@ jobs:
       - name: Swift package generation (dummy release)
         env:
           SWIFT_GIT_REPO_URL: ${{ secrets.SWIFT_GIT_REPO_URL }}
+        ## Below Git settings needs to be adjusted
         run: |
+          git config --global user.email ${{ secrets.GIT_CI_EMAIL }}
+          git config --global user.name ${{ secrets.GIT_CI_NAME }}
           cargo run -p uniffi-zcash-cli release swift -v 0.0.0
 
       - name: Save artifacts for Swift package
