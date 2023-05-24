@@ -201,9 +201,13 @@ jobs:
 
       - name: Kotlin package generation (dummy release)
         env:
-          KOTLIN_REGISTRY_URL: ${{ env.KOTLIN_REGISTRY_URL }}
-          KOTLIN_REGISTRY_USERNAME: ${{ secrets.KOTLIN_REGISTRY_USERNAME }}
-          KOTLIN_REGISTRY_PASSWORD: ${{ secrets.KOTLIN_REGISTRY_PASSWORD }}
+          # Following variables only need to be present in the build stage,
+          # as they are checked by gradle.
+          # They are required because we use System.getenv()
+          # in the build.gradle.kts template for security reasons.
+          KOTLIN_REGISTRY_URL: ""
+          KOTLIN_REGISTRY_USERNAME: ""
+          KOTLIN_REGISTRY_PASSWORD: ""
         run: |
           cargo run -p uniffi-zcash-cli release kotlin -v 0.0.0
 
