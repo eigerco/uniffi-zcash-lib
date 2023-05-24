@@ -50,6 +50,7 @@ jobs:
           cargo test --verbose
 
   build-packages:
+    needs: build
     # Kotlin variables/secrets only need to be present in the build stage,
     # as they are checked by gradle.
     # They are required because we use System.getenv()
