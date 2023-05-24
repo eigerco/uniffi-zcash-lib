@@ -59,7 +59,7 @@ jobs:
           path: lib/bindings
           if-no-files-found: error
 
-  package-python:
+  python:
     needs: bindgen
     runs-on: ubuntu-latest
     defaults:
@@ -100,7 +100,7 @@ jobs:
           path: lib/packages/python
           if-no-files-found: error
 
-  package-ruby:
+  ruby:
     needs: bindgen
     runs-on: ubuntu-latest
     defaults:
@@ -145,7 +145,7 @@ jobs:
           path: lib/packages/ruby
           if-no-files-found: error
 
-  package-kotlin:
+  kotlin:
     needs: bindgen
     runs-on: ubuntu-latest
     defaults:
@@ -189,7 +189,7 @@ jobs:
           path: lib/packages/kotlin
           if-no-files-found: error
 
-  package-swift:
+  swift:
     needs: bindgen
     runs-on: ubuntu-latest
     defaults:
