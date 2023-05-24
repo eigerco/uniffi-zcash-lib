@@ -11,7 +11,6 @@ env:
 
 jobs:
   build:
-    if: ${{false}}
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -51,7 +50,7 @@ jobs:
           cargo test --verbose
 
   build-packages:
-    #needs: build
+    needs: build
     # Kotlin variables/secrets only need to be present, without value,
     # in the build stage, as they are checked by gradle.
     # They are required because we use System.getenv()
@@ -59,11 +58,11 @@ jobs:
     uses: ./.github/workflows/packages.yml
     with:
       version: "0.0.0" # dummy version we are only testing the build.
-      languages: "python,ruby,kotlin,swift"
-      kotlin-registry-url: "" # dummy, we are testing the build.
     secrets:
+      languages: ${{ secrets.LANGUAGES }}
       git-user-name: ${{ secrets.GIT_USER_NAME }}
       git-user-email: ${{ secrets.GIT_USER_EMAIL }}
+      kotlin-registry-url: "" # dummy, we are testing the build.
       kotlin-registry-username: "" # dummy, we are testing the build.
       kotlin-registry-password: "" # dummy, we are testing the build.
       # Swift needs to clone the package repo for build.

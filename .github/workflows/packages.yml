@@ -6,17 +6,15 @@ on:
       version:
         required: true
         type: string
-      languages:
-        required: true
-        type: string
-      kotlin-registry-url:
-        required: true
-        type: string
 
     secrets:
+      languages:
+        required: true
       git-user-name:
         required: true
       git-user-email:
+        required: true
+      kotlin-registry-url:
         required: true
       kotlin-registry-username:
         required: true
@@ -50,7 +48,7 @@ jobs:
 
       - name: Generate languages bindings and shared lib
         run: |
-          cargo run -p uniffi-zcash-cli bindgen --languages=${{ inputs.languages }}
+          cargo run -p uniffi-zcash-cli bindgen --languages=${{ secrets.languages }}
 
       - name: Save artifacts for bindgen
         uses: actions/upload-artifact@v2
@@ -176,7 +174,7 @@ jobs:
 
       - name: Kotlin package generation (dummy release)
         env:
-          KOTLIN_REGISTRY_URL: ${{ inputs.kotlin-registry-url }}
+          KOTLIN_REGISTRY_URL: ${{ secrets.kotlin-registry-url }}
           KOTLIN_REGISTRY_USERNAME: ${{ secrets.kotlin-registry-username }}
           KOTLIN_REGISTRY_PASSWORD: ${{ secrets.kotlin-registry-password }}
         run: |
