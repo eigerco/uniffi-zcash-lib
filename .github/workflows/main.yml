@@ -40,7 +40,7 @@ jobs:
             ~/.cargo/git/db/
             lib/target
           key: 1-${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+          restore-keys: ${{ runner.os }}-cargo-build
 
       - name: 🔨 Build
         run: cargo build --verbose
