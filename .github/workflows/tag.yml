@@ -50,6 +50,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: publishing-package-python-data-${{ github.run_number }}
+          path: lib/packages/python
 
       - name: Publish Python package
         env:
@@ -89,6 +90,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: publishing-package-ruby-data-${{ github.run_number }}
+          path: lib/packages/ruby
 
       - name: Publish
         env:
@@ -128,6 +130,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: publishing-package-kotlin-data-${{ github.run_number }}
+          path: lib/packages/kotlin
 
       - name: Publish Kotlin package
         env:
@@ -167,6 +170,9 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: publishing-package-swift-data-${{ github.run_number }}
+          path: |
+            lib/packages/swift
+            /tmp/zcash_uniffi_swift_package_build
 
       - name: Publish Swift repository
         env:
@@ -206,6 +212,9 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: publishing-package-swift-data-${{ github.run_number }}
+          path: |
+            lib/packages/swift
+            /tmp/zcash_uniffi_swift_package_build
 
       - name: Publish Swift package to registry
         env:
