@@ -58,6 +58,7 @@ jobs:
     uses: ./.github/workflows/packages.yml
     with:
       version: "0.0.0" # dummy version we are only testing the build.
+      artifacts-storage-prefix: "build-test"
     secrets:
       languages: ${{ secrets.LANGUAGES }}
       git-user-name: ${{ secrets.GIT_USER_NAME }}

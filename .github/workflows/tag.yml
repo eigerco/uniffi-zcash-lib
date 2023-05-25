@@ -10,6 +10,7 @@ jobs:
     uses: ./.github/workflows/packages.yml
     with:
       version: "${GITHUB_REF#refs/*/}"
+      artifacts-storage-prefix: "publishing"
     secrets:
       languages: ${{ secrets.LANGUAGES }}
       git-user-name: ${{ secrets.GIT_USER_NAME }}
@@ -48,7 +49,7 @@ jobs:
       - name: Download python artifacts
         uses: actions/download-artifact@v2
         with:
-          name: package-python-data-${{ github.run_number }}
+          name: publishing-package-python-data-${{ github.run_number }}
           path: lib/packages/python
           if-no-files-found: error
 
@@ -89,7 +90,7 @@ jobs:
       - name: Download Ruby artifacts
         uses: actions/download-artifact@v2
         with:
-          name: package-ruby-data-${{ github.run_number }}
+          name: publishing-package-ruby-data-${{ github.run_number }}
           path: lib/packages/ruby
           if-no-files-found: error
 
@@ -130,7 +131,7 @@ jobs:
       - name: Download kotlin artifacts
         uses: actions/download-artifact@v2
         with:
-          name: package-kotlin-data-${{ github.run_number }}
+          name: publishing-package-kotlin-data-${{ github.run_number }}
           path: lib/packages/kotlin
           if-no-files-found: error
 
@@ -171,7 +172,7 @@ jobs:
       - name: Download swift artifacts
         uses: actions/download-artifact@v2
         with:
-          name: package-swift-data-${{ github.run_number }}
+          name: publishing-package-swift-data-${{ github.run_number }}
           path: |
             lib/packages/swift
             /tmp/zcash_uniffi_swift_package_build
@@ -214,7 +215,7 @@ jobs:
       - name: Download swift artifacts
         uses: actions/download-artifact@v2
         with:
-          name: package-swift-data-${{ github.run_number }}
+          name: publishing-package-swift-data-${{ github.run_number }}
           path: |
             lib/packages/swift
             /tmp/zcash_uniffi_swift_package_build
