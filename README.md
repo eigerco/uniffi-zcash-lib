@@ -84,13 +84,10 @@ sudo apt-get install python3.x # 3.8, 3.9
 
 There is a Docker image for development on emulated system, but at the moment only for M1 - although it's easily configurable for other architectures. We'll make a set of instructions available for it.
 
-# Using the uniffi-bindgen CLI
+# Using the repo CLI
 
-This project has a dedicated crate for build and run the CLI. You can execute it from any crate root by:
-
-```bash
-cargo run -p uniffi-bindgen
-```
+This CLI allows to easy build and publish the bindings. We encourage
+to read the in crate [documentation](./lib/uniffi-zcash-cli/README.md).
 
 # Test data generation
 
