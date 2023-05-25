@@ -166,12 +166,18 @@ jobs:
           key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-publish
 
-      - name: Download swift artifacts
+      - name: Download swift package pointer artifacts
         uses: actions/download-artifact@v2
         with:
-          name: publishing-package-swift-data-${{ github.run_number }}
+          name: publishing-package-swift-pointer-data-${{ github.run_number }}
           path: |
             lib/packages/swift
+      
+      - name: Download swift package artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: publishing-package-swift-package-data-${{ github.run_number }}
+          path: |
             /tmp/zcash_uniffi_swift_package_build
 
       - name: Publish Swift repository
@@ -208,12 +214,18 @@ jobs:
           key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-publish
 
-      - name: Download swift artifacts
+      - name: Download swift package pointer artifacts
         uses: actions/download-artifact@v2
         with:
-          name: publishing-package-swift-data-${{ github.run_number }}
+          name: publishing-package-swift-pointer-data-${{ github.run_number }}
           path: |
             lib/packages/swift
+      
+      - name: Download swift package artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: publishing-package-swift-package-data-${{ github.run_number }}
+          path: |
             /tmp/zcash_uniffi_swift_package_build
 
       - name: Publish Swift package to registry
