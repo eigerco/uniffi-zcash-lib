@@ -184,7 +184,7 @@ jobs:
           ls -l /tmp/zcash_uniffi_swift_package_build
 
   publish-swift-registry:
-    needs: build-packages
+    needs: [build-packages, publish-swift-repo]
     runs-on: ubuntu-latest
     defaults:
       run:
