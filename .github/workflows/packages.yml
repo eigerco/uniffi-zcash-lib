@@ -76,7 +76,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
-          path: lib/bindings
 
       - name: Set up cargo cache
         uses: actions/cache@v3
@@ -116,7 +115,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
-          path: lib/bindings
 
       - name: Set up cargo cache
         uses: actions/cache@v3
@@ -161,7 +159,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
-          path: lib/bindings
 
       - name: Set up cargo cache
         uses: actions/cache@v3
@@ -205,7 +202,6 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
-          path: lib/bindings
 
       - name: Set up cargo cache
         uses: actions/cache@v3
