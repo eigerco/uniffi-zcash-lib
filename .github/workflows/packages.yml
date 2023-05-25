@@ -77,7 +77,6 @@ jobs:
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
-          if-no-files-found: error
 
       - name: Set up cargo cache
         uses: actions/cache@v3

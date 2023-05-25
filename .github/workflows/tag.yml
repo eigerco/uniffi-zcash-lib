@@ -51,7 +51,6 @@ jobs:
         with:
           name: publishing-package-python-data-${{ github.run_number }}
           path: lib/packages/python
-          if-no-files-found: error
 
       - name: Publish Python package
         env:
@@ -92,7 +91,6 @@ jobs:
         with:
           name: publishing-package-ruby-data-${{ github.run_number }}
           path: lib/packages/ruby
-          if-no-files-found: error
 
       - name: Publish
         env:
@@ -133,7 +131,6 @@ jobs:
         with:
           name: publishing-package-kotlin-data-${{ github.run_number }}
           path: lib/packages/kotlin
-          if-no-files-found: error
 
       - name: Publish Kotlin package
         env:
@@ -176,7 +173,6 @@ jobs:
           path: |
             lib/packages/swift
             /tmp/zcash_uniffi_swift_package_build
-          if-no-files-found: error
 
       - name: Publish Swift repository
         env:
@@ -219,7 +215,6 @@ jobs:
           path: |
             lib/packages/swift
             /tmp/zcash_uniffi_swift_package_build
-          if-no-files-found: error
 
       - name: Publish Swift package to registry
         env:
