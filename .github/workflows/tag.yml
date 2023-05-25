@@ -20,7 +20,7 @@ jobs:
       kotlin-registry-password: ${{ secrets.KOTLIN_REGISTRY_PASSWORD }}
       swift-git-repo-url: ${{ secrets.SWIFT_GIT_REPO_URL }}
 
-  python:
+  publish-python:
     needs: build-packages
     runs-on: ubuntu-latest
     defaults:
@@ -61,7 +61,7 @@ jobs:
         run: |
           echo "version - ${GITHUB_REF#refs/*/}"
           ls -l packages/python
-  ruby:
+  publish-ruby:
     needs: build-packages
     runs-on: ubuntu-latest
     defaults:
@@ -101,7 +101,7 @@ jobs:
           echo "version - ${GITHUB_REF#refs/*/}"
           ls -l packages/ruby
 
-  kotlin:
+  publish-kotlin:
     needs: build-packages
     runs-on: ubuntu-latest
     defaults:
@@ -141,7 +141,7 @@ jobs:
         run: |
           echo "version - ${GITHUB_REF#refs/*/}"
           ls -l packages/kotlin
-  swift-repo:
+  publish-swift-repo:
     needs: build-packages
     runs-on: ubuntu-latest
     defaults:
@@ -183,7 +183,7 @@ jobs:
           ls -l packages/swift
           ls -l /tmp/zcash_uniffi_swift_package_build
 
-  swift-registry:
+  publish-swift-registry:
     needs: build-packages
     runs-on: ubuntu-latest
     defaults:
