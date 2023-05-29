@@ -10,7 +10,5 @@ KOTLIN_REGISTRY_USERNAME=token
 KOTLIN_REGISTRY_PASSWORD=<password/token>
 
 SWIFT_GIT_REPO_URL=https://user:ghp_token@github.com/user/myrepo.git
-
-# This implementation needs to be customized/uncommented in code.
-# SWIFT_REGISTRY_URL=https://swiftpackageindex.com/
-# SWIFT_REGISTRY_TOKEN=<token>
+SWIFT_REGISTRY_URL=https://swiftpackageindex.com/
+SWIFT_REGISTRY_TOKEN=<token>
