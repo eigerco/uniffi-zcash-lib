@@ -2,9 +2,9 @@ name: Build and Test
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   CARGO_TERM_COLOR: always
@@ -20,12 +20,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
-          submodules: 'true'
+          submodules: "true"
 
       - name: Setting up Ruby env
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.2.0'
+          ruby-version: "3.2.0"
 
       - run: gem install ffi --no-document
 
@@ -38,9 +38,9 @@ jobs:
             ~/.cargo/registry/index/
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
-            target/
-          key: 1-${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-
+            lib/target
+          key: 1-${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-build
 
       - name: 🔨 Build
         run: cargo build --verbose
@@ -48,3 +48,23 @@ jobs:
       - name: 🔎 Test
         run: |
           cargo test --verbose
+
+  build-packages:
+    needs: build
+    # Kotlin variables/secrets only need to be present, without value,
+    # in the build stage, as they are checked by gradle.
+    # They are required because we use System.getenv()
+    # in the build.gradle.kts template for security reasons.
+    uses: ./.github/workflows/packages.yml
+    with:
+      version: "0.0.0" # dummy version we are only testing the build.
+      artifacts-storage-prefix: "build-test"
+    secrets:
+      languages: ${{ secrets.LANGUAGES }}
+      git-user-name: ${{ secrets.GIT_USER_NAME }}
+      git-user-email: ${{ secrets.GIT_USER_EMAIL }}
+      kotlin-registry-url: "" # dummy, we are testing the build.
+      kotlin-registry-username: "" # dummy, we are testing the build.
+      kotlin-registry-password: "" # dummy, we are testing the build.
+      # Swift needs to clone the package repo for build.
+      swift-git-repo-url: ${{ secrets.SWIFT_GIT_REPO_URL }}

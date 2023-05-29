@@ -1,0 +1,246 @@
+name: "Build and test packages"
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      # In order to discriminate across workflows, a prefix is needed.
+      # I.e , the operation name, like "publishing" or "building"
+      artifacts-storage-prefix:
+        required: true
+        type: string
+
+    secrets:
+      languages:
+        required: true
+      git-user-name:
+        required: true
+      git-user-email:
+        required: true
+      kotlin-registry-url:
+        required: true
+      kotlin-registry-username:
+        required: true
+      kotlin-registry-password:
+        required: true
+      swift-git-repo-url:
+        required: true
+
+jobs:
+  bindgen:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+          key: 1-${{ runner.os }}-cargo-bindgen-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-bindgen
+
+      - name: Generate languages bindings and shared lib
+        run: |
+          cargo run -p uniffi-zcash-cli bindgen --languages=${{ secrets.languages }}
+
+      - name: Save artifacts for bindgen
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
+          path: lib/bindings
+          if-no-files-found: error
+
+  python:
+    needs: bindgen
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download bindgen artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
+          path: lib/bindings
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-packages
+
+      - name: Python package generation (dummy release)
+        run: |
+          cargo run -p uniffi-zcash-cli release python -v ${{ inputs.version }}
+
+      - name: Save artifacts for python package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-python-data-${{ github.run_number }}
+          path: lib/packages/python
+          if-no-files-found: error
+
+  ruby:
+    needs: bindgen
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download bindgen artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
+          path: lib/bindings
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-packages
+
+      - name: Setting up Ruby env
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2.0"
+
+      - name: Ruby package generation (dummy release)
+        run: |
+          cargo run -p uniffi-zcash-cli release ruby -v ${{ inputs.version }}
+
+      - name: Save artifacts for Ruby package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-ruby-data-${{ github.run_number }}
+          path: lib/packages/ruby
+          if-no-files-found: error
+
+  kotlin:
+    needs: bindgen
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download bindgen artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
+          path: lib/bindings
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-packages
+
+      - name: Kotlin package generation (dummy release)
+        env:
+          KOTLIN_REGISTRY_URL: ${{ secrets.kotlin-registry-url }}
+          KOTLIN_REGISTRY_USERNAME: ${{ secrets.kotlin-registry-username }}
+          KOTLIN_REGISTRY_PASSWORD: ${{ secrets.kotlin-registry-password }}
+        run: |
+          cargo run -p uniffi-zcash-cli release kotlin -v ${{ inputs.version }}
+
+      - name: Save artifacts for Kotlin package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-kotlin-data-${{ github.run_number }}
+          path: lib/packages/kotlin
+          if-no-files-found: error
+
+  swift:
+    needs: bindgen
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Download bindgen artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
+          path: lib/bindings
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-packages
+
+      - name: Swift package generation (dummy release)
+        env:
+          SWIFT_GIT_REPO_URL: ${{ secrets.swift-git-repo-url }}
+        ## Below Git settings needs to be adjusted
+        run: |
+          git config --global user.name ${{ secrets.git-user-name }}
+          git config --global user.email ${{ secrets.git-user-email }}
+          cargo run -p uniffi-zcash-cli release swift -v ${{ inputs.version }}
+
+      - name: Save artifacts package pointer file for Swift package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-swift-pointer-data-${{ github.run_number }}
+          path: |
+            lib/packages/swift
+          if-no-files-found: error
+      
+      - name: Save artifacts package for Swift package
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-swift-package-data-${{ github.run_number }}
+          path: |
+            /tmp/zcash_uniffi_swift_package_build
+          if-no-files-found: error
