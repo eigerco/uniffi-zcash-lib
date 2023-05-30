@@ -1,100 +1,123 @@
-# LibRustZcash UniFFI port
+# <a href="project"></a> Zcash UniFFI project
 
-This is the Repository for the codebase concerning the [Zcash RFP](https://forum.zcashcommunity.com/t/rfp-zcash-uniffi-library/41335) published some time ago on the Forum. [Eiger](https://www.eiger.co/) won the grant to realize the RFP with [this proposal](https://forum.zcashcommunity.com/t/zcash-uniffi-library-rfp/43468).
+This is a satellite 🛰️ project that aims to extend the accessibility/adoption of the Zcash core library ecosystem, aka [librustzcash](https://github.com/zcash/librustzcash) library to other language communities :handshake: 
 
-⚠️ Production use is discouraged, as this project is still under heavy development.
+It makes use of the mozilla [UniFFI tool](https://mozilla.github.io/uniffi-rs/) under the hood for generating an `FFI` layer for the currently targeted languages: `python`, `ruby`, `kotlin` and `swift` .
 
-## Available documentation
+Heres is diagram that shows the mental model of the project and how the updates in the code are flowing.
 
-* We are currently using [Github milestones](https://github.com/eigerco/uniffi-zcash-lib/milestones).
+```mermaid
+flowchart LR
+    librustzcash --ports changes--> this-repo
+    this-repo--generates--> python-package--is published to--> pypi
+    this-repo--generates--> ruby-package--is published to-->rubygems
+    this-repo--generates--> kotlin-package--is published to-->maven
+    this-repo--generates--> swift-package--is published to-->git-repo
+    swift-package--is published to-->swift-registry
 
-* An updated feature matrix with the API surface status can be found [here](./STATUS.md).
+```
 
-* If you are new to the project, probably the [wiki](https://github.com/eigerco/uniffi-zcash-lib/wiki) is a good starting point.
+All steps commented happens in the [CI pipeline](./.github/workflows/), but developers can also execute them locally by making use of our [internal tooling](./lib/uniffi-zcash-cli/README.md).
 
-## Contributors
+## <a href="where-to-find-packages"></a> Where to find my language package ?
 
- - [@eloylp](https://github.com/eloylp)
- - [@hauleth](https://github.com/hauleth)
- - [@MeerKatDev](https://github.com/MeerKatDev)
- - [@zduny](https://github.com/zduny)
+This project provides a [CI pipeline](./.github/workflows/) that automatically publish each language package on the relevant registries:
 
-## License
+* [Pypi](https://pypi.org/) TBD - link to package pypi page when first time publication.
+* [Rubygems](https://guides.rubygems.org/) TBD - link to package ruby page when first time publication.
+* [maven](https://search.maven.org/) TBD - link to package kotlin page when first time publication.
+* [swiftpackageregistry](https://swiftpackageregistry.com/) TBD - link to package swift page when first time publication.
+* [swift dependency repository]() TBD - link to package swift page when first time publication.
 
-All code in this workspace is licensed under [MIT license](http://opensource.org/licenses/MIT).
+## <a href="manuals-and-docs"></a> Manuals and other docs
 
-## Conventions
- - We shall use Github Actions for the CI/CD, as long as it's maintainable and practical.
- - For local development there will be the option to use a Docker image provided by us. We should also maintain a section to help getting started for local tooling.
- - In order to double check compatibility, we shall use Test Vectors generated _indirectly_ by the librustzcash, whose data will be used to test the libraries for the foreign languages. This should ensure full compatibility.
+ [Manuals](../../wiki/Manuals) are part of our [wiki](../../wiki). We recommend to check the home page for other interesting documentation.
+
+## <a href="building-packages-locally"></a> Building packages locally
+
+As an alternative to the [languages package registries](#-where-to-find-packages), this repository provides a [CLI](./lib/uniffi-zcash-cli/README.md) for managing internal repo workflows. It allows developers to access all generation stages. The [configuration of some basic software](./CONTRIBUTING.md#-local-environment-setup) is needed.
+
+1. Clone the repo and go to the `lib` folder:
+   ```bash
+   git clone https://github.com/eigerco/uniffi-zcash-lib.git
+   cd uniffi-zcash-lib/lib
+   ```
+
+2. Generate the bindings plus the shared library for the desired languages, this calls the UniFFI tool under the hood:
+   ```bash
+   $ cargo run -p uniffi-zcash-cli bindgen --languages=python,ruby,kotlin,swift
+   ```
+   This command will leave a folder per language in the `lib/bindings` directory, containing the needed files for each languages for the next command. Depending on the intention, this could be enough.
+
+3. Finally generate the redistributable packages for all the desired languages (all for this example). 
+   Please, check the CLI help and [docs](./lib/uniffi-zcash-cli/README.md) for required arguments and configuration.
+
+   ```bash
+   $ cargo run -p uniffi-zcash-cli release python -v {{semver_version}}
+   ## lots of output ...
+   Python test application successfully executed ✅
+   ```
+   ```bash
+   $ cargo run -p uniffi-zcash-cli release ruby -v {{semver_version}}
+   ## lots of output ...
+   Ruby test application successfully executed ✅
+   ```
+   ```bash
+   $ cargo run -p uniffi-zcash-cli release kotlin -v {{semver_version}}
+   ## lots of output ...
+   Kotlin test application successfully executed ✅
+   ```
+   For the following `swift` case, its needed to configure a local GIT repo and pass its URL (it can be a filesystem url)  to the CLI (see cli help). The CLI will clone the repo and overwrite the relevant files, preparing everything for the later publish step.
+
+   ```bash
+   $ cargo run -p uniffi-zcash-cli release swift -v {{semver_version}}
+   ## lots of output ...
+   Swift test application successfully executed ✅
+   ```
+
+
+
+We should see a "{{language}} test application successfully executed ✅" message at the end of the package build commands. That means the package has been built and imported by a temporary [test application](./lib/uniffi-zcash-cli/templates/) on the flight with success. See the internal [CLI docs](./lib/uniffi-zcash-cli/README.md) for more information. The value of the {{ semver_version }} argument is not critical if only local package testing is intended.
+
+* For `python` and `ruby` , the packages are automatically installed in the user local package space. As an example, a python user could now execute Zcash code from the REPL:
+
+  ```pyhton
+  $ python
+  >>> from zcash import *
+  >>> amount = ZcashAmount(100)
+  >>> amount.value()
+  100
+  ```
+
+* In the case of `kotlin` , the artifact should be present in the local maven repository, which is normally under `$HOME/.m2`. Applications can require then by making use of the local maven repository.
+
+* For `swift` check the outcome at `lib/packages/swift` , it should be a pointer to the package location.
+
+All the generated packages per each languages should be under the  `lib/packages` git ignored folder.
+
 
 ## Generating documentation
 
-At the moment the UniFFI library doesn't have the ability to add inline documentation. We are prototyping that feature [here](https://github.com/eigerco/uniffi-rs). We will fork the library and add the ability to do so, and a prototype should be available during the next milestone. The tools to generate documentation for each platform are:
+At the moment the UniFFI library doesn't have the ability to add inline documentation. We are prototyping that feature [here](https://github.com/eigerco/uniffi-rs).  A prototype should be available at some point. The tools to generate documentation for each platform are:
 
  - Kotlin: [Dokka](https://kotlinlang.org/docs/kotlin-doc.html)
- - Python: [Sphynx]()
- - Ruby: [YARD]()
+ - Python: [pydoc](https://docs.python.org/es/3/library/pydoc.html)
+ - Ruby: [YARD](https://yardoc.org/)
  - Swift: [DDoc]()
 
 which are, to our understanding, the most common tools used in each ecosystem.
 
-## Development procedure
+## Contributing
 
-At the moment we don't have a stable team on this, but once we have a team in place we should be able to define the development guidelines and stabilize the workflow (first two weeks of February).
+Visit our [CONTRIBUTING.md](./CONTRIBUTING.md) section.
 
-# Local environment setup
+## FAQ
 
-## MacOS
-
-### Easy, using Homebrew:
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-rustup default nightly
-rustup update
-
-brew install kotlin
-brew install swift
-brew install python
-brew install ruby
-```
-
-## Linux
-
-### (Ubuntu/Debian, APT package manager)
-
-```bash
-# Kotlin
-sudo apt install default-jdk # if you still don't have Java installed
-curl -s https://get.sdkman.io | bash # restart the terminal after this
-sdk install kotlin
-
-# Ruby
-sudo apt-get install ruby-full
-
-# Swift
-# Download, un-tar, put in the path the binary from (here) <https://www.swift.org/download>.
-
-# Python
-sudo apt-get install python3.x # 3.8, 3.9
-```
-
-# Docker setup
-
-There is a Docker image for development on emulated system, but at the moment only for M1 - although it's easily configurable for other architectures. We'll make a set of instructions available for it.
-
-# Using the repo CLI
-
-This CLI allows to easy build and publish the bindings. We encourage
-to read the in crate [documentation](./lib/uniffi-zcash-cli/README.md).
-
-# Test data generation
-
-A CSV file with test data is automatically generated during build if it does not exist already.
-
-To force regeneration of this file you can either:
-
-- remove the file (located at `lib/uniffi-zcash/tests/test_data.csv`)
-- or force regeneration using environment variable: `REGENERATE_TEST_DATA=true cargo build`
-- or you could simply run `cargo run --bin test-data` instead
+* Why are all the classes and functions at the same package level ?
+  * We needed to keep with a flat structure due to UniFFI [limitations](https://mozilla.github.io/uniffi-rs/udl/ext_types.html). Not all the languages support inter-crate bindings dependencies.
+* Why so much insistence about including the shared library in the target packages ?
+  * We wanted to favor a better user experience of the packages. Similar to what a pure language lib looks like.
+* Why the dependencies are so weighty (~50MB) ?
+  * We include the `Sapling` [crypto setup](https://z.cash/technology/paramgen/) in the shared library. That way, users do not need to download them separately. This is needed for doing `Sapling` transactions.
+* I am developing with `Xcode`. Where i can find the files to include them on my project ?
+  * By following the step 1 of [build locally](#-building-the-packages-locally) instructions you should get all files by free. Then there is documentation [here](https://mozilla.github.io/uniffi-rs/swift/xcode.html) and a example application [here](https://github.com/mozilla/uniffi-rs/tree/main/examples/app/ios). If you have any problems, please, open a [new issue](../../issue/new). We are happy to know about your endeavors.

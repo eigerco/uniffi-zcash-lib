@@ -21,6 +21,8 @@ of the key points are:
 
 ## <a name="how-to-execute"></a> How to execute
 
+**Prerequisites**:  Ensure you have the [needed software](../../CONTRIBUTING.md#local-environment-setup) installed.
+
 This CLI is only exposed as a binary crate. From [/lib](..) it can be executed with cargo by:
 
 ```bash
@@ -68,7 +70,7 @@ The commented modular design allows many options for configuring the CI. Steps c
 2. Execute the [script](./load_env.sh) for loading the needed environment variables into the current terminal:
     ```bash
     $ source ./load_env.sh
-    ``` 
+    ```
 3. Now the developer can execute the desired commands.
 
 ## <a name="how-to-test"></a> How to test this CLI ✅
