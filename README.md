@@ -49,7 +49,7 @@ As an alternative to the [languages package registries](#-where-to-find-packages
    ```
    This command will leave a folder per language in the `lib/bindings` directory, containing the needed files for each languages for the next command. Depending on the intention, this could be enough.
 
-3. Finally generate the redistributable packages for all the desired languages (all for this example). 
+3. Finally generate the redistributable packages for all the desired languages (all for this example). This step only supports linux targets currently.
    Please, check the CLI help and [docs](./lib/uniffi-zcash-cli/README.md) for required arguments and configuration.
 
    ```bash
@@ -119,5 +119,5 @@ Visit our [CONTRIBUTING.md](./CONTRIBUTING.md) section.
   * We wanted to favor a better user experience of the packages. Similar to what a pure language lib looks like.
 * Why the dependencies are so weighty (~50MB) ?
   * We include the `Sapling` [crypto setup](https://z.cash/technology/paramgen/) in the shared library. That way, users do not need to download them separately. This is needed for doing `Sapling` transactions.
-* I am developing with `Xcode`. Where i can find the files to include them on my project ?
-  * By following the step 1 of [build locally](#-building-the-packages-locally) instructions you should get all files by free. Then there is documentation [here](https://mozilla.github.io/uniffi-rs/swift/xcode.html) and a example application [here](https://github.com/mozilla/uniffi-rs/tree/main/examples/app/ios). If you have any problems, please, open a [new issue](../../issue/new). We are happy to know about your endeavors.
+* I am developing with `Xcode` or `macos` in general. Where i can find the files to include them on my project ?
+  * By following the step `2` of [build locally](#-building-the-packages-locally) instructions you should get all files by free. Then there is documentation [here](https://mozilla.github.io/uniffi-rs/swift/xcode.html) and a example application [here](https://github.com/mozilla/uniffi-rs/tree/main/examples/app/ios). If you have any problems, please, open a [new issue](../../issue/new). We are happy to know about your endeavors.
