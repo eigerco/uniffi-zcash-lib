@@ -5,7 +5,7 @@ use std::{
 };
 
 use crate::{
-    cli::CLIResult, helper::cmd_success, KOTLIN, PYTHON, RUBY, SUPPORTED_LANGUAGES, SWIFT,
+    cli::CLIResult, helper::{cmd_success, shared_lib_name}, KOTLIN, PYTHON, RUBY, SUPPORTED_LANGUAGES, SWIFT,
 };
 
 pub fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
@@ -21,7 +21,7 @@ pub fn generate_shared_lib(root_dir: &Path) -> CLIResult<PathBuf> {
     Ok(root_dir
         .join("target")
         .join("release")
-        .join("libuniffi_zcash.so"))
+        .join(shared_lib_name()))
 }
 
 pub fn generate_bindings(
@@ -58,9 +58,11 @@ pub fn generate_bindings(
                     .wait(),
             )?;
 
+            let shared_lib_name = shared_lib_name();
+
             let shared_lib_dest_path = target_bindings_path
                 .join(lang)
-                .join("libuniffi_zcash.so");
+                .join(&shared_lib_name);
 
             fs::copy(shared_lib, shared_lib_dest_path)?;
 
@@ -72,8 +74,8 @@ pub fn generate_bindings(
                 KOTLIN => {
                     let inner_dir = bindings_dir.join("uniffi").join("zcash");
                     rename(
-                        bindings_dir.join("libuniffi_zcash.so"),
-                        inner_dir.join("libuniffi_zcash.so"),
+                        bindings_dir.join(&shared_lib_name),
+                        inner_dir.join(&shared_lib_name),
                     )?;
                     fs::copy(root_dir.join("jna.jar"), inner_dir.join("jna.jar"))?;
                     Ok(())

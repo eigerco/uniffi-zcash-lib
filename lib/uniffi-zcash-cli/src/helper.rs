@@ -97,3 +97,8 @@ pub fn clean_dir(dir: &PathBuf) -> CLIResult<()> {
     _ = remove_dir_all(dir);
     Ok(create_dir_all(dir)?)
 }
+
+/// Returns the shared lib name taking into account the current platform.
+pub fn shared_lib_name() -> String {
+    format!("libuniffi_zcash{}", std::env::consts::DLL_SUFFIX)
+}
