@@ -44,7 +44,10 @@ fn main() -> CLIResult<()> {
             }
             Err(err) => Err(err.to_string().into()),
         },
-        Some(("testdata", _)) => Ok(generate_test_data(true)),
+        Some(("testdata", _)) => {
+            generate_test_data(true);
+            Ok(())
+        }
         Some(("bindgen", args)) => {
             let languages: Vec<String> = args
                 .try_get_many::<String>("languages")?

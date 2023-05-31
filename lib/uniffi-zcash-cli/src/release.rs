@@ -297,7 +297,7 @@ pub fn swift(cfg: &SwiftConfig) -> CLIResult<()> {
         .create(true)
         .write(true)
         .truncate(true)
-        .open(&cfg.package_dir.join("processing_at.txt"))?;
+        .open(cfg.package_dir.join("processing_at.txt"))?;
     pointer.write_all(tmp_package_dir.to_str().unwrap().as_bytes())?;
 
     let package_subfolder = tmp_package_dir.join("Zcash");
