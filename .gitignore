@@ -6,5 +6,6 @@ lib/target/
 **/*.rs.bk
 
 lib/uniffi-zcash/src/zcash.udl
+shared_libs
 bindings
 packages

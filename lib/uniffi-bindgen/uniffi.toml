@@ -4,4 +4,3 @@
 [bindings.swift]
 [bindings.kotlin]
 [bindings.ruby]
-cdylib_name = "libuniffi_zcash.so"

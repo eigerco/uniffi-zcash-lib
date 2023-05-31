@@ -34,8 +34,8 @@ fn main() -> CLIResult<()> {
                 .unwrap()
                 .map(Clone::clone)
                 .collect();
-            let shared_lib_path = generate_shared_lib(&root_dir)?;
-            Ok(generate_bindings(&root_dir, &shared_lib_path, &languages)?)
+            generate_shared_lib(&root_dir)?;
+            Ok(generate_bindings(&root_dir, &languages)?)
         }
         Some(("release", args)) => {
             let package_template_dir = root_dir.join("uniffi-zcash-cli").join("templates");

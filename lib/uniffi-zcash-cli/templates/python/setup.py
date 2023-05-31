@@ -17,5 +17,5 @@ setuptools.setup(
         "Programming Language :: Python",
         "Programming Language :: C"
     ],                                     
-    package_data={"zcash": ["libuniffi_zcash.so"]}
+    package_data={"zcash": ["libuniffi_zcash.so", "libuniffi_zcash.dylib"]}
 )

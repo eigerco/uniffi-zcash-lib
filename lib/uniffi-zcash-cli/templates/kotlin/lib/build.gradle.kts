@@ -24,10 +24,11 @@ java {
     }
 }
 
-// Inlude the .so files in the jar. Our shared library is there.
+// Inlude the shared libraries.
 val libsDir = File("libs")
 tasks.withType<Jar> {
     from(libsDir) { include("**/*.so") }
+    from(libsDir) { include("**/*.dylib") }
 }
 
 publishing {
