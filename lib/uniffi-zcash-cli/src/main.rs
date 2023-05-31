@@ -4,6 +4,8 @@ use bindgen::{generate_bindings, generate_shared_lib};
 use cli::{get_matches, CLIResult};
 
 use helper::workspace_root_dir;
+use uniffi_zcash_test::test_data::generate_test_data;
+use zcash_proofs::download_sapling_parameters;
 
 mod bindgen;
 mod cli;
@@ -28,6 +30,21 @@ fn main() -> CLIResult<()> {
     set_current_dir(&root_dir)?;
 
     match matches.subcommand() {
+        Some(("saplingparams", _)) => match download_sapling_parameters(None) {
+            Ok(paths) => {
+                println!(
+                    "Downloaded spend parameters at : {}",
+                    paths.spend.to_string_lossy()
+                );
+                println!(
+                    "Downloaded output parameters at : {}",
+                    paths.output.to_string_lossy()
+                );
+                Ok(())
+            }
+            Err(err) => Err(err.to_string().into()),
+        },
+        Some(("testdata", _)) => Ok(generate_test_data(true)),
         Some(("bindgen", args)) => {
             let languages: Vec<String> = args
                 .try_get_many::<String>("languages")?

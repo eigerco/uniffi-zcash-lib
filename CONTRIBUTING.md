@@ -67,7 +67,7 @@ All the tests are located in the [testing](./lib/uniffi-zcash/tests/) directory.
 
 ### <a href="executing-tests"></a> Executing the tests
 
-It should be enough with
+It should be enough with:
 
 ```bash
 $ cargo test
@@ -81,8 +81,5 @@ Having a different dataset per each language would make no sense since we are te
 
 A [CSV file](./lib/uniffi-zcash/tests/test_data.csv) with test data is committed in the repo. In case a new test is added or a modification is done in any of them, the new data should be committed.
 
-To force regeneration of this file you can either:
-
-* remove the file (located at `lib/uniffi-zcash/tests/test_data.csv`)
-* or force regeneration using environment variable: `REGENERATE_TEST_DATA=true cargo build`
-* or you could simply run `cargo run --bin test-data` instead.
+If its needed to add new data generators or modifying the actual golden file, please refer to `testdata` data generation CLI commands.
+More details available in the [CLI docs](./lib/uniffi-zcash-cli/README.md)

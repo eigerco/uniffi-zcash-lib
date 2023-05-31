@@ -36,7 +36,7 @@ cargo run -p uniffi-bindgen --help
 But it will only provide low level binding generation operations.
 ## <a name="commands-and-design"></a> Commands and overall design
 
-The CLI has the following available commands. They need to be executed in the following order:
+The CLI has the following build related available commands. They need to be executed in the following order:
 
 ```mermaid
 graph LR;
@@ -56,6 +56,12 @@ bindgen-->release-->publish;
     ```
 
 3. `publish` - This is the last step and only does the final publish operations i.e pushing previously generated artifacts at `lib/packages` . Its where most of the external calls are concentrated. As artifacts tend to be a bit weighty, it uses exponential backoff for pushing the artifacts to each language specific registry.
+
+There are also other utility commands to help developers in testing stages:
+
+`saplingparams` - Downloads the [sapling parameters](https://z.cash/technology/paramgen/) to the default location, normally in developers home directory.
+
+`testdata` - Tests are based in inputs and outputs. This command regenerates the [golden data file](../uniffi-zcash/tests/test_data.csv) by executing the [data generators](../uniffi-zcash-test/src/test_data/).
 
 ## <a name="ci-integration"></a> Integration with the CI 🤖
 

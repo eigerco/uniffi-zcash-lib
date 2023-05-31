@@ -10,6 +10,14 @@ pub fn get_matches() -> ArgMatches {
         .about("A CLI for managing internal repo workflows")
         .subcommand_required(true)
         .subcommand(
+            Command::new("saplingparams")
+            .about("Downloads the sapling parameters to the default location, normally in your home directory.")
+        )
+        .subcommand(
+            Command::new("testdata")
+            .about("Generates the pre-built golden file with test data for the test cases.")
+        )        
+        .subcommand(
             Command::new("bindgen")
             .about(format!("Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory", SUPPORTED_LANGUAGES.join(",")))
             .arg(
