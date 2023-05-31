@@ -90,7 +90,7 @@ pub fn transparent_builder_with_nonstandard_fee_example<W: Write>(
         .add_transparent_output(&address, Amount::from_u64(200).unwrap())
         .unwrap();
 
-    let prover = LocalTxProver::bundled(); // This can increase binary size byb 50MB.
+    let prover = LocalTxProver::with_default_location().unwrap();
     let fee_rule = fixed::FeeRule::non_standard(Amount::zero());
 
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
@@ -126,7 +126,7 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
         .add_transparent_output(&address, Amount::from_u64(200).unwrap())
         .unwrap();
 
-    let prover = LocalTxProver::bundled();
+    let prover = LocalTxProver::with_default_location().unwrap();
     let fee_rule = fixed::FeeRule::standard();
 
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
@@ -170,7 +170,7 @@ pub fn transparent_builder_with_zip317_standard_fee_example<W: Write>(
         .add_transparent_output(&address, Amount::from_u64(9200).unwrap())
         .unwrap();
 
-    let prover = LocalTxProver::bundled();
+    let prover = LocalTxProver::with_default_location().unwrap();
     let fee_rule = zip317::FeeRule::standard();
 
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
@@ -206,7 +206,7 @@ pub fn transparent_builder_with_zip317_non_standard_fee_example<W: Write>(
         .add_transparent_output(&address, Amount::from_u64(9200).unwrap())
         .unwrap();
 
-    let prover = LocalTxProver::bundled();
+    let prover = LocalTxProver::with_default_location().unwrap();
     let fee_rule =
         zip317::FeeRule::non_standard(Amount::from_u64(5000).unwrap(), 2, 150, 34).unwrap();
 
@@ -252,7 +252,7 @@ pub fn sapling_transaction_general_builder_example<W: Write>(
         )
         .unwrap();
 
-    let prover = LocalTxProver::bundled();
+    let prover = LocalTxProver::with_default_location().unwrap();
     let fee_rule = fixed::FeeRule::non_standard(Amount::zero());
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
 

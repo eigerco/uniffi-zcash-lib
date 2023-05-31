@@ -67,7 +67,14 @@ All the tests are located in the [testing](./lib/uniffi-zcash/tests/) directory.
 
 ### <a href="executing-tests"></a> Executing the tests
 
-It should be enough with:
+Ensure the `Sapling` crypto parameters are downloaded. You can download them
+to your `$home` with the in repo [CLI](./lib/uniffi-zcash-cli/README.md) by:
+
+```bash
+$ cargo run -p uniffi-zcash-cli saplingparams
+```
+
+Then the tests can be run by:
 
 ```bash
 $ cargo test

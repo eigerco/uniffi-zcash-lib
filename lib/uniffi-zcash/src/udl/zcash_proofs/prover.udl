@@ -6,7 +6,4 @@ interface ZcashLocalTxProver {
 
     [Name=with_default_location, Throws=ZcashError]
     constructor();
-
-    [Name=bundled]
-    constructor();
 };
