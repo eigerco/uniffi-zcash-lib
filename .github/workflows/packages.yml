@@ -53,6 +53,7 @@ jobs:
 
       - name: Generate languages bindings and shared lib
         run: |
+          cargo run -p uniffi-zcash-cli setup buildenv
           cargo run -p uniffi-zcash-cli sharedlibs
           cargo run -p uniffi-zcash-cli bindgen --languages=${{ secrets.languages }}
 
