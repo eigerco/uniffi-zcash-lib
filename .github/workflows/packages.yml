@@ -51,10 +51,16 @@ jobs:
           key: 1-${{ runner.os }}-cargo-bindgen-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-bindgen
 
-      - name: Generate languages bindings and shared lib
+      - name: Prepare build env
         run: |
           cargo run -p uniffi-zcash-cli setup buildenv
+
+      - name: Generate shared lib
+        run: |
           cargo run -p uniffi-zcash-cli sharedlibs
+
+      - name: Generate languages bindings
+        run: |
           cargo run -p uniffi-zcash-cli bindgen --languages=${{ secrets.languages }}
 
       - name: Save artifacts for bindgen
