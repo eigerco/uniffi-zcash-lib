@@ -59,11 +59,11 @@ bindgen-->release-->publish;
 
 4. `publish` - This is the last step and only does the final publish operations i.e pushing previously generated artifacts at `lib/packages` . Its where most of the external calls are concentrated. As artifacts tend to be a bit weighty, it uses exponential backoff for pushing the artifacts to each language specific registry.
 
-There are also other utility commands to help developers in testing stages:
+There are also other utility subcommands under the `setup` command to help developers in testing or build stages, see:
 
-`saplingparams` - Downloads the [sapling parameters](https://z.cash/technology/paramgen/) to the default location, normally in developers home directory.
-
-`testdata` - Tests are based in inputs and outputs. This command regenerates the [golden data file](../uniffi-zcash/tests/test_data.csv) by executing the [data generators](../uniffi-zcash-test/src/test_data/).
+```bash
+$ cargo run -p uniffi-zcash-cli setup --help
+```
 
 ## <a name="ci-integration"></a> Integration with the CI 🤖
 

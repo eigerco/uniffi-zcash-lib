@@ -4,6 +4,7 @@ use bindgen::generate_bindings;
 use cli::{get_matches, CLIResult};
 
 use helper::workspace_root_dir;
+use setup::{add_rust_targets, install_macos_sdk, install_zig_build};
 use sharedlibs::generate_shared_libs;
 use uniffi_zcash_test::test_data::generate_test_data;
 use zcash_proofs::download_sapling_parameters;
@@ -13,6 +14,7 @@ mod cli;
 mod helper;
 mod publish;
 mod release;
+mod setup;
 mod sharedlibs;
 
 const PYTHON: &str = "python";
@@ -32,24 +34,33 @@ fn main() -> CLIResult<()> {
     set_current_dir(&root_dir)?;
 
     match matches.subcommand() {
-        Some(("saplingparams", _)) => match download_sapling_parameters(None) {
-            Ok(paths) => {
-                println!(
-                    "Downloaded spend parameters at : {}",
-                    paths.spend.to_string_lossy()
-                );
-                println!(
-                    "Downloaded output parameters at : {}",
-                    paths.output.to_string_lossy()
-                );
+        Some(("setup", args)) => match args.subcommand() {
+            Some(("buildenv", _)) => {
+                add_rust_targets()?;
+                install_zig_build()?;
+                Ok(install_macos_sdk()?)
+            }
+            Some(("saplingparams", _)) => match download_sapling_parameters(None) {
+                Ok(paths) => {
+                    println!(
+                        "Downloaded spend parameters at : {}",
+                        paths.spend.to_string_lossy()
+                    );
+                    println!(
+                        "Downloaded output parameters at : {}",
+                        paths.output.to_string_lossy()
+                    );
+                    Ok(())
+                }
+                Err(err) => Err(err.to_string().into()),
+            },
+            Some(("testdata", _)) => {
+                generate_test_data(true);
                 Ok(())
             }
-            Err(err) => Err(err.to_string().into()),
+            _ => Err("Command not found. See help.".into()),
         },
-        Some(("testdata", _)) => {
-            generate_test_data(true);
-            Ok(())
-        }
+
         Some(("sharedlibs", _)) => Ok(generate_shared_libs(&root_dir)?),
         Some(("bindgen", args)) => {
             let languages: Vec<String> = args

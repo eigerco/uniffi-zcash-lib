@@ -10,12 +10,21 @@ pub fn get_matches() -> ArgMatches {
         .about("A CLI for managing internal repo workflows")
         .subcommand_required(true)
         .subcommand(
-            Command::new("saplingparams")
-            .about("Downloads the sapling parameters to the default location, normally in your home directory.")
-        )
-        .subcommand(
-            Command::new("testdata")
-            .about("Generates the pre-built golden file with test data for the test cases.")
+            Command::new("setup")
+            .subcommand_required(true)
+            .about("Install pre-requisites needed for build operations or testing.")
+            .subcommand(
+                Command::new("buildenv")
+                    .about("Downloads necessary dependencies for locally building packages.")
+            )
+            .subcommand(
+                Command::new("saplingparams")
+                .about("Downloads the sapling parameters to the default location, normally in your home directory.")
+            )
+            .subcommand(
+                Command::new("testdata")
+                .about("Generates the pre-built golden file with test data for the test cases.")
+            )
         )
         .subcommand(
             Command::new("sharedlibs")

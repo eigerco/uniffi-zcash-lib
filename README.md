@@ -42,20 +42,24 @@ As an alternative to the [languages package registries](#-where-to-find-packages
    $ git clone https://github.com/eigerco/uniffi-zcash-lib.git
    $ cd uniffi-zcash-lib/lib
    ```
+2. Setup your environment, ⚠️ this will attempt to install [pre-requisites](./lib/uniffi-zcash-cli/src/setup.rs) in your environment:
+   ```bash
+   $ cargo run -p uniffi-zcash-cli setup buildenv
+   ```
 
-2. Generate the shared libraries for linux and MacOs. This command will leave its outputs at `lib/shared_libs` 
+3. Generate the shared libraries for linux and MacOs. This command will leave its outputs at `lib/shared_libs` 
    See the [CLI docs](./lib/uniffi-zcash-cli/README.md) for more details about pre-requisites:
    ```bash
    $ cargo run -p uniffi-zcash-cli sharedlibs
    ```
 
-3. Generate the bindings for the desired languages, this calls the UniFFI tool under the hood:
+4. Generate the bindings for the desired languages, this calls the UniFFI tool under the hood:
    ```bash
    $ cargo run -p uniffi-zcash-cli bindgen --languages=python,ruby,kotlin,swift
    ```
    This command will leave a folder per language in the `lib/bindings` directory, containing the needed files for each languages for the next command. Depending on the intention, this could be enough.
 
-4. Finally generate the redistributable packages for all the desired languages (all for this example). This step only supports linux targets currently.
+5. Finally generate the redistributable packages for all the desired languages (all for this example). This step only supports linux targets currently.
    Please, check the CLI help and [docs](./lib/uniffi-zcash-cli/README.md) for required arguments and configuration.
 
    ```bash
