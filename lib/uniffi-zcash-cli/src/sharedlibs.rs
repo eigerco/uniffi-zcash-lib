@@ -3,42 +3,25 @@ use std::{fs::copy, path::Path, process::Command};
 use crate::{
     cli::CLIResult,
     helper::{
-        clean_dir, cmd_success, LINUX_SHARED_LIB_NAME, MACOS_SHARED_LIB_NAME, TARGETS,
-        TARGET_LINUX_X86_64, TARGET_MACOS_64,
+        clean_dir, cmd_success, LINUX_SHARED_LIB_NAME, MACOS_SHARED_LIB_NAME, TARGET_LINUX_X86_64,
+        TARGET_MACOS_64,
     },
+    setup::macos_sdk_require_path,
 };
 
 pub fn generate_shared_libs(root_dir: &Path) -> CLIResult<()> {
     let shared_libs_dir = root_dir.join("shared_libs");
 
-    TARGETS.iter().try_for_each(|arch| {
-        cmd_success(
-            Command::new("rustup")
-                .arg("target")
-                .arg("add")
-                .arg(arch)
-                .spawn()?
-                .wait(),
-        )
-    })?;
-
     clean_dir(&shared_libs_dir)?;
 
     println!("Generating .dylib shared library for macos ...");
     cmd_success(
-        Command::new("docker")
-            .arg("run")
-            .arg("--rm")
-            .arg("-v")
-            .arg(format!("{}:/io", root_dir.to_string_lossy()))
-            .arg("-w")
-            .arg("/io")
-            .arg("messense/cargo-zigbuild:0.16.2")
-            .arg("cargo")
+        Command::new("cargo")
             .arg("zigbuild")
             .arg("--release")
             .arg("--target")
             .arg(TARGET_MACOS_64)
+            .env("SDKROOT", macos_sdk_require_path())
             .current_dir(root_dir)
             .spawn()?
             .wait(),
