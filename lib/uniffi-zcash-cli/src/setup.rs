@@ -30,6 +30,7 @@ pub fn install_zig_build() -> CLIResult<()> {
     Ok(cmd_success(
         Command::new("cargo")
             .arg("install")
+            .arg("--force")
             .arg("cargo-zigbuild")
             .spawn()?
             .wait(),
@@ -43,10 +44,13 @@ pub fn install_macos_sdk() -> CLIResult<()> {
     clean_dir(&apple_sdk_install_path)?;
     cmd_success(
         Command::new("wget")
-            .arg(format!("https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/{}.sdk.tar.xz", MACOS_SDK_VERSION))
+            .arg(format!(
+                "https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/{}.sdk.tar.xz",
+                MACOS_SDK_VERSION
+            ))
             .current_dir(&apple_sdk_install_path)
             .spawn()?
-            .wait()
+            .wait(),
     )?;
 
     Ok(cmd_success(
