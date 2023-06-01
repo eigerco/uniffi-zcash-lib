@@ -100,7 +100,11 @@ pub fn tmp_folder() -> CLIResult<PathBuf> {
     Ok(path_buff)
 }
 
+/// Removes the dir if exists and creates the entire
+/// path if there are missing elements.
 pub fn clean_dir(dir: &PathBuf) -> CLIResult<()> {
-    _ = remove_dir_all(dir);
+    if dir.exists() {
+        remove_dir_all(dir)?;
+    }
     Ok(create_dir_all(dir)?)
 }

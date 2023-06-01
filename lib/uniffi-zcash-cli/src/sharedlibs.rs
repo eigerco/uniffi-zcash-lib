@@ -1,14 +1,10 @@
-use std::{
-    fs::{copy, create_dir_all},
-    path::Path,
-    process::Command,
-};
+use std::{fs::copy, path::Path, process::Command};
 
 use crate::{
     cli::CLIResult,
     helper::{
-        cmd_success, LINUX_SHARED_LIB_NAME, MACOS_SHARED_LIB_NAME, TARGETS, TARGET_LINUX_X86_64,
-        TARGET_MACOS_64,
+        clean_dir, cmd_success, LINUX_SHARED_LIB_NAME, MACOS_SHARED_LIB_NAME, TARGETS,
+        TARGET_LINUX_X86_64, TARGET_MACOS_64,
     },
 };
 
@@ -26,7 +22,7 @@ pub fn generate_shared_libs(root_dir: &Path) -> CLIResult<()> {
         )
     })?;
 
-    create_dir_all(&shared_libs_dir)?;
+    clean_dir(&shared_libs_dir)?;
 
     println!("Generating .dylib shared library for macos ...");
     cmd_success(

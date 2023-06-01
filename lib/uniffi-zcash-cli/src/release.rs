@@ -1,8 +1,9 @@
 use std::{
     fs::{copy, create_dir_all, read_to_string, OpenOptions},
     io::Write,
+    ops::Add,
     path::PathBuf,
-    process::Command, ops::Add,
+    process::Command,
 };
 
 use fs_extra::dir::{self, CopyOptions};
@@ -10,7 +11,10 @@ use serde_json::json;
 
 use crate::{
     cli::CLIResult,
-    helper::{clean_dir, cmd_success, in_file_template_replace, tmp_folder, LINUX_SHARED_LIB_NAME, MACOS_SHARED_LIB_NAME},
+    helper::{
+        clean_dir, cmd_success, in_file_template_replace, tmp_folder, LINUX_SHARED_LIB_NAME,
+        MACOS_SHARED_LIB_NAME,
+    },
 };
 
 pub fn python(cfg: &PythonConfig) -> CLIResult<()> {
@@ -149,7 +153,7 @@ pub fn ruby(cfg: &RubyConfig) -> CLIResult<()> {
         "ffi_lib 'uniffi_zcash'",
         "ffi_lib File.join(File.dirname(File.expand_path(__FILE__)), '/libuniffi_zcash' + (OS.windows? && '.dll' || OS.mac? && '.dylib' || '.so'))",
     );
-    
+
     let mut file = OpenOptions::new()
         .write(true)
         .truncate(true)
