@@ -16,6 +16,10 @@ pub fn get_matches() -> ArgMatches {
         .subcommand(
             Command::new("testdata")
             .about("Generates the pre-built golden file with test data for the test cases.")
+        )
+        .subcommand(
+            Command::new("sharedlibs")
+            .about("Generates shared libs bindings and places them in the shared_libs directory")
         )        
         .subcommand(
             Command::new("bindgen")

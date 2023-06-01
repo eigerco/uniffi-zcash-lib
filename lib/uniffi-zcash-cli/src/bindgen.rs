@@ -1,91 +1,22 @@
 use std::{
-    fs::{self, copy, create_dir_all, remove_dir_all, rename},
+    fs::{self, remove_dir_all, rename},
     path::Path,
     process::Command,
 };
 
 use crate::{
     cli::CLIResult,
-    helper::{
-        cmd_success, LINUX_SHARED_LIB_NAME, MACOS_SHARED_LIB_NAME, TARGETS, TARGET_LINUX_X86_64,
-        TARGET_MACOS_64,
-    },
+    helper::{cmd_success, LINUX_SHARED_LIB_NAME, MACOS_SHARED_LIB_NAME},
     KOTLIN, PYTHON, RUBY, SUPPORTED_LANGUAGES, SWIFT,
 };
-
-pub fn generate_shared_lib(root_dir: &Path) -> CLIResult<()> {
-    let shared_libs_dir = root_dir.join("shared_libs");
-
-    TARGETS.iter().try_for_each(|arch| {
-        cmd_success(
-            Command::new("rustup")
-                .arg("target")
-                .arg("add")
-                .arg(arch)
-                .spawn()?
-                .wait(),
-        )
-    })?;
-
-    create_dir_all(&shared_libs_dir)?;
-
-    println!("Generating .dylib shared library for macos ...");
-    cmd_success(
-        Command::new("docker")
-            .arg("run")
-            .arg("--rm")
-            .arg("-v")
-            .arg(format!("{}:/io", root_dir.to_string_lossy()))
-            .arg("-w")
-            .arg("/io")
-            .arg("messense/cargo-zigbuild:0.16.2")
-            .arg("cargo")
-            .arg("zigbuild")
-            .arg("--release")
-            .arg("--target")
-            .arg(TARGET_MACOS_64)
-            .current_dir(root_dir)
-            .spawn()?
-            .wait(),
-    )?;
-
-    copy(
-        root_dir
-            .join("target")
-            .join(TARGET_MACOS_64)
-            .join("release")
-            .join(MACOS_SHARED_LIB_NAME),
-        shared_libs_dir.join(MACOS_SHARED_LIB_NAME),
-    )?;
-
-    println!("Generating .so shared library for linux ...");
-    cmd_success(
-        Command::new("cargo")
-            .arg("build")
-            .arg("--release")
-            .arg("--target")
-            .arg(TARGET_LINUX_X86_64)
-            .current_dir(root_dir)
-            .spawn()?
-            .wait(),
-    )?;
-
-    copy(
-        root_dir
-            .join("target")
-            .join(TARGET_LINUX_X86_64)
-            .join("release")
-            .join(LINUX_SHARED_LIB_NAME),
-        shared_libs_dir.join(LINUX_SHARED_LIB_NAME),
-    )?;
-    Ok(())
-}
 
 pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> CLIResult<()> {
     // Define paths
     let udl_path = root_dir.join("uniffi-zcash").join("src").join("zcash.udl");
     let target_bindings_path = root_dir.join("bindings");
     let shared_libs_dir = root_dir.join("shared_libs");
+
+    shared_libs_dir.try_exists()?;
 
     let linux_shared_lib_path = shared_libs_dir.join(LINUX_SHARED_LIB_NAME);
     let macos_shared_lib_path = shared_libs_dir.join(MACOS_SHARED_LIB_NAME);

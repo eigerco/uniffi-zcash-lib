@@ -1,9 +1,10 @@
 use std::env::set_current_dir;
 
-use bindgen::{generate_bindings, generate_shared_lib};
+use bindgen::generate_bindings;
 use cli::{get_matches, CLIResult};
 
 use helper::workspace_root_dir;
+use sharedlibs::generate_shared_libs;
 use uniffi_zcash_test::test_data::generate_test_data;
 use zcash_proofs::download_sapling_parameters;
 
@@ -12,6 +13,7 @@ mod cli;
 mod helper;
 mod publish;
 mod release;
+mod sharedlibs;
 
 const PYTHON: &str = "python";
 const RUBY: &str = "ruby";
@@ -48,13 +50,13 @@ fn main() -> CLIResult<()> {
             generate_test_data(true);
             Ok(())
         }
+        Some(("sharedlibs", _)) => Ok(generate_shared_libs(&root_dir)?),
         Some(("bindgen", args)) => {
             let languages: Vec<String> = args
                 .try_get_many::<String>("languages")?
                 .unwrap()
                 .map(Clone::clone)
                 .collect();
-            generate_shared_lib(&root_dir)?;
             Ok(generate_bindings(&root_dir, &languages)?)
         }
         Some(("release", args)) => {

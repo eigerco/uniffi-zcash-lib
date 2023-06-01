@@ -53,6 +53,7 @@ jobs:
 
       - name: Generate languages bindings and shared lib
         run: |
+          cargo run -p uniffi-zcash-cli sharedlibs
           cargo run -p uniffi-zcash-cli bindgen --languages=${{ secrets.languages }}
 
       - name: Save artifacts for bindgen
@@ -236,7 +237,7 @@ jobs:
           path: |
             lib/packages/swift
           if-no-files-found: error
-      
+
       - name: Save artifacts package for Swift package
         uses: actions/upload-artifact@v2
         with:

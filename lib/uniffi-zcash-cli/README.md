@@ -43,9 +43,11 @@ graph LR;
 bindgen-->release-->publish;
 ```
 
-1. `bindgen` - It accepts a comma separated list of target `languages` . This command calls all the needed UniFFI machinery for generating the language bindings. It invokes the UniFFI tools under the hood, passing [our desired values](./../uniffi-bindgen/uniffi.toml) by default. The outcome of this command is the lib/bindings git ignored folder, which contains the bindings. It also generates the C shared library the bindings need to import. The outcome of executing this command is a folder at `lib/bindings` , with a subfolder per each language that holds per language necessary files.
+1. `sharedlibs` - It generates the C shared library the bindings need to import for both, MacOs and Linux. It leaves its output at `lib/shared_libs` . Its needed as pre-requisites... TBD. 
 
-2. `release` - This command has a subcommand per each target language. It normally accepts a `version` argument among others (see help for more information). This command **doesn't push the artifacts yet**. It only prepares them by using a little, in house [project template system](./templates/). Such system has predefined projects structures for the different languages, which later are parametrized with a text template engine. It also copies the needed files from the previous command outcome at lib/bindings. The outcome of this command is placed at the `lib/packages` git ignored folder, with a subfolder per each language. It contains the packages ready to be published. This **packages are also automatically tested against little sample applications**. Such [sample applications](./templates/) just import the artifact as an user would do,  exercising the application code in way that checks that the entire import chain/dynamic library loading is not broken.
+2. `bindgen` - It accepts a comma separated list of target `languages` . This command calls all the needed UniFFI machinery for generating each language bindings. It invokes the UniFFI tools under the hood, passing [our desired values](./../uniffi-bindgen/uniffi.toml) by default. The outcome of executing this command is a folder at `lib/bindings` , with a subfolder per each language that holds per language necessary files.
+
+3. `release` - This command has a subcommand per each target language. It normally accepts a `version` argument among others (see help for more information). This command **doesn't push the artifacts yet**. It only prepares them by using a little, in house [project template system](./templates/). Such system has predefined projects structures for the different languages, which later are parametrized with a text template engine. It also copies the needed files from the previous command outcome at lib/bindings. The outcome of this command is placed at the `lib/packages` git ignored folder, with a subfolder per each language. It contains the packages ready to be published. This **packages are also automatically tested against little sample applications**. Such [sample applications](./templates/) just import the artifact as an user would do,  exercising the application code in way that checks that the entire import chain/dynamic library loading is not broken.
 
     At the end of this command execution, and per language, we should see something like:
 
@@ -55,7 +57,7 @@ bindgen-->release-->publish;
     Python test application successfully executed ✅
     ```
 
-3. `publish` - This is the last step and only does the final publish operations i.e pushing previously generated artifacts at `lib/packages` . Its where most of the external calls are concentrated. As artifacts tend to be a bit weighty, it uses exponential backoff for pushing the artifacts to each language specific registry.
+4. `publish` - This is the last step and only does the final publish operations i.e pushing previously generated artifacts at `lib/packages` . Its where most of the external calls are concentrated. As artifacts tend to be a bit weighty, it uses exponential backoff for pushing the artifacts to each language specific registry.
 
 There are also other utility commands to help developers in testing stages:
 
