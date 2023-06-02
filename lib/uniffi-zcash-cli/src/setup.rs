@@ -1,4 +1,4 @@
-use std::{env::temp_dir, path::PathBuf, process::Command};
+use std::{path::PathBuf, process::Command};
 
 use crate::{
     cli::CLIResult,
@@ -6,7 +6,7 @@ use crate::{
 };
 
 pub fn add_rust_targets() -> CLIResult<()> {
-    Ok(TARGETS.iter().try_for_each(|arch| {
+    TARGETS.iter().try_for_each(|arch| {
         cmd_success(
             Command::new("rustup")
                 .arg("target")
@@ -15,7 +15,7 @@ pub fn add_rust_targets() -> CLIResult<()> {
                 .spawn()?
                 .wait(),
         )
-    })?)
+    })
 }
 
 pub fn install_zig_build() -> CLIResult<()> {
@@ -27,14 +27,14 @@ pub fn install_zig_build() -> CLIResult<()> {
             .wait(),
     )?;
 
-    Ok(cmd_success(
+    cmd_success(
         Command::new("cargo")
             .arg("install")
             .arg("--force")
             .arg("cargo-zigbuild")
             .spawn()?
             .wait(),
-    )?)
+    )
 }
 
 const MACOS_SDK_VERSION: &str = "MacOSX11.3";
@@ -53,7 +53,7 @@ pub fn install_macos_sdk() -> CLIResult<()> {
             .wait(),
     )?;
 
-    Ok(cmd_success(
+    cmd_success(
         Command::new("tar")
             .arg("-J")
             .arg("-xf")
@@ -61,7 +61,7 @@ pub fn install_macos_sdk() -> CLIResult<()> {
             .current_dir(&apple_sdk_install_path)
             .spawn()?
             .wait(),
-    )?)
+    )
 }
 
 pub fn macos_sdk_install_path() -> PathBuf {
