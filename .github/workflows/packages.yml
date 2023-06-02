@@ -59,7 +59,7 @@ jobs:
           key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
-      - name: Python package generation (dummy release)
+      - name: Python package generation
         run: |
           cargo run -p uniffi-zcash-cli release python -v ${{ inputs.version }}
 
