@@ -18,7 +18,9 @@ pub const MACOS_SHARED_LIB_NAME: &str = "libuniffi_zcash.dylib";
 
 pub const TARGET_LINUX_X86_64: &str = "x86_64-unknown-linux-gnu";
 pub const TARGET_MACOS_64: &str = "aarch64-apple-darwin";
-pub const TARGETS: [&str; 2] = [TARGET_LINUX_X86_64, TARGET_MACOS_64];
+pub const TARGET_MACOS_X86_64: &str = "x86_64-apple-darwin";
+pub const TARGET_MACOS_UNIVERSAL2: &str = "universal2-apple-darwin";
+pub const TARGETS: [&str; 3] = [TARGET_LINUX_X86_64, TARGET_MACOS_64, TARGET_MACOS_X86_64];
 
 /// Overwrites the provided file by rendering the provided data on it.
 pub fn in_file_template_replace<P, T>(file_path: P, data: &T) -> CLIResult<()>

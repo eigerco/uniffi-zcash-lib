@@ -66,3 +66,11 @@ impl From<retry::Error<CLIError>> for CLIError {
         value.error
     }
 }
+
+impl From<fat_macho::Error> for CLIError {
+    fn from(value: fat_macho::Error) -> Self {
+        Self {
+            message: value.to_string(),
+        }
+    }
+}
