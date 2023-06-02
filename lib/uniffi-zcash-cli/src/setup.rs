@@ -40,6 +40,11 @@ pub fn install_zig_build() -> CLIResult<()> {
 const MACOS_SDK_VERSION: &str = "MacOSX11.3";
 
 pub fn install_macos_sdk() -> CLIResult<()> {
+    if macos_sdk_require_path().exists() {
+        println!("Macos sdk already installed");
+        return Ok(());
+    }
+
     let apple_sdk_install_path = macos_sdk_install_path();
     clean_dir(&apple_sdk_install_path)?;
     cmd_success(
