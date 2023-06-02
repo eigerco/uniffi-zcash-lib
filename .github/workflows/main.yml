@@ -42,15 +42,6 @@ jobs:
             lib/target
           key: 1-${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-build
-      
-      - name: Set up home cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.zcash-uniffi/         
-          key: 1-${{ runner.os }}-home-build-${{ hashFiles('.zcash-uniffi/**') }}
-          restore-keys: ${{ runner.os }}-home-build
 
       - name: 🔨 Build
         run: cargo build --verbose
@@ -60,8 +51,16 @@ jobs:
           cargo run -p uniffi-zcash-cli saplingparams
           cargo test --verbose
 
-  build-packages:
+  bindgen:
     #needs: build
+    uses: ./.github/workflows/bindgen.yml
+    with:
+      artifacts-storage-prefix: "build-test"
+    secrets:
+      languages: ${{ secrets.LANGUAGES }}
+
+  build-packages:
+    needs: bindgen
     # Kotlin variables/secrets only need to be present, without value,
     # in the build stage, as they are checked by gradle.
     # They are required because we use System.getenv()
@@ -71,7 +70,6 @@ jobs:
       version: "0.0.0" # dummy version we are only testing the build.
       artifacts-storage-prefix: "build-test"
     secrets:
-      languages: ${{ secrets.LANGUAGES }}
       git-user-name: ${{ secrets.GIT_USER_NAME }}
       git-user-email: ${{ secrets.GIT_USER_EMAIL }}
       kotlin-registry-url: "" # dummy, we are testing the build.

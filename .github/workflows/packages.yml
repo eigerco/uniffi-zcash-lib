@@ -13,8 +13,6 @@ on:
         type: string
 
     secrets:
-      languages:
-        required: true
       git-user-name:
         required: true
       git-user-email:
@@ -29,49 +27,7 @@ on:
         required: true
 
 jobs:
-  bindgen:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./lib
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Set up cargo cache
-        uses: actions/cache@v3
-        continue-on-error: false
-        with:
-          path: |
-            ~/.cargo/bin/
-            ~/.cargo/registry/index/
-            ~/.cargo/registry/cache/
-            ~/.cargo/git/db/
-            lib/target
-          key: 1-${{ runner.os }}-cargo-bindgen-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: ${{ runner.os }}-cargo-bindgen
-
-      - name: Prepare build env
-        run: |
-          cargo run -p uniffi-zcash-cli setup buildenv
-
-      - name: Generate shared lib
-        run: |
-          cargo run -p uniffi-zcash-cli sharedlibs
-
-      - name: Generate languages bindings
-        run: |
-          cargo run -p uniffi-zcash-cli bindgen --languages=${{ secrets.languages }}
-
-      - name: Save artifacts for bindgen
-        uses: actions/upload-artifact@v2
-        with:
-          name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
-          path: lib/bindings
-          if-no-files-found: error
-
   python:
-    needs: bindgen
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -111,7 +67,6 @@ jobs:
           if-no-files-found: error
 
   ruby:
-    needs: bindgen
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -156,7 +111,6 @@ jobs:
           if-no-files-found: error
 
   kotlin:
-    needs: bindgen
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -200,7 +154,6 @@ jobs:
           if-no-files-found: error
 
   swift:
-    needs: bindgen
     runs-on: ubuntu-latest
     defaults:
       run:

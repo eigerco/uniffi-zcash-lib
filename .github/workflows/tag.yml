@@ -6,13 +6,19 @@ on:
       - "*.*.*" # Must be a semver parseable tag
 
 jobs:
+  bindgen:
+    uses: ./.github/workflows/bindgen.yml
+    with:
+      artifacts-storage-prefix: "publishing"
+    secrets:
+      languages: ${{ secrets.LANGUAGES }}
+
   build-packages:
     uses: ./.github/workflows/packages.yml
     with:
       version: ${{ github.ref_name }}
       artifacts-storage-prefix: "publishing"
     secrets:
-      languages: ${{ secrets.LANGUAGES }}
       git-user-name: ${{ secrets.GIT_USER_NAME }}
       git-user-email: ${{ secrets.GIT_USER_EMAIL }}
       kotlin-registry-url: ${{ secrets.KOTLIN_REGISTRY_URL }}
@@ -59,7 +65,7 @@ jobs:
           PYTHON_REGISTRY_PASSWORD: ${{ secrets.PYTHON_REGISTRY_PASSWORD }}
         run: |
           cargo run -p uniffi-zcash-cli publish python
-          
+
   publish-ruby:
     needs: build-packages
     runs-on: ubuntu-latest
