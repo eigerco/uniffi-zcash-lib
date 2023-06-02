@@ -98,4 +98,4 @@ For most of the services that should be enough. How ever the are some specific n
         isAllowInsecureProtocol = true // uncomment this for testing.
     ```
   
-* In case of swift, only the Git repository publication can be tested at the moment. One needs a Git URL repo, and probably a personal access token included in that repo url following basic auth scheme. For github based repos, you can check [personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+* In case of swift, only the Git `bare` repository publication can be tested at the moment. One needs a Git URL repo, and probably a personal access token included in that repo url following basic auth scheme. For github based repos, you can check [personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
