@@ -3,10 +3,10 @@ PYTHON_REGISTRY_USERNAME=__token__
 PYTHON_REGISTRY_PASSWORD=admin
 
 RUBY_REGISTRY_URL=http://localhost:9292/
-RUBY_REGISTRY_TOKEN=<token>
+RUBY_REGISTRY_TOKEN=missing
 
 KOTLIN_REGISTRY_URL=http://localhost:8080/repository/internal/
-KOTLIN_REGISTRY_USERNAME=token
+KOTLIN_REGISTRY_USERNAME=admin
 KOTLIN_REGISTRY_PASSWORD=<password/token>
 
 SWIFT_GIT_REPO_URL=https://user:ghp_token@github.com/user/myrepo.git
