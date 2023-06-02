@@ -31,7 +31,7 @@ on:
         required: true
 env:
   CARGO_TERM_COLOR: always
-  
+
 jobs:
   python:
     runs-on: ${{ inputs.runs-on }}
@@ -65,7 +65,7 @@ jobs:
         run: |
           cargo run -p uniffi-zcash-cli release python -v ${{ inputs.version }}
 
-      - name: Save artifacts for python package
+      - name: Save artifacts for Python package
         uses: actions/upload-artifact@v2
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-python-data-${{ github.run_number }}
@@ -105,7 +105,7 @@ jobs:
         with:
           ruby-version: "3.2.0"
 
-      - name: Ruby package generation (dummy release)
+      - name: Ruby package generation
         run: |
           cargo run -p uniffi-zcash-cli release ruby -v ${{ inputs.version }}
 
@@ -144,7 +144,7 @@ jobs:
           key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
-      - name: Kotlin package generation (dummy release)
+      - name: Kotlin package generation
         env:
           KOTLIN_REGISTRY_URL: ${{ secrets.kotlin-registry-url }}
           KOTLIN_REGISTRY_USERNAME: ${{ secrets.kotlin-registry-username }}
@@ -187,7 +187,7 @@ jobs:
           key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
-      - name: Swift package generation (dummy release)
+      - name: Swift package generation
         env:
           SWIFT_GIT_REPO_URL: ${{ secrets.swift-git-repo-url }}
         ## Below Git settings needs to be adjusted
