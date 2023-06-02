@@ -6,10 +6,11 @@ on:
       version:
         required: true
         type: string
-      
+
       runs-on:
-        required: true
+        required: false
         type: string
+        default: ubuntu-latest
       # In order to discriminate across workflows, a prefix is needed.
       # I.e , the operation name, like "publishing" or "building"
       artifacts-storage-prefix:
