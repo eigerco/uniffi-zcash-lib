@@ -65,9 +65,16 @@ pub fn install_macos_sdk() -> CLIResult<()> {
 }
 
 pub fn macos_sdk_install_path() -> PathBuf {
-    temp_dir().join("MacOSXSDK")
+    home_dir().unwrap().join("MacOSXSDK")
 }
 
 pub fn macos_sdk_require_path() -> PathBuf {
     macos_sdk_install_path().join(format!("{}.sdk", MACOS_SDK_VERSION))
+}
+
+pub fn home_dir() -> CLIResult<PathBuf> {
+    match home::home_dir() {
+        Some(path) => Ok(path.join(".zcash-uniffi")),
+        None => Err("Cannot calculate home dir !".into()),
+    }
 }

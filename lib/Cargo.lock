@@ -950,6 +950,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "home"
+version = "0.5.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5444c27eef6923071f7ebcc33e3444508466a76f7a2b93da00ed6e19f30c1ddb"
+dependencies = [
+ "windows-sys 0.48.0",
+]
+
+[[package]]
 name = "incrementalmerkletree"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2265,6 +2274,7 @@ dependencies = [
  "clap 4.3.0",
  "fs_extra",
  "handlebars",
+ "home",
  "regex",
  "retry",
  "serde",

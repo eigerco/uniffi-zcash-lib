@@ -18,3 +18,4 @@ regex = "1"
 retry = "2.0.0"
 uniffi-zcash-test = { path = "../uniffi-zcash-test" }
 zcash_proofs = { workspace = true, features = ["download-params"] }
+home = "0.5.5"
