@@ -17,6 +17,11 @@ on:
         required: true
         type: string
 
+      save-artifacts:
+        required: false
+        type: boolean
+        default: true
+
     secrets:
       git-user-name:
         required: true
@@ -67,6 +72,7 @@ jobs:
           cargo run -p uniffi-zcash-cli release python -v ${{ inputs.version }}
 
       - name: Save artifacts for Python package
+        if: ${{ inputs.save-artifacts }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-python-data-${{ github.run_number }}
@@ -111,6 +117,7 @@ jobs:
           cargo run -p uniffi-zcash-cli release ruby -v ${{ inputs.version }}
 
       - name: Save artifacts for Ruby package
+        if: ${{ inputs.save-artifacts }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-ruby-data-${{ github.run_number }}
@@ -154,6 +161,7 @@ jobs:
           cargo run -p uniffi-zcash-cli release kotlin -v ${{ inputs.version }}
 
       - name: Save artifacts for Kotlin package
+        if: ${{ inputs.save-artifacts }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-kotlin-data-${{ github.run_number }}
@@ -198,6 +206,7 @@ jobs:
           cargo run -p uniffi-zcash-cli release swift -v ${{ inputs.version }}
 
       - name: Save artifacts package pointer file for Swift package
+        if: ${{ inputs.save-artifacts }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-swift-pointer-data-${{ github.run_number }}
@@ -206,6 +215,7 @@ jobs:
           if-no-files-found: error
 
       - name: Save artifacts package for Swift package
+        if: ${{ inputs.save-artifacts }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-swift-package-data-${{ github.run_number }}

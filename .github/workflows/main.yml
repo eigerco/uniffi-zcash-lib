@@ -69,6 +69,7 @@ jobs:
     with:
       version: "0.0.0" # dummy version we are only testing the build.
       artifacts-storage-prefix: "build-test"
+      save-artifacts: false
     secrets:
       git-user-name: ${{ secrets.GIT_USER_NAME }}
       git-user-email: ${{ secrets.GIT_USER_EMAIL }}
@@ -89,6 +90,7 @@ jobs:
       runs-on: macos-latest
       version: "0.0.0" # dummy version we are only testing the build.
       artifacts-storage-prefix: "build-test"
+      save-artifacts: false
     secrets:
       git-user-name: ${{ secrets.GIT_USER_NAME }}
       git-user-email: ${{ secrets.GIT_USER_EMAIL }}
