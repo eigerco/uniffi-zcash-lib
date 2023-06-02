@@ -34,10 +34,26 @@ rustup default nightly
 rustup update
 
 brew install kotlin
-brew install swift
+brew install kylef/formulae/swiftenv
 brew install python
 brew install ruby
+brew install wget
 ```
+
+Use `swiftenv` to setup a system wide swift version.
+
+In case of problems, re-check:
+
+* Ensure ruby has an user writable path for storing gems. Sometimes this needs to be setup by:
+  ```
+  export GEM_HOME="$HOME/.gem"
+  ```
+* By default, you could be using the default system ruby installation (check with `which ruby` ) if not pointing to homebrew, this needs to be setup:
+  ```
+  export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+  ```
+* Ensure x-code tools are properly installed with developer tools: `xcode-select --install`.
+* Ensure your `SDKROOT` environment variable is configured.
 
 ### <a href="local-environment-linux"></a> Linux
 
