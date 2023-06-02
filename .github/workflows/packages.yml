@@ -6,6 +6,10 @@ on:
       version:
         required: true
         type: string
+      
+      runs-on:
+        required: true
+        type: string
       # In order to discriminate across workflows, a prefix is needed.
       # I.e , the operation name, like "publishing" or "building"
       artifacts-storage-prefix:
@@ -28,7 +32,7 @@ on:
 
 jobs:
   python:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
         working-directory: ./lib
@@ -67,7 +71,7 @@ jobs:
           if-no-files-found: error
 
   ruby:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
         working-directory: ./lib
@@ -111,7 +115,7 @@ jobs:
           if-no-files-found: error
 
   kotlin:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
         working-directory: ./lib
@@ -154,7 +158,7 @@ jobs:
           if-no-files-found: error
 
   swift:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
         working-directory: ./lib

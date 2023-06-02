@@ -67,6 +67,7 @@ jobs:
     # in the build.gradle.kts template for security reasons.
     uses: ./.github/workflows/packages.yml
     with:
+      runs-on: ubuntu-latest
       version: "0.0.0" # dummy version we are only testing the build.
       artifacts-storage-prefix: "build-test"
     secrets:
