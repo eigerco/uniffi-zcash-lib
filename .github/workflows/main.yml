@@ -42,6 +42,15 @@ jobs:
             lib/target
           key: 1-${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-build
+      
+      - name: Set up home cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.zcash-uniffi/         
+          key: 1-${{ runner.os }}-home-build-${{ hashFiles('.zcash-uniffi/**') }}
+          restore-keys: ${{ runner.os }}-home-build
 
       - name: 🔨 Build
         run: cargo build --verbose
