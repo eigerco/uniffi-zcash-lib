@@ -1,4 +1,4 @@
-use std::{path::PathBuf, process::Command};
+use std::{fs, path::PathBuf, process::Command};
 
 use crate::{
     cli::CLIResult,
@@ -38,6 +38,7 @@ pub fn install_zig_build() -> CLIResult<()> {
 }
 
 const MACOS_SDK_VERSION: &str = "MacOSX11.3";
+const MACOS_SDK_SHA256_SUM: &str = "cd4f08a75577145b8f05245a2975f7c81401d75e9535dcffbb879ee1deefcbf4";
 
 pub fn install_macos_sdk() -> CLIResult<()> {
     if macos_sdk_require_path().exists() {
@@ -58,6 +59,17 @@ pub fn install_macos_sdk() -> CLIResult<()> {
             .wait(),
     )?;
 
+    let tar = fs::read(macos_sdk_tar_path())?;
+    let hash = sha256::digest(tar.as_slice());
+
+    if hash.ne(MACOS_SDK_SHA256_SUM) {
+        return Err(format!(
+            "Hashes differ. Expected {} \n Downloaded {}",
+            MACOS_SDK_SHA256_SUM, hash
+        )
+        .into());
+    }
+
     cmd_success(
         Command::new("tar")
             .arg("-J")
@@ -75,6 +87,10 @@ pub fn macos_sdk_install_path() -> PathBuf {
 
 pub fn macos_sdk_require_path() -> PathBuf {
     macos_sdk_install_path().join(format!("{}.sdk", MACOS_SDK_VERSION))
+}
+
+pub fn macos_sdk_tar_path() -> PathBuf {
+    macos_sdk_install_path().join(format!("{}.sdk.tar.xz", MACOS_SDK_VERSION))
 }
 
 pub fn home_dir() -> CLIResult<PathBuf> {
