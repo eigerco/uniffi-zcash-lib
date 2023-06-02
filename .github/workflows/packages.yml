@@ -29,7 +29,9 @@ on:
         required: true
       swift-git-repo-url:
         required: true
-
+env:
+  CARGO_TERM_COLOR: always
+  
 jobs:
   python:
     runs-on: ${{ inputs.runs-on }}

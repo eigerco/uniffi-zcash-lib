@@ -4,6 +4,8 @@ on:
   push:
     tags:
       - "*.*.*" # Must be a semver parseable tag
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
   bindgen:
