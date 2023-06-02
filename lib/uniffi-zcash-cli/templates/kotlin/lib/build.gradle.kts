@@ -54,9 +54,11 @@ publishing {
    repositories {
      maven {
         url = uri(System.getenv("KOTLIN_REGISTRY_URL")) // https://example.com/repository/maven
+        isAllowInsecureProtocol = true // uncomment this for testing.
         credentials {
             username = System.getenv("KOTLIN_REGISTRY_USERNAME") // Use "token" as the username for API token authentication
             password = System.getenv("KOTLIN_REGISTRY_PASSWORD")
+
         }
      }
   }

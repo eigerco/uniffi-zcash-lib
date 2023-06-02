@@ -89,6 +89,13 @@ The provided [env_example](./env_example) has the necessary values for interacti
 
 For most of the services that should be enough. How ever the are some specific nuances per language:
 
-* In the case of `archiva` the service for maven packages, one needs to set a password for admin that later should be used in the commented env vars.
+* Kotlin
+    * In the case of `archiva` the service for maven packages, one needs to set a password for admin that later should be used in the commented env vars.
+
+    * Remember to uncomment this line [here](./templates/kotlin/lib/build.gradle.kts):
+
+    ```bash
+        isAllowInsecureProtocol = true // uncomment this for testing.
+    ```
   
 * In case of swift, only the Git repository publication can be tested at the moment. One needs a Git URL repo, and probably a personal access token included in that repo url following basic auth scheme. For github based repos, you can check [personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
