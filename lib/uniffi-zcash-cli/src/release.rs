@@ -48,7 +48,7 @@ pub fn python(cfg: &PythonConfig) -> CLIResult<()> {
 
     // Prepare python distribution files
     cmd_success(
-        Command::new("python")
+        Command::new("python3")
             .arg("-m")
             .arg("pip")
             .arg("install")
@@ -60,7 +60,7 @@ pub fn python(cfg: &PythonConfig) -> CLIResult<()> {
     )?;
 
     cmd_success(
-        Command::new("python")
+        Command::new("python3")
             .arg("-m")
             .arg("build")
             .current_dir(&cfg.package_dir)
@@ -70,7 +70,7 @@ pub fn python(cfg: &PythonConfig) -> CLIResult<()> {
 
     // Install lib and test.
     cmd_success(
-        Command::new("python")
+        Command::new("python3")
             .arg("-m")
             .arg("pip")
             .arg("install")
@@ -90,7 +90,7 @@ pub fn python(cfg: &PythonConfig) -> CLIResult<()> {
     )?;
 
     cmd_success(
-        Command::new("python")
+        Command::new("python3")
             .arg("app.py")
             .current_dir(test_app_path)
             .spawn()?
@@ -384,6 +384,16 @@ pub fn swift(cfg: &SwiftConfig) -> CLIResult<()> {
 
     // Execute the test app for testing all generated stuff.
     let test_app_path = tmp_folder()?;
+
+    // Also, copy the shared lib to the root of testing app,
+    // so it can be located by search rules.
+    // This is needed, as the MacOS integrity protection
+    // wipes out all the DYLD_* env vars. See https://developer.apple.com/library/prerelease/mac/documentation/Security/Conceptual/System_Integrity_Protection_Guide/RuntimeProtections/RuntimeProtections.html
+    copy(
+        cfg.bindings_dir.join(MACOS_SHARED_LIB_NAME),
+        test_app_path
+            .join(MACOS_SHARED_LIB_NAME),
+    )?;
 
     dir::copy(
         &cfg.test_app_template_dir,

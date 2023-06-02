@@ -20,7 +20,7 @@ pub fn add_rust_targets() -> CLIResult<()> {
 
 pub fn install_zig_build() -> CLIResult<()> {
     cmd_success(
-        Command::new("pip")
+        Command::new("pip3")
             .arg("install")
             .arg("ziglang")
             .spawn()?

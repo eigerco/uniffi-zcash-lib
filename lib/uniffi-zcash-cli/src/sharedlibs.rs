@@ -39,7 +39,7 @@ pub fn generate_shared_libs(root_dir: &Path) -> CLIResult<()> {
     println!("Generating .so shared library for linux ...");
     cmd_success(
         Command::new("cargo")
-            .arg("build")
+            .arg("zigbuild")
             .arg("--release")
             .arg("--target")
             .arg(TARGET_LINUX_X86_64)

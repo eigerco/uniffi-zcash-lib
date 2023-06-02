@@ -14,7 +14,7 @@ use crate::{
 pub fn python(config: &PythonConfig) -> CLIResult<()> {
     // Ensure deps are installed.
     cmd_success(
-        Command::new("python")
+        Command::new("python3")
             .arg("-m")
             .arg("pip")
             .arg("install")
@@ -26,7 +26,7 @@ pub fn python(config: &PythonConfig) -> CLIResult<()> {
     )?;
 
     // Publish the artifact. See twine --help options.
-    let mut publish_cmd = Command::new("python");
+    let mut publish_cmd = Command::new("python3");
     publish_cmd
         .arg("-m")
         .arg("twine")
