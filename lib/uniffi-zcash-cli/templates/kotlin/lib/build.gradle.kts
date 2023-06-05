@@ -24,10 +24,11 @@ java {
     }
 }
 
-// Inlude the .so files in the jar. Our shared library is there.
+// Inlude the shared libraries.
 val libsDir = File("libs")
 tasks.withType<Jar> {
     from(libsDir) { include("**/*.so") }
+    from(libsDir) { include("**/*.dylib") }
 }
 
 publishing {
@@ -53,9 +54,11 @@ publishing {
    repositories {
      maven {
         url = uri(System.getenv("KOTLIN_REGISTRY_URL")) // https://example.com/repository/maven
+        isAllowInsecureProtocol = true // uncomment this for testing.
         credentials {
             username = System.getenv("KOTLIN_REGISTRY_USERNAME") // Use "token" as the username for API token authentication
             password = System.getenv("KOTLIN_REGISTRY_PASSWORD")
+
         }
      }
   }

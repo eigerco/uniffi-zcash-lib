@@ -23,7 +23,7 @@ class TransactionBuilderTest(supp: TestSupport) {
         builder.addTransparentInput(secretKey, ZcashOutPoint(List(32) { 0u }, 1u),  prevCoin)
         builder.addTransparentOutput(address, ZcashAmount(200))
 
-        val prover = ZcashLocalTxProver.bundled()
+        val prover = ZcashLocalTxProver.withDefaultLocation()
 
         val feeRule = ZcashFeeRules.FixedNonStandard(0u)
 
@@ -49,7 +49,7 @@ class TransactionBuilderTest(supp: TestSupport) {
         builder.addTransparentInput(secretKey, ZcashOutPoint(List(32) { 0u }, 1u),  prevCoin)
         builder.addTransparentOutput(address, ZcashAmount(200))
 
-        val prover = ZcashLocalTxProver.bundled()
+        val prover = ZcashLocalTxProver.withDefaultLocation()
 
         val feeRule = ZcashFeeRules.FixedStandard
 
@@ -76,7 +76,7 @@ class TransactionBuilderTest(supp: TestSupport) {
         builder.addTransparentInput(secretKey, ZcashOutPoint(List(32) { 0u }, 1u),  prevCoin)
         builder.addTransparentOutput(address, ZcashAmount(9200))
 
-        val prover = ZcashLocalTxProver.bundled()
+        val prover = ZcashLocalTxProver.withDefaultLocation()
 
         val feeRule = ZcashFeeRules.Zip317Standard
 
@@ -103,7 +103,7 @@ class TransactionBuilderTest(supp: TestSupport) {
         builder.addTransparentInput(secretKey, ZcashOutPoint(List(32) { 0u }, 1u),  prevCoin)
         builder.addTransparentOutput(address, ZcashAmount(9200))
 
-        val prover = ZcashLocalTxProver.bundled()
+        val prover = ZcashLocalTxProver.withDefaultLocation()
 
         val feeRule = ZcashFeeRules.Zip317NonStandard(5000u, 2u, 150u, 34u)
 
@@ -132,7 +132,7 @@ class TransactionBuilderTest(supp: TestSupport) {
         builder.addSaplingOutput(
             ovk, paymentAddress, ZcashAmount(200), ZcashMemoBytes.empty())
 
-        val prover = ZcashLocalTxProver.bundled()
+        val prover = ZcashLocalTxProver.withDefaultLocation()
         val feeRule = ZcashFeeRules.FixedNonStandard(0u)
 
         val result = builder.build(prover, feeRule)

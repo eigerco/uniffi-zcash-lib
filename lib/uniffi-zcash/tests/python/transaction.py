@@ -25,7 +25,7 @@ class TransactionBuilderTest(unittest.TestCase):
             secret_key, ZcashOutPoint([0] * 32, 1),  prev_coin)
         builder.add_transparent_output(address, ZcashAmount(200))
 
-        prover = ZcashLocalTxProver.bundled()
+        prover = ZcashLocalTxProver.with_default_location()
 
         fee_rule = ZcashFeeRules.FIXED_NON_STANDARD(0)
 
@@ -57,7 +57,7 @@ class TransactionBuilderTest(unittest.TestCase):
             secret_key, ZcashOutPoint([0] * 32, 1),  prev_coin)
         builder.add_transparent_output(address, ZcashAmount(200))
 
-        prover = ZcashLocalTxProver.bundled()
+        prover = ZcashLocalTxProver.with_default_location()
 
         fee_rule = ZcashFeeRules.FIXED_STANDARD()
 
@@ -88,7 +88,7 @@ class TransactionBuilderTest(unittest.TestCase):
             secret_key, ZcashOutPoint([0] * 32, 1),  prev_coin)
         builder.add_transparent_output(address, ZcashAmount(9200))
 
-        prover = ZcashLocalTxProver.bundled()
+        prover = ZcashLocalTxProver.with_default_location()
 
         fee_rule = ZcashFeeRules.ZIP317_STANDARD()
 
@@ -120,7 +120,7 @@ class TransactionBuilderTest(unittest.TestCase):
             secret_key, ZcashOutPoint([0] * 32, 1),  prev_coin)
         builder.add_transparent_output(address, ZcashAmount(9200))
 
-        prover = ZcashLocalTxProver.bundled()
+        prover = ZcashLocalTxProver.with_default_location()
 
         fee_rule = ZcashFeeRules.ZIP317_NON_STANDARD(5000, 2, 150, 34)
 
@@ -152,7 +152,7 @@ class TransactionBuilderTest(unittest.TestCase):
         builder.add_sapling_output(
             ovk, payment_address, ZcashAmount(200), ZcashMemoBytes.empty())
 
-        prover = ZcashLocalTxProver.bundled()
+        prover = ZcashLocalTxProver.with_default_location()
         fee_rule = ZcashFeeRules.FIXED_NON_STANDARD(0)
 
         result = builder.build(prover, fee_rule)

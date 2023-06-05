@@ -27,14 +27,6 @@ impl ZcashLocalTxProver {
             None => Err("Parameters cannot be found in default location".into()),
         }
     }
-
-    /// Creates a `LocalTxProver` using Sapling parameters bundled inside the binary.
-    ///
-    /// This requires the `bundled-prover` feature, which will increase the binary size by
-    /// around 50 MiB.
-    pub fn bundled() -> Self {
-        LocalTxProver::bundled().into()
-    }
 }
 
 impl From<LocalTxProver> for ZcashLocalTxProver {

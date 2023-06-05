@@ -24,7 +24,7 @@ class TransactionBuilderTest < Test::Unit::TestCase
 
         builder.add_transparent_output(address, Zcash::ZcashAmount.new(200))
 
-        prover = Zcash::ZcashLocalTxProver::bundled()
+        prover = Zcash::ZcashLocalTxProver::with_default_location()
 
         fee_rule = Zcash::ZcashFeeRules::FIXED_NON_STANDARD.new(0)
 
@@ -53,7 +53,7 @@ class TransactionBuilderTest < Test::Unit::TestCase
 
         builder.add_transparent_output(address, Zcash::ZcashAmount.new(200))
 
-        prover = Zcash::ZcashLocalTxProver::bundled()
+        prover = Zcash::ZcashLocalTxProver::with_default_location()
 
         fee_rule = Zcash::ZcashFeeRules::FIXED_STANDARD.new()
 
@@ -83,7 +83,7 @@ class TransactionBuilderTest < Test::Unit::TestCase
 
         builder.add_transparent_output(address, Zcash::ZcashAmount.new(9200))
 
-        prover = Zcash::ZcashLocalTxProver::bundled()
+        prover = Zcash::ZcashLocalTxProver::with_default_location()
 
         fee_rule = Zcash::ZcashFeeRules::ZIP317_STANDARD.new()
 
@@ -113,7 +113,7 @@ class TransactionBuilderTest < Test::Unit::TestCase
 
         builder.add_transparent_output(address, Zcash::ZcashAmount.new(9200))
 
-        prover = Zcash::ZcashLocalTxProver::bundled()
+        prover = Zcash::ZcashLocalTxProver::with_default_location()
 
         fee_rule = Zcash::ZcashFeeRules::ZIP317_NON_STANDARD.new(5000, 2, 150, 34)
 
@@ -145,7 +145,7 @@ class TransactionBuilderTest < Test::Unit::TestCase
         builder.add_sapling_output(
             ovk, payment_address, Zcash::ZcashAmount.new(200), Zcash::ZcashMemoBytes.empty())
 
-        prover = Zcash::ZcashLocalTxProver.bundled()
+        prover = Zcash::ZcashLocalTxProver.with_default_location()
         fee_rule = Zcash::ZcashFeeRules::FIXED_NON_STANDARD.new(0)
 
         result = builder.build(prover, fee_rule)

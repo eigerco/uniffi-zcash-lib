@@ -26,7 +26,7 @@ class TransactionBuilderTest {
         
         try! builder.addTransparentOutput(to: address, value: ZcashAmount(amount: 200))
 
-        let prover = ZcashLocalTxProver.bundled()
+        let prover = try! ZcashLocalTxProver.withDefaultLocation()
 
         let feeRule = ZcashFeeRules.fixedNonStandard(amount: 0)
 
@@ -54,7 +54,7 @@ class TransactionBuilderTest {
         
         try! builder.addTransparentOutput(to: address, value: ZcashAmount(amount: 200))
 
-        let prover = ZcashLocalTxProver.bundled()
+        let prover = try! ZcashLocalTxProver.withDefaultLocation()
 
         let feeRule = ZcashFeeRules.fixedStandard
 
@@ -82,7 +82,7 @@ class TransactionBuilderTest {
         
         try! builder.addTransparentOutput(to: address, value: ZcashAmount(amount: 9200))
 
-        let prover = ZcashLocalTxProver.bundled()
+        let prover = try! ZcashLocalTxProver.withDefaultLocation()
 
         let feeRule = ZcashFeeRules.zip317Standard
 
@@ -110,7 +110,7 @@ class TransactionBuilderTest {
         
         try! builder.addTransparentOutput(to: address, value: ZcashAmount(amount: 9200))
 
-        let prover = ZcashLocalTxProver.bundled()
+        let prover = try! ZcashLocalTxProver.withDefaultLocation()
 
         let feeRule = ZcashFeeRules.zip317NonStandard(marginalFee: 5000, graceActions: 2,   p2pkhStandardInputSize: 150, p2pkhStandardOutputSize: 34)
 
@@ -138,7 +138,7 @@ class TransactionBuilderTest {
         let ovk = key.sapling().toDiversifiableFullViewingKey().toOvk(scope: ZcashScope.internal)
         builder.addSaplingOutput(ovk: ovk, to: paymentAddress, value: try! ZcashAmount(amount: 200), memo: ZcashMemoBytes.empty())
 
-        let prover = ZcashLocalTxProver.bundled()
+        let prover = try! ZcashLocalTxProver.withDefaultLocation()
         let feeRule = ZcashFeeRules.fixedNonStandard(amount: 0)
 
         let result = try! builder.build(prover: prover, feeRule: feeRule)

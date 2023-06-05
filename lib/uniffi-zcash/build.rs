@@ -1,16 +1,9 @@
-use std::env;
 use std::fs::{read_to_string, OpenOptions};
 use std::io::Write;
 use std::path::Path;
 
-use uniffi_zcash_test::test_data::generate_test_data;
 
 fn main() {
-    let force_test_data_regeneration = env::var("REGENERATE_TEST_DATA")
-        .map(|var| var.parse().unwrap_or_default())
-        .unwrap_or_default();
-    generate_test_data(force_test_data_regeneration);
-
     println!("cargo:rerun-if-changed=src/udl");
     println!("cargo:rerun-if-changed=../uniffi-zcash-test/src/udl");
     generate_udl_file();

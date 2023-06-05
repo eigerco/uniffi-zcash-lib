@@ -22,7 +22,7 @@ We just must follow this initially established (but not fixed) conventions.
 
 ## <a href="repo-cli"></a> Using the repo CLI
 
-This CLI allows to easy build and publish the bindings and packages. We encourage to read the in crate [documentation](./lib/uniffi-zcash-cli/README.md).
+This CLI allows to easy setup, build and publish the bindings and packages. We encourage to read the in crate [documentation](./lib/uniffi-zcash-cli/README.md).
 
 ## <a href="local-environment-setup"></a> Local environment setup
 
@@ -34,10 +34,26 @@ rustup default nightly
 rustup update
 
 brew install kotlin
-brew install swift
+brew install kylef/formulae/swiftenv
 brew install python
 brew install ruby
+brew install wget
 ```
+
+Use `swiftenv` to setup a system wide swift version.
+
+In case of problems, re-check:
+
+* Ensure ruby has an user writable path for storing gems. Sometimes this needs to be setup by:
+  ```
+  export GEM_HOME="$HOME/.gem"
+  ```
+* By default, you could be using the default system ruby installation (check with `which ruby` ) if not pointing to homebrew, this needs to be setup:
+  ```
+  export PATH="/opt/homebrew/opt/ruby/bin:$PATH"
+  ```
+* Ensure x-code tools are properly installed with developer tools: `xcode-select --install`.
+* Ensure your `SDKROOT` environment variable is configured.
 
 ### <a href="local-environment-linux"></a> Linux
 
@@ -67,7 +83,14 @@ All the tests are located in the [testing](./lib/uniffi-zcash/tests/) directory.
 
 ### <a href="executing-tests"></a> Executing the tests
 
-It should be enough with
+Ensure the `Sapling` crypto parameters are downloaded. You can download them
+to your `$home` with the in repo [CLI](./lib/uniffi-zcash-cli/README.md) by:
+
+```bash
+$ cargo run -p uniffi-zcash-cli setup saplingparams
+```
+
+Then the tests can be run by:
 
 ```bash
 $ cargo test
@@ -81,8 +104,10 @@ Having a different dataset per each language would make no sense since we are te
 
 A [CSV file](./lib/uniffi-zcash/tests/test_data.csv) with test data is committed in the repo. In case a new test is added or a modification is done in any of them, the new data should be committed.
 
-To force regeneration of this file you can either:
+If its needed to add new data generators or modifying the actual golden file you can execute from the `lib` folder of the repo:
 
-* remove the file (located at `lib/uniffi-zcash/tests/test_data.csv`)
-* or force regeneration using environment variable: `REGENERATE_TEST_DATA=true cargo build`
-* or you could simply run `cargo run --bin test-data` instead.
+```bash
+$ cargo run -p uniffi-zcash-cli setup saplingparams
+```
+
+More details available in the [CLI docs](./lib/uniffi-zcash-cli/README.md)

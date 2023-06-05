@@ -1,10 +1,10 @@
 mod hdwallet;
+mod helper;
 mod orchard;
 mod secp256k1;
 mod transaction;
 mod zcash_client_backend;
 mod zcash_primitives;
-mod helper;
 
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -20,6 +20,8 @@ use self::zcash_primitives::write_for_zcash_primitives;
 pub fn generate_test_data(force: bool) {
     let base_url = env!("CARGO_MANIFEST_DIR");
     let path = format!("{base_url}/../uniffi-zcash/tests/test_data.csv");
+
+    println!("Generating test data at: {}", base_url);
 
     if force || !Path::new(&path).exists() {
         let mut file = OpenOptions::new()
@@ -42,6 +44,7 @@ pub fn generate_test_data(force: bool) {
         write_for_zcash_primitives(&mut file, &seed);
         write_for_transaction(&mut file, &seed);
     }
+    println!("done !");
 }
 
 pub(crate) fn format_bytes(label: &str, bytes: &[u8]) -> String {

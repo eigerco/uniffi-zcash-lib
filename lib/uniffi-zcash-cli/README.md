@@ -4,8 +4,7 @@ An internal repo CLI to manage repo workflows, like binding generation, packagin
 
 ## <a name="motivation"></a> Motivation
 
-The UniFFI project [is not providing](https://mozilla.github.io/uniffi-rs/Motivation.html#why-not) a way to pack and publish the generated bindings. This CLI is an effort to provide a first version of a packaging/publishing solution. Some
-of the key points are:
+The UniFFI project [is not providing](https://mozilla.github.io/uniffi-rs/Motivation.html#why-not) a way to pack and publish the generated bindings. This CLI is an effort to provide a version of a packaging/publishing solution. Some of the key points are:
 
 * Programmatically interact with all repo workflows. Abstract (but not hide) low level details of UniFFI tooling.
   
@@ -36,16 +35,18 @@ cargo run -p uniffi-bindgen --help
 But it will only provide low level binding generation operations.
 ## <a name="commands-and-design"></a> Commands and overall design
 
-The CLI has the following available commands. They need to be executed in the following order:
+The CLI has the following build related available commands. They need **to be executed in the following order**:
 
 ```mermaid
 graph LR;
-bindgen-->release-->publish;
+sharedlibs-->bindgen-->release-->publish;
 ```
 
-1. `bindgen` - It accepts a comma separated list of target `languages` . This command calls all the needed UniFFI machinery for generating the language bindings. It invokes the UniFFI tools under the hood, passing [our desired values](./../uniffi-bindgen/uniffi.toml) by default. The outcome of this command is the lib/bindings git ignored folder, which contains the bindings. It also generates the C shared library the bindings need to import. The outcome of executing this command is a folder at `lib/bindings` , with a subfolder per each language that holds per language necessary files.
+1. `sharedlibs` - It generates the C shared library the bindings need to import for both, MacOS and Linux. It leaves its output at `lib/shared_libs` .
 
-2. `release` - This command has a subcommand per each target language. It normally accepts a `version` argument among others (see help for more information). This command **doesn't push the artifacts yet**. It only prepares them by using a little, in house [project template system](./templates/). Such system has predefined projects structures for the different languages, which later are parametrized with a text template engine. It also copies the needed files from the previous command outcome at lib/bindings. The outcome of this command is placed at the `lib/packages` git ignored folder, with a subfolder per each language. It contains the packages ready to be published. This **packages are also automatically tested against little sample applications**. Such [sample applications](./templates/) just import the artifact as an user would do,  exercising the application code in way that checks that the entire import chain/dynamic library loading is not broken.
+2. `bindgen` - It accepts a comma separated list of target `languages` . This command calls all the needed UniFFI machinery for generating each language bindings. It invokes the UniFFI tools under the hood, passing [our desired values](./../uniffi-bindgen/uniffi.toml) by default. The outcome of executing this command is a folder at `lib/bindings` , with a subfolder per each language that holds per language necessary files.
+
+3. `release` - This command has a subcommand per each target language. It normally accepts a `version` argument among others (see help for more information). This command **doesn't push the artifacts yet**. It only prepares them by using a little, in house [project template system](./templates/). Such system has predefined projects structures for the different languages, which later are parametrized with a text template engine. It also copies the needed files from the previous command outcome at lib/bindings. The outcome of this command is placed at the `lib/packages` git ignored folder, with a subfolder per each language. It contains the packages ready to be published. This **packages are also automatically tested against little sample applications**. Such [sample applications](./templates/) just import the artifact as an user would do,  exercising the application code in way that checks that the entire import chain/dynamic library loading is not broken.
 
     At the end of this command execution, and per language, we should see something like:
 
@@ -55,7 +56,13 @@ bindgen-->release-->publish;
     Python test application successfully executed ✅
     ```
 
-3. `publish` - This is the last step and only does the final publish operations i.e pushing previously generated artifacts at `lib/packages` . Its where most of the external calls are concentrated. As artifacts tend to be a bit weighty, it uses exponential backoff for pushing the artifacts to each language specific registry.
+4. `publish` - This is the last step and only does the final publish operations i.e pushing previously generated artifacts at `lib/packages` . Its where most of the external calls are concentrated. As artifacts tend to be a bit weighty, it uses exponential backoff for pushing the artifacts to each language specific registry.
+
+There are also other utility subcommands under the `setup` command to help developers in testing or build stages, see:
+
+```bash
+$ cargo run -p uniffi-zcash-cli setup --help
+```
 
 ## <a name="ci-integration"></a> Integration with the CI 🤖
 
@@ -63,15 +70,18 @@ The commented modular design allows many options for configuring the CI. Steps c
 
 ## <a name="how-to-use"></a> How to use it from my laptop 💻  
 
-1. Copy the [provided](./env_example) `env` file to a personal, git ignored `.env` one, and fill the variables values. By default, they have testing values. Only those for the relevant target languages are needed.
+1. Ensure you have the [needed software](../../CONTRIBUTING.md#local-environment-setup) installed.
+
+2. Copy the [provided](./env_example) `env` file to a personal, git ignored `.env` one, and fill the variables values. By default, they have testing values. Only those for the relevant target languages are needed.
+
     ```bash
     $ cp ./env_example .env 
     ```
-2. Execute the [script](./load_env.sh) for loading the needed environment variables into the current terminal:
+3. Execute the [script](./load_env.sh) for loading the needed environment variables into the current terminal:
     ```bash
     $ source ./load_env.sh
     ```
-3. Now the developer can execute the desired commands.
+4. Now the developer can execute the desired commands.
 
 ## <a name="how-to-test"></a> How to test this CLI ✅
 
@@ -81,6 +91,13 @@ The provided [env_example](./env_example) has the necessary values for interacti
 
 For most of the services that should be enough. How ever the are some specific nuances per language:
 
-* In the case of `archiva` the service for maven packages, one needs to set a password for admin that later should be used in the commented env vars.
+* Kotlin
+    * In the case of `archiva` the service for maven packages, one needs to set a password for admin that later should be used in the commented env vars.
+
+    * Remember to uncomment this line [here](./templates/kotlin/lib/build.gradle.kts):
+
+    ```bash
+        isAllowInsecureProtocol = true // uncomment this for testing.
+    ```
   
-* In case of swift, only the Git repository publication can be tested at the moment. One needs a Git URL repo, and probably a personal access token included in that repo url following basic auth scheme. For github based repos, you can check [personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+* In case of swift, only the Git `bare` repository publication can be tested at the moment. One needs a Git URL repo, and probably a personal access token included in that repo url following basic auth scheme. For github based repos, you can check [personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
