@@ -22,7 +22,7 @@ We just must follow this initially established (but not fixed) conventions.
 
 ## <a href="repo-cli"></a> Using the repo CLI
 
-This CLI allows to easy build and publish the bindings and packages. We encourage to read the in crate [documentation](./lib/uniffi-zcash-cli/README.md).
+This CLI allows to easy setup, build and publish the bindings and packages. We encourage to read the in crate [documentation](./lib/uniffi-zcash-cli/README.md).
 
 ## <a href="local-environment-setup"></a> Local environment setup
 
@@ -87,7 +87,7 @@ Ensure the `Sapling` crypto parameters are downloaded. You can download them
 to your `$home` with the in repo [CLI](./lib/uniffi-zcash-cli/README.md) by:
 
 ```bash
-$ cargo run -p uniffi-zcash-cli saplingparams
+$ cargo run -p uniffi-zcash-cli setup saplingparams
 ```
 
 Then the tests can be run by:
@@ -104,5 +104,10 @@ Having a different dataset per each language would make no sense since we are te
 
 A [CSV file](./lib/uniffi-zcash/tests/test_data.csv) with test data is committed in the repo. In case a new test is added or a modification is done in any of them, the new data should be committed.
 
-If its needed to add new data generators or modifying the actual golden file, please refer to `testdata` data generation CLI commands.
+If its needed to add new data generators or modifying the actual golden file you can execute from the `lib` folder of the repo:
+
+```bash
+$ cargo run -p uniffi-zcash-cli setup saplingparams
+```
+
 More details available in the [CLI docs](./lib/uniffi-zcash-cli/README.md)

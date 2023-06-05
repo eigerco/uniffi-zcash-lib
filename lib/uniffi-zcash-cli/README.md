@@ -4,8 +4,7 @@ An internal repo CLI to manage repo workflows, like binding generation, packagin
 
 ## <a name="motivation"></a> Motivation
 
-The UniFFI project [is not providing](https://mozilla.github.io/uniffi-rs/Motivation.html#why-not) a way to pack and publish the generated bindings. This CLI is an effort to provide a first version of a packaging/publishing solution. Some
-of the key points are:
+The UniFFI project [is not providing](https://mozilla.github.io/uniffi-rs/Motivation.html#why-not) a way to pack and publish the generated bindings. This CLI is an effort to provide a version of a packaging/publishing solution. Some of the key points are:
 
 * Programmatically interact with all repo workflows. Abstract (but not hide) low level details of UniFFI tooling.
   
@@ -36,14 +35,14 @@ cargo run -p uniffi-bindgen --help
 But it will only provide low level binding generation operations.
 ## <a name="commands-and-design"></a> Commands and overall design
 
-The CLI has the following build related available commands. They need to be executed in the following order:
+The CLI has the following build related available commands. They need **to be executed in the following order**:
 
 ```mermaid
 graph LR;
-bindgen-->release-->publish;
+sharedlibs-->bindgen-->release-->publish;
 ```
 
-1. `sharedlibs` - It generates the C shared library the bindings need to import for both, MacOs and Linux. It leaves its output at `lib/shared_libs` . Its needed as pre-requisites... TBD. 
+1. `sharedlibs` - It generates the C shared library the bindings need to import for both, MacOS and Linux. It leaves its output at `lib/shared_libs` .
 
 2. `bindgen` - It accepts a comma separated list of target `languages` . This command calls all the needed UniFFI machinery for generating each language bindings. It invokes the UniFFI tools under the hood, passing [our desired values](./../uniffi-bindgen/uniffi.toml) by default. The outcome of executing this command is a folder at `lib/bindings` , with a subfolder per each language that holds per language necessary files.
 
@@ -71,15 +70,18 @@ The commented modular design allows many options for configuring the CI. Steps c
 
 ## <a name="how-to-use"></a> How to use it from my laptop 💻  
 
-1. Copy the [provided](./env_example) `env` file to a personal, git ignored `.env` one, and fill the variables values. By default, they have testing values. Only those for the relevant target languages are needed.
+1. Ensure you have the [needed software](../../CONTRIBUTING.md#local-environment-setup) installed.
+
+2. Copy the [provided](./env_example) `env` file to a personal, git ignored `.env` one, and fill the variables values. By default, they have testing values. Only those for the relevant target languages are needed.
+
     ```bash
     $ cp ./env_example .env 
     ```
-2. Execute the [script](./load_env.sh) for loading the needed environment variables into the current terminal:
+3. Execute the [script](./load_env.sh) for loading the needed environment variables into the current terminal:
     ```bash
     $ source ./load_env.sh
     ```
-3. Now the developer can execute the desired commands.
+4. Now the developer can execute the desired commands.
 
 ## <a name="how-to-test"></a> How to test this CLI ✅
 
