@@ -6,12 +6,9 @@ use std::{
 use fs_extra::file::read_to_string;
 use retry::delay::Exponential;
 
-use crate::{
-    cli::CLIResult,
-    helper::{cmd_retry, cmd_success},
-};
+use crate::helper::{cmd_retry, cmd_success};
 
-pub fn python(config: &PythonConfig) -> CLIResult<()> {
+pub fn python(config: &PythonConfig) -> anyhow::Result<()> {
     // Ensure deps are installed.
     cmd_success(
         Command::new("python3")
@@ -52,7 +49,7 @@ pub struct PythonConfig {
     pub registry_password: String,
 }
 
-pub fn ruby(config: &RubyConfig) -> CLIResult<()> {
+pub fn ruby(config: &RubyConfig) -> anyhow::Result<()> {
     // Publish the artifact. See https://guides.rubygems.org/publishing/
     let mut publish_cmd = Command::new("gem");
     publish_cmd
@@ -79,7 +76,7 @@ pub struct RubyConfig {
     pub registry_token: String,
 }
 
-pub fn kotlin(config: &KotlinConfig) -> CLIResult<()> {
+pub fn kotlin(config: &KotlinConfig) -> anyhow::Result<()> {
     let mut publish_cmd = Command::new("./gradlew");
     publish_cmd
         .arg("publish")
@@ -103,14 +100,12 @@ pub struct KotlinConfig {
     pub registry_password: String,
 }
 
-pub fn swift_repo(config: &SwiftRepoConfig) -> CLIResult<()> {
-    
-
+pub fn swift_repo(config: &SwiftRepoConfig) -> anyhow::Result<()> {
     // Get the pointer to the tmp folder generated in the previous release step
     let tmp_package_path =
         Path::new(read_to_string(config.lang_package_path.join("processing_at.txt"))?.as_str())
             .join("Zcash");
-    
+
     // Publish the artifact to git.
     let mut git_publish_cmd = Command::new("git");
     git_publish_cmd
@@ -147,8 +142,7 @@ pub struct SwiftRepoConfig {
     pub git_repo_url: String,
 }
 
-pub fn swift_registry(config: &SwiftRegistryConfig) -> CLIResult<()> {
-    
+pub fn swift_registry(config: &SwiftRegistryConfig) -> anyhow::Result<()> {
     // Log-in into swift package registry via token. See https://github.com/apple/swift-package-manager/blob/main/Documentation/PackageRegistryUsage.md#registry-authentication
     cmd_success(
         Command::new("swift")

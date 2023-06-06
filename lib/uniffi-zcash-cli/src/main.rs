@@ -1,8 +1,9 @@
 use std::env::set_current_dir;
 
 use bindgen::generate_bindings;
-use cli::{get_matches, CLIResult};
+use cli::get_matches;
 
+use anyhow::anyhow;
 use helper::workspace_root_dir;
 use setup::{add_rust_targets, install_macos_sdk, install_zig_build};
 use sharedlibs::generate_shared_libs;
@@ -24,7 +25,7 @@ const SWIFT: &str = "swift";
 
 const SUPPORTED_LANGUAGES: [&str; 4] = [PYTHON, RUBY, KOTLIN, SWIFT];
 
-fn main() -> CLIResult<()> {
+fn main() -> anyhow::Result<()> {
     let matches = get_matches();
 
     let root_dir = workspace_root_dir()?;
@@ -52,13 +53,13 @@ fn main() -> CLIResult<()> {
                     );
                     Ok(())
                 }
-                Err(err) => Err(err.to_string().into()),
+                Err(err) => Err(anyhow!(err.to_string())),
             },
             Some(("testdata", _)) => {
                 generate_test_data(true);
                 Ok(())
             }
-            _ => Err("Command not found. See help.".into()),
+            _ => Err(anyhow!("Command not found. See help.")),
         },
 
         Some(("sharedlibs", _)) => Ok(generate_shared_libs(&root_dir)?),
@@ -117,7 +118,7 @@ fn main() -> CLIResult<()> {
                     };
                     Ok(release::swift(&cfg)?)
                 }
-                _ => Err("Command not found. See help.".into()),
+                _ => Err(anyhow!("Command not found. See help.")),
             }
         }
         Some(("publish", args)) => match args.subcommand() {
@@ -203,10 +204,10 @@ fn main() -> CLIResult<()> {
                     cfg.lang_package_path.try_exists()?;
                     Ok(publish::swift_registry(&cfg)?)
                 }
-                _ => Err("Command not found. See help.".into()),
+                _ => Err(anyhow!("Command not found. See help.")),
             },
-            _ => Err("Command not found. See help.".into()),
+            _ => Err(anyhow!("Command not found. See help.")),
         },
-        _ => Err("Command not found. See help.".into()),
+        _ => Err(anyhow!("Command not found. See help.")),
     }
 }

@@ -2348,6 +2348,7 @@ dependencies = [
 name = "uniffi-zcash-cli"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "clap 4.3.0",
  "fat-macho",
  "fs_extra",

@@ -1,8 +1,6 @@
-use self::error::CLIError;
 use crate::SUPPORTED_LANGUAGES;
 use clap::{builder::{ValueParser, PossibleValuesParser}, Arg, ArgMatches, Command};
-
-pub mod error;
+use anyhow::anyhow;
 
 pub fn get_matches() -> ArgMatches {
     Command::new("UniFFI Zcash CLI")
@@ -185,13 +183,11 @@ pub fn validator_semver() -> ValueParser {
 /// * `regex`   - The regex to test against.
 /// * `err_msg` - Is a human friendly message to show in case the parser fails.
 pub fn validator_regex(regex: &'static str, err_msg: &'static str) -> ValueParser {
-    ValueParser::from(move |input: &str| -> CLIResult<String> {
+    ValueParser::from(move |input: &str| -> anyhow::Result<String> {
         let reg = regex::Regex::new(regex).unwrap();
         match reg.is_match(input) {
             true => Ok(input.to_owned()),
-            false => Err(format!("Value \"{}\" is not matching format: {}", input, err_msg).into()),
+            false => Err(anyhow!("Value \"{}\" is not matching format: {}", input, err_msg)),
         }
     })
 }
-
-pub type CLIResult<T> = Result<T, CLIError>;
