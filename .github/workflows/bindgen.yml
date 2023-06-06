@@ -44,8 +44,8 @@ jobs:
         with:
           path: |
             ~/.zcash-uniffi/
-          key: 1-${{ runner.os }}-home-build-${{ hashFiles('.zcash-uniffi/**') }}
-          restore-keys: ${{ runner.os }}-home-build
+          key: home-build-${{ hashFiles('.zcash-uniffi/**') }}
+          restore-keys: home-build
 
       - name: Prepare build env
         run: |

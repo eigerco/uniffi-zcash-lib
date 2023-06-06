@@ -48,8 +48,8 @@ jobs:
         with:
           path: |
             ~/.zcash-params/
-          key: 1-${{ runner.os }}-zcash-params-${{ hashFiles('.zcash-params/**') }}
-          restore-keys: ${{ runner.os }}-zcash-params
+          key: zcash-params-${{ hashFiles('.zcash-params/**') }}
+          restore-keys: zcash-params
 
       - name: 🔨 Build
         run: cargo build --verbose
