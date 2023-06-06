@@ -10,10 +10,8 @@ use crate::{
     setup::macos_sdk_require_path,
 };
 
-pub fn generate_shared_libs(root_dir: &Path) -> anyhow::Result<()> {
-    let shared_libs_dir = root_dir.join("shared_libs");
-
-    clean_dir(&shared_libs_dir)?;
+pub fn generate_shared_libs(root_dir: &Path, shared_libs_dir: &Path) -> anyhow::Result<()> {
+    clean_dir(shared_libs_dir)?;
 
     println!(
         "Generating .dylib shared library for {} ...",

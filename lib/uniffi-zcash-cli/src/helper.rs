@@ -6,7 +6,7 @@ use std::{
     time::Duration,
 };
 
-use anyhow::anyhow;
+use anyhow::{anyhow, bail};
 use fs_extra::dir;
 use handlebars::Handlebars;
 use retry::{retry_with_index, OperationResult};
@@ -112,4 +112,18 @@ pub fn tmp_folder() -> anyhow::Result<PathBuf> {
 /// path if there are missing elements.
 pub fn clean_dir(dir: &Path) -> anyhow::Result<()> {
     Ok(dir::create_all(dir, true)?)
+}
+
+pub trait PathChecker {
+    fn informed_exists(&self, msg: &str) -> anyhow::Result<()>;
+}
+
+impl PathChecker for PathBuf {
+    fn informed_exists(&self, msg: &str) -> anyhow::Result<()> {
+        if !self.exists() {
+            bail!("Path {} does not exist: {}", self.to_string_lossy(), msg)
+        } else {
+            Ok(())
+        }
+    }
 }

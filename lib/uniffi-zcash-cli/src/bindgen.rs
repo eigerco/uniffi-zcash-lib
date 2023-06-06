@@ -16,8 +16,6 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
     let target_bindings_path = root_dir.join("bindings");
     let shared_libs_dir = root_dir.join("shared_libs");
 
-    shared_libs_dir.try_exists()?;
-
     let linux_shared_lib_path = shared_libs_dir.join(LINUX_SHARED_LIB_NAME);
     let macos_shared_lib_path = shared_libs_dir.join(MACOS_SHARED_LIB_NAME);
 

@@ -4,7 +4,7 @@ use bindgen::generate_bindings;
 use cli::get_matches;
 
 use anyhow::anyhow;
-use helper::workspace_root_dir;
+use helper::{workspace_root_dir, PathChecker};
 use setup::{add_rust_targets, install_macos_sdk, install_zig_build};
 use sharedlibs::generate_shared_libs;
 use uniffi_zcash_test::test_data::generate_test_data;
@@ -29,6 +29,7 @@ fn main() -> anyhow::Result<()> {
     let matches = get_matches();
 
     let root_dir = workspace_root_dir()?;
+    let shared_libs_dir = root_dir.join("shared_libs");
     let bindings_dir = root_dir.join("bindings");
     let packages_dir = root_dir.join("packages");
 
@@ -62,8 +63,11 @@ fn main() -> anyhow::Result<()> {
             _ => Err(anyhow!("Command not found. See help.")),
         },
 
-        Some(("sharedlibs", _)) => Ok(generate_shared_libs(&root_dir)?),
+        Some(("sharedlibs", _)) => Ok(generate_shared_libs(&root_dir, &shared_libs_dir)?),
         Some(("bindgen", args)) => {
+            shared_libs_dir
+                .informed_exists("Are the shared libs already built ? Check CLI help.")?;
+
             let languages: Vec<String> = args
                 .try_get_many::<String>("languages")?
                 .unwrap()
@@ -72,6 +76,8 @@ fn main() -> anyhow::Result<()> {
             Ok(generate_bindings(&root_dir, &languages)?)
         }
         Some(("release", args)) => {
+            bindings_dir
+                .informed_exists("Are the language bindings already built ? Check CLI help.")?;
             let package_template_dir = root_dir.join("uniffi-zcash-cli").join("templates");
             match args.subcommand() {
                 Some((PYTHON, args)) => {
@@ -121,76 +127,33 @@ fn main() -> anyhow::Result<()> {
                 _ => Err(anyhow!("Command not found. See help.")),
             }
         }
-        Some(("publish", args)) => match args.subcommand() {
-            Some((PYTHON, args)) => {
-                let cfg = publish::PythonConfig {
-                    lang_package_path: packages_dir.join(PYTHON),
-                    registry_url: args
-                        .try_get_one::<String>("registry_url")?
-                        .unwrap()
-                        .to_owned(),
-                    registry_username: args
-                        .try_get_one::<String>("registry_username")?
-                        .unwrap()
-                        .to_owned(),
-                    registry_password: args
-                        .try_get_one::<String>("registry_password")?
-                        .unwrap()
-                        .to_owned(),
-                };
-                cfg.lang_package_path.try_exists()?;
-                Ok(publish::python(&cfg)?)
-            }
-            Some((RUBY, args)) => {
-                let cfg = publish::RubyConfig {
-                    lang_package_path: packages_dir.join(RUBY),
-                    version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
-                    registry_url: args
-                        .try_get_one::<String>("registry_url")?
-                        .unwrap()
-                        .to_owned(),
-                    registry_token: args
-                        .try_get_one::<String>("registry_token")?
-                        .unwrap()
-                        .to_owned(),
-                };
-                cfg.lang_package_path.try_exists()?;
-                Ok(publish::ruby(&cfg)?)
-            }
-            Some((KOTLIN, args)) => {
-                let cfg = publish::KotlinConfig {
-                    lang_package_path: packages_dir.join(KOTLIN),
-                    registry_url: args
-                        .try_get_one::<String>("registry_url")?
-                        .unwrap()
-                        .to_owned(),
-                    registry_username: args
-                        .try_get_one::<String>("registry_username")?
-                        .unwrap()
-                        .to_owned(),
-                    registry_password: args
-                        .try_get_one::<String>("registry_password")?
-                        .unwrap()
-                        .to_owned(),
-                };
-                cfg.lang_package_path.try_exists()?;
-                Ok(publish::kotlin(&cfg)?)
-            }
-            Some((SWIFT, args)) => match args.subcommand() {
-                Some(("git-repo", args)) => {
-                    let cfg = publish::SwiftRepoConfig {
-                        lang_package_path: packages_dir.join(SWIFT),
-                        git_repo_url: args
-                            .try_get_one::<String>("git_repo_url")?
+        Some(("publish", args)) => {
+            packages_dir
+                .informed_exists("Are the language packages already built ? Check CLI help.")?;
+
+            match args.subcommand() {
+                Some((PYTHON, args)) => {
+                    let cfg = publish::PythonConfig {
+                        lang_package_path: packages_dir.join(PYTHON),
+                        registry_url: args
+                            .try_get_one::<String>("registry_url")?
+                            .unwrap()
+                            .to_owned(),
+                        registry_username: args
+                            .try_get_one::<String>("registry_username")?
+                            .unwrap()
+                            .to_owned(),
+                        registry_password: args
+                            .try_get_one::<String>("registry_password")?
                             .unwrap()
                             .to_owned(),
                     };
                     cfg.lang_package_path.try_exists()?;
-                    Ok(publish::swift_repo(&cfg)?)
+                    Ok(publish::python(&cfg)?)
                 }
-                Some(("registry", args)) => {
-                    let cfg = publish::SwiftRegistryConfig {
-                        lang_package_path: packages_dir.join(SWIFT),
+                Some((RUBY, args)) => {
+                    let cfg = publish::RubyConfig {
+                        lang_package_path: packages_dir.join(RUBY),
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
                         registry_url: args
                             .try_get_one::<String>("registry_url")?
@@ -202,12 +165,60 @@ fn main() -> anyhow::Result<()> {
                             .to_owned(),
                     };
                     cfg.lang_package_path.try_exists()?;
-                    Ok(publish::swift_registry(&cfg)?)
+                    Ok(publish::ruby(&cfg)?)
                 }
+                Some((KOTLIN, args)) => {
+                    let cfg = publish::KotlinConfig {
+                        lang_package_path: packages_dir.join(KOTLIN),
+                        registry_url: args
+                            .try_get_one::<String>("registry_url")?
+                            .unwrap()
+                            .to_owned(),
+                        registry_username: args
+                            .try_get_one::<String>("registry_username")?
+                            .unwrap()
+                            .to_owned(),
+                        registry_password: args
+                            .try_get_one::<String>("registry_password")?
+                            .unwrap()
+                            .to_owned(),
+                    };
+                    cfg.lang_package_path.try_exists()?;
+                    Ok(publish::kotlin(&cfg)?)
+                }
+                Some((SWIFT, args)) => match args.subcommand() {
+                    Some(("git-repo", args)) => {
+                        let cfg = publish::SwiftRepoConfig {
+                            lang_package_path: packages_dir.join(SWIFT),
+                            git_repo_url: args
+                                .try_get_one::<String>("git_repo_url")?
+                                .unwrap()
+                                .to_owned(),
+                        };
+                        cfg.lang_package_path.try_exists()?;
+                        Ok(publish::swift_repo(&cfg)?)
+                    }
+                    Some(("registry", args)) => {
+                        let cfg = publish::SwiftRegistryConfig {
+                            lang_package_path: packages_dir.join(SWIFT),
+                            version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
+                            registry_url: args
+                                .try_get_one::<String>("registry_url")?
+                                .unwrap()
+                                .to_owned(),
+                            registry_token: args
+                                .try_get_one::<String>("registry_token")?
+                                .unwrap()
+                                .to_owned(),
+                        };
+                        cfg.lang_package_path.try_exists()?;
+                        Ok(publish::swift_registry(&cfg)?)
+                    }
+                    _ => Err(anyhow!("Command not found. See help.")),
+                },
                 _ => Err(anyhow!("Command not found. See help.")),
-            },
-            _ => Err(anyhow!("Command not found. See help.")),
-        },
+            }
+        }
         _ => Err(anyhow!("Command not found. See help.")),
     }
 }

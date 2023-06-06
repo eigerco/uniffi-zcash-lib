@@ -12,7 +12,6 @@ use crate::helper::{
 };
 
 pub fn python(cfg: &PythonConfig) -> anyhow::Result<()> {
-    cfg.bindings_dir.try_exists()?;
     clean_dir(&cfg.package_dir)?;
 
     dir::copy(
