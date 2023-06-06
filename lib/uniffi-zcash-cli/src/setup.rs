@@ -1,11 +1,8 @@
+use crate::helper::{clean_dir, cmd_success, TARGETS};
+use anyhow::anyhow;
 use std::{fs, path::PathBuf, process::Command};
 
-use crate::{
-    cli::CLIResult,
-    helper::{clean_dir, cmd_success, TARGETS},
-};
-
-pub fn add_rust_targets() -> CLIResult<()> {
+pub fn add_rust_targets() -> anyhow::Result<()> {
     TARGETS.iter().try_for_each(|arch| {
         cmd_success(
             Command::new("rustup")
@@ -18,7 +15,7 @@ pub fn add_rust_targets() -> CLIResult<()> {
     })
 }
 
-pub fn install_zig_build() -> CLIResult<()> {
+pub fn install_zig_build() -> anyhow::Result<()> {
     cmd_success(
         Command::new("pip3")
             .arg("install")
@@ -41,7 +38,7 @@ const MACOS_SDK_VERSION: &str = "MacOSX11.3";
 const MACOS_SDK_SHA256_SUM: &str =
     "cd4f08a75577145b8f05245a2975f7c81401d75e9535dcffbb879ee1deefcbf4";
 
-pub fn install_macos_sdk() -> CLIResult<()> {
+pub fn install_macos_sdk() -> anyhow::Result<()> {
     if macos_sdk_require_path().exists() {
         println!(
             "Macos sdk already installed at {}",
@@ -67,11 +64,11 @@ pub fn install_macos_sdk() -> CLIResult<()> {
     let hash = sha256::digest(tar.as_slice());
 
     if hash.ne(MACOS_SDK_SHA256_SUM) {
-        return Err(format!(
+        return Err(anyhow!(
             "Hashes differ. Expected {} \n Downloaded {}",
-            MACOS_SDK_SHA256_SUM, hash
-        )
-        .into());
+            MACOS_SDK_SHA256_SUM,
+            hash
+        ));
     }
 
     cmd_success(
@@ -97,9 +94,9 @@ pub fn macos_sdk_tar_path() -> PathBuf {
     macos_sdk_install_path().join(format!("{}.sdk.tar.xz", MACOS_SDK_VERSION))
 }
 
-pub fn home_dir() -> CLIResult<PathBuf> {
+pub fn home_dir() -> anyhow::Result<PathBuf> {
     match home::home_dir() {
         Some(path) => Ok(path.join(".zcash-uniffi")),
-        None => Err("Cannot calculate home dir !".into()),
+        None => Err(anyhow!("Cannot calculate home dir !")),
     }
 }

@@ -1,11 +1,8 @@
-use std::{
-    fs::{copy, read},
-    path::Path,
-    process::Command,
-};
+use std::{fs::read, path::Path, process::Command};
+
+use fs_extra::file::{self, CopyOptions};
 
 use crate::{
-    cli::CLIResult,
     helper::{
         clean_dir, cmd_success, LINUX_SHARED_LIB_NAME, MACOS_SHARED_LIB_NAME, TARGET_LINUX_X86_64,
         TARGET_MACOS_64, TARGET_MACOS_UNIVERSAL2, TARGET_MACOS_X86_64,
@@ -13,10 +10,8 @@ use crate::{
     setup::macos_sdk_require_path,
 };
 
-pub fn generate_shared_libs(root_dir: &Path) -> CLIResult<()> {
-    let shared_libs_dir = root_dir.join("shared_libs");
-
-    clean_dir(&shared_libs_dir)?;
+pub fn generate_shared_libs(root_dir: &Path, shared_libs_dir: &Path) -> anyhow::Result<()> {
+    clean_dir(shared_libs_dir)?;
 
     println!(
         "Generating .dylib shared library for {} ...",
@@ -87,13 +82,14 @@ pub fn generate_shared_libs(root_dir: &Path) -> CLIResult<()> {
             .wait(),
     )?;
 
-    copy(
+    file::copy(
         root_dir
             .join("target")
             .join(TARGET_LINUX_X86_64)
             .join("release")
             .join(LINUX_SHARED_LIB_NAME),
         shared_libs_dir.join(LINUX_SHARED_LIB_NAME),
+        &CopyOptions::default(),
     )?;
     Ok(())
 }

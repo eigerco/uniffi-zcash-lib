@@ -1,17 +1,17 @@
 use std::{
-    fs::{create_dir_all, read_to_string, remove_dir_all, OpenOptions},
+    fs::{read_to_string, OpenOptions},
     io::{self, Write},
     path::{Path, PathBuf},
     process::{Command, ExitStatus},
     time::Duration,
 };
 
+use anyhow::{anyhow, bail};
+use fs_extra::dir;
 use handlebars::Handlebars;
 use retry::{retry_with_index, OperationResult};
 use serde::Serialize;
 use uuid::Uuid;
-
-use crate::cli::CLIResult;
 
 pub const LINUX_SHARED_LIB_NAME: &str = "libuniffi_zcash.so";
 pub const MACOS_SHARED_LIB_NAME: &str = "libuniffi_zcash.dylib";
@@ -23,7 +23,7 @@ pub const TARGET_MACOS_UNIVERSAL2: &str = "universal2-apple-darwin";
 pub const TARGETS: [&str; 3] = [TARGET_LINUX_X86_64, TARGET_MACOS_64, TARGET_MACOS_X86_64];
 
 /// Overwrites the provided file by rendering the provided data on it.
-pub fn in_file_template_replace<P, T>(file_path: P, data: &T) -> CLIResult<()>
+pub fn in_file_template_replace<P, T>(file_path: P, data: &T) -> anyhow::Result<()>
 where
     P: AsRef<Path>,
     T: Serialize,
@@ -39,74 +39,91 @@ where
     Ok(())
 }
 
-pub fn workspace_root_dir() -> CLIResult<PathBuf> {
+pub fn workspace_root_dir() -> anyhow::Result<PathBuf> {
     let err_msg = "Cannot find parent path.";
     Ok(std::env::current_exe()?
         .parent()
-        .ok_or(err_msg)?
+        .ok_or(anyhow!(err_msg))?
         .parent()
-        .ok_or(err_msg)?
+        .ok_or(anyhow!(err_msg))?
         .parent()
-        .ok_or(err_msg)?
+        .ok_or(anyhow!(err_msg))?
         .to_owned())
 }
 
 /// Wraps a call to [`std::process::Command::wait()`] . In case
 /// of error, it returns the status code as error, so users can use ?
 /// easily to return immediately.
-pub fn cmd_success(cmd_result: io::Result<ExitStatus>) -> CLIResult<()> {
+pub fn cmd_success(cmd_result: io::Result<ExitStatus>) -> anyhow::Result<()> {
     let status = cmd_result?;
     match status.success() {
         true => Ok(()),
         false => match status.code() {
-            Some(code) => Err(format!("Command exited with non zero error: {}", code).into()),
-            None => Err("Process terminated by signal".into()),
+            Some(code) => Err(anyhow!("Command exited with non zero error: {}", code)),
+            None => Err(anyhow!("Process terminated by signal")),
         },
     }
 }
 
 /// Wraps the retry library and adapts it to our specific use
 /// of commands. It does not pretend to decouple foreign types.
-pub fn cmd_retry<I>(name: &str, interval: I, max_retries: u64, mut cmd: Command) -> CLIResult<()>
+pub fn cmd_retry<I>(
+    name: &str,
+    interval: I,
+    max_retries: u64,
+    mut cmd: Command,
+) -> anyhow::Result<()>
 where
     I: IntoIterator<Item = Duration>,
 {
-    Ok(retry_with_index(interval, |current_try| {
+    retry_with_index(interval, |current_try| {
         if current_try > max_retries {
-            let message = format!(
+            return OperationResult::Err(anyhow!(
                 "Command {}: Max tries of {} reached, aborting ...",
-                name, current_try
-            );
-            return OperationResult::Err(message.as_str().into());
+                name,
+                current_try
+            ));
         }
 
         let cmd = cmd.spawn();
 
         if let Err(err) = cmd {
-            return OperationResult::Err(err.to_string().into());
+            return OperationResult::Err(anyhow!("Error spawning process ! {}", err));
         }
 
         match cmd_success(cmd.unwrap().wait()) {
             Ok(ok) => OperationResult::Ok(ok),
             Err(err) => OperationResult::Retry(err),
         }
-    })?)
+    })
+    .map_err(|err| err.error)
 }
 
 /// Generates a collision free /tmp folder
-pub fn tmp_folder() -> CLIResult<PathBuf> {
+pub fn tmp_folder() -> anyhow::Result<PathBuf> {
     let uuid = Uuid::new_v4();
     let name = format!("zcash_uniffi_{}", uuid);
     let path_buff = std::env::temp_dir().join(name);
-    create_dir_all(&path_buff)?;
+    dir::create_all(&path_buff, false)?;
     Ok(path_buff)
 }
 
 /// Removes the dir if exists and creates the entire
 /// path if there are missing elements.
-pub fn clean_dir(dir: &PathBuf) -> CLIResult<()> {
-    if dir.exists() {
-        remove_dir_all(dir)?;
+pub fn clean_dir(dir: &Path) -> anyhow::Result<()> {
+    Ok(dir::create_all(dir, true)?)
+}
+
+pub trait PathChecker {
+    fn informed_exists(&self, msg: &str) -> anyhow::Result<()>;
+}
+
+impl PathChecker for PathBuf {
+    fn informed_exists(&self, msg: &str) -> anyhow::Result<()> {
+        if !self.exists() {
+            bail!("Path {} does not exist: {}", self.to_string_lossy(), msg)
+        } else {
+            Ok(())
+        }
     }
-    Ok(create_dir_all(dir)?)
 }

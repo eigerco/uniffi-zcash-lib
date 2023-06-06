@@ -1,27 +1,25 @@
 use std::{
-    fs::{self, remove_dir_all, rename},
     path::Path,
     process::Command,
 };
 
+use fs_extra::{file::{self, CopyOptions}, dir};
+
 use crate::{
-    cli::CLIResult,
     helper::{cmd_success, LINUX_SHARED_LIB_NAME, MACOS_SHARED_LIB_NAME},
     KOTLIN, PYTHON, RUBY, SUPPORTED_LANGUAGES, SWIFT,
 };
 
-pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> CLIResult<()> {
+pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyhow::Result<()> {
     // Define paths
     let udl_path = root_dir.join("uniffi-zcash").join("src").join("zcash.udl");
     let target_bindings_path = root_dir.join("bindings");
     let shared_libs_dir = root_dir.join("shared_libs");
 
-    shared_libs_dir.try_exists()?;
-
     let linux_shared_lib_path = shared_libs_dir.join(LINUX_SHARED_LIB_NAME);
     let macos_shared_lib_path = shared_libs_dir.join(MACOS_SHARED_LIB_NAME);
 
-    _ = remove_dir_all(&target_bindings_path);
+    dir::remove(&target_bindings_path)?;
 
     println!("Generating language bindings ...");
     SUPPORTED_LANGUAGES
@@ -48,8 +46,8 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> CLIRe
 
             let shared_lib_dest_path = target_bindings_path.join(lang);
 
-            fs::copy(&linux_shared_lib_path, shared_lib_dest_path.join(LINUX_SHARED_LIB_NAME))?;
-            fs::copy(&macos_shared_lib_path, shared_lib_dest_path.join(MACOS_SHARED_LIB_NAME))?;
+            file::copy(&linux_shared_lib_path, shared_lib_dest_path.join(LINUX_SHARED_LIB_NAME), &CopyOptions::default())?;
+            file::copy(&macos_shared_lib_path, shared_lib_dest_path.join(MACOS_SHARED_LIB_NAME), &CopyOptions::default())?;
 
             let bindings_dir = target_bindings_path.join(lang);
 
@@ -57,16 +55,20 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> CLIRe
             match lang {
                 PYTHON => Ok(()),
                 KOTLIN => {
+
+                    
                     let inner_dir = bindings_dir.join("uniffi").join("zcash");
-                    rename(
+                    file::move_file(
                         bindings_dir.join(LINUX_SHARED_LIB_NAME),
                         inner_dir.join(LINUX_SHARED_LIB_NAME),
+                        &CopyOptions::default()
                     )?;
-                    rename(
+                    file::move_file(
                         bindings_dir.join(MACOS_SHARED_LIB_NAME),
                         inner_dir.join(MACOS_SHARED_LIB_NAME),
+                        &CopyOptions::default()
                     )?;
-                    fs::copy(root_dir.join("jna.jar"), inner_dir.join("jna.jar"))?;
+                    file::copy(root_dir.join("jna.jar"), inner_dir.join("jna.jar"), &CopyOptions::default())?;
                     Ok(())
                 }
                 SWIFT => {
@@ -99,7 +101,7 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> CLIRe
                     Ok(())
                 }
                 RUBY => Ok(()),
-                &_ => panic!("Unrecognized language (programming error). A language was added, but has no support in code !"),
+                &_ => panic!("Unrecognized language (programming error). A language was added to supported list, but has no support in code !"),
             }
         })
 }

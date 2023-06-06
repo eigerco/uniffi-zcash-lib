@@ -1,24 +1,17 @@
-use std::{
-    fs::{copy, create_dir_all, read_to_string, OpenOptions},
-    io::Write,
-    ops::Add,
-    path::PathBuf,
-    process::Command,
-};
+use std::{fs::OpenOptions, io::Write, ops::Add, path::PathBuf, process::Command};
 
-use fs_extra::dir::{self, CopyOptions};
+use fs_extra::{
+    dir::{self, CopyOptions},
+    file,
+};
 use serde_json::json;
 
-use crate::{
-    cli::CLIResult,
-    helper::{
-        clean_dir, cmd_success, in_file_template_replace, tmp_folder, LINUX_SHARED_LIB_NAME,
-        MACOS_SHARED_LIB_NAME,
-    },
+use crate::helper::{
+    clean_dir, cmd_success, in_file_template_replace, tmp_folder, LINUX_SHARED_LIB_NAME,
+    MACOS_SHARED_LIB_NAME,
 };
 
-pub fn python(cfg: &PythonConfig) -> CLIResult<()> {
-    cfg.bindings_dir.try_exists()?;
+pub fn python(cfg: &PythonConfig) -> anyhow::Result<()> {
     clean_dir(&cfg.package_dir)?;
 
     dir::copy(
@@ -29,17 +22,20 @@ pub fn python(cfg: &PythonConfig) -> CLIResult<()> {
 
     // Copy all needed files from previously generated bindings operation
 
-    copy(
+    file::copy(
         cfg.bindings_dir.join(LINUX_SHARED_LIB_NAME),
         cfg.package_dir.join("zcash").join(LINUX_SHARED_LIB_NAME),
+        &file::CopyOptions::default(),
     )?;
-    copy(
+    file::copy(
         cfg.bindings_dir.join(MACOS_SHARED_LIB_NAME),
         cfg.package_dir.join("zcash").join(MACOS_SHARED_LIB_NAME),
+        &file::CopyOptions::default(),
     )?;
-    copy(
+    file::copy(
         cfg.bindings_dir.join("zcash.py"),
         cfg.package_dir.join("zcash").join("zcash.py"),
+        &file::CopyOptions::default(),
     )?;
 
     // Modify in place setup.py in order to set version in the template.
@@ -106,7 +102,7 @@ pub struct PythonConfig {
     pub package_dir: PathBuf,
 }
 
-pub fn ruby(cfg: &RubyConfig) -> CLIResult<()> {
+pub fn ruby(cfg: &RubyConfig) -> anyhow::Result<()> {
     cfg.bindings_dir.try_exists()?;
     clean_dir(&cfg.package_dir)?;
 
@@ -117,17 +113,20 @@ pub fn ruby(cfg: &RubyConfig) -> CLIResult<()> {
     )?;
 
     // Copy all needed files from previously generated bindings operation
-    copy(
+    file::copy(
         cfg.bindings_dir.join(LINUX_SHARED_LIB_NAME),
         cfg.package_dir.join("lib").join(LINUX_SHARED_LIB_NAME),
+        &file::CopyOptions::default(),
     )?;
-    copy(
+    file::copy(
         cfg.bindings_dir.join(MACOS_SHARED_LIB_NAME),
         cfg.package_dir.join("lib").join(MACOS_SHARED_LIB_NAME),
+        &file::CopyOptions::default(),
     )?;
-    copy(
+    file::copy(
         cfg.bindings_dir.join("zcash.rb"),
         cfg.package_dir.join("lib").join("zcash.rb"),
+        &file::CopyOptions::default(),
     )?;
 
     // Modify in place the gemspec in order to set version in the template.
@@ -147,7 +146,7 @@ pub fn ruby(cfg: &RubyConfig) -> CLIResult<()> {
     // library its needed .so or .dylib.
 
     let binding_file = cfg.package_dir.join("lib").join("zcash.rb");
-    let original_content = read_to_string(&binding_file)?;
+    let original_content = file::read_to_string(&binding_file)?;
     let content = "require 'os' \n".to_string().add(&original_content);
     let result = content.replace(
         "ffi_lib 'uniffi_zcash'",
@@ -205,7 +204,7 @@ pub struct RubyConfig {
     pub package_dir: PathBuf,
 }
 
-pub fn kotlin(cfg: &KotlinConfig) -> CLIResult<()> {
+pub fn kotlin(cfg: &KotlinConfig) -> anyhow::Result<()> {
     cfg.bindings_dir.try_exists()?;
     clean_dir(&cfg.package_dir)?;
 
@@ -217,21 +216,23 @@ pub fn kotlin(cfg: &KotlinConfig) -> CLIResult<()> {
 
     // Copy all needed files from previously generated bindings operation
     let bindings_code = cfg.bindings_dir.join("uniffi").join("zcash");
-    copy(
+    file::copy(
         bindings_code.join(LINUX_SHARED_LIB_NAME),
         cfg.package_dir
             .join("lib")
             .join("libs")
             .join(LINUX_SHARED_LIB_NAME),
+        &file::CopyOptions::default(),
     )?;
-    copy(
+    file::copy(
         bindings_code.join(MACOS_SHARED_LIB_NAME),
         cfg.package_dir
             .join("lib")
             .join("libs")
             .join(MACOS_SHARED_LIB_NAME),
+        &file::CopyOptions::default(),
     )?;
-    copy(
+    file::copy(
         bindings_code.join("zcash.kt"),
         cfg.package_dir
             .join("lib")
@@ -240,6 +241,7 @@ pub fn kotlin(cfg: &KotlinConfig) -> CLIResult<()> {
             .join("kotlin")
             .join("zcash")
             .join("Zcash.kt"),
+        &file::CopyOptions::default(),
     )?;
 
     // Modify in place the build.gradle.kts in order to set version in the template.
@@ -286,7 +288,7 @@ pub struct KotlinConfig {
     pub package_dir: PathBuf,
 }
 
-pub fn swift(cfg: &SwiftConfig) -> CLIResult<()> {
+pub fn swift(cfg: &SwiftConfig) -> anyhow::Result<()> {
     cfg.bindings_dir.try_exists()?;
     clean_dir(&cfg.package_dir)?;
 
@@ -306,7 +308,7 @@ pub fn swift(cfg: &SwiftConfig) -> CLIResult<()> {
 
     let package_subfolder = tmp_package_dir.join("Zcash");
 
-    create_dir_all(&package_subfolder)?;
+    dir::create_all(&package_subfolder, false)?;
 
     cmd_success(
         Command::new("git")
@@ -324,33 +326,37 @@ pub fn swift(cfg: &SwiftConfig) -> CLIResult<()> {
     )?;
 
     // Copy all needed files from previously generated bindings operation
-    copy(
+    file::copy(
         cfg.bindings_dir.join(LINUX_SHARED_LIB_NAME),
         package_subfolder
             .join("Sources")
             .join("zcashFFI")
             .join(LINUX_SHARED_LIB_NAME),
+        &file::CopyOptions::default(),
     )?;
-    copy(
+    file::copy(
         cfg.bindings_dir.join(MACOS_SHARED_LIB_NAME),
         package_subfolder
             .join("Sources")
             .join("zcashFFI")
             .join(MACOS_SHARED_LIB_NAME),
+        &file::CopyOptions::default(),
     )?;
-    copy(
+    file::copy(
         cfg.bindings_dir.join("zcashFFI.h"),
         package_subfolder
             .join("Sources")
             .join("zcashFFI")
             .join("uniffi_zcash.h"),
+        &file::CopyOptions::default(),
     )?;
-    copy(
+    file::copy(
         cfg.bindings_dir.join("zcash.swift"),
         package_subfolder
             .join("Sources")
             .join("Zcash")
             .join("zcash.swift"),
+        &file::CopyOptions::default(),
     )?;
 
     // Commit and tag the version
@@ -389,10 +395,10 @@ pub fn swift(cfg: &SwiftConfig) -> CLIResult<()> {
     // so it can be located by search rules.
     // This is needed, as the MacOS integrity protection
     // wipes out all the DYLD_* env vars. See https://developer.apple.com/library/prerelease/mac/documentation/Security/Conceptual/System_Integrity_Protection_Guide/RuntimeProtections/RuntimeProtections.html
-    copy(
+    file::copy(
         cfg.bindings_dir.join(MACOS_SHARED_LIB_NAME),
-        test_app_path
-            .join(MACOS_SHARED_LIB_NAME),
+        test_app_path.join(MACOS_SHARED_LIB_NAME),
+        &file::CopyOptions::default(),
     )?;
 
     dir::copy(
