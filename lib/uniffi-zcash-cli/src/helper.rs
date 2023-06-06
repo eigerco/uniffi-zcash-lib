@@ -110,6 +110,6 @@ pub fn tmp_folder() -> anyhow::Result<PathBuf> {
 
 /// Removes the dir if exists and creates the entire
 /// path if there are missing elements.
-pub fn clean_dir(dir: &PathBuf) -> anyhow::Result<()> {
+pub fn clean_dir(dir: &Path) -> anyhow::Result<()> {
     Ok(dir::create_all(dir, true)?)
 }
