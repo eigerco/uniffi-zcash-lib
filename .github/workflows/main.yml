@@ -41,13 +41,22 @@ jobs:
             lib/target
           key: 1-${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-build
+      
+      - name: Set up Zcash params cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.zcash-params/
+          key: 1-${{ runner.os }}-zcash-params-${{ hashFiles('.zcash-params/**') }}
+          restore-keys: ${{ runner.os }}-zcash-params
 
       - name: 🔨 Build
         run: cargo build --verbose
 
       - name: 🔎 Test
         run: |
-          cargo run -p uniffi-zcash-cli saplingparams
+          cargo run -p uniffi-zcash-cli setup saplingparams
           cargo test --verbose
 
   bindgen:
