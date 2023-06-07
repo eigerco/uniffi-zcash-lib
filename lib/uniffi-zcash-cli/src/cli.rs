@@ -16,6 +16,10 @@ pub fn get_matches() -> ArgMatches {
                     .about("Downloads necessary dependencies for locally building packages.")
             )
             .subcommand(
+                Command::new("builddoc")
+                    .about("Downloads necessary dependencies for locally generating packages documentation.")
+            )
+            .subcommand(
                 Command::new("saplingparams")
                 .about("Downloads the sapling parameters to the default location, normally in your home directory.")
             )
@@ -149,6 +153,21 @@ pub fn get_matches() -> ArgMatches {
                     )
                 )               
             )
+        ).subcommand(
+            Command::new("docgen").about("It generates API surface docs per each language and places them in the 'docs' folder.")
+            .subcommand_required(true)
+            .subcommand(
+                Command::new("python").arg(arg_version())
+            )
+            .subcommand(
+                Command::new("ruby").arg(arg_version())
+            )
+            .subcommand(
+                Command::new("kotlin").arg(arg_version())
+            )
+            .subcommand(
+                Command::new("swift").arg(arg_version())
+            )        
         )
         .get_matches()
 }

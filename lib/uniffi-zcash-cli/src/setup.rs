@@ -100,3 +100,39 @@ pub fn home_dir() -> anyhow::Result<PathBuf> {
         None => Err(anyhow!("Cannot calculate home dir !")),
     }
 }
+
+pub fn install_dokka_cli() -> anyhow::Result<()> {
+    let install_dir = dokka_install_dir();
+    if install_dir.exists() {
+        println!(
+            "Dokka already installed at {}",
+            install_dir.to_string_lossy()
+        );
+        return Ok(());
+    }
+    clean_dir(&install_dir)?;
+    // See https://kotlinlang.org/docs/dokka-cli.html#generate-documentation
+    let jars = vec![
+        "https://repo1.maven.org/maven2/org/jetbrains/dokka/dokka-cli/1.8.20/dokka-cli-1.8.20.jar",
+        "https://repo1.maven.org/maven2/org/jetbrains/dokka/dokka-base/1.8.20/dokka-base-1.8.20.jar",
+        "https://repo1.maven.org/maven2/org/jetbrains/dokka/dokka-analysis/1.8.20/dokka-analysis-1.8.20.jar",
+        "https://repo1.maven.org/maven2/org/jetbrains/dokka/kotlin-analysis-compiler/1.8.20/kotlin-analysis-compiler-1.8.20.jar",
+        "https://repo1.maven.org/maven2/org/jetbrains/dokka/kotlin-analysis-intellij/1.8.20/kotlin-analysis-intellij-1.8.20.jar",
+        "https://repo1.maven.org/maven2/org/jetbrains/kotlinx/kotlinx-html-jvm/0.8.0/kotlinx-html-jvm-0.8.0.jar",
+        "https://repo1.maven.org/maven2/org/freemarker/freemarker/2.3.31/freemarker-2.3.31.jar"
+    ];
+
+    jars.into_iter().try_for_each(|j| {
+        cmd_success(
+            Command::new("wget")
+                .arg(j)
+                .current_dir(&install_dir)
+                .spawn()?
+                .wait(),
+        )
+    })
+}
+
+pub fn dokka_install_dir() -> PathBuf {
+    home_dir().unwrap().join("dokka")
+}

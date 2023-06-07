@@ -5,13 +5,14 @@ use cli::get_matches;
 
 use anyhow::anyhow;
 use helper::{workspace_root_dir, PathChecker};
-use setup::{add_rust_targets, install_macos_sdk, install_zig_build};
+use setup::{add_rust_targets, install_dokka_cli, install_macos_sdk, install_zig_build};
 use sharedlibs::generate_shared_libs;
 use uniffi_zcash_test::test_data::generate_test_data;
 use zcash_proofs::download_sapling_parameters;
 
 mod bindgen;
 mod cli;
+mod docgen;
 mod helper;
 mod publish;
 mod release;
@@ -32,6 +33,7 @@ fn main() -> anyhow::Result<()> {
     let shared_libs_dir = root_dir.join("shared_libs");
     let bindings_dir = root_dir.join("bindings");
     let packages_dir = root_dir.join("packages");
+    let docs_dir = root_dir.join("docs");
 
     set_current_dir(&root_dir)?;
 
@@ -42,6 +44,7 @@ fn main() -> anyhow::Result<()> {
                 install_zig_build()?;
                 Ok(install_macos_sdk()?)
             }
+            Some(("builddoc", _)) => Ok(install_dokka_cli()?),
             Some(("saplingparams", _)) => match download_sapling_parameters(None) {
                 Ok(paths) => {
                     println!(
@@ -216,6 +219,42 @@ fn main() -> anyhow::Result<()> {
                     }
                     _ => Err(anyhow!("Command not found. See help.")),
                 },
+                _ => Err(anyhow!("Command not found. See help.")),
+            }
+        }
+        Some(("docgen", args)) => {
+            packages_dir
+                .informed_exists("Are the language packages already built ? Check CLI help.")?;
+
+            match args.subcommand() {
+                Some((PYTHON, args)) => {
+                    let version = args.try_get_one::<String>("version")?.unwrap().to_owned();
+                    Ok(docgen::python(
+                        &packages_dir.join(PYTHON),
+                        &docs_dir.join(PYTHON).join(version),
+                    )?)
+                }
+                Some((RUBY, args)) => {
+                    let version = args.try_get_one::<String>("version")?.unwrap().to_owned();
+                    Ok(docgen::ruby(
+                        &packages_dir.join(RUBY),
+                        &docs_dir.join(RUBY).join(version),
+                    )?)
+                }
+                Some((KOTLIN, args)) => {
+                    let version = args.try_get_one::<String>("version")?.unwrap().to_owned();
+                    Ok(docgen::kotlin(
+                        &packages_dir.join(KOTLIN),
+                        &docs_dir.join(KOTLIN).join(version),
+                    )?)
+                }
+                Some((SWIFT, args)) => {
+                    let version = args.try_get_one::<String>("version")?.unwrap().to_owned();
+                    Ok(docgen::swift(
+                        &packages_dir.join(SWIFT),
+                        &docs_dir.join(SWIFT).join(version),
+                    )?)
+                }
                 _ => Err(anyhow!("Command not found. See help.")),
             }
         }
