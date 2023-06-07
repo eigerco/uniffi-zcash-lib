@@ -114,3 +114,9 @@ $ cargo run -p uniffi-zcash-cli setup saplingparams
 ```
 
 More details available in the [CLI docs](./lib/uniffi-zcash-cli/README.md)
+
+## <a href="releasing"></a> Releasing a new version
+
+This repo follows [trunk based](https://trunkbaseddevelopment.com/) development workflow. It means we move features directly to `main` assuming all the checks passed at that point. Then the `main` branch is tagged when we reach a release point with a [semver compliant tag](https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string). Lets note here, a valid tag is `1.0.0` not `v1.0.0`. The tag action will ultimately trigger the package generation and publishing.
+
+**important note**: Generated documentation should be taken into account during this process. It can be generated with the [CLI](./lib/uniffi-zcash-cli/README.md). At the time of this write, its unclear if it should be committed in the repo, thus prepared before tagging or should uploaded to another system.
