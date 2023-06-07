@@ -1,6 +1,6 @@
 # Zcash UniFFI CLI 🕹️
 
-An internal repo CLI to manage repo workflows, like binding generation, packaging and publishing.
+An internal repo CLI to manage repo workflows, like binding generation, packaging, publishing and docs generation.
 
 ## <a name="motivation"></a> Motivation
 
@@ -58,10 +58,16 @@ sharedlibs-->bindgen-->release-->publish;
 
 4. `publish` - This is the last step and only does the final publish operations i.e pushing previously generated artifacts at `lib/packages` . Its where most of the external calls are concentrated. As artifacts tend to be a bit weighty, it uses exponential backoff for pushing the artifacts to each language specific registry.
 
-There are also other utility subcommands under the `setup` command to help developers in testing or build stages, see:
+There are other utility subcommands under the `setup` command to help developers in testing or build stages, see:
 
 ```bash
 $ cargo run -p uniffi-zcash-cli setup --help
+```
+
+This CLI has documentation generation capabilities per each language. Commands can be checked by:
+
+```bash
+$ cargo run -p uniffi-zcash-cli docgen --help
 ```
 
 ## <a name="ci-integration"></a> Integration with the CI 🤖
