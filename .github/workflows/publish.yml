@@ -1,0 +1,258 @@
+name: "Publish packages"
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+      # In order to discriminate across workflows, a prefix is needed.
+      # I.e , the operation name, like "publishing" or "building"
+      artifacts-storage-prefix:
+        required: true
+        type: string
+
+      # Wether to finally push artifacts to registries or not.
+      dry-run:
+        required: false
+        default: false
+        type: boolean
+
+    secrets:
+      python-registry-url:
+        required: true
+      python-registry-username:
+        required: true
+      python-registry-password:
+        required: true
+
+      ruby-registry-url:
+        required: true
+      ruby-registry-token:
+        required: true
+
+      kotlin-registry-url:
+        required: true
+      kotlin-registry-username:
+        required: true
+      kotlin-registry-password:
+        required: true
+
+      swift-git-repo-url:
+        required: true
+      swift-registry-url:
+        required: true
+      swift-registry-token:
+        required: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  publish-python:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: "true"
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+          key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-publish
+
+      - name: Download python artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-python-data-${{ github.run_number }}
+          path: lib/packages/python
+
+      - name: Publish Python package
+        if: ${{ !inputs.dry-run }}
+        env:
+          PYTHON_REGISTRY_URL: ${{ secrets.python-registry-url }}
+          PYTHON_REGISTRY_USERNAME: ${{ secrets.python-registry-username }}
+          PYTHON_REGISTRY_PASSWORD: ${{ secrets.python-registry-password }}
+        run: |
+          cargo run -p uniffi-zcash-cli publish python
+
+  publish-ruby:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: "true"
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+          key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-publish
+
+      - name: Download Ruby artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-ruby-data-${{ github.run_number }}
+          path: lib/packages/ruby
+
+      - name: Publish
+        if: ${{ !inputs.dry-run }}
+        env:
+          RUBY_REGISTRY_URL: ${{ secrets.ruby-registry-url }}
+          RUBY_REGISTRY_TOKEN: ${{ secrets.ruby-registry-token }}
+        run: |
+          cargo run -p uniffi-zcash-cli publish ruby -v ${{ inputs.version }}
+
+  publish-kotlin:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: "true"
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+          key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-publish
+
+      - name: Download kotlin artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-kotlin-data-${{ github.run_number }}
+          path: lib/packages/kotlin
+
+      - name: Publish Kotlin package
+        if: ${{ !inputs.dry-run }}
+        env:
+          KOTLIN_REGISTRY_URL: ${{ secrets.kotlin-registry-url }}
+          KOTLIN_REGISTRY_USERNAME: ${{ secrets.kotlin-registry-username }}
+          KOTLIN_REGISTRY_PASSWORD: ${{ secrets.kotlin-registry-password }}
+        run: |
+          cargo run -p uniffi-zcash-cli publish kotlin
+
+  publish-swift-repo:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: "true"
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+          key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-publish
+
+      - name: Download swift package pointer artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-swift-pointer-data-${{ github.run_number }}
+          path: |
+            lib/packages/swift
+
+      - name: Download swift package artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-swift-package-data-${{ github.run_number }}
+          path: |
+            /tmp/zcash_uniffi_swift_package_build
+
+      - name: Publish Swift repository
+        if: ${{ !inputs.dry-run }}
+        env:
+          SWIFT_GIT_REPO_URL: ${{ secrets.swift-git-repo-url }}
+        run: |
+          cargo run -p uniffi-zcash-cli publish swift git-repo
+
+  publish-swift-registry:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./lib
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: "true"
+
+      - name: Set up cargo cache
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+          key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-publish
+
+      - name: Download swift package pointer artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-swift-pointer-data-${{ github.run_number }}
+          path: |
+            lib/packages/swift
+
+      - name: Download swift package artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-package-swift-package-data-${{ github.run_number }}
+          path: |
+            /tmp/zcash_uniffi_swift_package_build
+
+      - name: Publish Swift package to registry
+        if: ${{ !inputs.dry-run }}
+        env:
+          SWIFT_REGISTRY_URL: ${{ secrets.swift-registry-url }}
+          SWIFT_REGISTRY_TOKEN: ${{ secrets.swift-registry-token }}
+        run: |
+          cargo run -p uniffi-zcash-cli publish swift registry -v ${{ inputs.version }}
