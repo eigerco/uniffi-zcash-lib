@@ -35,7 +35,7 @@ jobs:
     with:
       version: ${{ github.ref_name }}
       artifacts-storage-prefix: "publishing"
-      dry-run: true
+      dry-run: true ## Uncomment this for real publication.
     secrets:
       python-registry-url: ${{ secrets.PYTHON_REGISTRY_URL }}
       python-registry-username: ${{ secrets.PYTHON_REGISTRY_USERNAME }}
