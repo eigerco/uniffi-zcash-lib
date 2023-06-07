@@ -89,16 +89,23 @@ As an alternative to the [languages package registries](#-where-to-find-packages
 All the generated packages per each languages should be under the  `lib/packages` git ignored folder.
 
 
-## Generating documentation
+## <a href="generating-documentation"></a> Generating documentation
 
-At the moment the UniFFI library doesn't have the ability to add inline documentation. We are prototyping that feature [here](https://github.com/eigerco/uniffi-rs).  A prototype should be available at some point. The tools to generate documentation for each platform are:
+The [CLI](./lib/uniffi-zcash-cli/README.md) has documentation generation capabilities. The documentation can be generated for any target language. As an example, this command will generate the Python documentation:
 
- - Kotlin: [Dokka](https://kotlinlang.org/docs/kotlin-doc.html)
- - Python: [pydoc](https://docs.python.org/es/3/library/pydoc.html)
- - Ruby: [YARD](https://yardoc.org/)
- - Swift: [DDoc]()
+```bash
+$ cargo run -p uniffi-zcash-cli docgen python -v 0.0.0
+```
 
-which are, to our understanding, the most common tools used in each ecosystem.
+The documentation can be found now at the `lib/docs/python` folder.
+
+**Note**: The above command needs the packages ready in the `lib/packages` folder. See [build locally](#-building-the-packages-locally) instructions for more info.
+
+Currently, for `kotlin` documentation, we need to setup some dependencies by:
+
+```bash
+$ cargo run -p uniffi-zcash-cli setup builddoc
+```
 
 ## Contributing
 
