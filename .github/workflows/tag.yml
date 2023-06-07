@@ -51,3 +51,7 @@ jobs:
       swift-git-repo-url: ${{ secrets.SWIFT_GIT_REPO_URL }}
       swift-registry-url: ${{ secrets.SWIFT_REGISTRY_URL }}
       swift-registry-token: ${{ secrets.SWIFT_REGISTRY_TOKEN }}
+
+  publish-docs:
+    needs: publish-packages
+    uses: ./.github/workflows/docs.yml
