@@ -71,6 +71,9 @@ sudo apt-get install ruby-full
 
 # Python
 sudo apt-get install python3.x # 3.8, 3.9
+
+# Others
+sudo apt-get install wget
 ```
 
 ### <a href="local-environment-docker"></a> Docker setup
