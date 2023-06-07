@@ -28,13 +28,14 @@ jobs:
       kotlin-registry-username: ${{ secrets.KOTLIN_REGISTRY_USERNAME }}
       kotlin-registry-password: ${{ secrets.KOTLIN_REGISTRY_PASSWORD }}
       swift-git-repo-url: ${{ secrets.SWIFT_GIT_REPO_URL }}
-  
+
   publish-packages:
     needs: build-packages
     uses: ./.github/workflows/publish.yml
     with:
       version: ${{ github.ref_name }}
       artifacts-storage-prefix: "publishing"
+      dry-run: true
     secrets:
       python-registry-url: ${{ secrets.PYTHON_REGISTRY_URL }}
       python-registry-username: ${{ secrets.PYTHON_REGISTRY_USERNAME }}
@@ -42,11 +43,11 @@ jobs:
 
       ruby-registry-url: ${{ secrets.RUBY_REGISTRY_URL }}
       ruby-registry-token: ${{ secrets.RUBY_REGISTRY_TOKEN }}
-      
+
       kotlin-registry-url: ${{ secrets.KOTLIN_REGISTRY_URL }}
       kotlin-registry-username: ${{ secrets.KOTLIN_REGISTRY_USERNAME }}
       kotlin-registry-password: ${{ secrets.KOTLIN_REGISTRY_PASSWORD }}
-      
+
       swift-git-repo-url: ${{ secrets.SWIFT_GIT_REPO_URL }}
-      swift-registry-url: ${{ secrets.SWIFT_REGISTRY_URL }}     
+      swift-registry-url: ${{ secrets.SWIFT_REGISTRY_URL }}
       swift-registry-token: ${{ secrets.SWIFT_REGISTRY_TOKEN }}
