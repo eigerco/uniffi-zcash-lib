@@ -16,6 +16,7 @@ jobs:
       languages: ${{ secrets.LANGUAGES }}
 
   build-packages:
+    needs: bindgen
     uses: ./.github/workflows/packages.yml
     with:
       version: ${{ github.ref_name }}
