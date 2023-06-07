@@ -53,5 +53,6 @@ jobs:
       swift-registry-token: ${{ secrets.SWIFT_REGISTRY_TOKEN }}
 
   publish-docs:
+    if: ${{ false }} ## Disabled, Publishing Github pages from CI is still beta feature, at the moment of this write this doesn't work.
     needs: publish-packages
     uses: ./.github/workflows/docs.yml
