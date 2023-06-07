@@ -107,11 +107,11 @@ Currently, for `kotlin` documentation, we need to setup some dependencies by:
 $ cargo run -p uniffi-zcash-cli setup builddoc
 ```
 
-## Contributing
+## <a href="contributing"></a> Contributing
 
 Visit our [CONTRIBUTING.md](./CONTRIBUTING.md) section.
 
-## FAQ
+## <a href="faq"></a> FAQ
 
 * Why are all the classes and functions at the same package level ?
   * We needed to keep with a flat structure due to UniFFI [limitations](https://mozilla.github.io/uniffi-rs/udl/ext_types.html). Not all the languages support inter-crate bindings dependencies.
