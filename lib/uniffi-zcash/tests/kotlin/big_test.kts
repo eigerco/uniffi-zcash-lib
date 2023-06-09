@@ -2031,7 +2031,7 @@ class OrchardTransactionBuilderTest(supp: TestSupport) {
         val builder = ZcashOrchardTransactionBuilder(ZcashConsensusParameters.MAIN_NETWORK, ZcashBlockHeight(
             2030820u), ZcashBlockHeight(2030820u+100u), anchor, flags)
         builder.addSpend(fvk!!, note, merklePath)
-        builder.addRecipient(ovk, address, 15u, null)
+        builder.addRecipient(ovk, address, noteValue, null)
 
         val transaction = builder.build(listOf(key.orchard()), List(32) { 0u })
 

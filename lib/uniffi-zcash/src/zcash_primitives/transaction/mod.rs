@@ -10,7 +10,6 @@ use hdwallet::rand_core::OsRng;
 use orchard::{
     builder::{InProgress, Unauthorized, Unproven},
     keys::{SpendAuthorizingKey, SpendingKey},
-    value::NoteValue,
 };
 use zcash_primitives::transaction::TxId;
 use zcash_primitives::{
@@ -24,6 +23,7 @@ use zcash_primitives::{
 
 use crate::ZcashOrchardBundle;
 use crate::ZcashOrchardFlags;
+use crate::ZcashOrchardNoteValue;
 use crate::{
     utils::cast_slice, SecpSecretKey, ZcashAnchor, ZcashBlockHeight, ZcashBranchId,
     ZcashConsensusParameters, ZcashDiversifier, ZcashError, ZcashExtendedSpendingKey,
@@ -344,7 +344,7 @@ impl ZcashOrchardTransactionBuilder {
         target_height: Arc<ZcashBlockHeight>,
         expiry_height: Arc<ZcashBlockHeight>,
         anchor: Arc<ZcashAnchor>,
-        flags: Arc<ZcashOrchardFlags>
+        flags: Arc<ZcashOrchardFlags>,
     ) -> Self {
         Self {
             parameters,
@@ -370,7 +370,7 @@ impl ZcashOrchardTransactionBuilder {
         &self,
         ovk: Option<Arc<ZcashOrchardOutgoingViewingKey>>,
         recipient: Arc<ZcashOrchardAddress>,
-        value: u64,
+        value: Arc<ZcashOrchardNoteValue>,
         memo: Option<Vec<u8>>,
     ) -> ZcashResult<()> {
         let m = match memo {
@@ -390,10 +390,8 @@ impl ZcashOrchardTransactionBuilder {
         keys: Vec<Arc<ZcashOrchardSpendingKey>>,
         sighash: Vec<u8>,
     ) -> ZcashResult<Arc<ZcashTransaction>> {
-        let mut builder = orchard::builder::Builder::new(
-            self.flags.as_ref().into(),
-            self.anchor.as_ref().into(),
-        );
+        let mut builder =
+            orchard::builder::Builder::new(self.flags.as_ref().into(), self.anchor.as_ref().into());
 
         self.spends
             .read()
@@ -415,7 +413,7 @@ impl ZcashOrchardTransactionBuilder {
                 builder.add_recipient(
                     ovk.clone().map(|k| k.as_ref().into()),
                     recipient.as_ref().into(),
-                    NoteValue::from_raw(*value),
+                    (**value).into(),
                     *memo,
                 )
             })?;
@@ -473,7 +471,7 @@ type OrchardOutputs = RwLock<
     Vec<(
         Option<Arc<ZcashOrchardOutgoingViewingKey>>,
         Arc<ZcashOrchardAddress>,
-        u64,
+        Arc<ZcashOrchardNoteValue>,
         Option<[u8; 512]>,
     )>,
 >;
