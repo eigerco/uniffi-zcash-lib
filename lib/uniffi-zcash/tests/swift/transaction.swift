@@ -185,7 +185,7 @@ class OrchardTransactionBuilderTest {
 
         let builder = ZcashOrchardTransactionBuilder(parameters: ZcashConsensusParameters.mainNetwork, targetHeight: ZcashBlockHeight(v: 2030820), expiryHeight: ZcashBlockHeight(v: 2030820+100), anchor: anchor, flags: flags)
         builder.addSpend(fvk: fvk, note: note, merklePath: merklePath)
-        try! builder.addRecipient(ovk: ovk, recipient: address, value: 15, memo: nil)
+        try! builder.addRecipient(ovk: ovk, recipient: address, value: noteValue, memo: nil)
 
         let transaction = try! builder.build(keys: [key.orchard()], sighash: Array(repeating: 0, count: 32))
 

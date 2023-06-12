@@ -101,7 +101,7 @@ interface ZcashOrchardTransactionBuilder {
     void add_recipient(
         ZcashOrchardOutgoingViewingKey? ovk,
         ZcashOrchardAddress recipient,
-        u64 value,
+        ZcashOrchardNoteValue value,
         sequence<u8>? memo
     );
 

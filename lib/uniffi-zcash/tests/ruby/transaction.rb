@@ -186,7 +186,7 @@ class OrchardTransactionBuilderTest < Test::Unit::TestCase
         builder = Zcash::ZcashOrchardTransactionBuilder.new(Zcash::ZcashConsensusParameters::MAIN_NETWORK, Zcash::ZcashBlockHeight.new(
             2030820), Zcash::ZcashBlockHeight.new(2030820+100), anchor, flags)
         builder.add_spend(fvk, note, merkle_path)
-        builder.add_recipient(ovk, address, 15, nil)
+        builder.add_recipient(ovk, address, note_value, nil)
 
         transaction = builder.build([key.orchard()], [0]*32)
 

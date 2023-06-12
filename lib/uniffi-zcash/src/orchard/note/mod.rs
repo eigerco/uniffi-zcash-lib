@@ -32,7 +32,7 @@ impl ZcashOrchardNote {
     ) -> ZcashResult<Self> {
         let opt: Option<Note> = Note::from_parts(
             recipient.as_ref().into(),
-            value.as_ref().into(),
+            (*value).into(),
             rho.as_ref().into(),
             rseed.as_ref().into(),
         )
