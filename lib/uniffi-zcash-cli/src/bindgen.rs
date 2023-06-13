@@ -35,7 +35,7 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
                     .arg("generate")
                     .arg(&udl_path)
                     .arg("--config")
-                    .arg(root_dir.join("uniffi-bindgen").join("uniffi.toml"))
+                    .arg(root_dir.join("uniffi-zcash").join("uniffi.toml"))
                     .arg("--language")
                     .arg(lang)
                     .arg("--out-dir")
