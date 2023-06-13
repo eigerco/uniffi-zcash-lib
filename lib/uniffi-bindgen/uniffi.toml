@@ -1,6 +1,0 @@
-## Custom UniFFI binding generation settings
-## See https://mozilla.github.io/uniffi-rs/swift/configuration.html.  
-[bindings.python]
-[bindings.swift]
-[bindings.kotlin]
-[bindings.ruby]
