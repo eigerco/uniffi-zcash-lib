@@ -31,12 +31,6 @@ pip3 install git+https://github.com/eigerco/uniffi-python-pkg.git#egg=uniffi-zca
 ```
 This divide is caused by the support of Github packages: while it does support RubyGems and Apache Maven registries, it isn't the same for Python and Swift, which may be instead released and downloaded directly as tarballs.
 
-<!-- * [Pypi](https://pypi.org/) TBD - link to package pypi page when first time publication.
-* [Rubygems](https://guides.rubygems.org/) TBD - link to package ruby page when first time publication.
-* [maven](https://search.maven.org/) TBD - link to package kotlin page when first time publication.
-* [swiftpackageregistry](https://swiftpackageregistry.com/) TBD - link to package swift page when first time publication.
-* [swift dependency repository]() TBD - link to package swift page when first time publication. -->
-
 ## <a href="manuals-and-docs"></a> Manuals and other docs
 
  [Manuals](../../wiki/Manuals) are part of our [wiki](../../wiki). We recommend to check the home page for other interesting documentation.
