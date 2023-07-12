@@ -22,6 +22,11 @@ All the commented steps happens in the [CI pipeline](./.github/workflows/), but 
 
 This project provides a [CI pipeline](./.github/workflows/) that automatically publish each language package on the relevant registries.  We are presently reorganizing the workflow for this part.
 
+ - Swift: Go to `File > Add Packages ...` and paste this URL into the search bar in the upper right corner of the modal: https://github.com/eigerco/uniffi-swift-pkg/
+ - Ruby: published on RubyGems through Github, instructions at [this link](https://github.com/orgs/eigerco/packages/rubygems/zcash)
+ - Kotlin: published on Maven through Github, instructions at [this link](https://github.com/eigerco/uniffi-kotlin-pkg/packages/1895780)
+ - Python: temporarily on [pypi](https://pypi.org/project/uniffi-zcash/0.0.0/)
+
 <!-- * [Pypi](https://pypi.org/) TBD - link to package pypi page when first time publication.
 * [Rubygems](https://guides.rubygems.org/) TBD - link to package ruby page when first time publication.
 * [maven](https://search.maven.org/) TBD - link to package kotlin page when first time publication.
