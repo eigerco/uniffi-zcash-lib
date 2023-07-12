@@ -9,11 +9,10 @@ Heres is diagram that shows the mental model of the project and how the updates 
 ```mermaid
 flowchart LR
     librustzcash --ports changes--> this-repo
-    this-repo--generates--> python-package--is published to--> pypi
-    this-repo--generates--> ruby-package--is published to-->rubygems
-    this-repo--generates--> kotlin-package--is published to-->maven
-    this-repo--generates--> swift-package--is published to-->git-repo
-    swift-package--is published to-->swift-registry
+    this-repo--generates--> python-package--is released to --> github
+    this-repo--generates--> ruby-package--is published to --> rubygems
+    this-repo--generates--> kotlin-package--is published to --> maven
+    this-repo--generates--> swift-package--is released to --> github
 
 ```
 
@@ -21,13 +20,13 @@ All the commented steps happens in the [CI pipeline](./.github/workflows/), but 
 
 ## <a href="where-to-find-packages"></a> Where to find my language package ?
 
-This project provides a [CI pipeline](./.github/workflows/) that automatically publish each language package on the relevant registries:
+This project provides a [CI pipeline](./.github/workflows/) that automatically publish each language package on the relevant registries.  We are presently reorganizing the workflow for this part.
 
-* [Pypi](https://pypi.org/) TBD - link to package pypi page when first time publication.
+<!-- * [Pypi](https://pypi.org/) TBD - link to package pypi page when first time publication.
 * [Rubygems](https://guides.rubygems.org/) TBD - link to package ruby page when first time publication.
 * [maven](https://search.maven.org/) TBD - link to package kotlin page when first time publication.
 * [swiftpackageregistry](https://swiftpackageregistry.com/) TBD - link to package swift page when first time publication.
-* [swift dependency repository]() TBD - link to package swift page when first time publication.
+* [swift dependency repository]() TBD - link to package swift page when first time publication. -->
 
 ## <a href="manuals-and-docs"></a> Manuals and other docs
 
