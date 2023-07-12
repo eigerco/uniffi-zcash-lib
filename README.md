@@ -20,7 +20,7 @@ All the commented steps happens in the [CI pipeline](./.github/workflows/), but 
 
 ## <a href="where-to-find-packages"></a> Where to find my language package ?
 
-This project provides a [CI pipeline](./.github/workflows/) that automatically publish each language package on the relevant registries.  We are presently reorganizing the workflow for this part.
+This project provides a [CI pipeline](./.github/workflows/) that automatically publish each language package:
 
  - Swift: Go to `File > Add Packages ...` and paste this URL into the search bar in the upper right corner of the modal: https://github.com/eigerco/uniffi-swift-pkg/
  - Ruby: published on RubyGems through Github, instructions at [this link](https://github.com/orgs/eigerco/packages/rubygems/zcash)
@@ -29,6 +29,7 @@ This project provides a [CI pipeline](./.github/workflows/) that automatically p
 ```
 pip3 install git+https://github.com/eigerco/uniffi-python-pkg.git#egg=uniffi-zcash 
 ```
+This divide is caused by the support of Github packages: while it does support RubyGems and Apache Maven registries, it isn't the same for Python and Swift, which may be instead released and downloaded directly as tarballs.
 
 <!-- * [Pypi](https://pypi.org/) TBD - link to package pypi page when first time publication.
 * [Rubygems](https://guides.rubygems.org/) TBD - link to package ruby page when first time publication.
