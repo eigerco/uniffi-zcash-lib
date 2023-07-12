@@ -29,6 +29,7 @@ This project provides a [CI pipeline](./.github/workflows/) that automatically p
 ```
 pip3 install git+https://github.com/eigerco/uniffi-python-pkg.git#egg=uniffi-zcash 
 ```
+
 This divide is caused by the support of Github packages: while it does support RubyGems and Apache Maven registries, it isn't the same for Python and Swift, which may be instead released and downloaded directly as tarballs.
 
 ## <a href="manuals-and-docs"></a> Manuals and other docs
