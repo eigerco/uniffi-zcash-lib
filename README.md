@@ -25,7 +25,10 @@ This project provides a [CI pipeline](./.github/workflows/) that automatically p
  - Swift: Go to `File > Add Packages ...` and paste this URL into the search bar in the upper right corner of the modal: https://github.com/eigerco/uniffi-swift-pkg/
  - Ruby: published on RubyGems through Github, instructions at [this link](https://github.com/orgs/eigerco/packages/rubygems/zcash)
  - Kotlin: published on Maven through Github, instructions at [this link](https://github.com/eigerco/uniffi-kotlin-pkg/packages/1895780)
- - Python: temporarily on [pypi](https://pypi.org/project/uniffi-zcash/0.0.0/)
+ - Python: it may be downloaded with pip as a release from our repo:
+```
+pip3 install git+https://github.com/eigerco/uniffi-python-pkg.git#egg=uniffi-zcash 
+```
 
 <!-- * [Pypi](https://pypi.org/) TBD - link to package pypi page when first time publication.
 * [Rubygems](https://guides.rubygems.org/) TBD - link to package ruby page when first time publication.
