@@ -1,9 +1,11 @@
 use std::env::set_current_dir;
 
 use bindgen::generate_bindings;
+use clap::ColorChoice;
 use cli::get_matches;
 
 use anyhow::anyhow;
+use diff::generate_diff;
 use helper::{workspace_root_dir, PathChecker};
 use setup::{add_rust_targets, install_dokka_cli, install_macos_sdk, install_zig_build};
 use sharedlibs::generate_shared_libs;
@@ -12,6 +14,7 @@ use zcash_proofs::download_sapling_parameters;
 
 mod bindgen;
 mod cli;
+mod diff;
 mod docgen;
 mod helper;
 mod publish;
@@ -257,6 +260,27 @@ fn main() -> anyhow::Result<()> {
                 }
                 _ => Err(anyhow!("Command not found. See help.")),
             }
+        }
+        Some(("diff", args)) => {
+            let lib_name = args.try_get_one::<String>("lib_name")?.unwrap().to_owned();
+            let color = args
+                .try_get_one::<ColorChoice>("color")?
+                .unwrap_or(&ColorChoice::Never)
+                .to_owned();
+            let lib_old_version = args
+                .try_get_one::<String>("lib_old_version")?
+                .unwrap()
+                .to_owned();
+            let lib_new_version = args
+                .try_get_one::<String>("lib_new_version")?
+                .unwrap()
+                .to_owned();
+
+            let grep_dir = args.try_get_one::<String>("grep_dir")?.unwrap().to_owned();
+
+            generate_diff(lib_name, lib_new_version, lib_old_version, grep_dir, color)?;
+
+            Ok(())
         }
         _ => Err(anyhow!("Command not found. See help.")),
     }

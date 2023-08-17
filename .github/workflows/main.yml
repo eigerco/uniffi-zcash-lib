@@ -41,7 +41,7 @@ jobs:
             lib/target
           key: 1-${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-build
-      
+
       - name: Set up Zcash params cache
         uses: actions/cache@v3
         continue-on-error: false
@@ -86,7 +86,7 @@ jobs:
       kotlin-registry-password: "" # dummy, we are testing the build.
       # Swift needs to clone the package repo for build.
       swift-git-repo-url: ${{ secrets.SWIFT_GIT_REPO_URL }}
-  
+
   macos-build-packages:
     needs: bindgen
     # Kotlin variables/secrets only need to be present, without value,
