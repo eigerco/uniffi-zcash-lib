@@ -1,0 +1,55 @@
+use zcash_client_backend::fees::{DustOutputPolicy, DustAction};
+use crate::ZcashAmount;
+use std::sync::Arc;
+
+pub enum ZcashDustAction {
+    /// Do not allow creation of dust outputs; instead, require that additional inputs be provided.
+    Reject,
+    /// Explicitly allow the creation of dust change amounts greater than the specified value.
+    AllowDustChange,
+    /// Allow dust amounts to be added to the transaction fee
+    AddDustToFee,
+}
+
+impl From<ZcashDustAction> for DustAction {
+    fn from(value: ZcashDustAction) -> Self {
+        match value {
+            ZcashDustAction::Reject => DustAction::Reject,
+            ZcashDustAction::AllowDustChange => DustAction::AllowDustChange,
+            ZcashDustAction::AddDustToFee => DustAction::AddDustToFee,
+        }
+    }
+}
+
+impl From<DustAction> for ZcashDustAction {
+    fn from(value: DustAction) -> Self {
+        match value {
+            DustAction::Reject => ZcashDustAction::Reject,
+            DustAction::AllowDustChange => ZcashDustAction::AllowDustChange,
+            DustAction::AddDustToFee => ZcashDustAction::AddDustToFee,
+        }
+    }
+}
+
+pub struct ZcashDustOutputPolicy(DustOutputPolicy);
+
+impl ZcashDustOutputPolicy {
+
+	pub fn new(action: ZcashDustAction, dust_threshold: Option<Arc<ZcashAmount>>) -> Self {
+		ZcashDustOutputPolicy(DustOutputPolicy::new(action.into(), dust_threshold.as_deref().map(From::from)))
+	}
+
+	pub fn action(&self) -> ZcashDustAction {
+		self.0.action().into()
+	}
+
+	pub fn dust_threshold(&self) -> Option<Arc<ZcashAmount>> {
+		self.0.dust_threshold().map(From::from).map(Arc::new).into()
+	}
+}
+
+impl Default for ZcashDustOutputPolicy {
+    fn default() -> Self {
+        ZcashDustOutputPolicy::new(ZcashDustAction::Reject, None)
+    }
+}
