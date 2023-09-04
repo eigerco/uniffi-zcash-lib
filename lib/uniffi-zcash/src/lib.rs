@@ -16,6 +16,9 @@ pub use self::orchard::*;
 mod zcash_client_backend;
 pub use self::zcash_client_backend::*;
 
+mod native;
+pub use self::native::*;
+
 mod zcash_primitives;
 pub use self::zcash_primitives::*;
 
