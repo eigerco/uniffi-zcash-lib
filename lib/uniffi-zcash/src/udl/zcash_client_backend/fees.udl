@@ -1,0 +1,11 @@
+enum ZcashDustAction {
+    "Reject",
+    "AllowDustChange",
+    "AddDustToFee"
+};
+
+interface ZcashDustOutputPolicy {
+	constructor(ZcashDustAction action, ZcashAmount? dust_threshold);
+	ZcashDustAction action();
+	ZcashAmount? dust_threshold();
+};
