@@ -23,14 +23,13 @@ use std::ptr;
 
 use crate::{
     // encoding::AddressCodec, // NOT USED
-    ZcashRecipientAddress, ZcashUnifiedAddress // zcash_client_backend::address
+    ZcashRecipientAddress, ZcashUnifiedAddress, // zcash_client_backend::address
     ZcashDustOutputPolicy, // zcash_client_backend::fees
-    ZcashKeysEra, ZcashUnifiedFullViewingKey, ZcashUnifiedSpendingKey, ZcashDecodingError // keys
+    ZcashKeysEra, ZcashUnifiedFullViewingKey, ZcashUnifiedSpendingKey, ZcashDecodingError, // keys
+    ZcashOvkPolicy, ZcashWalletTransparentOutput // wallet
+    // Payment, TransactionRequest // zip321
 };
-// use zcash_client_backend::{
-    // wallet::{OvkPolicy, WalletTransparentOutput}, // to do
-//     zip321::{Payment, TransactionRequest}, // to do
-// };
+
 
 // use zcash_client_backend::data_api::{
 //     chain::{scan_cached_blocks, CommitmentTreeRoot},

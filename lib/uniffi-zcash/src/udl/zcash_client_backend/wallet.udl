@@ -1,0 +1,16 @@
+[Enum]
+interface ZcashOvkPolicy {
+	Sender();
+	Custom(sequence<u8> bytes);
+	Discard();
+};
+
+interface ZcashWalletTransparentOutput {
+	[Name=from_parts, Throws=ZcashError]
+	constructor(ZcashOutPoint outpoint, ZcashTxOut txout, ZcashBlockHeight height);
+	ZcashOutPoint outpoint();
+	ZcashTxOut txout();
+	ZcashBlockHeight height();
+	ZcashTransparentAddress recipient_address();
+	ZcashAmount value();
+};

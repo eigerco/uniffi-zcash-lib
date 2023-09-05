@@ -14,6 +14,12 @@ pub use self::encoding::*;
 mod keys;
 pub use self::keys::*;
 
+mod wallet;
+pub use self::wallet::*;
+
+mod fees;
+pub use self::fees::*;
+
 pub struct ZcashUnifiedAddressAndDiversifierIndex {
     pub address: Arc<ZcashUnifiedAddress>,
     pub diversifier_index: Arc<ZcashDiversifierIndex>,
