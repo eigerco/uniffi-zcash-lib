@@ -25,6 +25,9 @@ pub use self::merkle_tree::*;
 mod zip32;
 pub use self::zip32::*;
 
+mod block;
+pub use self::block::*;
+
 pub struct ZcashDiversifierIndexAndPaymentAddress {
     pub diversifier_index: Arc<ZcashDiversifierIndex>,
     pub address: Arc<ZcashPaymentAddress>,

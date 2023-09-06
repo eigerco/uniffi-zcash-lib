@@ -29,6 +29,7 @@ mod jubjub;
 pub use self::jubjub::*;
 
 mod utils;
+mod native_utils;
 
 pub use uniffi_zcash_test::test_support::*;
 

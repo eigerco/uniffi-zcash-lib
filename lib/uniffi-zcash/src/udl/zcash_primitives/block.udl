@@ -1,0 +1,4 @@
+interface ZcashBlockHash {
+	[Name=from_slice]
+	constructor([ByRef] sequence<u8> from_bytes);
+};
