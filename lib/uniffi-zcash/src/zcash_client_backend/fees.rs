@@ -1,6 +1,6 @@
-use zcash_client_backend::fees::{DustOutputPolicy, DustAction};
 use crate::ZcashAmount;
 use std::sync::Arc;
+use zcash_client_backend::fees::{DustAction, DustOutputPolicy};
 
 pub enum ZcashDustAction {
     /// Do not allow creation of dust outputs; instead, require that additional inputs be provided.
@@ -34,18 +34,20 @@ impl From<DustAction> for ZcashDustAction {
 pub struct ZcashDustOutputPolicy(DustOutputPolicy);
 
 impl ZcashDustOutputPolicy {
+    pub fn new(action: ZcashDustAction, dust_threshold: Option<Arc<ZcashAmount>>) -> Self {
+        ZcashDustOutputPolicy(DustOutputPolicy::new(
+            action.into(),
+            dust_threshold.as_deref().map(From::from),
+        ))
+    }
 
-	pub fn new(action: ZcashDustAction, dust_threshold: Option<Arc<ZcashAmount>>) -> Self {
-		ZcashDustOutputPolicy(DustOutputPolicy::new(action.into(), dust_threshold.as_deref().map(From::from)))
-	}
+    pub fn action(&self) -> ZcashDustAction {
+        self.0.action().into()
+    }
 
-	pub fn action(&self) -> ZcashDustAction {
-		self.0.action().into()
-	}
-
-	pub fn dust_threshold(&self) -> Option<Arc<ZcashAmount>> {
-		self.0.dust_threshold().map(From::from).map(Arc::new).into()
-	}
+    pub fn dust_threshold(&self) -> Option<Arc<ZcashAmount>> {
+        self.0.dust_threshold().map(From::from).map(Arc::new)
+    }
 }
 
 impl Default for ZcashDustOutputPolicy {

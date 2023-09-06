@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// An address that funds can be sent to.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub enum ZcashRecipientAddress {
     Shielded(Arc<ZcashPaymentAddress>),
     Transparent(Arc<ZcashTransparentAddress>),

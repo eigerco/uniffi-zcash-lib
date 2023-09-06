@@ -22,14 +22,19 @@ use std::ptr;
 // use zcash_address::{ToAddress, ZcashAddress};
 
 use crate::{
+    ZcashDecodingError,    // keys
+    ZcashDustOutputPolicy, // fees
+    ZcashKeysEra,
+    ZcashOvkPolicy,
+    ZcashPayment,
     // encoding::AddressCodec, // NOT USED
-    ZcashRecipientAddress, ZcashUnifiedAddress, // zcash_client_backend::address
-    ZcashDustOutputPolicy, // zcash_client_backend::fees
-    ZcashKeysEra, ZcashUnifiedFullViewingKey, ZcashUnifiedSpendingKey, ZcashDecodingError, // keys
-    ZcashOvkPolicy, ZcashWalletTransparentOutput // wallet
-    // Payment, TransactionRequest // zip321
+    ZcashRecipientAddress,
+    ZcashTransactionRequest, // zip321
+    ZcashUnifiedAddress,     // address
+    ZcashUnifiedFullViewingKey,
+    ZcashUnifiedSpendingKey,
+    ZcashWalletTransparentOutput, // wallet
 };
-
 
 // use zcash_client_backend::data_api::{
 //     chain::{scan_cached_blocks, CommitmentTreeRoot},
@@ -131,4 +136,3 @@ use crate::{
 // get_verified_transparent_balance
 // get_sapling_receiver_for_unified_address
 // get_transparent_receiver_for_unified_address
-

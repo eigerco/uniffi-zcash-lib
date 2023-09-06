@@ -1,7 +1,6 @@
 mod builder;
 pub use self::builder::*;
 
-
 use std::sync::Arc;
 
 use zcash_primitives::transaction::components::{

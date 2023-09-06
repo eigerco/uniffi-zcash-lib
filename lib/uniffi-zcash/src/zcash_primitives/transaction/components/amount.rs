@@ -13,7 +13,7 @@ use crate::ZcashError;
 /// by the network consensus rules.
 ///
 /// [`Transaction`]: crate::transaction::Transaction
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct ZcashAmount(Amount);
 
 impl std::ops::Deref for ZcashAmount {

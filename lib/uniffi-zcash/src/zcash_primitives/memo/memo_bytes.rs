@@ -2,7 +2,7 @@ use zcash_primitives::memo::MemoBytes;
 
 use crate::{ZcashError, ZcashResult};
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ZcashMemoBytes(MemoBytes);
 
 impl ZcashMemoBytes {
@@ -32,6 +32,13 @@ impl ZcashMemoBytes {
     /// Returns a slice of the raw bytes, excluding null padding.
     pub fn data(&self) -> Vec<u8> {
         self.0.as_slice().to_owned()
+    }
+}
+
+// maybe implement it for all the other types?
+impl From<MemoBytes> for ZcashMemoBytes {
+    fn from(value: MemoBytes) -> Self {
+        ZcashMemoBytes(value)
     }
 }
 

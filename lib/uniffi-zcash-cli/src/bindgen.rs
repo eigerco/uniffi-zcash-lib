@@ -1,9 +1,9 @@
-use std::{
-    path::Path,
-    process::Command,
-};
+use std::{path::Path, process::Command};
 
-use fs_extra::{file::{self, CopyOptions}, dir};
+use fs_extra::{
+    dir,
+    file::{self, CopyOptions},
+};
 
 use crate::{
     helper::{cmd_success, LINUX_SHARED_LIB_NAME, MACOS_SHARED_LIB_NAME},

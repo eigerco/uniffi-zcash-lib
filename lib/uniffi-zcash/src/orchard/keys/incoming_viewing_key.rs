@@ -62,7 +62,6 @@ impl From<IncomingViewingKey> for ZcashOrchardIncomingViewingKey {
     }
 }
 
-
 impl From<&ZcashOrchardIncomingViewingKey> for IncomingViewingKey {
     fn from(value: &ZcashOrchardIncomingViewingKey) -> Self {
         value.0.clone()
