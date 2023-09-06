@@ -1,0 +1,5 @@
+
+interface ZcashWalletDb {
+  	[Name=for_path, Throws=ZcashError]
+	constructor(string path, ZcashConsensusParameters params);
+};

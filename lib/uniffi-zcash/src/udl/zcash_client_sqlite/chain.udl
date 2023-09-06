@@ -1,0 +1,4 @@
+
+interface ZcashBlockMeta {
+	string block_file_path(string blocks_dir);
+};

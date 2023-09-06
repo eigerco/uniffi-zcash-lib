@@ -50,7 +50,10 @@ use crate::{
     ZcashAccountId, ZcashDiversifierIndex,
     ZcashLocalTxProver,
     ZcashTransaction, ZcashTxId,
-    ZcashConsensusParameters
+    ZcashConsensusParameters,
+    // zcash_client_sqlite
+    ZcashChain, // init_blockmeta_db
+    ZcashBlockMeta
 };
 
 // use zcash_client_backend::data_api::{
@@ -67,7 +70,6 @@ use crate::{
 // use zcash_client_sqlite::chain::init::init_blockmeta_db;
 
 // use zcash_client_sqlite::{
-//     chain::BlockMeta,
 //     wallet::init::{init_accounts_table, init_blocks_table, init_wallet_db, WalletMigrationError},
 //     FsBlockDb, WalletDb,
 // };
