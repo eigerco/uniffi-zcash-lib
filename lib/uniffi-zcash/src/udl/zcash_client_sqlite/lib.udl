@@ -3,3 +3,14 @@ interface ZcashWalletDb {
   	[Name=for_path, Throws=ZcashError]
 	constructor(string path, ZcashConsensusParameters params);
 };
+
+interface ZcashFsBlockDb {
+	[Name=for_path, Throws=ZcashError]
+	constructor(string fsblockdb_root);
+
+	[Throws=ZcashError]
+	ZcashBlockHeight? get_max_cached_height();
+
+	[Throws=ZcashError]
+	void write_block_metadata(sequence<ZcashBlockMeta> block_meta);
+};

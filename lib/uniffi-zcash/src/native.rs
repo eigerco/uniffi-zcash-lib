@@ -26,35 +26,41 @@ use utils::exception::unwrap_exc_or;
 // use zcash_address::{ToAddress, ZcashAddress};
 
 use crate::{
-    ZcashDecodingError,    // keys
+    ZcashAccountId,
+    ZcashAmount,
+    ZcashBlockHash,
+    // primitives
+    ZcashBlockHeight,
+    ZcashBlockMeta,
+    ZcashBranchId,
+    // zcash_client_sqlite
+    ZcashChain, // init_blockmeta_db
+    ZcashConsensusParameters,
+    ZcashConsensusParameters::{MainNetwork, TestNetwork}, // consensus
+    ZcashDecodingError,                                   // keys
+    ZcashDiversifierIndex,
     ZcashDustOutputPolicy, // fees
     ZcashKeysEra,
+    ZcashLocalTxProver,
+    ZcashMemoBytes,
+    ZcashOutPoint,
     ZcashOvkPolicy,
     ZcashPayment,
     // encoding::AddressCodec, // NOT USED
     ZcashRecipientAddress,
+    ZcashScript,
+    ZcashTransaction,
     ZcashTransactionRequest, // zip321
-    ZcashUnifiedAddress,     // address
+    ZcashTransparentAddress,
+    ZcashTxId,
+    ZcashTxOut,
+    ZcashUnifiedAddress, // address
     ZcashUnifiedFullViewingKey,
     ZcashUnifiedSpendingKey,
     ZcashWalletTransparentOutput, // wallet
-    ZcashConsensusParameters::{MainNetwork, TestNetwork}, // consensus
-    // primitives
-    ZcashBlockHeight,
-    ZcashBranchId,
-    ZcashScript,
-    ZcashTransparentAddress,
-    ZcashMemoBytes,
-    ZcashBlockHash,
-    ZcashAmount, ZcashOutPoint, ZcashTxOut,
-    ZcashAccountId, ZcashDiversifierIndex,
-    ZcashLocalTxProver,
-    ZcashTransaction, ZcashTxId,
-    ZcashConsensusParameters,
-    // zcash_client_sqlite
-    ZcashChain, // init_blockmeta_db
-    ZcashBlockMeta
 };
+
+// use crate::chain::ZcashBlockMeta;
 
 // use zcash_client_backend::data_api::{
 //     chain::{scan_cached_blocks, CommitmentTreeRoot},
@@ -107,7 +113,6 @@ fn print_debug_state() {
 fn print_debug_state() {
     debug!("Release enabled (congrats, this is NOT a debug build).");
 }
-
 
 //subssitute with USK constructor
 // fn encode_usk(

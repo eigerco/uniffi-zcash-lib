@@ -31,8 +31,8 @@ pub use self::zcash_proofs::*;
 mod jubjub;
 pub use self::jubjub::*;
 
-mod utils;
 mod native_utils;
+mod utils;
 
 pub use uniffi_zcash_test::test_support::*;
 
