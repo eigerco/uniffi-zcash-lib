@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Debug, Clone)]
-pub struct ZcashWalletTransparentOutput(WalletTransparentOutput);
+pub struct ZcashWalletTransparentOutput(pub WalletTransparentOutput);
 
 impl ZcashWalletTransparentOutput {
     pub fn from_parts(
@@ -55,6 +55,12 @@ impl From<WalletTransparentOutput> for ZcashWalletTransparentOutput {
         ZcashWalletTransparentOutput(inner)
     }
 }
+
+// impl From<&ZcashWalletTransparentOutput> for &WalletTransparentOutput {
+//     fn from(output: &ZcashWalletTransparentOutput) -> Self {
+//         &output.0
+//     }
+// }
 
 pub enum ZcashOvkPolicy {
     /// Use the outgoing viewing key from the sender's [`ExtendedFullViewingKey`].

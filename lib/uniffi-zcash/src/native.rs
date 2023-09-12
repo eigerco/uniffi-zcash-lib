@@ -40,6 +40,8 @@ use crate::{
     ZcashDecodingError,                                   // keys
     ZcashDiversifierIndex,
     ZcashDustOutputPolicy, // fees
+    ZcashError,
+    ZcashFsBlockDb,
     ZcashKeysEra,
     ZcashLocalTxProver,
     ZcashMemoBytes,
@@ -48,6 +50,7 @@ use crate::{
     ZcashPayment,
     // encoding::AddressCodec, // NOT USED
     ZcashRecipientAddress,
+    ZcashResult,
     ZcashScript,
     ZcashTransaction,
     ZcashTransactionRequest, // zip321
@@ -57,10 +60,12 @@ use crate::{
     ZcashUnifiedAddress, // address
     ZcashUnifiedFullViewingKey,
     ZcashUnifiedSpendingKey,
+    ZcashWalletDb,
     ZcashWalletTransparentOutput, // wallet
+    scan_cached_blocks
 };
 
-// use crate::chain::ZcashBlockMeta;
+// use crate::zcash_client_backend::data_api::chain::scan_cached_blocks;
 
 // use zcash_client_backend::data_api::{
 //     chain::{scan_cached_blocks, CommitmentTreeRoot},
@@ -74,11 +79,7 @@ use crate::{
 // };
 
 // use zcash_client_sqlite::chain::init::init_blockmeta_db;
-
-// use zcash_client_sqlite::{
-//     wallet::init::{init_accounts_table, init_blocks_table, init_wallet_db, WalletMigrationError},
-//     FsBlockDb, WalletDb,
-// };
+// use zcash_client_sqlite::wallet::init::{init_accounts_table, init_blocks_table, init_wallet_db, WalletMigrationError}
 
 // use zcash_primitives::{
 //     consensus::{, Network, Parameters},
@@ -90,19 +91,17 @@ use crate::{
 //     },
 // };
 
-// fn wallet_db<P: Parameters>(
-//     params: P,
-//     db_data: String,
-// ) -> Result<WalletDb<rusqlite::Connection, P>, failure::Error> {
-//     WalletDb::for_path(db_data, params)
-//         .map_err(|e| format_err!("Error opening wallet database connection: {}", e))
-// }
+fn wallet_db(params: ZcashConsensusParameters, db_data: String) -> ZcashResult<ZcashWalletDb> {
+    ZcashWalletDb::for_path(db_data, params).map_err(|e| ZcashError::Message {
+        error: format_err!("Error opening wallet database connection: {}", e).to_string(),
+    })
+}
 
-// needed ?
-// fn block_db(fsblockdb_root: String) -> Result<FsBlockDb, failure::Error> {
-//     FsBlockDb::for_path(fsblockdb_root)
-//         .map_err(|e| format_err!("Error opening block source database connection: {:?}", e))
-// }
+fn block_db(fsblockdb_root: String) -> ZcashResult<ZcashFsBlockDb> {
+    ZcashFsBlockDb::for_path(fsblockdb_root).map_err(|e| ZcashError::Message {
+        error: format_err!("Error opening block source database connection: {:?}", e).to_string(),
+    })
+}
 
 #[cfg(debug_assertions)]
 fn print_debug_state() {
@@ -196,32 +195,34 @@ pub fn init_on_load() {
 
 // NOTE: need to get WalletDB translated first
 
-// pub fn create_account(
-//     // db_data: JString<'_>,
-//     seed: Vec<u8>,
-//     params: ZcashConsensusParameters,
-// ) -> ZcashUnifiedSpendingKey {
-//     // not needed because we may pass the full param instead of the id
-//     // let network = parse_network(network_id)?;
+pub fn create_account(
+    db_data: String,
+    seed: Vec<u8>,
+    params: ZcashConsensusParameters,
+) -> ZcashUnifiedSpendingKey {
+    // not needed because we may pass the full param instead of the id
+    // let network = parse_network(network_id)?;
 
-//     let mut db_data = wallet_db(&env, network, db_data)?;
+    let db_data = wallet_db(params, db_data).unwrap();
+    let account = ZcashAccountId { id: 55 };
 
-//     // the seed is passed from outside
-//     // let seed = SecretVec::new(env.convert_byte_array(seed).unwrap());
+    // the seed is passed from outside
+    // let seed = SecretVec::new(env.convert_byte_array(seed).unwrap());
 
-//     // NOTE: is it needed to store the account created?
-//     // let (account, usk) = db_data
-//     //     .create_account(&seed)
-//     //     .map_err(|e| format_err!("Error while initializing accounts: {}", e))?;
+    // NOTE: is it needed to store the account created?
+    // let (account, usk) = db_data
+    //     .create_account(&seed)
+    //     .map_err(|e| format_err!("Error while initializing accounts: {}", e))?;
 
-//     // encode_usk(&env, account, usk)
-//     ZcashUnifiedSpendingKey::from_seed(params, seed, ZcashAccountId{id: 1})
-// }
+    // encode_usk(&env, account, usk)
+    ZcashUnifiedSpendingKey::from_seed(params, seed, account).unwrap()
+}
 
+// NOTE need walletread impl
 // pub fn get_balance(db_data: String, aid: u32, params: ZcashConsensusParameters) -> u32 {
 //     // let network = parse_network(network_id as u32)?;
-//     let db_data = wallet_db(params, db_data)?;
-//     let account = ZcashAccountId::from(aid);
+//     let db_data = wallet_db(params, db_data).unwrap();
+//     let account = ZcashAccountId {id: aid};
 
 //     // We query the unverified balance including unmined transactions. Shielded notes
 //     // in unmined transactions are never spendable, but this ensures that the balance
@@ -246,11 +247,86 @@ pub fn init_on_load() {
 //         .map(|amount| amount.into())
 // }
 
-// put_utxo
+// pub fn get_latest_height(fsblockdb_root: String) -> ZcashResult<i64> {
+//     let block_db = block_db(fsblockdb_root);
+
+//     match block_db?.get_max_cached_height() {
+//         Ok(Some(block_height)) => Ok(i64::from(u32::from(block_height))),
+//         // Use -1 to return null across the FFI.
+//         Ok(None) => Ok(-1),
+//         Err(e) => Err(format_err!(
+//             "Failed to read block metadata from FsBlockDb: {:?}",
+//             e
+//         )),
+//     }
+// }
+
+pub fn put_utxo(
+    db_data: String,
+    address: String,
+    params: ZcashConsensusParameters,
+    txid_bytes: Vec<u8>,
+    script_bytes: Vec<u8>,
+    index: u32,
+    value: i64,
+    height: u32,
+) -> ZcashResult<bool> {
+    let mut txid = [0u8; 32];
+    txid.copy_from_slice(&txid_bytes[..]);
+
+    let mut script = [0u8; 512];
+    script.copy_from_slice(&script_bytes[..]);
+
+    let script_pubkey = ZcashScript::from_bytes(&script);
+    let mut db_data = wallet_db(params, db_data)?;
+
+    // just making sure the process doesn't fail, that's why the underscore
+    let _address = ZcashTransparentAddress::decode(params, &address).unwrap();
+
+    let output = ZcashWalletTransparentOutput::from_parts(
+        ZcashOutPoint::new(&txid, index).unwrap().into(),
+        ZcashTxOut::new(
+            ZcashAmount::new(value).unwrap().into(),
+            script_pubkey.unwrap().into(),
+        )
+        .into(),
+        ZcashBlockHeight::new(height).into(),
+    )
+    .unwrap();
+    //"UTXO is not P2PKH or P2SH"
+
+    debug!("Storing UTXO in db_data");
+
+    match db_data.put_received_transparent_utxo(&output) {
+        Ok(_) => Ok(true),
+        Err(e) => Err(ZcashError::Message {
+            error: format!("Error while inserting UTXO: {}", e),
+        }),
+    }
+}
 
 // init_data_db
 
-// scan_blocks
+pub fn scan_blocks(
+    db_cache: String,
+    db_data: String,
+    from_height: u32,
+    limit: u32,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<bool> {
+    let db_cache = block_db(db_cache)?;
+    let mut db_data = wallet_db(params, db_data)?;
+    // let from_height = ZcashBlockHeight::new(from_height);
+
+    match scan_cached_blocks(params, db_cache, db_data, limit) {
+        Ok(()) => Ok(true),
+        Err(e) => Err(ZcashError::Message{error: format!(
+            "Rust error while scanning blocks (limit {:?}): {:?}",
+            limit,
+            e
+        )}),
+    }
+}
 
 // create_account
 
@@ -261,8 +337,6 @@ pub fn init_on_load() {
 // update_chain_tip
 
 // create_to_address
-
-// get_latest_height
 
 // init_block_meta_db
 
@@ -289,13 +363,23 @@ pub fn init_on_load() {
 // get_nearest_rewind_height
 
 // is_valid_shielded_address
+
 // put_sapling_subtree_roots
+
 // list_transparent_receivers
+
 // init_accounts_table_with_keys
+
 // is_valid_transparent_address
+
 // decrypt_and_store_transaction
+
 // get_total_transparent_balance
+
 // rewind_block_metadata_to_height
+
 // get_verified_transparent_balance
+
 // get_sapling_receiver_for_unified_address
+
 // get_transparent_receiver_for_unified_address

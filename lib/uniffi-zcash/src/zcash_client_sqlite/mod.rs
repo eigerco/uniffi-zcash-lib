@@ -1,8 +1,16 @@
-use crate::{ZcashBlockHeight, ZcashConsensusParameters, ZcashError, ZcashResult};
+use crate::{
+    ZcashBlockHeight, ZcashConsensusParameters, ZcashError, ZcashResult,
+    ZcashWalletTransparentOutput,
+};
 use rusqlite::Connection;
+use std::fmt;
 use std::sync::{Arc, Mutex};
+use zcash_client_backend::data_api::WalletWrite;
 use zcash_client_sqlite::chain::BlockMeta;
+use zcash_client_sqlite::wallet as original_wallet;
+use zcash_client_sqlite::DataConnStmtCache;
 use zcash_client_sqlite::{FsBlockDb, WalletDb};
+use zcash_primitives::consensus;
 use zcash_primitives::consensus::{MAIN_NETWORK, TEST_NETWORK};
 
 mod chain;
@@ -14,6 +22,7 @@ pub use self::wallet::*;
 /// this is needed because WalletDb uses a generic argument
 /// and UniFFI doesn't support it. So we may init all the used types
 /// in order to avoid the need of using that argument.
+// #[derive(Clone)]
 pub struct SuperWalletDb {
     pub main: Mutex<WalletDb<zcash_primitives::consensus::MainNetwork>>,
     pub test: Mutex<WalletDb<zcash_primitives::consensus::TestNetwork>>,
@@ -25,9 +34,19 @@ pub struct ZcashWalletDb {
     pub params: ZcashConsensusParameters,
 }
 
-// pub struct ZcashWalletDb {
-// 	params: ZcashConsensusParameters,
-// 	conn: Arc<Mutex<Connection>>
+// #[derive(Debug)]
+// pub struct SuperDataConnStmtCache<'a> {
+//     pub main: DataConnStmtCache<'a, zcash_primitives::consensus::MainNetwork>,
+//     pub test: DataConnStmtCache<'a, zcash_primitives::consensus::TestNetwork>,
+// }
+
+// pub struct ZcashDataConnStmtCache<'a> {
+//     pub sup: Arc<SuperDataConnStmtCache<'a>>,
+//     pub params: ZcashConsensusParameters,
+// }
+
+// pub struct ZcashDataConnStmtCacheTwo<'a, P> {
+//     pub data: Arc<DataConnStmtCache<'a, P>>,
 // }
 
 // how to get WDB:
@@ -40,22 +59,88 @@ impl ZcashWalletDb {
             main: Mutex::new(WalletDb::for_path(&path, MAIN_NETWORK).unwrap()),
             test: Mutex::new(WalletDb::for_path(&path, TEST_NETWORK).unwrap()),
         };
+
         Ok(ZcashWalletDb {
             sup: Arc::new(sup),
             params,
         })
     }
-    // pub fn for_path(path: String, params: ZcashConsensusParameters) -> Result<ZcashWalletDb, ZcashError> {
-    // 	let conn = Connection::open(&path);
-    //     Ok(ZcashWalletDb { conn: Arc::new(Mutex::new(conn.unwrap())), params })
+
+
+    //NOTE: if I use this approach, it complains about a reference borrowed and not given back
+
+    // pub fn get_update_ops(&self) -> Arc<ZcashDataConnStmtCache> {
+    //     let man = (&self.sup).main.lock().unwrap();
+    //     let tst = (&self.sup).test.lock().unwrap();
+
+    //     let sup = SuperDataConnStmtCache {
+    //         main: man.get_update_ops().unwrap(),
+    //         test: tst.get_update_ops().unwrap(),
+    //     };
+
+    //     Arc::new(ZcashDataConnStmtCache {
+    //         sup: Arc::new(sup),
+    //         params: self.params,
+    //     })
     // }
 
-    // NOTE not needed for now
-    // pub fn get_update_ops(&self) -> ZcashResult<DataConnStmtCache<'_, P>, SqliteClientError>
+
+    //NOTE: if I use this, something else is wrong
+
+    // match self.params {
+    //     ZcashConsensusParameters::MainNetwork => {
+    //         let tmp = (&self.sup).main.lock().unwrap().get_update_ops().unwrap();
+    //         Arc::new( ZcashDataConnStmtCacheTwo { data: Arc::new(tmp) } )
+    //     } ,
+    //     ZcashConsensusParameters::TestNetwork => {
+    //         let tmp = (&self.sup).test.lock().unwrap().get_update_ops().unwrap();
+    //         Arc::new( ZcashDataConnStmtCacheTwo { data: Arc::new(tmp) } )
+    //     }
+    // }
+
+    pub fn put_received_transparent_utxo(
+        &mut self,
+        output: &ZcashWalletTransparentOutput,
+    ) -> ZcashResult<i64> {
+        match self.params {
+            ZcashConsensusParameters::MainNetwork => {
+                match self
+                    .sup
+                    .main
+                    .lock()
+                    .unwrap()
+                    .get_update_ops()
+                    .unwrap()
+                    .put_received_transparent_utxo(&output.0)
+                {
+                    Ok(utxo_id) => Ok(utxo_id.0),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+            ZcashConsensusParameters::TestNetwork => {
+                match self
+                    .sup
+                    .test
+                    .lock()
+                    .unwrap()
+                    .get_update_ops()
+                    .unwrap()
+                    .put_received_transparent_utxo(&output.0)
+                {
+                    Ok(utxo_id) => Ok(utxo_id.0),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+        }
+    }
 }
 
 pub struct ZcashFsBlockDb {
-    fs_block_db: Mutex<FsBlockDb>,
+    pub fs_block_db: Mutex<FsBlockDb>,
 }
 
 impl ZcashFsBlockDb {

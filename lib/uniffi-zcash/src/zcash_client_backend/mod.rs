@@ -8,6 +8,9 @@ use crate::ZcashDiversifierIndex;
 mod address;
 pub use self::address::*;
 
+mod data_api;
+pub use self::data_api::*;
+
 mod encoding;
 pub use self::encoding::*;
 
