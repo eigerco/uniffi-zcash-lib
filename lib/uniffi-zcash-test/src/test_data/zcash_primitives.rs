@@ -20,8 +20,9 @@ use super::format_bytes;
 pub fn write_for_zcash_primitives<W: Write>(mut file: W, seed: &[u8]) {
     let apk = AccountPrivKey::from_seed(&MainNetwork, seed, 0.into()).unwrap();
     writeln!(file, "{}", format_bytes("account_private_key", &apk.to_bytes())).unwrap();
-    writeln!(file, "{}", format_bytes("apk_derive_external_secret_key", &apk.derive_external_secret_key(0).unwrap().serialize_secret())).unwrap();
-    writeln!(file, "{}", format_bytes("apk_derive_internal_secret_key", &apk.derive_internal_secret_key(0).unwrap().serialize_secret())).unwrap();
+    // CHANGED
+    writeln!(file, "{}", format_bytes("apk_derive_external_secret_key", &apk.derive_external_secret_key(0).unwrap().secret_bytes())).unwrap();
+    writeln!(file, "{}", format_bytes("apk_derive_internal_secret_key", &apk.derive_internal_secret_key(0).unwrap().secret_bytes())).unwrap();
 
     let ppk = apk.to_account_pubkey();
     writeln!(file, "{}", format_bytes("account_public_key", &ppk.serialize())).unwrap();

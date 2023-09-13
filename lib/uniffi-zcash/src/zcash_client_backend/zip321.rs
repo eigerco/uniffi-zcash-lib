@@ -2,7 +2,7 @@ use std::fmt;
 
 use zcash_client_backend::zip321::{TransactionRequest, Zip321Error};
 
-use crate::{ZcashConsensusParameters, ZcashPayment, ZcashResult};
+use crate::{ZcashConsensusParameters, ZcashPayment};
 
 #[derive(Debug)]
 pub enum ZcashZip321Error {

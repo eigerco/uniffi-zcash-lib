@@ -13,7 +13,7 @@ impl SecpSecretKey {
 
     /// Serializes the secret key as byte value.
     pub fn serialize_secret(&self) -> Vec<u8> {
-        self.0.serialize_secret().to_vec()
+        self.0.secret_bytes().to_vec()
     }
 }
 

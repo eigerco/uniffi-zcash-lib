@@ -1,5 +1,6 @@
 use zcash_client_sqlite::wallet::init::{
-    init_accounts_table, init_blocks_table, init_wallet_db, WalletMigrationError,
+    // init_accounts_table, init_blocks_table, init_wallet_db,
+    WalletMigrationError,
 };
 
 #[derive(Debug)]
@@ -32,6 +33,7 @@ impl From<WalletMigrationError> for ZcashWalletMigrationError {
             WalletMigrationError::BalanceError { .. } => ZcashWalletMigrationError::BalanceError {
                 v: "BalanceError".to_string(),
             },
+            WalletMigrationError::CommitmentTree(_) => todo!()
         }
     }
 }

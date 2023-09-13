@@ -107,7 +107,8 @@ impl ZcashTransactionBuilder {
         prover: Arc<ZcashLocalTxProver>,
         fee_rule: ZcashFeeRules,
     ) -> ZcashResult<ZcashTransactionAndSaplingMetadata> {
-        let mut builder = Builder::new(self.parameters, (*self.target_height).into());
+        // CHANGED
+        let mut builder = Builder::new(self.parameters, (*self.target_height).into(), None);
 
         self.sapling_spends.read().unwrap().iter().try_for_each(
             |(extsk, diversifier, note, merkle_path)| {
@@ -155,7 +156,7 @@ impl ZcashTransactionBuilder {
 
         match fee_rule {
             ZcashFeeRules::FixedStandard => {
-                let fee = zcash_primitives::transaction::fees::fixed::FeeRule::standard();
+                let fee = zcash_primitives::transaction::fees::zip317::FeeRule::standard();
                 let result = builder.build(&prover.0, &fee).map_err(ZcashError::from)?;
                 Ok(result.into())
             }
@@ -319,6 +320,13 @@ impl ZcashTxId {
         let mut data = Vec::with_capacity(32);
         self.0.write(&mut data)?;
         Ok(data)
+    }
+}
+
+
+impl From<ZcashTxId> for TxId {
+    fn from(inner: ZcashTxId) -> Self {
+        inner.0
     }
 }
 

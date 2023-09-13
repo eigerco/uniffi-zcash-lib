@@ -1,16 +1,14 @@
 use crate::{
     ZcashBlockHeight, ZcashConsensusParameters, ZcashError, ZcashResult,
-    ZcashWalletTransparentOutput, ZcashMemo
+    ZcashWalletTransparentOutput, ZcashMemo, ZcashTxId, ZcashShieldedProtocol
 };
 use rusqlite::Connection;
-use std::fmt;
 use std::sync::{Arc, Mutex};
 use zcash_client_backend::data_api::WalletWrite;
 use zcash_client_sqlite::chain::BlockMeta;
 // use zcash_client_sqlite::wallet as original_wallet;
-use zcash_client_sqlite::{NoteId, DataConnStmtCache};
 use zcash_client_sqlite::{FsBlockDb, WalletDb};
-use zcash_primitives::consensus;
+use zcash_client_backend::data_api::NoteId;
 use zcash_primitives::consensus::{MAIN_NETWORK, TEST_NETWORK};
 use zcash_client_backend::data_api::WalletRead;
 
@@ -24,14 +22,14 @@ pub use self::wallet::*;
 /// and UniFFI doesn't support it. So we may init all the used types
 /// in order to avoid the need of using that argument.
 // #[derive(Clone)]
-pub struct SuperWalletDb {
-    pub main: Mutex<WalletDb<zcash_primitives::consensus::MainNetwork>>,
-    pub test: Mutex<WalletDb<zcash_primitives::consensus::TestNetwork>>,
+pub struct SuperWalletDb<C> {
+    pub main: Mutex<WalletDb<C, zcash_primitives::consensus::MainNetwork>>,
+    pub test: Mutex<WalletDb<C, zcash_primitives::consensus::TestNetwork>>,
 }
 
 /// A wrapper for the SQLite connection to the wallet database.
 pub struct ZcashWalletDb {
-    pub sup: Arc<SuperWalletDb>,
+    pub sup: Arc<SuperWalletDb<Connection>>,
     pub params: ZcashConsensusParameters,
 }
 
@@ -110,8 +108,6 @@ impl ZcashWalletDb {
                     .main
                     .lock()
                     .unwrap()
-                    .get_update_ops()
-                    .unwrap()
                     .put_received_transparent_utxo(&output.0)
                 {
                     Ok(utxo_id) => Ok(utxo_id.0),
@@ -125,8 +121,6 @@ impl ZcashWalletDb {
                     .sup
                     .test
                     .lock()
-                    .unwrap()
-                    .get_update_ops()
                     .unwrap()
                     .put_received_transparent_utxo(&output.0)
                 {
@@ -149,11 +143,10 @@ impl ZcashWalletDb {
                     .main
                     .lock()
                     .unwrap()
-                    .get_update_ops()
-                    .unwrap()
                     .get_memo(note)
                 {
-                    Ok(memo) => Ok(memo.into()),
+                    // NOTE this is stupid
+                    Ok(memo) => Ok(memo.unwrap().into()),
                     Err(e) => Err(ZcashError::Message {
                         error: format!("Err: {}", e),
                     }),
@@ -165,11 +158,9 @@ impl ZcashWalletDb {
                     .test
                     .lock()
                     .unwrap()
-                    .get_update_ops()
-                    .unwrap()
                     .get_memo(note)
                 {
-                    Ok(memo) => Ok(memo.into()),
+                    Ok(memo) => Ok(memo.unwrap().into()),
                     Err(e) => Err(ZcashError::Message {
                         error: format!("Err: {}", e),
                     }),
@@ -223,30 +214,25 @@ impl ZcashFsBlockDb {
             }),
         }
     }
-
-    // pub fn get_memo
 }
 
-pub enum ZcashNoteId {
-    SentNoteId{v: i64},
-    ReceivedNoteId{v: i64},
+pub struct ZcashNoteId(NoteId);
+
+impl ZcashNoteId {
+    pub fn new(txid: ZcashTxId, zsp: ZcashShieldedProtocol, output_index: u16) -> Self {
+        ZcashNoteId(NoteId::new(txid.into(), zsp.into(), output_index))
+    }
 }
 
 impl From<NoteId> for ZcashNoteId {
     fn from(e: NoteId) -> Self {
-        match e {
-            NoteId::SentNoteId(v) => ZcashNoteId::SentNoteId{ v },
-            NoteId::ReceivedNoteId(v) => ZcashNoteId::ReceivedNoteId{ v },
-        }
+        ZcashNoteId(e)
     }
 }
 
 impl From<ZcashNoteId> for NoteId {
-    fn from(e: ZcashNoteId) -> Self {
-        match e {
-            ZcashNoteId::SentNoteId{ v } => NoteId::SentNoteId(v),
-            ZcashNoteId::ReceivedNoteId{ v } => NoteId::ReceivedNoteId(v),
-        }
+    fn from(inner: ZcashNoteId) -> Self {
+        inner.0
     }
 }
 

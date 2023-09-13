@@ -1,10 +1,12 @@
 use std::sync::{Arc, RwLock};
 
-use zcash_primitives::{merkle_tree::CommitmentTree, sapling::Node};
+use incrementalmerkletree::frontier::CommitmentTree;
+use zcash_primitives::sapling::Node;
 
 use crate::{ZcashResult, ZcashSaplingNode};
+const DEPTH: u8 = 32;
 
-pub struct ZcashCommitmentTree(RwLock<CommitmentTree<Node>>);
+pub struct ZcashCommitmentTree(RwLock<CommitmentTree<Node, DEPTH>>);
 
 impl ZcashCommitmentTree {
     /// Creates an empty tree.
@@ -25,7 +27,7 @@ impl ZcashCommitmentTree {
     }
 }
 
-impl From<&ZcashCommitmentTree> for CommitmentTree<Node> {
+impl From<&ZcashCommitmentTree> for CommitmentTree<Node, DEPTH> {
     fn from(value: &ZcashCommitmentTree) -> Self {
         value.0.read().unwrap().clone()
     }

@@ -20,6 +20,8 @@ use tracing::error;
 
 type ExceptionResult<T> = thread::Result<Result<T, Error>>;
 
+// NOTE probably useless for us
+
 // Returns value or "throws" exception. `error_val` is returned, because exception will be thrown
 // at the Java side. So this function should be used only for the `panic::catch_unwind` result.
 pub fn unwrap_exc_or<T>(env: &JNIEnv, res: ExceptionResult<T>, error_val: T) -> T {

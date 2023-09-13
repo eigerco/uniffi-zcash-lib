@@ -1,9 +1,9 @@
-use std::collections::HashMap;
-use std::convert::{TryFrom, TryInto};
-use std::num::NonZeroU32;
-use std::panic;
-use std::path::Path;
-use std::ptr;
+// use std::collections::HashMap;
+// use std::convert::{TryFrom, TryInto};
+// use std::num::NonZeroU32;
+// use std::panic;
+// use std::path::Path;
+// use std::ptr;
 
 use failure::format_err;
 
@@ -21,9 +21,6 @@ use failure::format_err;
 use tracing::{debug, error};
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::reload;
-
-
-// use utils::exception::unwrap_exc_or;
 
 // use zcash_address::{ToAddress, ZcashAddress};
 
@@ -66,6 +63,7 @@ use crate::{
     ZcashWalletTransparentOutput, // wallet
     scan_cached_blocks,
     ZcashNoteId,
+    ZcashShieldedProtocol,
     ZcashMemo
 };
 use crate::native_utils as utils;
@@ -116,7 +114,7 @@ fn print_debug_state() {
     debug!("Release enabled (congrats, this is NOT a debug build).");
 }
 
-//subssitute with USK constructor
+// NOTE subssitute with USK constructor
 // fn encode_usk(
 //     // env: &JNIEnv<'_>,
 //     seed: Vec<u8>,
@@ -137,7 +135,7 @@ fn print_debug_state() {
 //     ZcashUnifiedSpendingKey::from_seed(params, seed, aid)
 // }
 
-// not needed
+// NOTE not needed
 // fn decode_usk(env: &JNIEnv<'_>, usk: jbyteArray) -> Result<UnifiedSpendingKey, failure::Error> {
 //     let usk_bytes = SecretVec::new(env.convert_byte_array(usk).unwrap());
 
@@ -264,6 +262,8 @@ pub fn create_account(
 //     }
 // }
 
+
+#[allow(clippy::too_many_arguments)]
 pub fn put_utxo(
     db_data: String,
     address: String,
@@ -308,20 +308,18 @@ pub fn put_utxo(
     }
 }
 
-// init_data_db
-
 pub fn scan_blocks(
     db_cache: String,
     db_data: String,
-    _from_height: u32,
+    from_height: u32,
     limit: u32,
     params: ZcashConsensusParameters,
 ) -> ZcashResult<bool> {
     let db_cache = block_db(db_cache)?;
     let db_data = wallet_db(params, db_data)?;
-    // let from_height = ZcashBlockHeight::new(from_height);
+    let from_height = ZcashBlockHeight::new(from_height);
 
-    match scan_cached_blocks(params, db_cache, db_data, limit) {
+    match scan_cached_blocks(params, db_cache, db_data, from_height, limit) {
         Ok(()) => Ok(true),
         Err(e) => Err(ZcashError::Message{error: format!(
             "Rust error while scanning blocks (limit {:?}): {:?}",
@@ -333,7 +331,7 @@ pub fn scan_blocks(
 
 pub fn get_memo_as_utf8(
     db_data: String,
-    _txid_bytes: Vec<u8>,
+    txid_bytes: Vec<u8>,
     output_index: u32,
     params: ZcashConsensusParameters,
 ) -> ZcashResult<ZcashMemo> {
@@ -343,11 +341,10 @@ pub fn get_memo_as_utf8(
     // txid.copy_from_slice(&txid_bytes[..]);
 
     // NOTE probably in a new version this is needed
-    // let txid = ZcashTxId::from_bytes(&txid_bytes[..])?;
-    // ZcashNoteId::new(txid, ShieldedProtocol::Sapling, output_index as u16)
+    let txid = ZcashTxId::from_bytes(&txid_bytes[..])?;
 
     let memo = db_data
-        .get_memo(ZcashNoteId::SentNoteId{v: output_index as i64})
+        .get_memo(ZcashNoteId::new(txid, ZcashShieldedProtocol::Sapling, output_index as u16))
         .map_err(|e| format_err!("An error occurred retrieving the memo, {}", e))
         .and_then(|memo| match memo {
             ZcashMemo::Empty => Ok("".to_string()),
@@ -358,13 +355,29 @@ pub fn get_memo_as_utf8(
         })
         .map_err(|e| Err(ZcashError::Message{error: format_err!("some err {}", e).to_string() }));
 
-    // into_raw was here
+    // NOTE into_raw was here
     // weird thing but works
     memo.unwrap_err()
 }
 
 
-// rewind_to_height
+
+// init_data_db
+
+// pub fn rewind_to_height(
+//     db_data: String,
+//     height: u32,
+//     params: ZcashConsensusParameters,
+// ) -> bool {
+//     let db_data = wallet_db(params, db_data)?;
+
+//     let height = ZcashBlockHeight::try_from(height)?;
+
+//     db_data
+//         .truncate_to_height(height)
+//         .map(|_| 1)
+//         .map_err(|e| format_err!("Error while rewinding data DB to height {}: {}", height, e))
+// }
 
 // update_chain_tip
 

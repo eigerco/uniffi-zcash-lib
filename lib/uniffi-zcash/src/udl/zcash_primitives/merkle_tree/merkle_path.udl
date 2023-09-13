@@ -6,5 +6,5 @@ interface ZcashSaplingMerklePath {
 
 dictionary ZcashAuthPath {
     ZcashSaplingNode node;
-    boolean bool;
+    // boolean bool;
 };
