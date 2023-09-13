@@ -6,22 +6,24 @@ use std::path::Path;
 use std::ptr;
 
 use failure::format_err;
-use jni::objects::{JObject, JValue};
-use jni::{
-    objects::{JClass, JString},
-    sys::{jboolean, jbyteArray, jint, jlong, jobject, jobjectArray, jstring, JNI_FALSE, JNI_TRUE},
-    JNIEnv,
-};
 
-use schemer::MigratorError;
-use secrecy::{ExposeSecret, SecretVec};
+// NOTE shouldn't be needed because we will be using Kotlin instead
+// use jni::objects::{JObject, JValue};
+// use jni::{
+//     // objects::{JClass, JString},
+//     sys::{jboolean, jbyteArray, jint, jlong, jobject, jobjectArray, jstring, JNI_FALSE, JNI_TRUE},
+//     JNIEnv,
+// };
+
+// use schemer::MigratorError;
+// use secrecy::{ExposeSecret, SecretVec};
+
 use tracing::{debug, error};
 use tracing_subscriber::prelude::*;
 use tracing_subscriber::reload;
 
-use crate::native_utils as utils;
 
-use utils::exception::unwrap_exc_or;
+// use utils::exception::unwrap_exc_or;
 
 // use zcash_address::{ToAddress, ZcashAddress};
 
@@ -62,28 +64,29 @@ use crate::{
     ZcashUnifiedSpendingKey,
     ZcashWalletDb,
     ZcashWalletTransparentOutput, // wallet
-    scan_cached_blocks
+    scan_cached_blocks,
+    ZcashNoteId,
+    ZcashMemo
 };
-
-// use crate::zcash_client_backend::data_api::chain::scan_cached_blocks;
+use crate::native_utils as utils;
 
 // use zcash_client_backend::data_api::{
-//     chain::{scan_cached_blocks, CommitmentTreeRoot},
+//     chain::CommitmentTreeRoot,
 //     wallet::{
 //         decrypt_and_store_transaction, input_selection::GreedyInputSelector,
 //         shield_transparent_funds, spend,
 //     },
-//     WalletCommitmentTrees, WalletRead, WalletWrite,
+//     WalletCommitmentTrees,
+// WalletRead, WalletWrite,
 //     scanning::{ScanPriority, ScanRange},
-//     NoteId, ShieldedProtocol,
+//     ShieldedProtocol,
 // };
 
 // use zcash_client_sqlite::chain::init::init_blockmeta_db;
 // use zcash_client_sqlite::wallet::init::{init_accounts_table, init_blocks_table, init_wallet_db, WalletMigrationError}
 
 // use zcash_primitives::{
-//     consensus::{, Network, Parameters},
-//     memo::{Memo,},
+//     memo::Memo,
 //     merkle_tree::HashSer, // to do
 //     sapling, // ?
 //     transaction::{
@@ -153,7 +156,7 @@ fn print_debug_state() {
 // }
 
 pub fn init_on_load() {
-    let trc_info_level = tracing_subscriber::filter::LevelFilter::INFO;
+    let _trc_info_level = tracing_subscriber::filter::LevelFilter::INFO;
     // Set up the Android tracing layer.
     #[cfg(target_os = "android")]
     let android_layer = paranoid_android::layer("cash.z.rust.logs")
@@ -203,7 +206,7 @@ pub fn create_account(
     // not needed because we may pass the full param instead of the id
     // let network = parse_network(network_id)?;
 
-    let db_data = wallet_db(params, db_data).unwrap();
+    let _db_data = wallet_db(params, db_data).unwrap();
     let account = ZcashAccountId { id: 55 };
 
     // the seed is passed from outside
@@ -310,12 +313,12 @@ pub fn put_utxo(
 pub fn scan_blocks(
     db_cache: String,
     db_data: String,
-    from_height: u32,
+    _from_height: u32,
     limit: u32,
     params: ZcashConsensusParameters,
 ) -> ZcashResult<bool> {
     let db_cache = block_db(db_cache)?;
-    let mut db_data = wallet_db(params, db_data)?;
+    let db_data = wallet_db(params, db_data)?;
     // let from_height = ZcashBlockHeight::new(from_height);
 
     match scan_cached_blocks(params, db_cache, db_data, limit) {
@@ -328,9 +331,38 @@ pub fn scan_blocks(
     }
 }
 
-// create_account
+pub fn get_memo_as_utf8(
+    db_data: String,
+    _txid_bytes: Vec<u8>,
+    output_index: u32,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<ZcashMemo> {
+    let db_data = wallet_db(params, db_data)?;
 
-// get_memo_as_utf8
+    // let mut txid = [0u8; 32];
+    // txid.copy_from_slice(&txid_bytes[..]);
+
+    // NOTE probably in a new version this is needed
+    // let txid = ZcashTxId::from_bytes(&txid_bytes[..])?;
+    // ZcashNoteId::new(txid, ShieldedProtocol::Sapling, output_index as u16)
+
+    let memo = db_data
+        .get_memo(ZcashNoteId::SentNoteId{v: output_index as i64})
+        .map_err(|e| format_err!("An error occurred retrieving the memo, {}", e))
+        .and_then(|memo| match memo {
+            ZcashMemo::Empty => Ok("".to_string()),
+            ZcashMemo::Text{v} => Ok(v),
+            ZcashMemo::Future { .. } | ZcashMemo::Arbitrary { .. } => todo!()
+            // None => Err(format_err!("Memo not available")),
+            // _ => Err(format_err!("This memo does not contain UTF-8 text")),
+        })
+        .map_err(|e| Err(ZcashError::Message{error: format_err!("some err {}", e).to_string() }));
+
+    // into_raw was here
+    // weird thing but works
+    memo.unwrap_err()
+}
+
 
 // rewind_to_height
 

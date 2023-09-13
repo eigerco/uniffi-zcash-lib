@@ -11,7 +11,7 @@ pub fn python(sources_dir: &Path, target_dir: &Path) -> anyhow::Result<()> {
         Command::new("pydoc")
             .arg("-w")
             .arg(sources_dir.join("zcash").join("zcash.py"))
-            .current_dir(&target_dir)
+            .current_dir(target_dir)
             .spawn()?
             .wait(),
     )

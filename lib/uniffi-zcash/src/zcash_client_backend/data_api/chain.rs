@@ -1,5 +1,5 @@
-use zcash_primitives::consensus::MainNetwork;
-use zcash_primitives::consensus::TestNetwork;
+// use zcash_primitives::consensus::MainNetwork;
+// use zcash_primitives::consensus::TestNetwork;
 use zcash_client_backend::data_api::chain;
 use zcash_client_backend::data_api::chain::BlockSource;
 use zcash_client_sqlite::{FsBlockDb, WalletDb};
@@ -31,7 +31,7 @@ pub fn scan_cached_blocks(params: ZcashConsensusParameters, z_db_cache: ZcashFsB
 
         ZcashConsensusParameters::TestNetwork => {
             let mut db_data = test.get_update_ops().unwrap();
-            match chain::scan_cached_blocks(&TestNetwork, &db_cache, &mut db_data, Some(limit)) {
+            match chain::scan_cached_blocks(&params, &db_cache, &mut db_data, Some(limit)) {
                 Ok(_) => Ok(()),
                 Err(_) => Err(ZcashError::Unknown)
             }

@@ -1,17 +1,18 @@
 use crate::{
     ZcashBlockHeight, ZcashConsensusParameters, ZcashError, ZcashResult,
-    ZcashWalletTransparentOutput,
+    ZcashWalletTransparentOutput, ZcashMemo
 };
 use rusqlite::Connection;
 use std::fmt;
 use std::sync::{Arc, Mutex};
 use zcash_client_backend::data_api::WalletWrite;
 use zcash_client_sqlite::chain::BlockMeta;
-use zcash_client_sqlite::wallet as original_wallet;
-use zcash_client_sqlite::DataConnStmtCache;
+// use zcash_client_sqlite::wallet as original_wallet;
+use zcash_client_sqlite::{NoteId, DataConnStmtCache};
 use zcash_client_sqlite::{FsBlockDb, WalletDb};
 use zcash_primitives::consensus;
 use zcash_primitives::consensus::{MAIN_NETWORK, TEST_NETWORK};
+use zcash_client_backend::data_api::WalletRead;
 
 mod chain;
 pub use self::chain::*;
@@ -137,6 +138,45 @@ impl ZcashWalletDb {
             }
         }
     }
+
+    pub fn get_memo(&self, id_note: ZcashNoteId) -> ZcashResult<ZcashMemo> {
+        let note: NoteId = id_note.into();
+
+        match self.params {
+            ZcashConsensusParameters::MainNetwork => {
+                match self
+                    .sup
+                    .main
+                    .lock()
+                    .unwrap()
+                    .get_update_ops()
+                    .unwrap()
+                    .get_memo(note)
+                {
+                    Ok(memo) => Ok(memo.into()),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+            ZcashConsensusParameters::TestNetwork => {
+                match self
+                    .sup
+                    .test
+                    .lock()
+                    .unwrap()
+                    .get_update_ops()
+                    .unwrap()
+                    .get_memo(note)
+                {
+                    Ok(memo) => Ok(memo.into()),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+        }
+    }
 }
 
 pub struct ZcashFsBlockDb {
@@ -183,4 +223,30 @@ impl ZcashFsBlockDb {
             }),
         }
     }
+
+    // pub fn get_memo
 }
+
+pub enum ZcashNoteId {
+    SentNoteId{v: i64},
+    ReceivedNoteId{v: i64},
+}
+
+impl From<NoteId> for ZcashNoteId {
+    fn from(e: NoteId) -> Self {
+        match e {
+            NoteId::SentNoteId(v) => ZcashNoteId::SentNoteId{ v },
+            NoteId::ReceivedNoteId(v) => ZcashNoteId::ReceivedNoteId{ v },
+        }
+    }
+}
+
+impl From<ZcashNoteId> for NoteId {
+    fn from(e: ZcashNoteId) -> Self {
+        match e {
+            ZcashNoteId::SentNoteId{ v } => NoteId::SentNoteId(v),
+            ZcashNoteId::ReceivedNoteId{ v } => NoteId::ReceivedNoteId(v),
+        }
+    }
+}
+

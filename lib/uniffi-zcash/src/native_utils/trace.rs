@@ -43,7 +43,7 @@ impl Layer {
         let mut open_spans = self.open_spans.lock().unwrap();
 
         if let Some(section_name) = open_spans.get_mut(id) {
-            f(&section_name);
+            f(section_name);
         } else {
             // We need to obtain the span's name as a CString.
             match ctx.metadata(id) {
