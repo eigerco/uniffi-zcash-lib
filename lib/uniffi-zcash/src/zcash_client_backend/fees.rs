@@ -34,6 +34,7 @@ impl From<DustAction> for ZcashDustAction {
     }
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ZcashDustOutputPolicy(DustOutputPolicy);
 
 impl ZcashDustOutputPolicy {

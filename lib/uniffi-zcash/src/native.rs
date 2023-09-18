@@ -1,9 +1,16 @@
+// INSTRUCTIONS
+// this file is supposed to contain only UniFFI-compatible structs (Zcash-Structs)
+// so, no imports directly from librustzcash
+// Afterwards, this should serve as SDK for mobile.
+// at the moment there are also external libraries - they will be gone too.
+
 // use std::collections::HashMap;
 // use std::convert::{TryFrom, TryInto};
-use std::num::NonZeroU32;
 // use std::panic;
 // use std::path::Path;
 // use std::ptr;
+
+use std::num::NonZeroU32;
 
 use failure::format_err;
 
@@ -32,41 +39,41 @@ use crate::{
     scan_cached_blocks,
     ZcashAccountId,
     ZcashAmount,
-    ZcashBlockHash,
+    // ZcashBlockHash,
     // primitives
     ZcashBlockHeight,
     ZcashBlockMeta,
-    ZcashBranchId,
+    // ZcashBranchId,
     // zcash_client_sqlite
-    ZcashChain, // init_blockmeta_db
+    // ZcashChain, // init_blockmeta_db
     ZcashConsensusParameters,
-    ZcashConsensusParameters::{MainNetwork, TestNetwork}, // consensus
-    ZcashDecodingError,                                   // keys
-    ZcashDiversifierIndex,
-    ZcashDustOutputPolicy, // fees
+    // ZcashConsensusParameters::{MainNetwork, TestNetwork}, // consensus
+    // ZcashDecodingError,                                   // keys
+    // ZcashDiversifierIndex,
+    // ZcashDustOutputPolicy, // fees
     ZcashError,
     ZcashFsBlockDb,
-    ZcashKeysEra,
-    ZcashLocalTxProver,
+    // ZcashKeysEra,
+    // ZcashLocalTxProver,
     ZcashMemo,
-    ZcashMemoBytes,
+    // ZcashMemoBytes,
     ZcashNonNegativeAmount,
     ZcashNoteId,
     ZcashOutPoint,
-    ZcashOvkPolicy,
-    ZcashPayment,
+    // ZcashOvkPolicy,
+    // ZcashPayment,
     // encoding::AddressCodec, // NOT USED
-    ZcashRecipientAddress,
+    // ZcashRecipientAddress,
     ZcashResult,
     ZcashScript,
     ZcashShieldedProtocol,
-    ZcashTransaction,
-    ZcashTransactionRequest, // zip321
+    // ZcashTransaction,
+    // ZcashTransactionRequest, // zip321
     ZcashTransparentAddress,
     ZcashTxId,
     ZcashTxOut,
-    ZcashUnifiedAddress, // address
-    ZcashUnifiedFullViewingKey,
+    // ZcashUnifiedAddress, // address
+    // ZcashUnifiedFullViewingKey,
     ZcashUnifiedSpendingKey,
     ZcashWalletDb,
     ZcashWalletTransparentOutput, // wallet
@@ -79,7 +86,6 @@ use crate::{
 //         shield_transparent_funds, spend,
 //     },
 //     WalletCommitmentTrees,
-// WalletRead, WalletWrite,
 //     scanning::{ScanPriority, ScanRange},
 //     ShieldedProtocol,
 // };
@@ -87,12 +93,7 @@ use crate::{
 // use zcash_client_sqlite::chain::init::init_blockmeta_db;
 // use zcash_client_sqlite::wallet::init::{init_accounts_table, init_blocks_table}
 
-// use zcash_primitives::{
-//     merkle_tree::HashSer, // to do
-//     sapling, // ?
-//     transaction::{
-//     },
-// };
+// use zcash_primitives::merkle_tree::HashSer
 
 fn wallet_db(params: ZcashConsensusParameters, db_data: String) -> ZcashResult<ZcashWalletDb> {
     ZcashWalletDb::for_path(db_data, params).map_err(|e| ZcashError::Message {
@@ -449,19 +450,20 @@ pub fn update_chain_tip(
         })
 }
 
-fn encode_blockmeta(meta: Arc<ZcashBlockMeta>) -> Result<Vec<String>, failure::Error> {
-    let u32_arr_to_str = |arr: [u8;32]| -> String {
-        arr.iter().map(|&id| id.to_string() + ",").collect::<String>()
-    };
+// NOTE unused so far
+// fn encode_blockmeta(meta: Arc<ZcashBlockMeta>) -> Result<Vec<String>, failure::Error> {
+//     let u32_arr_to_str = |arr: [u8;32]| -> String {
+//         arr.iter().map(|&id| id.to_string() + ",").collect::<String>()
+//     };
 
-    Ok(vec![
-        u32::from(meta.0.height).to_string(),
-        u32_arr_to_str(meta.0.block_hash.0),
-        meta.0.block_time.to_string(),
-        meta.0.sapling_outputs_count.to_string(),
-        meta.0.orchard_actions_count.to_string(),
-    ])
-}
+//     Ok(vec![
+//         u32::from(meta.0.height).to_string(),
+//         u32_arr_to_str(meta.0.block_hash.0),
+//         meta.0.block_time.to_string(),
+//         meta.0.sapling_outputs_count.to_string(),
+//         meta.0.orchard_actions_count.to_string(),
+//     ])
+// }
 
 // fn decode_blockmeta(obj: JObject<'_>) -> Result<BlockMeta, failure::Error> {
 //     let long_as_u32 = |name| -> Result<u32, failure::Error> {

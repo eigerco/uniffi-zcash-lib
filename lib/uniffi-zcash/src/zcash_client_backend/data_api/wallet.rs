@@ -1,21 +1,34 @@
 use zcash_client_backend::data_api::wallet;
 
-use crate::{ZcashConsensusParameters, ZcashWalletDb, ZcashTransaction, ZcashResult, ZcashError};
+use std::num::NonZeroU32;
+
+use std::sync::Arc;
+
+use crate::{ZcashConsensusParameters, ZcashTransactionRequest,
+    ZcashOvkPolicy, ZcashWalletDb, ZcashTransaction, ZcashLocalTxProver,
+    ZcashUnifiedSpendingKey, ZcashResult, ZcashError, ZcashTxId};
+
+use zcash_proofs::prover::LocalTxProver;
+use zcash_client_backend::keys::UnifiedSpendingKey;
+
+
+pub mod input_selection;
+
 /// Scans a [`Transaction`] for any information that can be decrypted by the accounts in
 /// the wallet, and saves it to the wallet.
 pub fn decrypt_and_store_transaction(
     params: ZcashConsensusParameters,
-    z_db_data: ZcashWalletDb,
-    tx: ZcashTransaction,
+    z_db_data: Arc<ZcashWalletDb>,
+    tx: Arc<ZcashTransaction>,
 ) -> ZcashResult<()> {
     match params {
         ZcashConsensusParameters::MainNetwork => {
-            let mut db_data = z_db_data.sup.main.lock().unwrap();
+            let mut db_data = (*z_db_data).sup.main.lock().unwrap();
 
             match wallet::decrypt_and_store_transaction(
                 &params,
                 &mut (*db_data),
-                &(tx.into())
+                &((*tx).clone().into())
             ) {
                 Ok(_) => Ok(()),
                 Err(_) => Err(ZcashError::Unknown),
@@ -23,12 +36,12 @@ pub fn decrypt_and_store_transaction(
         }
 
         ZcashConsensusParameters::TestNetwork => {
-            let mut db_data = z_db_data.sup.test.lock().unwrap();
+            let mut db_data = (*z_db_data).sup.test.lock().unwrap();
 
             match wallet::decrypt_and_store_transaction(
                 &params,
                 &mut (*db_data),
-                &(tx.into())
+                &((*tx).clone().into())
             ) {
                 Ok(_) => Ok(()),
                 Err(_) => Err(ZcashError::Unknown),
@@ -51,57 +64,63 @@ pub fn decrypt_and_store_transaction(
 //     DbT::NoteRef,
 // >,
 
-// #[allow(clippy::too_many_arguments)]
-// #[allow(clippy::type_complexity)]
-// pub fn spend(
-//     z_db_data: ZcashWalletDb,
-//     params: ZcashConsensusParameters,
-//     prover: impl SaplingProver,
-//     input_selector: &InputsT,
-//     usk: ZcashUnifiedSpendingKey,
-//     request: ZcashTransactionRequest,
-//     ovk_policy: ZcashOvkPolicy,
-//     min_confirmations: NonZeroU32,
-// ) -> ZcashResult<ZcashTxId> {
-//     match params {
-//         ZcashConsensusParameters::MainNetwork => {
-//             let mut db_data = z_db_data.sup.main.lock().unwrap();
+use crate::input_selection::{ZcashMainGreedyInputSelector, ZcashTestGreedyInputSelector, MainGreedyInputSelector, TestGreedyInputSelector};
+use crate::input_selection::ZcashGreedyInputSelector;
 
-//             match wallet::spend(
-//                 &mut (*db_data),
-//                 &params,
-//                 //,
-//                 //,
-//                 usk.into(),
-//                 request.into(),
-//                 ovk_policy.into(),
-//                 min_confirmations
-//             ) {
-//                 Ok(_) => Ok(()),
-//                 Err(_) => Err(ZcashError::Unknown),
-//             }
-//         }
+#[allow(clippy::too_many_arguments)]
+#[allow(clippy::type_complexity)]
+pub fn spend(
+    z_db_data: ZcashWalletDb,
+    params: ZcashConsensusParameters,
+    prover: ZcashLocalTxProver,
+    input_selector: Arc<dyn ZcashGreedyInputSelector>,
+    usk: ZcashUnifiedSpendingKey,
+    request: ZcashTransactionRequest,
+    ovk_policy: ZcashOvkPolicy,
+    min_confirmations: NonZeroU32,
+) -> ZcashResult<ZcashTxId> {
+    match params {
+        ZcashConsensusParameters::MainNetwork => {
+            let mut db_data = z_db_data.sup.main.lock().unwrap();
 
-//         ZcashConsensusParameters::TestNetwork => {
-//             let mut db_data = z_db_data.sup.test.lock().unwrap();
+            let a: ZcashMainGreedyInputSelector = (*input_selector).into();
 
-//             match wallet::spend(
-//                 &mut (*db_data),
-//                 &params,
-//                 //,
-//                 //,
-//                 usk.into(),
-//                 request.into(),
-//                 ovk_policy.into(),
-//                 min_confirmations
-//             ) {
-//                 Ok(_) => Ok(()),
-//                 Err(_) => Err(ZcashError::Unknown),
-//             }
-//         }
-//     }
+            match wallet::spend(
+                &mut (*db_data),
+                &params,
+                <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
+                &<ZcashMainGreedyInputSelector as Into<MainGreedyInputSelector>>::into(a),
+                &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into(usk),
+                request.into(),
+                ovk_policy.into(),
+                min_confirmations
+            ) {
+                Ok(txid) => Ok(txid.into()),
+                Err(_) => Err(ZcashError::Unknown),
+            }
+        }
 
-// }
+        ZcashConsensusParameters::TestNetwork => {
+            let mut db_data = z_db_data.sup.test.lock().unwrap();
+
+            let a: ZcashTestGreedyInputSelector = (*input_selector).into();
+
+            match wallet::spend(
+                &mut (*db_data),
+                &params,
+                <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
+                &<ZcashTestGreedyInputSelector as Into<TestGreedyInputSelector>>::into(a),
+                &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into(usk),
+                request.into(),
+                ovk_policy.into(),
+                min_confirmations
+            ) {
+                Ok(txid) => Ok(txid.into()),
+                Err(_) => Err(ZcashError::Unknown),
+            }
+        }
+    }
+}
 
 // #[cfg(feature = "transparent-inputs")]
 // #[allow(clippy::too_many_arguments)]

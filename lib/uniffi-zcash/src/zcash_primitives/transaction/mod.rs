@@ -233,6 +233,16 @@ pub enum ZcashFeeRules {
 /// A Zcash transaction.
 pub struct ZcashTransaction(Transaction);
 
+
+// NOTE apparently implementing Copy would be more difficult, so I did this instead
+impl Clone for ZcashTransaction {
+    fn clone(&self) -> Self {
+        let bs = (*self).to_bytes().unwrap().clone();
+
+        Self::from_bytes(&bs, (*self).consensus_branch_id()).unwrap()
+    }
+}
+
 impl ZcashTransaction {
     pub fn to_bytes(&self) -> ZcashResult<Vec<u8>> {
         let mut data = Vec::new();
