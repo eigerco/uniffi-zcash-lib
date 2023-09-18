@@ -9,13 +9,8 @@ use crate::{
 };
 
 /// A [ZIP 316](https://zips.z.cash/zip-0316) unified full viewing key.
+#[derive(Clone, Debug)]
 pub struct ZcashUnifiedFullViewingKey(UnifiedFullViewingKey);
-
-impl From<UnifiedFullViewingKey> for ZcashUnifiedFullViewingKey {
-    fn from(key: UnifiedFullViewingKey) -> Self {
-        ZcashUnifiedFullViewingKey(key)
-    }
-}
 
 impl ZcashUnifiedFullViewingKey {
     /// Construct a new unified full viewing key, if the required components are present.
@@ -97,5 +92,17 @@ impl ZcashUnifiedFullViewingKey {
     /// along with that index.
     pub fn default_address(&self) -> ZcashUnifiedAddressAndDiversifierIndex {
         self.0.default_address().into()
+    }
+}
+
+impl From<UnifiedFullViewingKey> for ZcashUnifiedFullViewingKey {
+    fn from(key: UnifiedFullViewingKey) -> Self {
+        ZcashUnifiedFullViewingKey(key)
+    }
+}
+
+impl From<ZcashUnifiedFullViewingKey> for UnifiedFullViewingKey {
+    fn from(outer: ZcashUnifiedFullViewingKey) -> Self {
+        outer.0
     }
 }

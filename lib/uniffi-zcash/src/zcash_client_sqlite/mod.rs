@@ -1,9 +1,11 @@
 use crate::{
-    ZcashBlockHeight, ZcashConsensusParameters, ZcashDecryptedTransaction, ZcashError, ZcashMemo,
-    ZcashResult, ZcashShieldedProtocol, ZcashTxId, ZcashWalletSummary,
+    ZcashAccountId, ZcashAmount, ZcashBlockHeight, ZcashConsensusParameters,
+    ZcashDecryptedTransaction, ZcashError, ZcashMemo, ZcashResult, ZcashShieldedProtocol,
+    ZcashTransparentAddress, ZcashTxId, ZcashUnifiedFullViewingKey, ZcashWalletSummary,
     ZcashWalletTransparentOutput,
 };
 use rusqlite::Connection;
+use std::collections::HashMap;
 use std::num::NonZeroU32;
 use std::sync::{Arc, Mutex};
 use zcash_client_backend::data_api::WalletWrite;
@@ -286,6 +288,85 @@ impl ZcashWalletDb {
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
                 }),
+        }
+    }
+
+    pub fn get_account_for_ufvk(
+        &mut self,
+        zufvk: ZcashUnifiedFullViewingKey,
+    ) -> ZcashResult<Option<ZcashAccountId>> {
+        match self.params {
+            ZcashConsensusParameters::MainNetwork => {
+                match self
+                    .sup
+                    .main
+                    .lock()
+                    .unwrap()
+                    .get_account_for_ufvk(&(zufvk.into()))
+                {
+                    Ok(aid) => Ok(aid.map(|x| x.into())),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+            ZcashConsensusParameters::TestNetwork => {
+                match self
+                    .sup
+                    .test
+                    .lock()
+                    .unwrap()
+                    .get_account_for_ufvk(&(zufvk.into()))
+                {
+                    Ok(aid) => Ok(aid.map(|x| x.into())),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+        }
+    }
+
+    pub fn get_transparent_balances(
+        &mut self,
+        account: ZcashAccountId,
+        max_height: ZcashBlockHeight,
+    ) -> ZcashResult<HashMap<ZcashTransparentAddress, ZcashAmount>> {
+        match self.params {
+            ZcashConsensusParameters::MainNetwork => {
+                match self
+                    .sup
+                    .main
+                    .lock()
+                    .unwrap()
+                    .get_transparent_balances(account.into(), max_height.into())
+                {
+                    Ok(hm) => Ok(hm
+                        .iter()
+                        .map(|(&x, &y)| (x.into(), y.into()))
+                        .collect::<HashMap<ZcashTransparentAddress, ZcashAmount>>()),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+            ZcashConsensusParameters::TestNetwork => {
+                match self
+                    .sup
+                    .test
+                    .lock()
+                    .unwrap()
+                    .get_transparent_balances(account.into(), max_height.into())
+                {
+                    Ok(hm) => Ok(hm
+                        .iter()
+                        .map(|(&x, &y)| (x.into(), y.into()))
+                        .collect::<HashMap<ZcashTransparentAddress, ZcashAmount>>()),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
         }
     }
 

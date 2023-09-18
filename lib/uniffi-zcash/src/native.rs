@@ -48,10 +48,10 @@ use crate::{
     // ZcashChain, // init_blockmeta_db
     ZcashConsensusParameters,
     ZcashDustOutputPolicy,
-    // ZcashConsensusParameters::{MainNetwork, TestNetwork}, // consensus
-    // ZcashDecodingError,                                   // keys
+    // ZcashDecodingError, // keys
     // ZcashDiversifierIndex,
     ZcashError,
+    ZcashFixedFeeRule,
     ZcashFsBlockDb,
     // ZcashKeysEra,
     ZcashLocalTxProver,
@@ -62,7 +62,6 @@ use crate::{
     ZcashOutPoint,
     ZcashOvkPolicy,
     ZcashPayment,
-    // encoding::AddressCodec, // NOT USED
     ZcashRecipientAddress,
     ZcashResult,
     ZcashScript,
@@ -77,14 +76,13 @@ use crate::{
     ZcashUnifiedSpendingKey,
     ZcashWalletDb,
     ZcashWalletTransparentOutput, // wallet
-    ZcashFixedFeeRule
 };
 
 use crate::fixed::ZcashFixedSingleOutputChangeStrategy;
 use crate::input_selection::ZcashGreedyInputSelector;
 use crate::input_selection::{ZcashMainGreedyInputSelector, ZcashTestGreedyInputSelector};
 
-use crate::zcash_client_backend::{decrypt_and_store_transaction, spend};
+use crate::zcash_client_backend::{decrypt_and_store_transaction, shield_transparent_funds, spend};
 
 // use zcash_client_backend::data_api::{
 //     chain::CommitmentTreeRoot,
@@ -532,6 +530,27 @@ pub fn find_block_metadata(
         })
 }
 
+pub fn store_decrypted_transaction(
+    db_data: String,
+    tx: ZcashTransaction,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<bool> {
+    let db_data = wallet_db(params, db_data)?;
+    // The consensus branch ID passed in here does not matter:
+    // - v4 and below cache it internally, but all we do with this transaction while
+    //   it is in memory is decryption and serialization, neither of which use the
+    //   consensus branch ID.
+    // - v5 and above transactions ignore the argument, and parse the correct value
+    //   from their encoding.
+    // let tx_bytes = env.convert_byte_array(tx).unwrap();
+    // let tx = Transaction::read(&tx_bytes[..], BranchId::Sapling)?;
+    decrypt_and_store_transaction(params, Arc::new(db_data), Arc::new(tx))
+        .map(|_| true)
+        .map_err(|e| ZcashError::Message {
+            error: format!("Error while decrypting transaction {}", e),
+        })
+}
+
 const ANCHOR_OFFSET_U32: u32 = 10;
 const ANCHOR_OFFSET: NonZeroU32 = unsafe { NonZeroU32::new_unchecked(ANCHOR_OFFSET_U32) };
 
@@ -644,32 +663,98 @@ pub fn create_to_address(
     // };
 }
 
-pub fn store_decrypted_transaction(
+pub fn shield_to_address(
     db_data: String,
-    tx: ZcashTransaction,
+    usk: ZcashUnifiedSpendingKey,
+    memo_bytes: &[u8],
+    spend_params: String,
+    output_params: String,
     params: ZcashConsensusParameters,
-) -> ZcashResult<bool> {
-    let db_data = wallet_db(params, db_data)?;
-    // The consensus branch ID passed in here does not matter:
-    // - v4 and below cache it internally, but all we do with this transaction while
-    //   it is in memory is decryption and serialization, neither of which use the
-    //   consensus branch ID.
-    // - v5 and above transactions ignore the argument, and parse the correct value
-    //   from their encoding.
-    // let tx_bytes = env.convert_byte_array(tx).unwrap();
-    // let tx = Transaction::read(&tx_bytes[..], BranchId::Sapling)?;
-    decrypt_and_store_transaction(params, Arc::new(db_data), Arc::new(tx))
-        .map(|_| true)
+    _use_zip317_fees: bool,
+) -> ZcashResult<ZcashTxId> {
+    let mut db_data = wallet_db(params, db_data)?;
+    // let usk = decode_usk(&env, usk)?;
+    // let memo_bytes = env.convert_byte_array(memo).unwrap();
+    // let spend_params = utils::java_string_to_rust(&env, spend_params);
+    // let output_params = utils::java_string_to_rust(&env, output_params);
+
+    let min_confirmations = NonZeroU32::new(1).unwrap();
+
+    let account = db_data
+        .get_account_for_ufvk((*usk.to_unified_full_viewing_key()).clone())?
+        .ok_or_else(|| ZcashError::Message {
+            error: "Spending key not recognized.".to_string(),
+        })?;
+
+    let from_addrs: Vec<ZcashTransparentAddress> = db_data
+        .get_target_and_anchor_heights(min_confirmations)
         .map_err(|e| ZcashError::Message {
-            error: format!("Error while decrypting transaction {}", e),
+            error: format!("Error while fetching anchor height: {}", e),
         })
+        .and_then(|opt_anchor| {
+            opt_anchor.map(|(_, a)| a).ok_or(ZcashError::Message {
+                error: "Anchor height not available; scan required.".to_string(),
+            })
+        })
+        .and_then(|anchor| {
+            db_data
+                .get_transparent_balances(account, anchor)
+                .map_err(|e| ZcashError::Message {
+                    error: format!(
+                        "Error while fetching transparent balances for {:?}: {}",
+                        account, e
+                    ),
+                })
+        })?
+        .into_keys()
+        .collect();
+
+    // let memo = Memo::from_bytes(&memo_bytes).unwrap();
+    let memo = ZcashMemoBytes::new(memo_bytes).ok().unwrap();
+
+    let prover = ZcashLocalTxProver::new(&spend_params, &output_params);
+
+    let shielding_threshold = ZcashNonNegativeAmount::from_u64(100000).unwrap();
+
+    let shield_transparent_funds_by_selector =
+        |input_selector: Arc<dyn ZcashGreedyInputSelector>| -> ZcashResult<ZcashTxId> {
+            shield_transparent_funds(
+                db_data,
+                params,
+                prover,
+                input_selector,
+                shielding_threshold.into(),
+                usk,
+                from_addrs,
+                memo,
+                min_confirmations,
+            )
+            .map_err(|e| ZcashError::Message {
+                error: format!("Error while creating transaction: {}", e),
+            })
+        };
+
+    let fixed_rule = ZcashFixedFeeRule::standard().into();
+
+    match params {
+        ZcashConsensusParameters::MainNetwork => {
+            shield_transparent_funds_by_selector(Arc::new(ZcashMainGreedyInputSelector::new(
+                ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
+                ZcashDustOutputPolicy::default().into(),
+            )))
+        }
+        ZcashConsensusParameters::TestNetwork => {
+            shield_transparent_funds_by_selector(Arc::new(ZcashTestGreedyInputSelector::new(
+                ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
+                ZcashDustOutputPolicy::default().into(),
+            )))
+        }
+    }
 }
 
 // init_block_meta_db
 
 // init_blocks_table
-
-// shield_to_address
 
 // branch_id_for_height
 

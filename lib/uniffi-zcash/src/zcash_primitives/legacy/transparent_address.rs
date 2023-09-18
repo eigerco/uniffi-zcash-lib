@@ -6,7 +6,7 @@ use zcash_primitives::{consensus::Parameters, legacy::TransparentAddress};
 use crate::{utils, ZcashConsensusParameters, ZcashError, ZcashResult, ZcashScript};
 
 /// A transparent address corresponding to either a public key or a `Script`.
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Hash, PartialEq, Eq)]
 pub struct ZcashTransparentAddress(TransparentAddress);
 
 impl From<TransparentAddress> for ZcashTransparentAddress {

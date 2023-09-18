@@ -4,12 +4,15 @@ use std::num::NonZeroU32;
 
 use std::sync::Arc;
 
+use crate::zcash_client_backend::data_api::NonNegativeAmount;
 use crate::{
-    ZcashConsensusParameters, ZcashError, ZcashLocalTxProver, ZcashOvkPolicy, ZcashResult,
-    ZcashTransaction, ZcashTransactionRequest, ZcashTxId, ZcashUnifiedSpendingKey, ZcashWalletDb,
+    ZcashConsensusParameters, ZcashError, ZcashLocalTxProver, ZcashMemoBytes, ZcashOvkPolicy,
+    ZcashResult, ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId,
+    ZcashUnifiedSpendingKey, ZcashWalletDb,
 };
 
 use zcash_client_backend::keys::UnifiedSpendingKey;
+use zcash_primitives::legacy::TransparentAddress;
 use zcash_proofs::prover::LocalTxProver;
 
 pub mod input_selection;
@@ -86,13 +89,13 @@ pub fn spend(
         ZcashConsensusParameters::MainNetwork => {
             let mut db_data = z_db_data.sup.main.lock().unwrap();
 
-            let a: ZcashMainGreedyInputSelector = (*input_selector).into();
+            let in_sel: ZcashMainGreedyInputSelector = (*input_selector).into();
 
             match wallet::spend(
                 &mut (*db_data),
                 &params,
                 <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
-                &<ZcashMainGreedyInputSelector as Into<MainGreedyInputSelector>>::into(a),
+                &<ZcashMainGreedyInputSelector as Into<MainGreedyInputSelector>>::into(in_sel),
                 &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into(usk),
                 request.into(),
                 ovk_policy.into(),
@@ -106,13 +109,13 @@ pub fn spend(
         ZcashConsensusParameters::TestNetwork => {
             let mut db_data = z_db_data.sup.test.lock().unwrap();
 
-            let a: ZcashTestGreedyInputSelector = (*input_selector).into();
+            let in_sel: ZcashTestGreedyInputSelector = (*input_selector).into();
 
             match wallet::spend(
                 &mut (*db_data),
                 &params,
                 <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
-                &<ZcashTestGreedyInputSelector as Into<TestGreedyInputSelector>>::into(a),
+                &<ZcashTestGreedyInputSelector as Into<TestGreedyInputSelector>>::into(in_sel),
                 &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into(usk),
                 request.into(),
                 ovk_policy.into(),
@@ -125,32 +128,66 @@ pub fn spend(
     }
 }
 
-// #[cfg(feature = "transparent-inputs")]
-// #[allow(clippy::too_many_arguments)]
-// #[allow(clippy::type_complexity)]
-// pub fn shield_transparent_funds<DbT, ParamsT, InputsT>(
-//     wallet_db: &mut DbT,
-//     params: &ParamsT,
-//     prover: impl SaplingProver,
-//     input_selector: &InputsT,
-//     shielding_threshold: NonNegativeAmount,
-//     usk: &UnifiedSpendingKey,
-//     from_addrs: &[TransparentAddress],
-//     memo: &MemoBytes,
-//     min_confirmations: NonZeroU32,
-// ) -> Result<
-//     TxId,
-//     Error<
-//         <DbT as WalletRead>::Error,
-//         <DbT as WalletCommitmentTrees>::Error,
-//         InputsT::Error,
-//         <InputsT::FeeRule as FeeRule>::Error,
-//         DbT::NoteRef,
-//     >,
-// >
-// where
-//     ParamsT: consensus::Parameters,
-//     DbT: WalletWrite + WalletCommitmentTrees,
-//     DbT::NoteRef: Copy + Eq + Ord,
-//     InputsT: InputSelector<DataSource = DbT>,
-// {
+#[allow(clippy::too_many_arguments)]
+#[allow(clippy::type_complexity)]
+pub fn shield_transparent_funds(
+    z_db_data: ZcashWalletDb,
+    params: ZcashConsensusParameters,
+    prover: ZcashLocalTxProver,
+    input_selector: Arc<dyn ZcashGreedyInputSelector>,
+    shielding_threshold: NonNegativeAmount,
+    usk: ZcashUnifiedSpendingKey,
+    from_addrs: Vec<ZcashTransparentAddress>,
+    memo: ZcashMemoBytes,
+    min_confirmations: NonZeroU32,
+) -> ZcashResult<ZcashTxId> {
+    match params {
+        ZcashConsensusParameters::MainNetwork => {
+            let mut db_data = z_db_data.sup.main.lock().unwrap();
+
+            let in_sel: ZcashMainGreedyInputSelector = (*input_selector).into();
+
+            match wallet::shield_transparent_funds(
+                &mut (*db_data),
+                &params,
+                <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
+                &<ZcashMainGreedyInputSelector as Into<MainGreedyInputSelector>>::into(in_sel),
+                shielding_threshold,
+                &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into(usk),
+                &(from_addrs
+                    .iter()
+                    .map(From::from)
+                    .collect::<Vec<TransparentAddress>>())[..],
+                &(memo.into()),
+                min_confirmations,
+            ) {
+                Ok(txid) => Ok(txid.into()),
+                Err(_) => Err(ZcashError::Unknown),
+            }
+        }
+
+        ZcashConsensusParameters::TestNetwork => {
+            let mut db_data = z_db_data.sup.test.lock().unwrap();
+
+            let in_sel: ZcashTestGreedyInputSelector = (*input_selector).into();
+
+            match wallet::shield_transparent_funds(
+                &mut (*db_data),
+                &params,
+                <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
+                &<ZcashTestGreedyInputSelector as Into<TestGreedyInputSelector>>::into(in_sel),
+                shielding_threshold,
+                &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into(usk),
+                &(from_addrs
+                    .iter()
+                    .map(From::from)
+                    .collect::<Vec<TransparentAddress>>())[..],
+                &(memo.into()),
+                min_confirmations,
+            ) {
+                Ok(txid) => Ok(txid.into()),
+                Err(_) => Err(ZcashError::Unknown),
+            }
+        }
+    }
+}
