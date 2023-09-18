@@ -85,14 +85,12 @@ use crate::{
 // };
 
 // use zcash_client_sqlite::chain::init::init_blockmeta_db;
-// use zcash_client_sqlite::wallet::init::{init_accounts_table, init_blocks_table, init_wallet_db, WalletMigrationError}
+// use zcash_client_sqlite::wallet::init::{init_accounts_table, init_blocks_table}
 
 // use zcash_primitives::{
-//     memo::Memo,
 //     merkle_tree::HashSer, // to do
 //     sapling, // ?
 //     transaction::{
-//         components::{amount::NonNegativeAmount, },
 //     },
 // };
 

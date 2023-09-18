@@ -1,43 +1,107 @@
-// /// Scans a [`Transaction`] for any information that can be decrypted by the accounts in
-// /// the wallet, and saves it to the wallet.
-// pub fn decrypt_and_store_transaction<ParamsT, DbT>(
-//     params: &ParamsT,
-//     data: &mut DbT,
-//     tx: &Transaction,
-// ) -> Result<(), DbT::Error>
-// where
-//     ParamsT: consensus::Parameters,
-//     DbT: WalletWrite,
-// {
+use zcash_client_backend::data_api::wallet;
+
+use crate::{ZcashConsensusParameters, ZcashWalletDb, ZcashTransaction, ZcashResult, ZcashError};
+/// Scans a [`Transaction`] for any information that can be decrypted by the accounts in
+/// the wallet, and saves it to the wallet.
+pub fn decrypt_and_store_transaction(
+    params: ZcashConsensusParameters,
+    z_db_data: ZcashWalletDb,
+    tx: ZcashTransaction,
+) -> ZcashResult<()> {
+    match params {
+        ZcashConsensusParameters::MainNetwork => {
+            let mut db_data = z_db_data.sup.main.lock().unwrap();
+
+            match wallet::decrypt_and_store_transaction(
+                &params,
+                &mut (*db_data),
+                &(tx.into())
+            ) {
+                Ok(_) => Ok(()),
+                Err(_) => Err(ZcashError::Unknown),
+            }
+        }
+
+        ZcashConsensusParameters::TestNetwork => {
+            let mut db_data = z_db_data.sup.test.lock().unwrap();
+
+            match wallet::decrypt_and_store_transaction(
+                &params,
+                &mut (*db_data),
+                &(tx.into())
+            ) {
+                Ok(_) => Ok(()),
+                Err(_) => Err(ZcashError::Unknown),
+            }
+        }
+    }
+}
 
 // /// [`sapling::TxProver`]: zcash_primitives::sapling::prover::TxProver
-// #[allow(clippy::too_many_arguments)]
-// #[allow(clippy::type_complexity)]
-// pub fn spend<DbT, ParamsT, InputsT>(
-//     wallet_db: &mut DbT,
-//     params: &ParamsT,
-//     prover: impl SaplingProver,
-//     input_selector: &InputsT,
-//     usk: &UnifiedSpendingKey,
-//     request: zip321::TransactionRequest,
-//     ovk_policy: OvkPolicy,
-//     min_confirmations: NonZeroU32,
-// ) -> Result<
-//     TxId,
-//     Error<
-//         <DbT as WalletRead>::Error,
-//         <DbT as WalletCommitmentTrees>::Error,
-//         InputsT::Error,
-//         <InputsT::FeeRule as FeeRule>::Error,
-//         DbT::NoteRef,
-//     >,
-// >
 // where
 //     DbT: WalletWrite + WalletCommitmentTrees,
 //     DbT::NoteRef: Copy + Eq + Ord,
 //     ParamsT: consensus::Parameters + Clone,
 //     InputsT: InputSelector<DataSource = DbT>,
-// {
+// Error<
+//     <DbT as WalletRead>::Error,
+//     <DbT as WalletCommitmentTrees>::Error,
+//     InputsT::Error,
+//     <InputsT::FeeRule as FeeRule>::Error,
+//     DbT::NoteRef,
+// >,
+
+// #[allow(clippy::too_many_arguments)]
+// #[allow(clippy::type_complexity)]
+// pub fn spend(
+//     z_db_data: ZcashWalletDb,
+//     params: ZcashConsensusParameters,
+//     prover: impl SaplingProver,
+//     input_selector: &InputsT,
+//     usk: ZcashUnifiedSpendingKey,
+//     request: ZcashTransactionRequest,
+//     ovk_policy: ZcashOvkPolicy,
+//     min_confirmations: NonZeroU32,
+// ) -> ZcashResult<ZcashTxId> {
+//     match params {
+//         ZcashConsensusParameters::MainNetwork => {
+//             let mut db_data = z_db_data.sup.main.lock().unwrap();
+
+//             match wallet::spend(
+//                 &mut (*db_data),
+//                 &params,
+//                 //,
+//                 //,
+//                 usk.into(),
+//                 request.into(),
+//                 ovk_policy.into(),
+//                 min_confirmations
+//             ) {
+//                 Ok(_) => Ok(()),
+//                 Err(_) => Err(ZcashError::Unknown),
+//             }
+//         }
+
+//         ZcashConsensusParameters::TestNetwork => {
+//             let mut db_data = z_db_data.sup.test.lock().unwrap();
+
+//             match wallet::spend(
+//                 &mut (*db_data),
+//                 &params,
+//                 //,
+//                 //,
+//                 usk.into(),
+//                 request.into(),
+//                 ovk_policy.into(),
+//                 min_confirmations
+//             ) {
+//                 Ok(_) => Ok(()),
+//                 Err(_) => Err(ZcashError::Unknown),
+//             }
+//         }
+//     }
+
+// }
 
 // #[cfg(feature = "transparent-inputs")]
 // #[allow(clippy::too_many_arguments)]

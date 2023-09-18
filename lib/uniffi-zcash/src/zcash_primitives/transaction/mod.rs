@@ -290,11 +290,19 @@ impl ZcashTransaction {
     }
 }
 
-impl From<Transaction> for ZcashTransaction {
-    fn from(inner: Transaction) -> Self {
-        ZcashTransaction(inner)
+
+impl From<ZcashTransaction> for Transaction {
+    fn from(inner: ZcashTransaction) -> Self {
+        inner.0
     }
 }
+
+impl From<Transaction> for ZcashTransaction {
+    fn from(e: Transaction) -> Self {
+        ZcashTransaction(e)
+    }
+}
+
 pub struct ZcashTransactionAndSaplingMetadata {
     pub transaction: Arc<ZcashTransaction>,
     pub sapling_metadata: Arc<ZcashSaplingMetadata>,

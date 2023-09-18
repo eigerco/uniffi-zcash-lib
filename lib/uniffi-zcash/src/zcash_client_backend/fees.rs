@@ -2,6 +2,9 @@ use crate::ZcashAmount;
 use std::sync::Arc;
 use zcash_client_backend::fees::{DustAction, DustOutputPolicy};
 
+pub mod fixed;
+pub mod zip317;
+
 pub enum ZcashDustAction {
     /// Do not allow creation of dust outputs; instead, require that additional inputs be provided.
     Reject,
@@ -47,6 +50,12 @@ impl ZcashDustOutputPolicy {
 
     pub fn dust_threshold(&self) -> Option<Arc<ZcashAmount>> {
         self.0.dust_threshold().map(From::from).map(Arc::new)
+    }
+}
+
+impl From<ZcashDustOutputPolicy> for DustOutputPolicy {
+    fn from(inner: ZcashDustOutputPolicy) -> Self {
+        inner.0
     }
 }
 

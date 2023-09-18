@@ -129,8 +129,15 @@ impl ZcashTransactionRequest {
     }
 }
 
+
+impl From<ZcashTransactionRequest> for TransactionRequest {
+    fn from(inner: ZcashTransactionRequest) -> Self {
+        inner.0
+    }
+}
+
 impl From<TransactionRequest> for ZcashTransactionRequest {
-    fn from(inner: TransactionRequest) -> Self {
-        ZcashTransactionRequest(inner)
+    fn from(e: TransactionRequest) -> Self {
+        ZcashTransactionRequest(e)
     }
 }
