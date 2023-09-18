@@ -1,7 +1,12 @@
-use zcash_client_sqlite::wallet::init::{
-    // init_accounts_table, init_blocks_table, init_wallet_db,
-    WalletMigrationError,
-};
+use zcash_client_sqlite::wallet::init;
+// init_accounts_table, init_blocks_table,
+use zcash_client_sqlite::wallet::init::WalletMigrationError;
+
+use crate::{ZcashConsensusParameters, ZcashError, ZcashResult, ZcashWalletDb};
+
+use failure::format_err;
+
+use secrecy::SecretVec;
 
 #[derive(Debug)]
 pub enum ZcashWalletMigrationError {
@@ -33,7 +38,7 @@ impl From<WalletMigrationError> for ZcashWalletMigrationError {
             WalletMigrationError::BalanceError { .. } => ZcashWalletMigrationError::BalanceError {
                 v: "BalanceError".to_string(),
             },
-            WalletMigrationError::CommitmentTree(_) => todo!()
+            WalletMigrationError::CommitmentTree(_) => todo!(),
         }
     }
 }
@@ -55,9 +60,36 @@ impl From<WalletMigrationError> for ZcashWalletMigrationError {
 // 	init::init_blocks_table(wdb, height.into(), hash.into(), time, sapling_tree)
 // }
 
-// pub fn init_wallet_db<P: consensus::Parameters + 'static>(
-//     wdb: &mut WalletDb<P>,
-//     seed: Option<SecretVec<u8>>,
-// ) -> Result<(), MigratorError<WalletMigrationError>> {
-//     init::init_wallet_db(wdb, seed)
-// }
+pub fn init_wallet_db(
+    zwdb: ZcashWalletDb,
+    seed: Vec<u8>,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<()> {
+    match params {
+        ZcashConsensusParameters::MainNetwork => init::init_wallet_db(
+            &mut zwdb.sup.main.lock().unwrap(),
+            Some(SecretVec::new(seed)),
+        )
+        .map_err(|e| ZcashError::Message {
+            error: format_err!("Error while initializing data DB: {:?}", e).to_string(),
+        }),
+        // match  {
+        //     Ok(utxo_id) => Ok(utxo_id.0),
+        //     Err(e) => Err(ZcashError::Message {
+        //         error: format!("Err: {}", e),
+        //     }),
+        // }
+        ZcashConsensusParameters::TestNetwork => init::init_wallet_db(
+            &mut zwdb.sup.test.lock().unwrap(),
+            Some(SecretVec::new(seed)),
+        )
+        .map_err(|e| ZcashError::Message {
+            error: format_err!("Error while initializing data DB: {:?}", e).to_string(),
+        }), // match  {
+            //     Ok(utxo_id) => Ok(utxo_id.0),
+            //     Err(e) => Err(ZcashError::Message {
+            //         error: format!("Err: {}", e),
+            //     }),
+            // }
+    }
+}

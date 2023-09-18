@@ -1,11 +1,13 @@
 // use std::collections::HashMap;
 // use std::convert::{TryFrom, TryInto};
-// use std::num::NonZeroU32;
+use std::num::NonZeroU32;
 // use std::panic;
 // use std::path::Path;
 // use std::ptr;
 
 use failure::format_err;
+
+use std::sync::Arc;
 
 // NOTE shouldn't be needed because we will be using Kotlin instead
 // use jni::objects::{JObject, JValue};
@@ -24,7 +26,10 @@ use tracing_subscriber::reload;
 
 // use zcash_address::{ToAddress, ZcashAddress};
 
+use crate::native_utils as utils;
+use crate::zcash_client_sqlite::init_wallet_db;
 use crate::{
+    scan_cached_blocks,
     ZcashAccountId,
     ZcashAmount,
     ZcashBlockHash,
@@ -43,7 +48,10 @@ use crate::{
     ZcashFsBlockDb,
     ZcashKeysEra,
     ZcashLocalTxProver,
+    ZcashMemo,
     ZcashMemoBytes,
+    ZcashNonNegativeAmount,
+    ZcashNoteId,
     ZcashOutPoint,
     ZcashOvkPolicy,
     ZcashPayment,
@@ -51,6 +59,7 @@ use crate::{
     ZcashRecipientAddress,
     ZcashResult,
     ZcashScript,
+    ZcashShieldedProtocol,
     ZcashTransaction,
     ZcashTransactionRequest, // zip321
     ZcashTransparentAddress,
@@ -61,12 +70,7 @@ use crate::{
     ZcashUnifiedSpendingKey,
     ZcashWalletDb,
     ZcashWalletTransparentOutput, // wallet
-    scan_cached_blocks,
-    ZcashNoteId,
-    ZcashShieldedProtocol,
-    ZcashMemo
 };
-use crate::native_utils as utils;
 
 // use zcash_client_backend::data_api::{
 //     chain::CommitmentTreeRoot,
@@ -219,49 +223,57 @@ pub fn create_account(
     ZcashUnifiedSpendingKey::from_seed(params, seed, account).unwrap()
 }
 
-// NOTE need walletread impl
-// pub fn get_balance(db_data: String, aid: u32, params: ZcashConsensusParameters) -> u32 {
-//     // let network = parse_network(network_id as u32)?;
-//     let db_data = wallet_db(params, db_data).unwrap();
-//     let account = ZcashAccountId {id: aid};
+// DEPR_NOTE get_balance_at was deprecated in newer version, instead get_wallet_summary was used
+pub fn get_balance(
+    db_data: String,
+    aid: u32,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<ZcashNonNegativeAmount> {
+    // let network = parse_network(network_id as u32)?;
+    let db_data = wallet_db(params, db_data).unwrap();
+    let account = ZcashAccountId { id: aid };
 
-//     // We query the unverified balance including unmined transactions. Shielded notes
-//     // in unmined transactions are never spendable, but this ensures that the balance
-//     // reported to users does not drop temporarily in a way that they don't expect.
-//     // `getVerifiedBalance` requires `ANCHOR_OFFSET` confirmations, which means it
-//     // always shows a spendable balance.
-//     let min_confirmations = NonZeroU32::new(1).unwrap();
+    // We query the unverified balance including unmined transactions. Shielded notes
+    // in unmined transactions are never spendable, but this ensures that the balance
+    // reported to users does not drop temporarily in a way that they don't expect.
+    // `getVerifiedBalance` requires `ANCHOR_OFFSET` confirmations, which means it
+    // always shows a spendable balance.
+    let min_confirmations = NonZeroU32::new(1).unwrap();
 
-//     (&db_data)
-//         .get_target_and_anchor_heights(min_confirmations)
-//         .map_err(|e| format_err!("Error while fetching anchor height: {}", e))
-//         .and_then(|opt_anchor| {
-//             opt_anchor
-//                 .map(|(_, a)| a + 1)
-//                 .ok_or(format_err!("Anchor height not available; scan required."))
-//         })
-//         .and_then(|anchor| {
-//             (&db_data)
-//                 .get_balance_at(account, anchor)
-//                 .map_err(|e| format_err!("Error while fetching verified balance: {}", e))
-//         })
-//         .map(|amount| amount.into())
-// }
+    // (&db_data)
+    //     .get_target_and_anchor_heights(min_confirmations)
+    //     .map_err(|e| format_err!("Error while fetching anchor height: {}", e))
+    //     .and_then(|opt_anchor| {
+    //         opt_anchor
+    //             .map(|(_, a)| a.value() + 1)
+    //             .ok_or(format_err!("Anchor height not available; scan required."))
+    //     })
+    //     .and_then(|anchor| {
+    Ok((*db_data
+        // get_balance_at
+        .get_wallet_summary(min_confirmations.into())
+        .unwrap() //Result
+        .unwrap() //Option
+        .account_balances()
+        .get(&account)
+        .unwrap())
+    .total())
+    // })
+    // .map_err(|e| ZcashError::Message { error: format!("Err: {}", e) })
+}
 
-// pub fn get_latest_height(fsblockdb_root: String) -> ZcashResult<i64> {
-//     let block_db = block_db(fsblockdb_root);
+pub fn get_latest_height(fsblockdb_root: String) -> ZcashResult<i64> {
+    let block_db = block_db(fsblockdb_root)?;
 
-//     match block_db?.get_max_cached_height() {
-//         Ok(Some(block_height)) => Ok(i64::from(u32::from(block_height))),
-//         // Use -1 to return null across the FFI.
-//         Ok(None) => Ok(-1),
-//         Err(e) => Err(format_err!(
-//             "Failed to read block metadata from FsBlockDb: {:?}",
-//             e
-//         )),
-//     }
-// }
-
+    match block_db.get_max_cached_height() {
+        Ok(Some(block_height)) => Ok(i64::from(block_height.value())),
+        // Use -1 to return null across the FFI.
+        Ok(None) => Ok(-1),
+        Err(e) => Err(ZcashError::Message {
+            error: format!("Failed to read block metadata from FsBlockDb: {}", e),
+        }),
+    }
+}
 
 #[allow(clippy::too_many_arguments)]
 pub fn put_utxo(
@@ -321,11 +333,12 @@ pub fn scan_blocks(
 
     match scan_cached_blocks(params, db_cache, db_data, from_height, limit) {
         Ok(()) => Ok(true),
-        Err(e) => Err(ZcashError::Message{error: format!(
-            "Rust error while scanning blocks (limit {:?}): {:?}",
-            limit,
-            e
-        )}),
+        Err(e) => Err(ZcashError::Message {
+            error: format!(
+                "Rust error while scanning blocks (limit {:?}): {:?}",
+                limit, e
+            ),
+        }),
     }
 }
 
@@ -334,7 +347,7 @@ pub fn get_memo_as_utf8(
     txid_bytes: Vec<u8>,
     output_index: u32,
     params: ZcashConsensusParameters,
-) -> ZcashResult<ZcashMemo> {
+) -> ZcashResult<String> {
     let db_data = wallet_db(params, db_data)?;
 
     // let mut txid = [0u8; 32];
@@ -343,8 +356,12 @@ pub fn get_memo_as_utf8(
     // NOTE probably in a new version this is needed
     let txid = ZcashTxId::from_bytes(&txid_bytes[..])?;
 
-    let memo = db_data
-        .get_memo(ZcashNoteId::new(txid, ZcashShieldedProtocol::Sapling, output_index as u16))
+    db_data
+        .get_memo(ZcashNoteId::new(
+            txid,
+            ZcashShieldedProtocol::Sapling,
+            output_index as u16,
+        ))
         .map_err(|e| format_err!("An error occurred retrieving the memo, {}", e))
         .and_then(|memo| match memo {
             ZcashMemo::Empty => Ok("".to_string()),
@@ -353,33 +370,161 @@ pub fn get_memo_as_utf8(
             // None => Err(format_err!("Memo not available")),
             // _ => Err(format_err!("This memo does not contain UTF-8 text")),
         })
-        .map_err(|e| Err(ZcashError::Message{error: format_err!("some err {}", e).to_string() }));
+        .map_err(|e| ZcashError::Message {
+            error: format_err!("some err {}", e).to_string(),
+        })
 
     // NOTE into_raw was here
-    // weird thing but works
-    memo.unwrap_err()
 }
 
+pub fn init_data_db(
+    db_path: String,
+    seed: Vec<u8>,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<u8> {
+    let db_data = wallet_db(params, db_path)?;
 
+    init_wallet_db(db_data, seed, params).map(|_| 0u8)
 
-// init_data_db
+    // match  {
+    //     Ok(()) => Ok(0),
+    //     Err(MigratorError::Migration { error, .. })
+    //         if matches!(error, WalletMigrationError::SeedRequired) => { Ok(1) }
+    //     Err(e) => Err(format_err!("Error while initializing data DB: {}", e)),
+    // }
+}
 
-// pub fn rewind_to_height(
-//     db_data: String,
-//     height: u32,
-//     params: ZcashConsensusParameters,
-// ) -> bool {
-//     let db_data = wallet_db(params, db_data)?;
+pub fn rewind_to_height(
+    db_data: String,
+    height: u32,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<u8> {
+    let mut db_data = wallet_db(params, db_data)?;
 
-//     let height = ZcashBlockHeight::try_from(height)?;
+    let z_height = ZcashBlockHeight::new(height);
 
-//     db_data
-//         .truncate_to_height(height)
-//         .map(|_| 1)
-//         .map_err(|e| format_err!("Error while rewinding data DB to height {}: {}", height, e))
+    db_data
+        .truncate_to_height(z_height)
+        .map(|_| 1u8)
+        .map_err(|e| ZcashError::Message {
+            error: format_err!("Error while rewinding data DB to height {}: {}", height, e)
+                .to_string(),
+        })
+}
+
+pub fn rewind_block_metadata_to_height(
+    db_data: String,
+    height: u32,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<u8> {
+    let mut db_data = wallet_db(params, db_data)?;
+    let z_height = ZcashBlockHeight::new(height);
+
+    db_data
+        .truncate_to_height(z_height)
+        .map(|_| 1u8)
+        .map_err(|e| ZcashError::Message {
+            error: format_err!(
+                "Error while rewinding block metadata DB to height {}: {}",
+                height,
+                e
+            )
+            .to_string(),
+        })
+}
+
+pub fn update_chain_tip(
+    db_data: String,
+    height: u32,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<u8> {
+    let mut db_data = wallet_db(params, db_data)?;
+
+    let z_height = ZcashBlockHeight::new(height);
+
+    db_data
+        .update_chain_tip(z_height)
+        .map(|_| 1u8)
+        .map_err(|e| ZcashError::Message {
+            error: format_err!("Error while rewinding data DB to height {}: {}", height, e)
+                .to_string(),
+        })
+}
+
+fn encode_blockmeta(meta: Arc<ZcashBlockMeta>) -> Result<Vec<String>, failure::Error> {
+    let u32_arr_to_str = |arr: [u8;32]| -> String {
+        arr.iter().map(|&id| id.to_string() + ",").collect::<String>()
+    };
+
+    Ok(vec![
+        u32::from(meta.0.height).to_string(),
+        u32_arr_to_str(meta.0.block_hash.0),
+        meta.0.block_time.to_string(),
+        meta.0.sapling_outputs_count.to_string(),
+        meta.0.orchard_actions_count.to_string(),
+    ])
+}
+
+// fn decode_blockmeta(obj: JObject<'_>) -> Result<BlockMeta, failure::Error> {
+//     let long_as_u32 = |name| -> Result<u32, failure::Error> {
+//         Ok(u32::try_from(env.get_field(obj, name, "J")?.j()?)?)
+//     };
+
+//     fn byte_array<const N: usize>(
+//         env: &JNIEnv<'_>,
+//         obj: JObject<'_>,
+//         name: &str,
+//     ) -> Result<[u8; N], failure::Error> {
+//         let field = env.get_field(obj, name, "[B")?.l()?.into_raw();
+//         Ok(env.convert_byte_array(field)?[..].try_into()?)
+//     }
+
+//     Ok(ZcashBlockMeta {
+//         height: BlockHeight::from_u32(long_as_u32("height")?),
+//         block_hash: BlockHash(byte_array(env, obj, "hash")?),
+//         block_time: long_as_u32("time")?,
+//         sapling_outputs_count: long_as_u32("saplingOutputsCount")?,
+//         orchard_actions_count: long_as_u32("orchardOutputsCount")?,
+//     })
 // }
 
-// update_chain_tip
+// pub fn write_block_metadata(fsblockdb_root: String, block_meta: Vec<String>) -> ZcashResult<bool> {
+
+//     let block_db = block_db(fsblockdb_root)?;
+
+//     // let block_meta = {
+//     //     // let count = env.get_array_length(block_meta).unwrap();
+//     //     (0..count)
+//     //         .map(|i| {
+//     //             env.get_object_array_element(block_meta, i)
+//     //                 .map_err(|e| e.into())
+//     //                 .and_then(|jobj| decode_blockmeta(&env, jobj))
+//     //         })
+//     //         .collect::<Result<Vec<_>, _>>()?
+//     // };
+
+//     match block_db.write_block_metadata(&block_meta) {
+//         Ok(()) => Ok(true),
+//         Err(e) => Err(format_err!(
+//             "Failed to write block metadata to FsBlockDb: {:?}",
+//             e
+//         )),
+//     }
+// }
+
+pub fn find_block_metadata(
+    fsblockdb_root: String,
+    height: u32,
+) -> ZcashResult<Option<Arc<ZcashBlockMeta>>> {
+    let block_db = block_db(fsblockdb_root)?;
+    let height = ZcashBlockHeight::new(height);
+
+    block_db
+        .find_block(height)
+        .map_err(|e| ZcashError::Message {
+            error: format_err!("Failed to read block metadata from FsBlockDb: {:?}", e).to_string(),
+        })
+}
 
 // create_to_address
 
@@ -400,8 +545,6 @@ pub fn get_memo_as_utf8(
 // get_verified_balance
 
 // is_valid_spending_key
-
-// write_block_metadata
 
 // is_valid_unified_address
 

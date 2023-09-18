@@ -4,8 +4,7 @@ use zcash_primitives::keys::OutgoingViewingKey;
 // use zcash_primitives::transaction::components::transparent::{self, OutPoint, TxOut};
 
 use crate::{
-    ZcashAmount, ZcashBlockHeight, ZcashOutPoint, ZcashResult,
-    ZcashTransparentAddress, ZcashTxOut,
+    ZcashAmount, ZcashBlockHeight, ZcashOutPoint, ZcashResult, ZcashTransparentAddress, ZcashTxOut,
 };
 
 #[derive(Debug, Clone)]

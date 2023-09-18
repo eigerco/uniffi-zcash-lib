@@ -1,7 +1,7 @@
 use std::sync::{Arc, RwLock};
 
-use zcash_primitives::sapling::Node;
 use incrementalmerkletree::witness::IncrementalWitness;
+use zcash_primitives::sapling::Node;
 
 use crate::{ZcashCommitmentTree, ZcashResult, ZcashSaplingMerklePath, ZcashSaplingNode};
 const DEPTH: u8 = 32;

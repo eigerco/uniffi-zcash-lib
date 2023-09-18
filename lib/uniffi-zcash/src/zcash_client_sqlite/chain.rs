@@ -24,6 +24,12 @@ impl From<ZcashBlockMeta> for BlockMeta {
     }
 }
 
+impl From<BlockMeta> for ZcashBlockMeta {
+    fn from(e: BlockMeta) -> Self {
+        ZcashBlockMeta(e)
+    }
+}
+
 use crate::ZcashError;
 use zcash_client_sqlite::{chain::init, FsBlockDb};
 

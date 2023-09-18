@@ -25,10 +25,7 @@ use zcash_primitives::{
 };
 
 // CHANGED
-use incrementalmerkletree::{
-    frontier::CommitmentTree,
-    witness::IncrementalWitness,
-};
+use incrementalmerkletree::{frontier::CommitmentTree, witness::IncrementalWitness};
 
 use zcash_proofs::prover::LocalTxProver;
 
@@ -132,7 +129,6 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
         .unwrap();
 
     let prover = LocalTxProver::with_default_location().unwrap();
-
 
     // CHANGED
     // use zcash_primitives::transaction::fees::fixed::FeeRule;

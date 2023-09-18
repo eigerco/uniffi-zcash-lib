@@ -63,12 +63,13 @@ pub enum ZcashError {
     #[error("Orchard builder BuildError occurred: {error:?}")]
     OrchardBuilderError { error: orchard::builder::BuildError },
 
-
     #[error("Orchard builder SpendError occurred: {error:?}")]
     OrchardBuilderSpendError { error: orchard::builder::SpendError },
 
     #[error("Orchard builder OutputError occurred: {error:?}")]
-    OrchardBuilderOutputError { error: orchard::builder::OutputError },
+    OrchardBuilderOutputError {
+        error: orchard::builder::OutputError,
+    },
 
     #[error("Insufficient founds error: {amount}")]
     InsufficientFundsError { amount: u64 },
@@ -178,7 +179,7 @@ impl From<transaction::builder::Error<fees::zip317::FeeError>> for ZcashError {
             transaction::builder::Error::Balance(_) => ZcashError::BuilderError { error },
             transaction::builder::Error::TransparentBuild(_) => ZcashError::BuilderError { error },
             transaction::builder::Error::SaplingBuild(_) => ZcashError::BuilderError { error },
-            _ => todo!()
+            _ => todo!(),
         }
     }
 }

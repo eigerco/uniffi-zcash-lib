@@ -1,6 +1,11 @@
-use zcash_primitives::transaction::components::{amount::MAX_MONEY, Amount};
+use zcash_primitives::transaction::components::{
+    amount::{NonNegativeAmount, MAX_MONEY},
+    Amount,
+};
 
-use crate::ZcashError;
+use zcash_client_backend::data_api::Balance;
+
+use crate::{ZcashError, ZcashResult};
 
 /// A type-safe representation of some quantity of Zcash.
 ///
@@ -62,13 +67,99 @@ impl ZcashAmount {
         Ok(ZcashAmount(amount))
     }
 
+    // pub fn from_u64(value: u64) -> Self {
+    //     ZcashAmount(self.0.from_u64(value))
+    // }
+
+    // pub fn from_nonnegative_i64(value: i64) -> Self {
+    //     ZcashAmount(self.0.from_nonnegative_i64(value))
+    // }
+
     /// Returns a zero-valued Amount.
     pub fn zero() -> Self {
         ZcashAmount(Amount::zero())
     }
 
+    pub const fn is_negative(self) -> bool {
+        self.0.is_negative()
+    }
+
     /// Returns the value of the amount as i64.
     pub fn value(&self) -> i64 {
         self.0.into()
+    }
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Eq, Ord)]
+pub struct ZcashNonNegativeAmount(NonNegativeAmount);
+
+impl ZcashNonNegativeAmount {
+    /// Returns the identity `NonNegativeAmount`
+    pub const ZERO: Self = Self(NonNegativeAmount::ZERO);
+
+    pub fn from_u64(amount: u64) -> ZcashResult<Self> {
+        NonNegativeAmount::from_u64(amount)
+            .map(Self)
+            .map_err(|_| ZcashError::Message {
+                error: "baaa".to_string(),
+            })
+    }
+
+    /// Creates a NonNegativeAmount from an i64.
+    ///
+    /// Returns an error if the amount is outside the range `{0..MAX_MONEY}`.
+    pub fn from_nonnegative_i64(amount: i64) -> ZcashResult<Self> {
+        NonNegativeAmount::from_nonnegative_i64(amount)
+            .map(Self)
+            .map_err(|_| ZcashError::Message {
+                error: "baaa".to_string(),
+            })
+    }
+}
+
+// converters
+
+impl From<ZcashNonNegativeAmount> for NonNegativeAmount {
+    fn from(inner: ZcashNonNegativeAmount) -> Self {
+        inner.0
+    }
+}
+
+impl From<NonNegativeAmount> for ZcashNonNegativeAmount {
+    fn from(e: NonNegativeAmount) -> Self {
+        ZcashNonNegativeAmount(e)
+    }
+}
+
+impl TryFrom<ZcashAmount> for ZcashNonNegativeAmount {
+    type Error = ();
+
+    fn try_from(value: ZcashAmount) -> Result<Self, Self::Error> {
+        if value.is_negative() {
+            Err(())
+        } else {
+            Ok(
+                NonNegativeAmount::from_u64(value.value().try_into().unwrap())
+                    .unwrap()
+                    .into(),
+            )
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ZcashBalance(Balance);
+
+impl ZcashBalance {
+    /// The [`Balance`] value having zero values for all its fields.
+    pub const ZERO: Self = Self(Balance {
+        spendable_value: NonNegativeAmount::ZERO,
+        change_pending_confirmation: NonNegativeAmount::ZERO,
+        value_pending_spendability: NonNegativeAmount::ZERO,
+    });
+
+    /// Returns the total value of funds represented by this [`Balance`].
+    pub fn total(&self) -> ZcashNonNegativeAmount {
+        self.0.total().into()
     }
 }

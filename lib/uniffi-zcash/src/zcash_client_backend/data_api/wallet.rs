@@ -1,4 +1,3 @@
-
 // /// Scans a [`Transaction`] for any information that can be decrypted by the accounts in
 // /// the wallet, and saves it to the wallet.
 // pub fn decrypt_and_store_transaction<ParamsT, DbT>(
@@ -10,7 +9,6 @@
 //     ParamsT: consensus::Parameters,
 //     DbT: WalletWrite,
 // {
-
 
 // /// [`sapling::TxProver`]: zcash_primitives::sapling::prover::TxProver
 // #[allow(clippy::too_many_arguments)]
@@ -40,7 +38,6 @@
 //     ParamsT: consensus::Parameters + Clone,
 //     InputsT: InputSelector<DataSource = DbT>,
 // {
-
 
 // #[cfg(feature = "transparent-inputs")]
 // #[allow(clippy::too_many_arguments)]

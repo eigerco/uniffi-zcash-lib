@@ -323,7 +323,6 @@ impl ZcashTxId {
     }
 }
 
-
 impl From<ZcashTxId> for TxId {
     fn from(inner: ZcashTxId) -> Self {
         inner.0

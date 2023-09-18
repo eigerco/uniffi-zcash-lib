@@ -2,3 +2,9 @@ dictionary ZcashUnifiedAddressAndDiversifierIndex {
   ZcashUnifiedAddress address;
   ZcashDiversifierIndex diversifier_index;
 };
+
+enum ZcashShieldedProtocol {
+  "Sapling"
+};
+
+interface ZcashDecryptedTransaction {};

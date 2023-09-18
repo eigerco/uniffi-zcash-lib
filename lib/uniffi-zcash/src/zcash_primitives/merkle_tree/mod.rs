@@ -1,8 +1,8 @@
 mod incremental_witness;
 use std::sync::Arc;
 
-use zcash_primitives::sapling::Node;
 use incrementalmerkletree::MerklePath;
+use zcash_primitives::sapling::Node;
 
 use crate::ZcashSaplingNode;
 const DEPTH: u8 = 32;
@@ -20,7 +20,7 @@ impl ZcashSaplingMerklePath {
             .path_elems()
             .iter()
             .map(|node| ZcashAuthPath {
-                node: Arc::new((*node).into())
+                node: Arc::new((*node).into()),
             })
             .collect()
     }
