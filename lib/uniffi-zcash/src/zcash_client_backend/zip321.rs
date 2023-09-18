@@ -129,7 +129,6 @@ impl ZcashTransactionRequest {
     }
 }
 
-
 impl From<ZcashTransactionRequest> for TransactionRequest {
     fn from(inner: ZcashTransactionRequest) -> Self {
         inner.0

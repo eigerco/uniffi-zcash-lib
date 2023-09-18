@@ -233,7 +233,6 @@ pub enum ZcashFeeRules {
 /// A Zcash transaction.
 pub struct ZcashTransaction(Transaction);
 
-
 // NOTE apparently implementing Copy would be more difficult, so I did this instead
 impl Clone for ZcashTransaction {
     fn clone(&self) -> Self {
@@ -299,7 +298,6 @@ impl ZcashTransaction {
         self.0.orchard_bundle().map(|b| b.into()).map(Arc::new)
     }
 }
-
 
 impl From<ZcashTransaction> for Transaction {
     fn from(inner: ZcashTransaction) -> Self {

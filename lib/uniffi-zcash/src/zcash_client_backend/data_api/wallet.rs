@@ -4,13 +4,13 @@ use std::num::NonZeroU32;
 
 use std::sync::Arc;
 
-use crate::{ZcashConsensusParameters, ZcashTransactionRequest,
-    ZcashOvkPolicy, ZcashWalletDb, ZcashTransaction, ZcashLocalTxProver,
-    ZcashUnifiedSpendingKey, ZcashResult, ZcashError, ZcashTxId};
+use crate::{
+    ZcashConsensusParameters, ZcashError, ZcashLocalTxProver, ZcashOvkPolicy, ZcashResult,
+    ZcashTransaction, ZcashTransactionRequest, ZcashTxId, ZcashUnifiedSpendingKey, ZcashWalletDb,
+};
 
-use zcash_proofs::prover::LocalTxProver;
 use zcash_client_backend::keys::UnifiedSpendingKey;
-
+use zcash_proofs::prover::LocalTxProver;
 
 pub mod input_selection;
 
@@ -23,12 +23,12 @@ pub fn decrypt_and_store_transaction(
 ) -> ZcashResult<()> {
     match params {
         ZcashConsensusParameters::MainNetwork => {
-            let mut db_data = (*z_db_data).sup.main.lock().unwrap();
+            let mut db_data = z_db_data.sup.main.lock().unwrap();
 
             match wallet::decrypt_and_store_transaction(
                 &params,
                 &mut (*db_data),
-                &((*tx).clone().into())
+                &((*tx).clone().into()),
             ) {
                 Ok(_) => Ok(()),
                 Err(_) => Err(ZcashError::Unknown),
@@ -36,12 +36,12 @@ pub fn decrypt_and_store_transaction(
         }
 
         ZcashConsensusParameters::TestNetwork => {
-            let mut db_data = (*z_db_data).sup.test.lock().unwrap();
+            let mut db_data = z_db_data.sup.test.lock().unwrap();
 
             match wallet::decrypt_and_store_transaction(
                 &params,
                 &mut (*db_data),
-                &((*tx).clone().into())
+                &((*tx).clone().into()),
             ) {
                 Ok(_) => Ok(()),
                 Err(_) => Err(ZcashError::Unknown),
@@ -64,8 +64,11 @@ pub fn decrypt_and_store_transaction(
 //     DbT::NoteRef,
 // >,
 
-use crate::input_selection::{ZcashMainGreedyInputSelector, ZcashTestGreedyInputSelector, MainGreedyInputSelector, TestGreedyInputSelector};
 use crate::input_selection::ZcashGreedyInputSelector;
+use crate::input_selection::{
+    MainGreedyInputSelector, TestGreedyInputSelector, ZcashMainGreedyInputSelector,
+    ZcashTestGreedyInputSelector,
+};
 
 #[allow(clippy::too_many_arguments)]
 #[allow(clippy::type_complexity)]
@@ -93,7 +96,7 @@ pub fn spend(
                 &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into(usk),
                 request.into(),
                 ovk_policy.into(),
-                min_confirmations
+                min_confirmations,
             ) {
                 Ok(txid) => Ok(txid.into()),
                 Err(_) => Err(ZcashError::Unknown),
@@ -113,7 +116,7 @@ pub fn spend(
                 &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into(usk),
                 request.into(),
                 ovk_policy.into(),
-                min_confirmations
+                min_confirmations,
             ) {
                 Ok(txid) => Ok(txid.into()),
                 Err(_) => Err(ZcashError::Unknown),
