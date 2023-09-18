@@ -7,7 +7,6 @@
 // use std::collections::HashMap;
 // use std::convert::{TryFrom, TryInto};
 // use std::panic;
-// use std::path::Path;
 // use std::ptr;
 
 use std::num::NonZeroU32;
@@ -15,6 +14,7 @@ use std::num::NonZeroU32;
 use failure::format_err;
 
 use std::sync::Arc;
+// use std::path::Path;
 
 // NOTE shouldn't be needed because we will be using Kotlin instead
 // use jni::objects::{JObject, JValue};
@@ -47,28 +47,28 @@ use crate::{
     // zcash_client_sqlite
     // ZcashChain, // init_blockmeta_db
     ZcashConsensusParameters,
+    ZcashDustOutputPolicy,
     // ZcashConsensusParameters::{MainNetwork, TestNetwork}, // consensus
     // ZcashDecodingError,                                   // keys
     // ZcashDiversifierIndex,
-    // ZcashDustOutputPolicy, // fees
     ZcashError,
     ZcashFsBlockDb,
     // ZcashKeysEra,
-    // ZcashLocalTxProver,
+    ZcashLocalTxProver,
     ZcashMemo,
-    // ZcashMemoBytes,
+    ZcashMemoBytes,
     ZcashNonNegativeAmount,
     ZcashNoteId,
     ZcashOutPoint,
-    // ZcashOvkPolicy,
-    // ZcashPayment,
+    ZcashOvkPolicy,
+    ZcashPayment,
     // encoding::AddressCodec, // NOT USED
-    // ZcashRecipientAddress,
+    ZcashRecipientAddress,
     ZcashResult,
     ZcashScript,
     ZcashShieldedProtocol,
-    // ZcashTransaction,
-    // ZcashTransactionRequest, // zip321
+    ZcashTransaction,
+    ZcashTransactionRequest, // zip321
     ZcashTransparentAddress,
     ZcashTxId,
     ZcashTxOut,
@@ -77,13 +77,19 @@ use crate::{
     ZcashUnifiedSpendingKey,
     ZcashWalletDb,
     ZcashWalletTransparentOutput, // wallet
+    ZcashFixedFeeRule
 };
+
+use crate::fixed::ZcashFixedSingleOutputChangeStrategy;
+use crate::input_selection::ZcashGreedyInputSelector;
+use crate::input_selection::{ZcashMainGreedyInputSelector, ZcashTestGreedyInputSelector};
+
+use crate::zcash_client_backend::{decrypt_and_store_transaction, spend};
 
 // use zcash_client_backend::data_api::{
 //     chain::CommitmentTreeRoot,
-//     wallet::{
-//         decrypt_and_store_transaction, input_selection::GreedyInputSelector,
-//         shield_transparent_funds, spend,
+//     wallet::{,
+//         shield_transparent_funds,
 //     },
 //     WalletCommitmentTrees,
 //     scanning::{ScanPriority, ScanRange},
@@ -526,7 +532,138 @@ pub fn find_block_metadata(
         })
 }
 
-// create_to_address
+const ANCHOR_OFFSET_U32: u32 = 10;
+const ANCHOR_OFFSET: NonZeroU32 = unsafe { NonZeroU32::new_unchecked(ANCHOR_OFFSET_U32) };
+
+#[allow(clippy::too_many_arguments)]
+pub fn create_to_address(
+    db_data: String,
+    usk: ZcashUnifiedSpendingKey,
+    addr_to: String,
+    value: u64,
+    memo_bytes: &[u8],
+    spend_params: String,
+    output_params: String,
+    params: ZcashConsensusParameters,
+    _use_zip317_fees: bool,
+) -> ZcashResult<ZcashTxId> {
+    let db_data = wallet_db(params, db_data)?;
+    // let usk = decode_usk(&env, usk)?;
+    // let to = utils::java_string_to_rust(&env, to);
+    // let value =
+    //     Amount::from_i64(value).map_err(|()| format_err!("Invalid amount, out of range"))?;
+    // if value.is_negative() {
+    //     return Err(format_err!("Amount is negative"));
+    // }
+
+    // let memo_bytes = env.convert_byte_array(memo).unwrap();
+    // let spend_params = utils::java_string_to_rust(&env, spend_params);
+    // let output_params = utils::java_string_to_rust(&env, output_params);
+
+    // it was checked with Path lib
+    let to = match ZcashRecipientAddress::decode(params, &addr_to) {
+        Ok(to) => to,
+        Err(_) => {
+            return Err(ZcashError::Message {
+                error: "Address is for the wrong network".to_string(),
+            })
+        }
+    };
+
+    // TODO: consider warning in this case somehow, rather than swallowing this error
+    // NOTE reconsider this
+    let memo = match to {
+        ZcashRecipientAddress::Shielded(_) | ZcashRecipientAddress::Unified(_) => {
+            // let memo_value =
+            //     ZcashMemo::from_bytes(&memo_bytes).map_err(|_| format_err!("Invalid memo"))?;
+
+            ZcashMemoBytes::new(memo_bytes).ok()
+        }
+        ZcashRecipientAddress::Transparent(_) => None,
+    };
+
+    let prover = ZcashLocalTxProver::new(&spend_params, &output_params);
+
+    let request = ZcashTransactionRequest::new(vec![ZcashPayment {
+        recipient_address: to.into(),
+        amount: ZcashAmount::new(i64::try_from(value).unwrap())
+            .unwrap()
+            .into(),
+        memo: memo.map(Arc::new),
+        label: None,
+        message: None,
+        other_params: vec![],
+    }])
+    .map_err(|e| ZcashError::Message {
+        error: format!("Error creating transaction request: {:?}", e),
+    })?;
+
+    let fixed_rule = ZcashFixedFeeRule::standard().into();
+
+    let spend_by_selector =
+        |input_selector: Arc<dyn ZcashGreedyInputSelector>| -> ZcashResult<ZcashTxId> {
+            spend(
+                db_data,
+                params,
+                prover,
+                input_selector,
+                usk,
+                request,
+                ZcashOvkPolicy::Sender,
+                ANCHOR_OFFSET,
+            )
+            .map_err(|e| ZcashError::Message {
+                error: format!("Error while creating transaction: {}", e),
+            })
+        };
+
+    // let input_selector: dyn ZcashGreedyInputSelector =
+    match params {
+        ZcashConsensusParameters::MainNetwork => {
+            spend_by_selector(Arc::new(ZcashMainGreedyInputSelector::new(
+                ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
+                ZcashDustOutputPolicy::default().into(),
+            )))
+        }
+        ZcashConsensusParameters::TestNetwork => {
+            spend_by_selector(Arc::new(ZcashTestGreedyInputSelector::new(
+                ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
+                ZcashDustOutputPolicy::default().into(),
+            )))
+        }
+    }
+    // NOTE only for Fixed ATM
+    // if use_zip317_fees == true {
+    //     ZcashGreedyInputSelector::new(
+    //         zip317::SingleOutputChangeStrategy::new(zip317::FeeRule::standard()),
+    //         DustOutputPolicy::default(),
+    //     )
+    // }
+    // else {
+
+    // };
+}
+
+pub fn store_decrypted_transaction(
+    db_data: String,
+    tx: ZcashTransaction,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<bool> {
+    let db_data = wallet_db(params, db_data)?;
+    // The consensus branch ID passed in here does not matter:
+    // - v4 and below cache it internally, but all we do with this transaction while
+    //   it is in memory is decryption and serialization, neither of which use the
+    //   consensus branch ID.
+    // - v5 and above transactions ignore the argument, and parse the correct value
+    //   from their encoding.
+    // let tx_bytes = env.convert_byte_array(tx).unwrap();
+    // let tx = Transaction::read(&tx_bytes[..], BranchId::Sapling)?;
+    decrypt_and_store_transaction(params, Arc::new(db_data), Arc::new(tx))
+        .map(|_| true)
+        .map_err(|e| ZcashError::Message {
+            error: format!("Error while decrypting transaction {}", e),
+        })
+}
 
 // init_block_meta_db
 
@@ -559,8 +696,6 @@ pub fn find_block_metadata(
 // init_accounts_table_with_keys
 
 // is_valid_transparent_address
-
-// decrypt_and_store_transaction
 
 // get_total_transparent_balance
 
