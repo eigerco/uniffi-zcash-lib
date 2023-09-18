@@ -55,8 +55,6 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
             match lang {
                 PYTHON => Ok(()),
                 KOTLIN => {
-
-                    
                     let inner_dir = bindings_dir.join("uniffi").join("zcash");
                     file::move_file(
                         bindings_dir.join(LINUX_SHARED_LIB_NAME),
