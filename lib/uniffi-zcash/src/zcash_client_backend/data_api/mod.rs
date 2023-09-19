@@ -4,6 +4,9 @@ pub use self::chain::*;
 mod wallet;
 pub use self::wallet::*;
 
+mod scanning;
+pub use self::scanning::*;
+
 use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::sync::Arc;

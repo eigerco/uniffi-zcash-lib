@@ -5,26 +5,11 @@
 // at the moment there are also external libraries - they will be gone too.
 
 // use std::collections::HashMap;
-// use std::convert::{TryFrom, TryInto};
-// use std::panic;
-// use std::ptr;
-
-use std::num::NonZeroU32;
 
 use failure::format_err;
 
-use std::sync::Arc;
 // use std::path::Path;
 
-// NOTE shouldn't be needed because we will be using Kotlin instead
-// use jni::objects::{JObject, JValue};
-// use jni::{
-//     // objects::{JClass, JString},
-//     sys::{jboolean, jbyteArray, jint, jlong, jobject, jobjectArray, jstring, JNI_FALSE, JNI_TRUE},
-//     JNIEnv,
-// };
-
-// use schemer::MigratorError;
 // use secrecy::{ExposeSecret, SecretVec};
 
 use tracing::{debug, error};
@@ -32,6 +17,9 @@ use tracing_subscriber::prelude::*;
 use tracing_subscriber::reload;
 
 // use zcash_address::{ToAddress, ZcashAddress};
+
+use std::num::NonZeroU32;
+use std::sync::Arc;
 
 use crate::native_utils as utils;
 use crate::zcash_client_sqlite::init_wallet_db;
@@ -76,6 +64,7 @@ use crate::{
     ZcashUnifiedSpendingKey,
     ZcashWalletDb,
     ZcashWalletTransparentOutput, // wallet
+    ZcashScanRange
 };
 
 use crate::fixed::ZcashFixedSingleOutputChangeStrategy;
@@ -85,13 +74,7 @@ use crate::input_selection::{ZcashMainGreedyInputSelector, ZcashTestGreedyInputS
 use crate::zcash_client_backend::{decrypt_and_store_transaction, shield_transparent_funds, spend};
 
 // use zcash_client_backend::data_api::{
-//     chain::CommitmentTreeRoot,
-//     wallet::{,
-//         shield_transparent_funds,
-//     },
-//     WalletCommitmentTrees,
 //     scanning::{ScanPriority, ScanRange},
-//     ShieldedProtocol,
 // };
 
 // use zcash_client_sqlite::chain::init::init_blockmeta_db;
@@ -801,41 +784,41 @@ fn get_transparent_balance(
     db_data: String,
     address: String,
     params: ZcashConsensusParameters,
-    min_confirmations: u32
+    min_confirmations: u32,
 ) -> ZcashResult<u32> {
-        let db_data = wallet_db(params, db_data)?;
-        let taddr = ZcashTransparentAddress::decode(params, &address).unwrap();
+    let db_data = wallet_db(params, db_data)?;
+    let taddr = ZcashTransparentAddress::decode(params, &address).unwrap();
 
-        let min_confs = NonZeroU32::new(min_confirmations).unwrap();
+    let min_confs = NonZeroU32::new(min_confirmations).unwrap();
 
-        let amount = db_data
-            .get_target_and_anchor_heights(min_confs)
-            .map_err(|e| ZcashError::Message {
-                error: format!("Error while fetching anchor height: {}", e),
+    let amount = db_data
+        .get_target_and_anchor_heights(min_confs)
+        .map_err(|e| ZcashError::Message {
+            error: format!("Error while fetching anchor height: {}", e),
+        })
+        .and_then(|opt_anchor| {
+            opt_anchor.map(|(_, a)| a).ok_or(ZcashError::Message {
+                error: "Anchor height not available; scan required.".to_string(),
             })
-            .and_then(|opt_anchor| {
-                opt_anchor.map(|(_, a)| a).ok_or(ZcashError::Message {
-                    error: "Anchor height not available; scan required.".to_string(),
+        })
+        .and_then(|anchor| {
+            db_data
+                .get_unspent_transparent_outputs(taddr, anchor, vec![])
+                .map_err(|e| ZcashError::Message {
+                    error: format!("Error while fetching verified balance: {}", e),
                 })
-            })
-            .and_then(|anchor| {
-                db_data
-                    .get_unspent_transparent_outputs(taddr, anchor, vec![])
-                    .map_err(|e| ZcashError::Message {
-                        error: format!("Error while fetching verified balance: {}", e),
-                    })
-            })?
-            .iter()
-            .map(|utxo| (*utxo.txout().value()).value())
-            .sum::<i64>();
+        })?
+        .iter()
+        .map(|utxo| (*utxo.txout().value()).value())
+        .sum::<i64>();
 
-        Ok(amount as u32)
+    Ok(amount as u32)
 }
 
 pub fn get_total_transparent_balance(
     db_data: String,
     address: String,
-    params: ZcashConsensusParameters
+    params: ZcashConsensusParameters,
 ) -> ZcashResult<u32> {
     get_transparent_balance(db_data, address, params, 1)
 }
@@ -843,7 +826,7 @@ pub fn get_total_transparent_balance(
 pub fn get_verified_transparent_balance(
     db_data: String,
     address: String,
-    params: ZcashConsensusParameters
+    params: ZcashConsensusParameters,
 ) -> ZcashResult<u32> {
     get_transparent_balance(db_data, address, params, ANCHOR_OFFSET_U32)
 }
@@ -895,76 +878,92 @@ pub fn get_current_address(
     }
 }
 
-pub fn get_nearest_rewind_height(db_data: String, height: u32, params: ZcashConsensusParameters) -> ZcashResult<u32> {
+pub fn get_nearest_rewind_height(
+    db_data: String,
+    height: u32,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<u32> {
     if height < 100 {
         Ok(height)
     } else {
         let db_data = wallet_db(params, db_data)?;
         match db_data.get_min_unspent_height() {
-            Ok(Some(best_height)) => {
-                Ok(std::cmp::min(best_height.value(), height))
-            }
+            Ok(Some(best_height)) => Ok(std::cmp::min(best_height.value(), height)),
             Ok(None) => Ok(height),
             Err(e) => Err(ZcashError::Message {
-                error: format!("Error while getting nearest rewind height for {}: {}", height, e),
+                error: format!(
+                    "Error while getting nearest rewind height for {}: {}",
+                    height, e
+                ),
             }),
         }
     }
 }
 
-
-pub fn get_transparent_receiver_for_unified_address(addr: String, params: ZcashConsensusParameters) -> ZcashResult<String> {
-
-        let ua = match ZcashUnifiedAddress::decode(params, &addr) {
-            Err(e) => return Err(ZcashError::Message {error: format!("Invalid Zcash address: {}", e)}),
-            Ok(ua) => ua
-        };
-
-        if let Some(taddr) = ua.transparent() {
-            // let Ok(_) =
-            //     if (*taddr).is_public_key() {
-            //         Ok("TODO")
-            //             // ZcashAddress::from_transparent_p2pkh(network, *data)
-            //     } else if (*taddr).is_script() {
-            //         Ok("TODO")
-            //             // ZcashAddress::from_transparent_p2sh(network, *data)
-            //     } else {
-            //         Ok("TODO")
-            //     }
-
-            Ok((*taddr).encode(params))
-        } else {
-            Err(ZcashError::Message {
-                error: "Unified Address doesn't contain a transparent receiver".to_string(),
+pub fn get_transparent_receiver_for_unified_address(
+    addr: String,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<String> {
+    let ua = match ZcashUnifiedAddress::decode(params, &addr) {
+        Err(e) => {
+            return Err(ZcashError::Message {
+                error: format!("Invalid Zcash address: {}", e),
             })
         }
+        Ok(ua) => ua,
+    };
+
+    if let Some(taddr) = ua.transparent() {
+        // let Ok(_) =
+        //     if (*taddr).is_public_key() {
+        //         Ok("TODO")
+        //             // ZcashAddress::from_transparent_p2pkh(network, *data)
+        //     } else if (*taddr).is_script() {
+        //         Ok("TODO")
+        //             // ZcashAddress::from_transparent_p2sh(network, *data)
+        //     } else {
+        //         Ok("TODO")
+        //     }
+
+        Ok((*taddr).encode(params))
+    } else {
+        Err(ZcashError::Message {
+            error: "Unified Address doesn't contain a transparent receiver".to_string(),
+        })
+    }
 }
 
-
-pub fn get_sapling_receiver_for_unified_address(addr: String, params: ZcashConsensusParameters) -> ZcashResult<String> {
-        let ua = match ZcashUnifiedAddress::decode(params, &addr) {
-            Err(e) => return Err(ZcashError::Message {error: format!("Invalid Zcash address: {}", e)}),
-            Ok(ua) => ua
-        };
-
-        if let Some(taddr) = ua.sapling() {
-            // let Ok(_) =
-            //     if (*taddr).is_public_key() {
-            //         Ok("TODO")
-            //             // ZcashAddress::from_transparent_p2pkh(network, *data)
-            //     } else if (*taddr).is_script() {
-            //         Ok("TODO")
-            //             // ZcashAddress::from_transparent_p2sh(network, *data)
-            //     } else {
-            //         Ok("TODO")
-            //     }
-
-            Ok((*taddr).encode(params))
-        } else {
-            Err(ZcashError::Message {
-                error: "Unified Address doesn't contain a sapling receiver".to_string(),
+pub fn get_sapling_receiver_for_unified_address(
+    addr: String,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<String> {
+    let ua = match ZcashUnifiedAddress::decode(params, &addr) {
+        Err(e) => {
+            return Err(ZcashError::Message {
+                error: format!("Invalid Zcash address: {}", e),
             })
         }
+        Ok(ua) => ua,
+    };
+
+    if let Some(taddr) = ua.sapling() {
+        // let Ok(_) =
+        //     if (*taddr).is_public_key() {
+        //         Ok("TODO")
+        //             // ZcashAddress::from_transparent_p2pkh(network, *data)
+        //     } else if (*taddr).is_script() {
+        //         Ok("TODO")
+        //             // ZcashAddress::from_transparent_p2sh(network, *data)
+        //     } else {
+        //         Ok("TODO")
+        //     }
+
+        Ok((*taddr).encode(params))
+    } else {
+        Err(ZcashError::Message {
+            error: "Unified Address doesn't contain a sapling receiver".to_string(),
+        })
+    }
 }
 
 // original!
@@ -995,6 +994,134 @@ pub fn get_sapling_receiver_for_unified_address(addr: String, params: ZcashConse
 //         }
 // }
 
+// NOTE cannot translate until I see what's the object type
+
+// fn decode_sapling_subtree_root(
+//     env: &JNIEnv<'_>,
+//     obj: JObject<'_>,
+// ) -> Result<CommitmentTreeRoot<sapling::Node>, failure::Error> {
+//     let long_as_u32 = |name| -> Result<u32, failure::Error> {
+//         Ok(u32::try_from(env.get_field(obj, name, "J")?.j()?)?)
+//     };
+
+//     fn byte_array(
+//         env: &JNIEnv<'_>,
+//         obj: JObject<'_>,
+//         name: &str,
+//     ) -> Result<Vec<u8>, failure::Error> {
+//         let field = env.get_field(obj, name, "[B")?.l()?.into_raw();
+//         Ok(env.convert_byte_array(field)?[..].try_into()?)
+//     }
+
+//     Ok(CommitmentTreeRoot::from_parts(
+//         BlockHeight::from_u32(long_as_u32("completingBlockHeight")?),
+//         sapling::Node::read(&byte_array(env, obj, "rootHash")?[..])?,
+//     ))
+// }
+
+// pub fn put_sapling_subtree_roots(
+//     db_data: String,
+//     start_index: u64,
+//     roots: Vec<_>,
+//     params: ZcashConsensusParameters,
+// ) -> ZcashResult<bool> {
+//         let mut db_data = wallet_db(params, db_data)?;
+
+//         if start_index < 0 {
+//             return Err(format_err!("Start index must be nonnegative."));
+//         };
+
+//         let roots = {
+//             let count = env.get_array_length(roots).unwrap();
+//             (0..count)
+//                 .map(|i| {
+//                     env.get_object_array_element(roots, i)
+//                         .map_err(|e| e.into())
+//                         .and_then(|jobj| decode_sapling_subtree_root(&env, jobj))
+//                 })
+//                 .collect::<Result<Vec<_>, _>>()?
+//         };
+
+//         db_data
+//             .put_sapling_subtree_roots(start_index, &roots)
+//             .map(|()| JNI_TRUE)
+//             .map_err(|e| format_err!("Error while storing Sapling subtree roots: {}", e))
+// }
+
+pub fn list_transparent_receivers(
+    db_data: String,
+    account: ZcashAccountId,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<Vec<String>> {
+    let db_data = wallet_db(params, db_data)?;
+
+    match db_data.get_transparent_receivers(account) {
+        Ok(receivers) => {
+            let transparent_receivers = receivers
+                .keys()
+                .map(|taddr| taddr.encode(params))
+                // let taddr = match taddr {
+                //     TransparentAddress::PublicKey(data) => {
+                //         ZcashAddress::from_transparent_p2pkh(zcash_network, *data)
+                //     }
+                //     TransparentAddress::Script(data) => {
+                //         ZcashAddress::from_transparent_p2sh(zcash_network, *data)
+                //     }
+                // };
+                .collect::<Vec<String>>();
+
+            Ok(transparent_receivers)
+        }
+        Err(e) => Err(ZcashError::Message {
+            error: format!("Error while fetching address: {}", e),
+        }),
+    }
+}
+
+// fn encode_scan_range<'a>(scan_range: ScanRange) -> jni::errors::Result<JObject<'a>> {
+
+//     let priority = match scan_range.priority() {
+//         ScanPriority::Ignored => 0,
+//         ScanPriority::Scanned => 10,
+//         ScanPriority::Historic => 20,
+//         ScanPriority::OpenAdjacent => 30,
+//         ScanPriority::FoundNote => 40,
+//         ScanPriority::ChainTip => 50,
+//         ScanPriority::Verify => 60,
+//     };
+
+//     env.new_object(
+//         "cash/z/ecc/android/sdk/internal/model/JniScanRange",
+//         "(JJJ)V",
+//         &[
+//             JValue::Long(i64::from(u32::from(scan_range.block_range().start))),
+//             JValue::Long(i64::from(u32::from(scan_range.block_range().end))),
+//             JValue::Long(priority),
+//         ],
+//     )
+// }
+
+pub fn suggest_scan_ranges(db_data: String, params: ZcashConsensusParameters) -> ZcashResult<Vec<ZcashScanRange>> {
+    let db_data = wallet_db(params, db_data)?;
+
+    db_data
+        .suggest_scan_ranges()
+        .map_err(|e| ZcashError::Message {error: format!("Error while fetching suggested scan ranges: {}", e)})
+
+    // NOTE maybe no need to encode it to a java object
+    // Ok(utils::rust_vec_to_java(
+    //     &env,
+    //     ranges,
+    //     "cash/z/ecc/android/sdk/internal/model/JniScanRange",
+    //     |env, scan_range| encode_scan_range(env, scan_range),
+    //     |env| {
+    //         encode_scan_range(
+    //             ScanRange::from_parts((0.into())..(0.into()), ScanPriority::Scanned),
+    //         )
+    //     },
+    // ))
+}
+
 // init_block_meta_db
 
 // init_blocks_table
@@ -1004,11 +1131,5 @@ pub fn get_sapling_receiver_for_unified_address(addr: String, params: ZcashConse
 // branch_id_for_height
 
 // find_block_metadata
-
-// suggest_scan_ranges
-
-// put_sapling_subtree_roots
-
-// list_transparent_receivers
 
 // rewind_block_metadata_to_height
