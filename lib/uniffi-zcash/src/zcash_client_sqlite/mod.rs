@@ -1,8 +1,8 @@
 use crate::{
     ZcashAccountId, ZcashAmount, ZcashBlockHeight, ZcashConsensusParameters,
-    ZcashDecryptedTransaction, ZcashError, ZcashMemo, ZcashResult, ZcashShieldedProtocol,
-    ZcashTransparentAddress, ZcashTxId, ZcashUnifiedFullViewingKey, ZcashWalletSummary,
-    ZcashWalletTransparentOutput,
+    ZcashDecryptedTransaction, ZcashError, ZcashMemo, ZcashOutPoint, ZcashResult,
+    ZcashShieldedProtocol, ZcashTransparentAddress, ZcashTxId, ZcashUnifiedAddress,
+    ZcashUnifiedFullViewingKey, ZcashWalletSummary, ZcashWalletTransparentOutput,
 };
 use rusqlite::Connection;
 use std::collections::HashMap;
@@ -15,6 +15,7 @@ use zcash_client_backend::data_api::NoteId;
 use zcash_client_backend::data_api::WalletRead;
 use zcash_client_sqlite::{FsBlockDb, WalletDb};
 use zcash_primitives::consensus::{MAIN_NETWORK, TEST_NETWORK};
+use zcash_primitives::transaction::components::OutPoint;
 
 mod chain;
 pub use self::chain::*;
@@ -370,7 +371,6 @@ impl ZcashWalletDb {
         }
     }
 
-    // NOTE not used yet
     pub fn store_decrypted_tx(&mut self, d_tx: ZcashDecryptedTransaction) -> ZcashResult<()> {
         match self.params {
             ZcashConsensusParameters::MainNetwork => {
@@ -396,6 +396,121 @@ impl ZcashWalletDb {
                     .store_decrypted_tx(d_tx.into())
                 {
                     Ok(()) => Ok(()),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+        }
+    }
+
+    pub fn get_min_unspent_height(&self) -> ZcashResult<Option<ZcashBlockHeight>> {
+        match self.params {
+            ZcashConsensusParameters::MainNetwork => {
+                match self
+                    .sup
+                    .main
+                    .lock()
+                    .unwrap()
+                    .get_min_unspent_height()
+                {
+                    Ok(height) => Ok(height.map(From::from)),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+            ZcashConsensusParameters::TestNetwork => {
+                match self
+                    .sup
+                    .test
+                    .lock()
+                    .unwrap()
+                    .get_min_unspent_height()
+                {
+                    Ok(height) => Ok(height.map(From::from)),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+        }
+    }
+
+    pub fn get_current_address(
+        &self,
+        aid: ZcashAccountId,
+    ) -> ZcashResult<Option<ZcashUnifiedAddress>> {
+        match self.params {
+            ZcashConsensusParameters::MainNetwork => {
+                match self
+                    .sup
+                    .main
+                    .lock()
+                    .unwrap()
+                    .get_current_address(aid.into())
+                {
+                    Ok(addr) => Ok(addr.map(From::from)),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+            ZcashConsensusParameters::TestNetwork => {
+                match self
+                    .sup
+                    .test
+                    .lock()
+                    .unwrap()
+                    .get_current_address(aid.into())
+                {
+                    Ok(addr) => Ok(addr.map(From::from)),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+        }
+    }
+
+    pub fn get_unspent_transparent_outputs(
+        &self,
+        zta: ZcashTransparentAddress,
+        zbh: ZcashBlockHeight,
+        zop: Vec<ZcashOutPoint>,
+    ) -> ZcashResult<Vec<ZcashWalletTransparentOutput>> {
+        let zop_arr = zop.iter().map(|x| x.into()).collect::<Vec<OutPoint>>();
+
+        match self.params {
+            ZcashConsensusParameters::MainNetwork => {
+                match self
+                    .sup
+                    .main
+                    .lock()
+                    .unwrap()
+                    .get_unspent_transparent_outputs(&(zta.into()), zbh.into(), &zop_arr)
+                {
+                    Ok(wtos) => Ok(wtos
+                        .iter()
+                        .map(|x| (*x).clone().into())
+                        .collect::<Vec<ZcashWalletTransparentOutput>>()),
+                    Err(e) => Err(ZcashError::Message {
+                        error: format!("Err: {}", e),
+                    }),
+                }
+            }
+            ZcashConsensusParameters::TestNetwork => {
+                match self
+                    .sup
+                    .test
+                    .lock()
+                    .unwrap()
+                    .get_unspent_transparent_outputs(&zta.into(), zbh.into(), &zop_arr)
+                {
+                    Ok(wtos) => Ok(wtos
+                        .iter()
+                        .map(|x| (*x).clone().into())
+                        .collect::<Vec<ZcashWalletTransparentOutput>>()),
                     Err(e) => Err(ZcashError::Message {
                         error: format!("Err: {}", e),
                     }),

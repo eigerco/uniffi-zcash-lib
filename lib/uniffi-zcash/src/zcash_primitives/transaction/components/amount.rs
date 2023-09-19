@@ -101,7 +101,7 @@ impl ZcashNonNegativeAmount {
         NonNegativeAmount::from_u64(amount)
             .map(Self)
             .map_err(|_| ZcashError::Message {
-                error: "baaa".to_string(),
+                error: "maybe it is negative".to_string(),
             })
     }
 
@@ -112,8 +112,13 @@ impl ZcashNonNegativeAmount {
         NonNegativeAmount::from_nonnegative_i64(amount)
             .map(Self)
             .map_err(|_| ZcashError::Message {
-                error: "baaa".to_string(),
+                error: "maybe it is negative".to_string(),
             })
+    }
+
+    pub fn value(&self) -> u64 {
+        let amount: Amount = self.0.into();
+        amount.into()
     }
 }
 

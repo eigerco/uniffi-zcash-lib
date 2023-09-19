@@ -165,6 +165,11 @@ impl ZcashAccountBalance {
     pub fn total(&self) -> ZcashNonNegativeAmount {
         self.0.total().into()
     }
+
+    /// Returns the total value of funds belonging to the account.
+    pub fn sapling_spendable_value(&self) -> ZcashNonNegativeAmount {
+        self.0.sapling_balance.spendable_value.into()
+    }
 }
 
 impl From<ZcashAccountBalance> for AccountBalance {

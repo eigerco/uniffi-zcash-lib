@@ -53,7 +53,7 @@ use crate::{
     ZcashError,
     ZcashFixedFeeRule,
     ZcashFsBlockDb,
-    // ZcashKeysEra,
+    ZcashKeysEra,
     ZcashLocalTxProver,
     ZcashMemo,
     ZcashMemoBytes,
@@ -71,7 +71,7 @@ use crate::{
     ZcashTransparentAddress,
     ZcashTxId,
     ZcashTxOut,
-    // ZcashUnifiedAddress, // address
+    ZcashUnifiedAddress, // address
     // ZcashUnifiedFullViewingKey,
     ZcashUnifiedSpendingKey,
     ZcashWalletDb,
@@ -98,6 +98,9 @@ use crate::zcash_client_backend::{decrypt_and_store_transaction, shield_transpar
 // use zcash_client_sqlite::wallet::init::{init_accounts_table, init_blocks_table}
 
 // use zcash_primitives::merkle_tree::HashSer
+
+const ANCHOR_OFFSET_U32: u32 = 10;
+const ANCHOR_OFFSET: NonZeroU32 = unsafe { NonZeroU32::new_unchecked(ANCHOR_OFFSET_U32) };
 
 fn wallet_db(params: ZcashConsensusParameters, db_data: String) -> ZcashResult<ZcashWalletDb> {
     ZcashWalletDb::for_path(db_data, params).map_err(|e| ZcashError::Message {
@@ -140,24 +143,6 @@ fn print_debug_state() {
 //     )?;
 //     Ok(output.into_raw())
 //     ZcashUnifiedSpendingKey::from_seed(params, seed, aid)
-// }
-
-// NOTE not needed
-// fn decode_usk(env: &JNIEnv<'_>, usk: jbyteArray) -> Result<UnifiedSpendingKey, failure::Error> {
-//     let usk_bytes = SecretVec::new(env.convert_byte_array(usk).unwrap());
-
-//     // The remainder of the function is safe.
-//     UnifiedSpendingKey::from_bytes(Era::Orchard, usk_bytes.expose_secret()).map_err(|e| match e {
-//         DecodingError::EraMismatch(era) => format_err!(
-//             "Spending key was from era {:?}, but {:?} was expected.",
-//             era,
-//             Era::Orchard
-//         ),
-//         e => format_err!(
-//             "An error occurred decoding the provided unified spending key: {:?}",
-//             e
-//         ),
-//     })
 // }
 
 pub fn init_on_load() {
@@ -551,9 +536,6 @@ pub fn store_decrypted_transaction(
         })
 }
 
-const ANCHOR_OFFSET_U32: u32 = 10;
-const ANCHOR_OFFSET: NonZeroU32 = unsafe { NonZeroU32::new_unchecked(ANCHOR_OFFSET_U32) };
-
 #[allow(clippy::too_many_arguments)]
 pub fn create_to_address(
     db_data: String,
@@ -735,59 +717,298 @@ pub fn shield_to_address(
         };
 
     let fixed_rule = ZcashFixedFeeRule::standard().into();
+    let fixed_strategy = ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into();
 
     match params {
         ZcashConsensusParameters::MainNetwork => {
             shield_transparent_funds_by_selector(Arc::new(ZcashMainGreedyInputSelector::new(
-                ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
+                fixed_strategy,
                 ZcashDustOutputPolicy::default().into(),
             )))
         }
         ZcashConsensusParameters::TestNetwork => {
-            shield_transparent_funds_by_selector(Arc::new(ZcashTestGreedyInputSelector::new(
-                ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
+            shield_transparent_funds_by_selector(Arc::new(ZcashMainGreedyInputSelector::new(
+                fixed_strategy,
                 ZcashDustOutputPolicy::default().into(),
             )))
         }
     }
 }
 
+fn decode_usk(zusk: ZcashUnifiedSpendingKey) -> ZcashResult<ZcashUnifiedSpendingKey> {
+    ZcashUnifiedSpendingKey::from_bytes(
+        ZcashKeysEra::Orchard,
+        &zusk.to_bytes(ZcashKeysEra::Orchard),
+    )
+    .map_err(|e| ZcashError::Message {
+        error: format!(
+            "An error occurred decoding the provided unified spending key: {:?}",
+            e
+        ),
+    })
+}
+
+pub fn is_valid_spending_key(zusk: ZcashUnifiedSpendingKey) -> bool {
+    matches!(decode_usk(zusk), Ok(_))
+}
+
+pub fn is_valid_shielded_address(
+    addr: String,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<bool> {
+    match ZcashRecipientAddress::decode(params, &addr) {
+        Ok(addr) => match addr {
+            ZcashRecipientAddress::Shielded(_) => Ok(true),
+            ZcashRecipientAddress::Transparent(_) | ZcashRecipientAddress::Unified(_) => Ok(false),
+        },
+        Err(_) => Err(ZcashError::Message {
+            error: "Address is for the wrong network".to_string(),
+        }),
+    }
+}
+
+pub fn is_valid_transparent_address(
+    addr: String,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<bool> {
+    match ZcashRecipientAddress::decode(params, &addr) {
+        Ok(addr) => match addr {
+            ZcashRecipientAddress::Transparent(_) => Ok(true),
+            ZcashRecipientAddress::Shielded(_) | ZcashRecipientAddress::Unified(_) => Ok(false),
+        },
+        Err(_) => Err(ZcashError::Message {
+            error: "Address is for the wrong network".to_string(),
+        }),
+    }
+}
+
+pub fn is_valid_unified_address(
+    addr: String,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<bool> {
+    match ZcashRecipientAddress::decode(params, &addr) {
+        Ok(addr) => match addr {
+            ZcashRecipientAddress::Unified(_) => Ok(true),
+            ZcashRecipientAddress::Shielded(_) | ZcashRecipientAddress::Transparent(_) => Ok(false),
+        },
+        Err(_) => Err(ZcashError::Message {
+            error: "Address is for the wrong network".to_string(),
+        }),
+    }
+}
+
+fn get_transparent_balance(
+    db_data: String,
+    address: String,
+    params: ZcashConsensusParameters,
+    min_confirmations: u32
+) -> ZcashResult<u32> {
+        let db_data = wallet_db(params, db_data)?;
+        let taddr = ZcashTransparentAddress::decode(params, &address).unwrap();
+
+        let min_confs = NonZeroU32::new(min_confirmations).unwrap();
+
+        let amount = db_data
+            .get_target_and_anchor_heights(min_confs)
+            .map_err(|e| ZcashError::Message {
+                error: format!("Error while fetching anchor height: {}", e),
+            })
+            .and_then(|opt_anchor| {
+                opt_anchor.map(|(_, a)| a).ok_or(ZcashError::Message {
+                    error: "Anchor height not available; scan required.".to_string(),
+                })
+            })
+            .and_then(|anchor| {
+                db_data
+                    .get_unspent_transparent_outputs(taddr, anchor, vec![])
+                    .map_err(|e| ZcashError::Message {
+                        error: format!("Error while fetching verified balance: {}", e),
+                    })
+            })?
+            .iter()
+            .map(|utxo| (*utxo.txout().value()).value())
+            .sum::<i64>();
+
+        Ok(amount as u32)
+}
+
+pub fn get_total_transparent_balance(
+    db_data: String,
+    address: String,
+    params: ZcashConsensusParameters
+) -> ZcashResult<u32> {
+    get_transparent_balance(db_data, address, params, 1)
+}
+
+pub fn get_verified_transparent_balance(
+    db_data: String,
+    address: String,
+    params: ZcashConsensusParameters
+) -> ZcashResult<u32> {
+    get_transparent_balance(db_data, address, params, ANCHOR_OFFSET_U32)
+}
+
+pub fn get_verified_balance(
+    db_data: String,
+    aid: ZcashAccountId,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<u64> {
+    let db_data = wallet_db(params, db_data)?;
+
+    if let Ok(Some(wallet_summary)) =
+        db_data
+            .get_wallet_summary(ANCHOR_OFFSET_U32)
+            .map_err(|e| ZcashError::Message {
+                error: format!("Error while fetching verified balance: {}", e),
+            })
+    {
+        wallet_summary
+            .account_balances()
+            .get(&aid)
+            .ok_or_else(|| ZcashError::Unknown)
+            .map(|acc_balance| acc_balance.sapling_spendable_value().value())
+    } else {
+        // `None` means that the caller has not yet called `updateChainTip` on a
+        // brand-new wallet, so we can assume the balance is zero.
+        Ok(0)
+    }
+}
+
+pub fn get_current_address(
+    db_data: String,
+    aid: ZcashAccountId,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<String> {
+    let db_data = wallet_db(params, db_data)?;
+
+    match db_data.get_current_address(aid) {
+        Ok(Some(addr)) => {
+            let addr_str = addr.encode(params);
+            Ok(addr_str)
+        }
+        Ok(None) => Err(ZcashError::Message {
+            error: format!("{:?} is not known to the wallet", aid),
+        }),
+        Err(e) => Err(ZcashError::Message {
+            error: format!("Error while fetching address: {}", e),
+        }),
+    }
+}
+
+pub fn get_nearest_rewind_height(db_data: String, height: u32, params: ZcashConsensusParameters) -> ZcashResult<u32> {
+    if height < 100 {
+        Ok(height)
+    } else {
+        let db_data = wallet_db(params, db_data)?;
+        match db_data.get_min_unspent_height() {
+            Ok(Some(best_height)) => {
+                Ok(std::cmp::min(best_height.value(), height))
+            }
+            Ok(None) => Ok(height),
+            Err(e) => Err(ZcashError::Message {
+                error: format!("Error while getting nearest rewind height for {}: {}", height, e),
+            }),
+        }
+    }
+}
+
+
+pub fn get_transparent_receiver_for_unified_address(addr: String, params: ZcashConsensusParameters) -> ZcashResult<String> {
+
+        let ua = match ZcashUnifiedAddress::decode(params, &addr) {
+            Err(e) => return Err(ZcashError::Message {error: format!("Invalid Zcash address: {}", e)}),
+            Ok(ua) => ua
+        };
+
+        if let Some(taddr) = ua.transparent() {
+            // let Ok(_) =
+            //     if (*taddr).is_public_key() {
+            //         Ok("TODO")
+            //             // ZcashAddress::from_transparent_p2pkh(network, *data)
+            //     } else if (*taddr).is_script() {
+            //         Ok("TODO")
+            //             // ZcashAddress::from_transparent_p2sh(network, *data)
+            //     } else {
+            //         Ok("TODO")
+            //     }
+
+            Ok((*taddr).encode(params))
+        } else {
+            Err(ZcashError::Message {
+                error: "Unified Address doesn't contain a transparent receiver".to_string(),
+            })
+        }
+}
+
+
+pub fn get_sapling_receiver_for_unified_address(addr: String, params: ZcashConsensusParameters) -> ZcashResult<String> {
+        let ua = match ZcashUnifiedAddress::decode(params, &addr) {
+            Err(e) => return Err(ZcashError::Message {error: format!("Invalid Zcash address: {}", e)}),
+            Ok(ua) => ua
+        };
+
+        if let Some(taddr) = ua.sapling() {
+            // let Ok(_) =
+            //     if (*taddr).is_public_key() {
+            //         Ok("TODO")
+            //             // ZcashAddress::from_transparent_p2pkh(network, *data)
+            //     } else if (*taddr).is_script() {
+            //         Ok("TODO")
+            //             // ZcashAddress::from_transparent_p2sh(network, *data)
+            //     } else {
+            //         Ok("TODO")
+            //     }
+
+            Ok((*taddr).encode(params))
+        } else {
+            Err(ZcashError::Message {
+                error: "Unified Address doesn't contain a sapling receiver".to_string(),
+            })
+        }
+}
+
+// original!
+// DOESN'T HAVE a string representation yet
+// pub fn get_orchard_receiver_for_unified_address(addr: String, params: ZcashConsensusParameters) -> ZcashResult<String> {
+//         let ua = match ZcashUnifiedAddress::decode(params, &addr) {
+//             Err(e) => return Err(ZcashError::Message {error: format!("Invalid Zcash address: {}", e)}),
+//             Ok(ua) => ua
+//         };
+
+//         if let Some(taddr) = ua.orchard() {
+//             // let Ok(_) =
+//             //     if (*taddr).is_public_key() {
+//             //         Ok("TODO")
+//             //             // ZcashAddress::from_transparent_p2pkh(network, *data)
+//             //     } else if (*taddr).is_script() {
+//             //         Ok("TODO")
+//             //             // ZcashAddress::from_transparent_p2sh(network, *data)
+//             //     } else {
+//             //         Ok("TODO")
+//             //     }
+
+//             Ok((*taddr).encode(params))
+//         } else {
+//             Err(ZcashError::Message {
+//                 error: "Unified Address doesn't contain a orchard receiver".to_string(),
+//             })
+//         }
+// }
+
 // init_block_meta_db
 
 // init_blocks_table
+
+// init_accounts_table_with_keys
 
 // branch_id_for_height
 
 // find_block_metadata
 
-// get_current_address
-
 // suggest_scan_ranges
-
-// get_verified_balance
-
-// is_valid_spending_key
-
-// is_valid_unified_address
-
-// get_nearest_rewind_height
-
-// is_valid_shielded_address
 
 // put_sapling_subtree_roots
 
 // list_transparent_receivers
 
-// init_accounts_table_with_keys
-
-// is_valid_transparent_address
-
-// get_total_transparent_balance
-
 // rewind_block_metadata_to_height
-
-// get_verified_transparent_balance
-
-// get_sapling_receiver_for_unified_address
-
-// get_transparent_receiver_for_unified_address
