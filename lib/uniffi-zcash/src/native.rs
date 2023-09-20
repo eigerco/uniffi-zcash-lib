@@ -52,6 +52,7 @@ use crate::{
     ZcashPayment,
     ZcashRecipientAddress,
     ZcashResult,
+    ZcashScanRange,
     ZcashScript,
     ZcashShieldedProtocol,
     ZcashTransaction,
@@ -64,7 +65,6 @@ use crate::{
     ZcashUnifiedSpendingKey,
     ZcashWalletDb,
     ZcashWalletTransparentOutput, // wallet
-    ZcashScanRange
 };
 
 use crate::fixed::ZcashFixedSingleOutputChangeStrategy;
@@ -73,14 +73,15 @@ use crate::input_selection::{ZcashMainGreedyInputSelector, ZcashTestGreedyInputS
 
 use crate::zcash_client_backend::{decrypt_and_store_transaction, shield_transparent_funds, spend};
 
-// use zcash_client_backend::data_api::{
-//     scanning::{ScanPriority, ScanRange},
-// };
+// use zcash_client_sqlite::chain::init_blockmeta_db; // HAVE IT
 
-// use zcash_client_sqlite::chain::init::init_blockmeta_db;
-// use zcash_client_sqlite::wallet::init::{init_accounts_table, init_blocks_table}
-
-// use zcash_primitives::merkle_tree::HashSer
+// NOTE from changelog
+// `zcash_client_sqlite::wallet::init::{init_blocks_table, init_accounts_table}`
+//   have been removed. `zcash_client_backend::data_api::WalletWrite::create_account`
+//   should be used instead; the initialization of the note commitment tree
+//   previously performed by `init_blocks_table` is now handled by passing an
+//   `AccountBirthday` containing the note commitment tree frontier as of the
+//   end of the birthday height block to `create_account` instead.
 
 const ANCHOR_OFFSET_U32: u32 = 10;
 const ANCHOR_OFFSET: NonZeroU32 = unsafe { NonZeroU32::new_unchecked(ANCHOR_OFFSET_U32) };
@@ -1101,12 +1102,17 @@ pub fn list_transparent_receivers(
 //     )
 // }
 
-pub fn suggest_scan_ranges(db_data: String, params: ZcashConsensusParameters) -> ZcashResult<Vec<ZcashScanRange>> {
+pub fn suggest_scan_ranges(
+    db_data: String,
+    params: ZcashConsensusParameters,
+) -> ZcashResult<Vec<ZcashScanRange>> {
     let db_data = wallet_db(params, db_data)?;
 
     db_data
         .suggest_scan_ranges()
-        .map_err(|e| ZcashError::Message {error: format!("Error while fetching suggested scan ranges: {}", e)})
+        .map_err(|e| ZcashError::Message {
+            error: format!("Error while fetching suggested scan ranges: {}", e),
+        })
 
     // NOTE maybe no need to encode it to a java object
     // Ok(utils::rust_vec_to_java(
@@ -1122,14 +1128,33 @@ pub fn suggest_scan_ranges(db_data: String, params: ZcashConsensusParameters) ->
     // ))
 }
 
-// init_block_meta_db
+// NOTE lot of hassle, may not be needed
+// pub fn branch_id_for_height(height: u32, params: ZcashConsensusParameters) -> u32 {
+//         let branch: ZcashBranchId = ZcashBranchId::new(params, ZcashBlockHeight::new(height));
+//         let branch_id = branch.value();
 
-// init_blocks_table
+//         debug!(
+//             "For height {} found consensus branch {:?} with id {}",
+//             height, branch, branch_id
+//         );
+
+//         branch_id
+// }
+
+// fn encode_blockmeta(env: &JNIEnv<'_>, meta: BlockMeta) -> Result<jobject, failure::Error> {
+//     let block_hash = env.byte_array_from_slice(&meta.block_hash.0)?;
+//     let output = env.new_object(
+//         "cash/z/ecc/android/sdk/internal/model/JniBlockMeta",
+//         "(J[BJJJ)V",
+//         &[
+//             JValue::Long(i64::from(u32::from(meta.height))),
+//             JValue::Object(unsafe { JObject::from_raw(block_hash) }),
+//             JValue::Long(i64::from(meta.block_time)),
+//             JValue::Long(i64::from(meta.sapling_outputs_count)),
+//             JValue::Long(i64::from(meta.orchard_actions_count)),
+//         ],
+//     )?;
+//     Ok(output.into_raw())
+// }
 
 // init_accounts_table_with_keys
-
-// branch_id_for_height
-
-// find_block_metadata
-
-// rewind_block_metadata_to_height

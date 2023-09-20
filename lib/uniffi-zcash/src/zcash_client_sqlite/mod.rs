@@ -9,17 +9,17 @@ use rusqlite::Connection;
 use std::collections::HashMap;
 use std::num::NonZeroU32;
 use std::sync::{Arc, Mutex};
-use zcash_client_backend::data_api::WalletWrite;
-use zcash_client_sqlite::chain::BlockMeta;
-// use zcash_client_sqlite::wallet as original_wallet;
 use zcash_client_backend::address::AddressMetadata;
 use zcash_client_backend::data_api::chain::CommitmentTreeRoot;
 use zcash_client_backend::data_api::scanning::ScanRange;
 use zcash_client_backend::data_api::NoteId;
 use zcash_client_backend::data_api::WalletCommitmentTrees;
 use zcash_client_backend::data_api::WalletRead;
+use zcash_client_backend::data_api::WalletWrite;
 use zcash_client_backend::wallet::WalletTransparentOutput;
+use zcash_client_sqlite::chain::BlockMeta;
 use zcash_client_sqlite::{FsBlockDb, WalletDb};
+use zcash_primitives::consensus;
 use zcash_primitives::consensus::{MAIN_NETWORK, TEST_NETWORK};
 use zcash_primitives::legacy::TransparentAddress;
 use zcash_primitives::sapling;
@@ -35,15 +35,18 @@ pub use self::wallet::*;
 /// this is needed because WalletDb uses a generic argument
 /// and UniFFI doesn't support it. So we may init all the used types
 /// in order to avoid the need of using that argument.
+
+// NOTE we could create a method that extracts the proper WalletDb, but that wouldn't
 // #[derive(Clone)]
-pub struct SuperWalletDb<C> {
-    pub main: Mutex<WalletDb<C, zcash_primitives::consensus::MainNetwork>>,
-    pub test: Mutex<WalletDb<C, zcash_primitives::consensus::TestNetwork>>,
+pub struct SuperWalletDb {
+    pub main: Mutex<WalletDb<Connection, consensus::MainNetwork>>,
+    pub test: Mutex<WalletDb<Connection, consensus::TestNetwork>>,
 }
 
 /// A wrapper for the SQLite connection to the wallet database.
 pub struct ZcashWalletDb {
-    pub sup: Arc<SuperWalletDb<Connection>>,
+    pub sup: Arc<SuperWalletDb>,
+    pub path: String,
     pub params: ZcashConsensusParameters,
 }
 
@@ -65,6 +68,30 @@ pub struct ZcashWalletDb {
 // how to get WDB:
 // let zwdb = ZcashWalletDb( ... )
 // zwdb.sup.main or zwdb.sup.test
+// trait Getter {
+//     fn get(&self, params: ZcashConsensusParameters) -> Self;
+// }
+
+// enum Both {
+//     Main(WalletDb<rusqlite::Connection, consensus::MainNetwork>),
+//     Test(WalletDb<rusqlite::Connection, consensus::TestNetwork>),
+// }
+
+// impl Getter for Both {
+//     fn get(&self, params: ZcashConsensusParameters) -> Self {
+//         match params {
+//             ZcashConsensusParameters::MainNetwork => Self::Main(WalletDb::for_path(&"", MAIN_NETWORK).unwrap()),
+//             ZcashConsensusParameters::TestNetwork => Self::Test(WalletDb::for_path(&"", TEST_NETWORK).unwrap())
+//         }
+//     }
+// }
+
+pub fn cast_err(e: zcash_client_sqlite::error::SqliteClientError) -> ZcashError {
+    ZcashError::Message {
+        error: format!("Err: {}", e),
+    }
+}
+
 impl ZcashWalletDb {
     /// Construct a connection to the wallet database stored at the specified path.
     pub fn for_path(path: String, params: ZcashConsensusParameters) -> ZcashResult<Self> {
@@ -75,9 +102,17 @@ impl ZcashWalletDb {
 
         Ok(ZcashWalletDb {
             sup: Arc::new(sup),
+            path,
             params,
         })
     }
+
+    // fn get_db(&self) -> Result<MutexGuard<'_, WalletDb<rusqlite::Connection, _>>, _> {
+    //     match self.params {
+    //         ZcashConsensusParameters::MainNetwork => self.sup.main.lock(),
+    //         ZcashConsensusParameters::TestNetwork => self.sup.test.lock()
+    //     }
+    // }
 
     //NOTE: if I use this approach, it complains about a reference borrowed and not given back
 
@@ -113,36 +148,48 @@ impl ZcashWalletDb {
         &mut self,
         output: &ZcashWalletTransparentOutput,
     ) -> ZcashResult<i64> {
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => {
-                match self
-                    .sup
-                    .main
-                    .lock()
-                    .unwrap()
-                    .put_received_transparent_utxo(&output.0)
-                {
-                    Ok(utxo_id) => Ok(utxo_id.0),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
-            ZcashConsensusParameters::TestNetwork => {
-                match self
-                    .sup
-                    .test
-                    .lock()
-                    .unwrap()
-                    .put_received_transparent_utxo(&output.0)
-                {
-                    Ok(utxo_id) => Ok(utxo_id.0),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
-        }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .put_received_transparent_utxo(&output.0)
+            .map(|x| x.0)
+            .map_err(cast_err)
+
+        // match  {
+        //     Ok(utxo_id) => Ok(utxo_id.0),
+        //     Err(e) => Err(ZcashError::Message {
+        //         error: format!("Err: {}", e),
+        //     }),
+        // }
+        // match self.params {
+        //     ZcashConsensusParameters::MainNetwork => {
+        //         match self
+        //             .sup
+        //             .main
+        //             .lock()
+        //             .unwrap()
+        //             .put_received_transparent_utxo(&output.0)
+        //         {
+        //             Ok(utxo_id) => Ok(utxo_id.0),
+        //             Err(e) => Err(ZcashError::Message {
+        //                 error: format!("Err: {}", e),
+        //             }),
+        //         }
+        //     }
+        //     ZcashConsensusParameters::TestNetwork => {
+        //         match self
+        //             .sup
+        //             .test
+        //             .lock()
+        //             .unwrap()
+        //             .put_received_transparent_utxo(&output.0)
+        //         {
+        //             Ok(utxo_id) => Ok(utxo_id.0),
+        //             Err(e) => Err(ZcashError::Message {
+        //                 error: format!("Err: {}", e),
+        //             }),
+        //         }
+        //     }
+        // }
     }
 
     pub fn get_memo(&self, id_note: ZcashNoteId) -> ZcashResult<ZcashMemo> {
@@ -557,9 +604,7 @@ impl ZcashWalletDb {
                 .unwrap()
                 .get_unspent_transparent_outputs(&zta.into(), zbh.into(), &zop_arr)
                 .map(convert_arr)
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
+                .map_err(cast_err),
         }
     }
 }
