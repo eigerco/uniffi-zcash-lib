@@ -1,0 +1,6 @@
+interface ZcashAddressMetadata {
+	constructor(ZcashAccountId account, ZcashDiversifierIndex diversifier_index);
+
+	ZcashAccountId account();
+	ZcashDiversifierIndex diversifier_index();
+};

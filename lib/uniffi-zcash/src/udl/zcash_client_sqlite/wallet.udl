@@ -1,0 +1,12 @@
+[Enum]
+interface ZcashWalletMigrationError {
+	SeedRequired();
+	CorruptedData(string v);
+	DbError(string v);
+	BalanceError(string v);
+};
+
+interface ZcashWallet {
+  	[Throws=ZcashError]
+  	void init_wallet_db(ZcashWalletDb zwdb, sequence<u8> seed, ZcashConsensusParameters params);
+};

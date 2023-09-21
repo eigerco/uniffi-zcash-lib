@@ -9,9 +9,10 @@ pub use self::scanning::*;
 
 use std::collections::BTreeMap;
 use std::collections::HashMap;
+use std::fmt;
 use std::sync::Arc;
 
-use crate::{ZcashAccountId, ZcashBlockHeight, ZcashNonNegativeAmount};
+use crate::{ZcashBlockHeight, ZcashNonNegativeAmount};
 
 use zcash_client_backend::data_api::{
     AccountBalance, Balance, DecryptedTransaction, Ratio, ShieldedProtocol, WalletSummary,
@@ -42,6 +43,13 @@ impl From<ShieldedProtocol> for ZcashShieldedProtocol {
 
 pub struct ZcashDecryptedTransaction(DecryptedTransaction<'static>);
 
+// NOTE change this
+impl fmt::Debug for ZcashDecryptedTransaction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "needed for Arc taking out")
+    }
+}
+
 impl From<DecryptedTransaction<'static>> for ZcashDecryptedTransaction {
     fn from(e: DecryptedTransaction<'static>) -> Self {
         Self(e)
@@ -58,40 +66,45 @@ pub struct ZcashWalletSummary(WalletSummary);
 
 impl ZcashWalletSummary {
     pub fn new(
-        account_balances: HashMap<ZcashAccountId, ZcashAccountBalance>,
+        account_balances: HashMap<String, Arc<ZcashAccountBalance>>,
         chain_tip_height: Arc<ZcashBlockHeight>,
         fully_scanned_height: Arc<ZcashBlockHeight>,
-        scan_progress: Option<ZcashRatio>,
+        scan_progress: Option<Arc<ZcashRatio>>,
     ) -> Self {
         Self(WalletSummary::new(
             account_balances
                 .into_iter()
-                .map(|(x, y)| (x.into(), y.into()))
+                .map(|(x, y)| (x.parse::<u32>().unwrap().into(), (*y).into()))
                 .collect::<BTreeMap<AccountId, AccountBalance>>(),
             (*chain_tip_height).into(),
             (*fully_scanned_height).into(),
-            scan_progress.map(From::from),
+            scan_progress.map(|x| (*x).into()),
         ))
     }
 
     /// Returns the balances of accounts in the wallet, keyed by account ID.
-    pub fn account_balances(&self) -> HashMap<ZcashAccountId, ZcashAccountBalance> {
+    pub fn account_balances(&self) -> HashMap<String, Arc<ZcashAccountBalance>> {
         self.0
             .account_balances()
             .iter()
-            .map(|(&x, &y)| (x.into(), y.into()))
-            .collect::<HashMap<ZcashAccountId, ZcashAccountBalance>>()
+            .map(|(&x, &y)| {
+                (
+                    <AccountId as Into<u32>>::into(x).to_string(),
+                    Arc::new(y.into()),
+                )
+            })
+            .collect()
     }
 
     /// Returns the height of the current chain tip.
-    pub fn chain_tip_height(&self) -> ZcashBlockHeight {
-        self.0.chain_tip_height().into()
+    pub fn chain_tip_height(&self) -> Arc<ZcashBlockHeight> {
+        Arc::new(self.0.chain_tip_height().into())
     }
 
     /// Returns the height below which all blocks have been scanned by the wallet, ignoring blocks
     /// below the wallet birthday.
-    pub fn fully_scanned_height(&self) -> ZcashBlockHeight {
-        self.0.fully_scanned_height().into()
+    pub fn fully_scanned_height(&self) -> Arc<ZcashBlockHeight> {
+        Arc::new(self.0.fully_scanned_height().into())
     }
 
     /// Returns the progress of scanning shielded outputs, in terms of the ratio between notes
@@ -100,8 +113,8 @@ impl ZcashWalletSummary {
     /// This ratio should only be used to compute progress percentages, and the numerator and
     /// denominator should not be treated as authoritative note counts. Returns `None` if the
     /// wallet is unable to determine the size of the note commitment tree.
-    pub fn scan_progress(&self) -> Option<ZcashRatio> {
-        self.0.scan_progress().map(From::from)
+    pub fn scan_progress(&self) -> Option<Arc<ZcashRatio>> {
+        self.0.scan_progress().map(From::from).map(Arc::new)
     }
 
     /// Returns whether or not wallet scanning is complete.
@@ -132,13 +145,13 @@ impl ZcashRatio {
     }
 
     /// Returns the numerator of the ratio.
-    pub fn numerator(&self) -> &u64 {
-        self.0.numerator()
+    pub fn numerator(&self) -> u64 {
+        *self.0.numerator()
     }
 
     /// Returns the denominator of the ratio.
-    pub fn denominator(&self) -> &u64 {
-        self.0.denominator()
+    pub fn denominator(&self) -> u64 {
+        *self.0.denominator()
     }
 }
 
@@ -159,19 +172,21 @@ pub struct ZcashAccountBalance(AccountBalance);
 
 impl ZcashAccountBalance {
     /// The [`Balance`] value having zero values for all its fields.
-    pub const ZERO: Self = Self(AccountBalance {
-        sapling_balance: Balance::ZERO,
-        unshielded: NonNegativeAmount::ZERO,
-    });
-
-    /// Returns the total value of funds belonging to the account.
-    pub fn total(&self) -> ZcashNonNegativeAmount {
-        self.0.total().into()
+    pub fn zero() -> Self {
+        Self(AccountBalance {
+            sapling_balance: Balance::ZERO,
+            unshielded: NonNegativeAmount::ZERO,
+        })
     }
 
     /// Returns the total value of funds belonging to the account.
-    pub fn sapling_spendable_value(&self) -> ZcashNonNegativeAmount {
-        self.0.sapling_balance.spendable_value.into()
+    pub fn total(&self) -> Arc<ZcashNonNegativeAmount> {
+        Arc::new(self.0.total().into())
+    }
+
+    /// Returns the total value of funds belonging to the account.
+    pub fn sapling_spendable_value(&self) -> Arc<ZcashNonNegativeAmount> {
+        Arc::new(self.0.sapling_balance.spendable_value.into())
     }
 }
 

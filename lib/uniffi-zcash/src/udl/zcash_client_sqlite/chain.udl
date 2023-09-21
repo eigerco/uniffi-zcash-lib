@@ -2,3 +2,8 @@
 interface ZcashBlockMeta {
 	string block_file_path(string blocks_dir);
 };
+
+interface ZcashChain {
+  	[Throws=ZcashError]
+  	void init_blockmeta_db(string blocks_dir);
+};

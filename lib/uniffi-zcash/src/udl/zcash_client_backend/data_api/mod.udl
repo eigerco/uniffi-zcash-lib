@@ -1,0 +1,28 @@
+interface ZcashWalletSummary {
+	constructor(record<string, ZcashAccountBalance> account_balances, ZcashBlockHeight chain_tip_height, ZcashBlockHeight fully_scanned_height, ZcashRatio? scan_progress);
+
+	record<string, ZcashAccountBalance> account_balances();
+
+	ZcashBlockHeight chain_tip_height();
+
+	ZcashBlockHeight fully_scanned_height();
+
+	ZcashRatio? scan_progress();
+
+	boolean is_synced();
+};
+
+interface ZcashRatio {
+	constructor(u64 numerator, u64 denominator);
+
+	u64 numerator();
+	u64 denominator();
+};
+
+interface ZcashAccountBalance {
+	[Name=zero]
+	constructor();
+
+	ZcashNonNegativeAmount total();
+	ZcashNonNegativeAmount sapling_spendable_value();
+};

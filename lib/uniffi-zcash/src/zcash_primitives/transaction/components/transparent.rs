@@ -7,6 +7,7 @@ use zcash_primitives::transaction::components::{
 
 use crate::{utils::cast_slice, ZcashAmount, ZcashResult, ZcashScript, ZcashTransparentAddress};
 
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ZcashOutPoint(OutPoint);
 
 impl ZcashOutPoint {

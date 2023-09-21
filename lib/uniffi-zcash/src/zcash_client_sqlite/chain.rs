@@ -5,7 +5,7 @@ use zcash_client_sqlite::chain::BlockMeta;
 
 /// Data structure representing a row in the block metadata database.
 // #[cfg(feature = "unstable")]
-#[derive(Debug)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ZcashBlockMeta(pub BlockMeta);
 
 // #[cfg(feature = "unstable")]

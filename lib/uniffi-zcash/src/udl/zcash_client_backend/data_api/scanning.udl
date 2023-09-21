@@ -1,0 +1,22 @@
+enum ZcashScanPriority {
+    "Ignored",
+    "Scanned",
+    "Historic",
+    "OpenAdjacent",
+    "FoundNote",
+    "ChainTip",
+    "Verify",
+};
+
+interface ZcashScanRange {
+    [Name=from_parts]
+    constructor(ZcashBlockHeight start_block, ZcashBlockHeight end_block, ZcashScanPriority priority);
+
+    sequence<ZcashBlockHeight> block_range();
+
+    ZcashScanPriority priority();
+
+    boolean is_empty();
+
+    u32 len();
+};

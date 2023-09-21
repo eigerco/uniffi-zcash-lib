@@ -12,18 +12,15 @@ pub use self::unified_address::*;
 pub struct ZcashAddressMetadata(AddressMetadata);
 
 impl ZcashAddressMetadata {
-    pub fn new(
-        account: Arc<ZcashAccountId>,
-        diversifier_index: Arc<ZcashDiversifierIndex>,
-    ) -> Self {
+    pub fn new(account: ZcashAccountId, diversifier_index: Arc<ZcashDiversifierIndex>) -> Self {
         Self(AddressMetadata::new(
-            (*account).into(),
+            account.into(),
             (&(*diversifier_index)).into(),
         ))
     }
 
-    pub fn account(&self) -> Arc<ZcashAccountId> {
-        Arc::new(self.0.account().into())
+    pub fn account(&self) -> ZcashAccountId {
+        self.0.account().into()
     }
 
     pub fn diversifier_index(&self) -> Arc<ZcashDiversifierIndex> {

@@ -325,6 +325,7 @@ impl From<(Transaction, SaplingMetadata)> for ZcashTransactionAndSaplingMetadata
     }
 }
 
+#[derive(Clone, Copy, PartialOrd, Ord, PartialEq, Eq, Hash)]
 pub struct ZcashTxId(TxId);
 
 impl ZcashTxId {

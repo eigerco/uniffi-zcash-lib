@@ -1,4 +1,5 @@
 use std::fmt;
+use std::sync::Arc;
 use zcash_client_backend::data_api::scanning::{ScanPriority, ScanRange};
 use zcash_primitives::consensus::BlockHeight;
 
@@ -62,22 +63,22 @@ impl ZcashScanRange {
     /// Constructs a scan range from its constituent parts.
     /// vector of two elements, start and end
     pub fn from_parts(
-        start_block: ZcashBlockHeight,
-        end_block: ZcashBlockHeight,
+        start_block: Arc<ZcashBlockHeight>,
+        end_block: Arc<ZcashBlockHeight>,
         priority: ZcashScanPriority,
     ) -> Self {
-        let start: BlockHeight = start_block.into();
-        let end: BlockHeight = end_block.into();
+        let start: BlockHeight = (*start_block).into();
+        let end: BlockHeight = (*end_block).into();
 
         Self(ScanRange::from_parts(start..end, priority.into()))
     }
 
     /// Returns the range of block heights to be scanned.
-    pub fn block_range(&self) -> Vec<ZcashBlockHeight> {
+    pub fn block_range(&self) -> Vec<Arc<ZcashBlockHeight>> {
         let range = self.0.block_range();
         let start: ZcashBlockHeight = range.start.into();
         let end: ZcashBlockHeight = range.end.into();
-        vec![start, end]
+        vec![Arc::new(start), Arc::new(end)]
     }
 
     /// Returns the priority with which the scan range should be scanned.
@@ -91,8 +92,8 @@ impl ZcashScanRange {
     }
 
     /// Returns the number of blocks in the scan range.
-    pub fn len(&self) -> usize {
-        self.0.len()
+    pub fn len(&self) -> u32 {
+        u32::try_from(self.0.len()).unwrap()
     }
 
     // truncate_start, truncate_end, split_at left

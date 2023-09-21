@@ -1,12 +1,6 @@
-use crate::{
-    ZcashAccountId, ZcashAddressMetadata, ZcashAmount, ZcashBlockHeight, ZcashCommitmentTreeRoot,
-    ZcashConsensusParameters, ZcashDecryptedTransaction, ZcashError, ZcashMemo, ZcashOutPoint,
-    ZcashResult, ZcashScanRange, ZcashShieldedProtocol, ZcashTransparentAddress, ZcashTxId,
-    ZcashUnifiedAddress, ZcashUnifiedFullViewingKey, ZcashWalletSummary,
-    ZcashWalletTransparentOutput,
-};
 use rusqlite::Connection;
 use std::collections::HashMap;
+use std::fmt;
 use std::num::NonZeroU32;
 use std::sync::{Arc, Mutex};
 use zcash_client_backend::address::AddressMetadata;
@@ -16,6 +10,7 @@ use zcash_client_backend::data_api::NoteId;
 use zcash_client_backend::data_api::WalletCommitmentTrees;
 use zcash_client_backend::data_api::WalletRead;
 use zcash_client_backend::data_api::WalletWrite;
+use zcash_client_backend::encoding::AddressCodec;
 use zcash_client_backend::wallet::WalletTransparentOutput;
 use zcash_client_sqlite::chain::BlockMeta;
 use zcash_client_sqlite::{FsBlockDb, WalletDb};
@@ -25,6 +20,14 @@ use zcash_primitives::legacy::TransparentAddress;
 use zcash_primitives::sapling;
 use zcash_primitives::transaction::components::Amount;
 use zcash_primitives::transaction::components::OutPoint;
+
+use crate::{
+    ZcashAccountId, ZcashAddressMetadata, ZcashAmount, ZcashBlockHeight, ZcashCommitmentTreeRoot,
+    ZcashConsensusParameters, ZcashDecryptedTransaction, ZcashError, ZcashMemo, ZcashOutPoint,
+    ZcashResult, ZcashScanRange, ZcashShieldedProtocol, ZcashTransparentAddress, ZcashTxId,
+    ZcashUnifiedAddress, ZcashUnifiedFullViewingKey, ZcashWalletSummary,
+    ZcashWalletTransparentOutput,
+};
 
 mod chain;
 pub use self::chain::*;
@@ -86,7 +89,7 @@ pub struct ZcashWalletDb {
 //     }
 // }
 
-pub fn cast_err(e: zcash_client_sqlite::error::SqliteClientError) -> ZcashError {
+fn cast_err(e: zcash_client_sqlite::error::SqliteClientError) -> ZcashError {
     ZcashError::Message {
         error: format!("Err: {}", e),
     }
@@ -145,8 +148,8 @@ impl ZcashWalletDb {
     // }
 
     pub fn put_received_transparent_utxo(
-        &mut self,
-        output: &ZcashWalletTransparentOutput,
+        &self,
+        output: Arc<ZcashWalletTransparentOutput>,
     ) -> ZcashResult<i64> {
         WalletDb::for_path(&self.path, self.params)
             .expect("Cannot access the DB!")
@@ -192,12 +195,10 @@ impl ZcashWalletDb {
         // }
     }
 
-    pub fn get_memo(&self, id_note: ZcashNoteId) -> ZcashResult<ZcashMemo> {
-        let note: NoteId = id_note.into();
-
+    pub fn get_memo(&self, id_note: Arc<ZcashNoteId>) -> ZcashResult<ZcashMemo> {
         match self.params {
             ZcashConsensusParameters::MainNetwork => {
-                match self.sup.main.lock().unwrap().get_memo(note) {
+                match self.sup.main.lock().unwrap().get_memo((*id_note).into()) {
                     // NOTE this is stupid
                     Ok(memo) => Ok(memo.unwrap().into()),
                     Err(e) => Err(ZcashError::Message {
@@ -206,7 +207,7 @@ impl ZcashWalletDb {
                 }
             }
             ZcashConsensusParameters::TestNetwork => {
-                match self.sup.test.lock().unwrap().get_memo(note) {
+                match self.sup.test.lock().unwrap().get_memo((*id_note).into()) {
                     Ok(memo) => Ok(memo.unwrap().into()),
                     Err(e) => Err(ZcashError::Message {
                         error: format!("Err: {}", e),
@@ -216,14 +217,14 @@ impl ZcashWalletDb {
         }
     }
 
-    pub fn truncate_to_height(&mut self, block_height: ZcashBlockHeight) -> ZcashResult<()> {
+    pub fn truncate_to_height(&self, block_height: u32) -> ZcashResult<()> {
         match self.params {
             ZcashConsensusParameters::MainNetwork => self
                 .sup
                 .main
                 .lock()
                 .unwrap()
-                .truncate_to_height(block_height.into())
+                .truncate_to_height(ZcashBlockHeight::new(block_height).into())
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
                 }),
@@ -232,21 +233,21 @@ impl ZcashWalletDb {
                 .test
                 .lock()
                 .unwrap()
-                .truncate_to_height(block_height.into())
+                .truncate_to_height(ZcashBlockHeight::new(block_height).into())
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
                 }),
         }
     }
 
-    pub fn update_chain_tip(&mut self, tip_height: ZcashBlockHeight) -> ZcashResult<()> {
+    pub fn update_chain_tip(&self, tip_height: u32) -> ZcashResult<()> {
         match self.params {
             ZcashConsensusParameters::MainNetwork => self
                 .sup
                 .main
                 .lock()
                 .unwrap()
-                .update_chain_tip(tip_height.into())
+                .update_chain_tip(ZcashBlockHeight::new(tip_height).into())
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
                 }),
@@ -255,7 +256,7 @@ impl ZcashWalletDb {
                 .test
                 .lock()
                 .unwrap()
-                .update_chain_tip(tip_height.into())
+                .update_chain_tip(ZcashBlockHeight::new(tip_height).into())
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
                 }),
@@ -264,8 +265,9 @@ impl ZcashWalletDb {
 
     pub fn get_target_and_anchor_heights(
         &self,
-        min_confirmations: NonZeroU32,
+        min_confirmations: u32,
     ) -> ZcashResult<Option<(ZcashBlockHeight, ZcashBlockHeight)>> {
+        let min = NonZeroU32::new(min_confirmations).unwrap();
         match self.params {
             ZcashConsensusParameters::MainNetwork => {
                 match self
@@ -273,7 +275,7 @@ impl ZcashWalletDb {
                     .main
                     .lock()
                     .unwrap()
-                    .get_target_and_anchor_heights(min_confirmations)
+                    .get_target_and_anchor_heights(min)
                 {
                     Ok(None) => Ok(None),
                     Ok(Some((bh1, bh2))) => Ok(Some((bh1.into(), bh2.into()))),
@@ -288,7 +290,7 @@ impl ZcashWalletDb {
                     .test
                     .lock()
                     .unwrap()
-                    .get_target_and_anchor_heights(min_confirmations)
+                    .get_target_and_anchor_heights(min)
                 {
                     Ok(None) => Ok(None),
                     Ok(Some((bh1, bh2))) => Ok(Some((bh1.into(), bh2.into()))),
@@ -303,7 +305,7 @@ impl ZcashWalletDb {
     pub fn get_wallet_summary(
         &self,
         min_confirmations: u32,
-    ) -> ZcashResult<Option<ZcashWalletSummary>> {
+    ) -> ZcashResult<Option<Arc<ZcashWalletSummary>>> {
         match self.params {
             ZcashConsensusParameters::MainNetwork => self
                 .sup
@@ -311,7 +313,7 @@ impl ZcashWalletDb {
                 .lock()
                 .unwrap()
                 .get_wallet_summary(min_confirmations)
-                .map(|x| x.map(From::from))
+                .map(|x| x.map(From::from).map(Arc::new))
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
                 }),
@@ -321,7 +323,7 @@ impl ZcashWalletDb {
                 .lock()
                 .unwrap()
                 .get_wallet_summary(min_confirmations)
-                .map(|x| x.map(From::from))
+                .map(|x| x.map(From::from).map(Arc::new))
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
                 }),
@@ -329,8 +331,8 @@ impl ZcashWalletDb {
     }
 
     pub fn get_account_for_ufvk(
-        &mut self,
-        zufvk: ZcashUnifiedFullViewingKey,
+        &self,
+        zufvk: Arc<ZcashUnifiedFullViewingKey>,
     ) -> ZcashResult<Option<ZcashAccountId>> {
         match self.params {
             ZcashConsensusParameters::MainNetwork => {
@@ -339,9 +341,9 @@ impl ZcashWalletDb {
                     .main
                     .lock()
                     .unwrap()
-                    .get_account_for_ufvk(&(zufvk.into()))
+                    .get_account_for_ufvk(&((*zufvk).clone().into()))
                 {
-                    Ok(aid) => Ok(aid.map(|x| x.into())),
+                    Ok(aid) => Ok(aid.map(From::from)),
                     Err(e) => Err(ZcashError::Message {
                         error: format!("Err: {}", e),
                     }),
@@ -353,9 +355,9 @@ impl ZcashWalletDb {
                     .test
                     .lock()
                     .unwrap()
-                    .get_account_for_ufvk(&(zufvk.into()))
+                    .get_account_for_ufvk(&((*zufvk).clone().into()))
                 {
-                    Ok(aid) => Ok(aid.map(|x| x.into())),
+                    Ok(aid) => Ok(aid.map(From::from)),
                     Err(e) => Err(ZcashError::Message {
                         error: format!("Err: {}", e),
                     }),
@@ -365,9 +367,9 @@ impl ZcashWalletDb {
     }
 
     pub fn get_transparent_balances(
-        &mut self,
+        &self,
         account: ZcashAccountId,
-        max_height: ZcashBlockHeight,
+        max_height: Arc<ZcashBlockHeight>,
     ) -> ZcashResult<HashMap<ZcashTransparentAddress, ZcashAmount>> {
         let convert_hm =
             |hm: HashMap<TransparentAddress, Amount>| -> HashMap<ZcashTransparentAddress, ZcashAmount> {
@@ -380,7 +382,7 @@ impl ZcashWalletDb {
                 .main
                 .lock()
                 .unwrap()
-                .get_transparent_balances(account.into(), max_height.into())
+                .get_transparent_balances(account.into(), (*max_height).into())
                 .map(convert_hm)
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
@@ -390,7 +392,7 @@ impl ZcashWalletDb {
                 .test
                 .lock()
                 .unwrap()
-                .get_transparent_balances(account.into(), max_height.into())
+                .get_transparent_balances(account.into(), (*max_height).into())
                 .map(convert_hm)
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
@@ -398,14 +400,15 @@ impl ZcashWalletDb {
         }
     }
 
-    pub fn store_decrypted_tx(&mut self, d_tx: ZcashDecryptedTransaction) -> ZcashResult<()> {
+    pub fn store_decrypted_tx(&self, d_tx: Arc<ZcashDecryptedTransaction>) -> ZcashResult<()> {
+        let a = Arc::try_unwrap(d_tx).unwrap();
         match self.params {
             ZcashConsensusParameters::MainNetwork => self
                 .sup
                 .main
                 .lock()
                 .unwrap()
-                .store_decrypted_tx(d_tx.into())
+                .store_decrypted_tx(a.into())
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
                 }),
@@ -414,18 +417,18 @@ impl ZcashWalletDb {
                 .test
                 .lock()
                 .unwrap()
-                .store_decrypted_tx(d_tx.into())
+                .store_decrypted_tx(a.into())
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
                 }),
         }
     }
 
-    pub fn get_min_unspent_height(&self) -> ZcashResult<Option<ZcashBlockHeight>> {
+    pub fn get_min_unspent_height(&self) -> ZcashResult<Option<Arc<ZcashBlockHeight>>> {
         match self.params {
             ZcashConsensusParameters::MainNetwork => {
                 match self.sup.main.lock().unwrap().get_min_unspent_height() {
-                    Ok(height) => Ok(height.map(From::from)),
+                    Ok(height) => Ok(height.map(From::from).map(Arc::new)),
                     Err(e) => Err(ZcashError::Message {
                         error: format!("Err: {}", e),
                     }),
@@ -433,7 +436,7 @@ impl ZcashWalletDb {
             }
             ZcashConsensusParameters::TestNetwork => {
                 match self.sup.test.lock().unwrap().get_min_unspent_height() {
-                    Ok(height) => Ok(height.map(From::from)),
+                    Ok(height) => Ok(height.map(From::from).map(Arc::new)),
                     Err(e) => Err(ZcashError::Message {
                         error: format!("Err: {}", e),
                     }),
@@ -442,9 +445,9 @@ impl ZcashWalletDb {
         }
     }
 
-    pub fn suggest_scan_ranges(&self) -> ZcashResult<Vec<ZcashScanRange>> {
-        let heights_arr = |heights: Vec<ScanRange>| -> Vec<ZcashScanRange> {
-            heights.into_iter().map(From::from).collect()
+    pub fn suggest_scan_ranges(&self) -> ZcashResult<Vec<Arc<ZcashScanRange>>> {
+        let heights = |heights: Vec<ScanRange>| -> Vec<Arc<ZcashScanRange>> {
+            heights.into_iter().map(From::from).map(Arc::new).collect()
         };
 
         match self.params {
@@ -454,7 +457,7 @@ impl ZcashWalletDb {
                 .lock()
                 .unwrap()
                 .suggest_scan_ranges()
-                .map(heights_arr)
+                .map(heights)
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
                 }),
@@ -465,7 +468,7 @@ impl ZcashWalletDb {
                 .lock()
                 .unwrap()
                 .suggest_scan_ranges()
-                .map(heights_arr)
+                .map(heights)
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
                 }),
@@ -475,7 +478,7 @@ impl ZcashWalletDb {
     pub fn get_current_address(
         &self,
         aid: ZcashAccountId,
-    ) -> ZcashResult<Option<ZcashUnifiedAddress>> {
+    ) -> ZcashResult<Option<Arc<ZcashUnifiedAddress>>> {
         match self.params {
             ZcashConsensusParameters::MainNetwork => {
                 match self
@@ -485,7 +488,7 @@ impl ZcashWalletDb {
                     .unwrap()
                     .get_current_address(aid.into())
                 {
-                    Ok(addr) => Ok(addr.map(From::from)),
+                    Ok(addr) => Ok(addr.map(From::from).map(Arc::new)),
                     Err(e) => Err(ZcashError::Message {
                         error: format!("Err: {}", e),
                     }),
@@ -499,7 +502,7 @@ impl ZcashWalletDb {
                     .unwrap()
                     .get_current_address(aid.into())
                 {
-                    Ok(addr) => Ok(addr.map(From::from)),
+                    Ok(addr) => Ok(addr.map(From::from).map(Arc::new)),
                     Err(e) => Err(ZcashError::Message {
                         error: format!("Err: {}", e),
                     }),
@@ -511,10 +514,10 @@ impl ZcashWalletDb {
     pub fn get_transparent_receivers(
         &self,
         aid: ZcashAccountId,
-    ) -> ZcashResult<HashMap<ZcashTransparentAddress, ZcashAddressMetadata>> {
+    ) -> ZcashResult<HashMap<String, Arc<ZcashAddressMetadata>>> {
         let convert_hm =
-            |hm: HashMap<TransparentAddress, AddressMetadata>| -> HashMap<ZcashTransparentAddress, ZcashAddressMetadata> {
-                hm.into_iter().map(|(x, y)| (x.into(), y.into())).collect()
+            |hm: HashMap<TransparentAddress, AddressMetadata>| -> HashMap<String, Arc<ZcashAddressMetadata>> {
+                hm.into_iter().map(|(x, y)| (x.encode(&self.params), Arc::new(y.into()))).collect()
             };
 
         match self.params {
@@ -544,11 +547,14 @@ impl ZcashWalletDb {
     pub fn put_sapling_subtree_roots(
         &self,
         start_index: u64,
-        roots: Vec<ZcashCommitmentTreeRoot>,
+        roots: Vec<Arc<ZcashCommitmentTreeRoot>>,
     ) -> ZcashResult<()> {
         let roots_arr = roots
             .into_iter()
-            .map(|x| x.into())
+            .map(|x| {
+                let y = Arc::try_unwrap(x).unwrap();
+                y.into()
+            })
             .collect::<Vec<CommitmentTreeRoot<sapling::Node>>>();
 
         match self.params {
@@ -575,15 +581,20 @@ impl ZcashWalletDb {
 
     pub fn get_unspent_transparent_outputs(
         &self,
-        zta: ZcashTransparentAddress,
-        zbh: ZcashBlockHeight,
-        zop: Vec<ZcashOutPoint>,
-    ) -> ZcashResult<Vec<ZcashWalletTransparentOutput>> {
-        let zop_arr = zop.iter().map(|x| x.into()).collect::<Vec<OutPoint>>();
+        zta: Arc<ZcashTransparentAddress>,
+        zbh: Arc<ZcashBlockHeight>,
+        zop: Vec<Arc<ZcashOutPoint>>,
+    ) -> ZcashResult<Vec<Arc<ZcashWalletTransparentOutput>>> {
+        let zop_arr = zop
+            .into_iter()
+            .map(|x| (*x).clone().into())
+            .collect::<Vec<OutPoint>>();
 
         let convert_arr =
-            |wtos: Vec<WalletTransparentOutput>| -> Vec<ZcashWalletTransparentOutput> {
-                wtos.iter().map(|x| (*x).clone().into()).collect()
+            |wtos: Vec<WalletTransparentOutput>| -> Vec<Arc<ZcashWalletTransparentOutput>> {
+                wtos.into_iter()
+                    .map(|x| Arc::new(x.clone().into()))
+                    .collect()
             };
 
         match self.params {
@@ -592,7 +603,7 @@ impl ZcashWalletDb {
                 .main
                 .lock()
                 .unwrap()
-                .get_unspent_transparent_outputs(&(zta.into()), zbh.into(), &zop_arr)
+                .get_unspent_transparent_outputs(&((*zta).into()), (*zbh).into(), &zop_arr)
                 .map(convert_arr)
                 .map_err(|e| ZcashError::Message {
                     error: format!("Err: {}", e),
@@ -602,7 +613,7 @@ impl ZcashWalletDb {
                 .test
                 .lock()
                 .unwrap()
-                .get_unspent_transparent_outputs(&zta.into(), zbh.into(), &zop_arr)
+                .get_unspent_transparent_outputs(&(*zta).into(), (*zbh).into(), &zop_arr)
                 .map(convert_arr)
                 .map_err(cast_err),
         }
@@ -611,6 +622,13 @@ impl ZcashWalletDb {
 
 pub struct ZcashFsBlockDb {
     pub fs_block_db: Mutex<FsBlockDb>,
+}
+
+// NOTE change this
+impl fmt::Debug for ZcashFsBlockDb {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "needed for Arc taking out")
+    }
 }
 
 impl ZcashFsBlockDb {
@@ -622,8 +640,16 @@ impl ZcashFsBlockDb {
 
     /// Returns the metadata for the block with the given height, if it exists in the
     /// database.
-    pub fn find_block(&self, height: ZcashBlockHeight) -> ZcashResult<Option<Arc<ZcashBlockMeta>>> {
-        match self.fs_block_db.lock().unwrap().find_block(height.into()) {
+    pub fn find_block(
+        &self,
+        height: Arc<ZcashBlockHeight>,
+    ) -> ZcashResult<Option<Arc<ZcashBlockMeta>>> {
+        match self
+            .fs_block_db
+            .lock()
+            .unwrap()
+            .find_block((*height).into())
+        {
             Ok(opt) => Ok(opt.map(From::from).map(Arc::new)),
             Err(e) => Err(ZcashError::Message {
                 error: format!("FsBlockDbError: {:?}", e),
@@ -647,8 +673,7 @@ impl ZcashFsBlockDb {
     ) -> ZcashResult<()> {
         let vec = block_meta
             .into_iter()
-            .map(|x| Arc::try_unwrap(x).unwrap())
-            .map(From::from)
+            .map(|x| (*x).into())
             .collect::<Vec<BlockMeta>>();
 
         let res = self
@@ -666,11 +691,12 @@ impl ZcashFsBlockDb {
     }
 }
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ZcashNoteId(NoteId);
 
 impl ZcashNoteId {
-    pub fn new(txid: ZcashTxId, zsp: ZcashShieldedProtocol, output_index: u16) -> Self {
-        ZcashNoteId(NoteId::new(txid.into(), zsp.into(), output_index))
+    pub fn new(txid: Arc<ZcashTxId>, zsp: ZcashShieldedProtocol, output_index: u16) -> Self {
+        ZcashNoteId(NoteId::new((*txid).into(), zsp.into(), output_index))
     }
 }
 

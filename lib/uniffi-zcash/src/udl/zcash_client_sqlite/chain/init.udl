@@ -1,5 +1,0 @@
-interface ZcashChain {
-  	[Throws=ZcashError]
-  	void init_blockmeta_db(string blocks_dir);
-};
-

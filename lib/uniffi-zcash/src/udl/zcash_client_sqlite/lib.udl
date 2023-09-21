@@ -2,6 +2,52 @@
 interface ZcashWalletDb {
   	[Name=for_path, Throws=ZcashError]
 	constructor(string path, ZcashConsensusParameters params);
+
+	[Throws=ZcashError]
+	i64 put_received_transparent_utxo(ZcashWalletTransparentOutput output);
+
+	// [Throws=ZcashError]
+	// ZcashMemo get_memo(ZcashNoteId id_note);
+
+	[Throws=ZcashError]
+	void truncate_to_height(u32 block_height);
+
+	[Throws=ZcashError]
+	void update_chain_tip(u32 tip_height);
+
+	[Throws=ZcashError]
+    ZcashWalletSummary? get_wallet_summary(u32 min_confirmations);
+
+	[Throws=ZcashError]
+    ZcashAccountId? get_account_for_ufvk(ZcashUnifiedFullViewingKey zufvk);
+
+    /*
+	[Throws=ZcashError]
+    (ZcashBlockHeight, ZcashBlockHeight)? get_target_and_anchor_heights(ZcashNonZeroU32 min_confirmations);
+	[Throws=ZcashError]
+    record<ZcashTransparentAddress, ZcashAmount> get_transparent_balances(account: ZcashAccountId, max_height: ZcashBlockHeight);
+    */
+
+	[Throws=ZcashError]
+    void store_decrypted_tx(ZcashDecryptedTransaction d_tx);
+
+	[Throws=ZcashError]
+    ZcashBlockHeight? get_min_unspent_height();
+
+	[Throws=ZcashError]
+    sequence<ZcashScanRange> suggest_scan_ranges();
+
+	[Throws=ZcashError]
+    ZcashUnifiedAddress? get_current_address(ZcashAccountId aid);
+
+	[Throws=ZcashError]
+    record<string, ZcashAddressMetadata> get_transparent_receivers(ZcashAccountId aid);
+
+	[Throws=ZcashError]
+    void put_sapling_subtree_roots(u64 start_index, sequence<ZcashCommitmentTreeRoot> roots);
+
+	[Throws=ZcashError]
+    sequence<ZcashWalletTransparentOutput> get_unspent_transparent_outputs(ZcashTransparentAddress zta, ZcashBlockHeight zbh, sequence<ZcashOutPoint> zop);
 };
 
 interface ZcashFsBlockDb {
@@ -9,8 +55,15 @@ interface ZcashFsBlockDb {
 	constructor(string fsblockdb_root);
 
 	[Throws=ZcashError]
+    ZcashBlockMeta? find_block(ZcashBlockHeight height);
+
+	[Throws=ZcashError]
 	ZcashBlockHeight? get_max_cached_height();
 
 	[Throws=ZcashError]
 	void write_block_metadata(sequence<ZcashBlockMeta> block_meta);
+};
+
+interface ZcashNoteId {
+	constructor(ZcashTxId txid, ZcashShieldedProtocol zsp, u16 output_index);
 };

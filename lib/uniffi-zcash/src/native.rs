@@ -22,18 +22,14 @@ use std::num::NonZeroU32;
 use std::sync::Arc;
 
 use crate::native_utils as utils;
-use crate::zcash_client_sqlite::init_wallet_db;
 use crate::{
-    scan_cached_blocks,
     ZcashAccountId,
     ZcashAmount,
+    ZcashBackendScan,
     // ZcashBlockHash,
     // primitives
     ZcashBlockHeight,
     ZcashBlockMeta,
-    // ZcashBranchId,
-    // zcash_client_sqlite
-    // ZcashChain, // init_blockmeta_db
     ZcashConsensusParameters,
     ZcashDustOutputPolicy,
     // ZcashDecodingError, // keys
@@ -63,8 +59,12 @@ use crate::{
     ZcashUnifiedAddress, // address
     // ZcashUnifiedFullViewingKey,
     ZcashUnifiedSpendingKey,
+    // ZcashBranchId,
+    // zcash_client_sqlite
+    // ZcashChain, // init_blockmeta_db
+    ZcashWallet,
     ZcashWalletDb,
-    ZcashWalletTransparentOutput, // wallet
+    ZcashWalletTransparentOutput, // wallet //
 };
 
 use crate::fixed::ZcashFixedSingleOutputChangeStrategy;
@@ -72,8 +72,6 @@ use crate::input_selection::ZcashGreedyInputSelector;
 use crate::input_selection::{ZcashMainGreedyInputSelector, ZcashTestGreedyInputSelector};
 
 use crate::zcash_client_backend::{decrypt_and_store_transaction, shield_transparent_funds, spend};
-
-// use zcash_client_sqlite::chain::init_blockmeta_db; // HAVE IT
 
 // NOTE from changelog
 // `zcash_client_sqlite::wallet::init::{init_blocks_table, init_accounts_table}`
@@ -200,10 +198,10 @@ pub fn get_balance(
     db_data: String,
     aid: u32,
     params: ZcashConsensusParameters,
-) -> ZcashResult<ZcashNonNegativeAmount> {
+) -> ZcashResult<Arc<ZcashNonNegativeAmount>> {
     // let network = parse_network(network_id as u32)?;
     let db_data = wallet_db(params, db_data).unwrap();
-    let account = ZcashAccountId { id: aid };
+    // let account = ZcashAccountId { id: aid };
 
     // We query the unverified balance including unmined transactions. Shielded notes
     // in unmined transactions are never spendable, but this ensures that the balance
@@ -227,7 +225,7 @@ pub fn get_balance(
         .unwrap() //Result
         .unwrap() //Option
         .account_balances()
-        .get(&account)
+        .get(&aid.to_string())
         .unwrap())
     .total())
     // })
@@ -265,7 +263,7 @@ pub fn put_utxo(
     script.copy_from_slice(&script_bytes[..]);
 
     let script_pubkey = ZcashScript::from_bytes(&script);
-    let mut db_data = wallet_db(params, db_data)?;
+    let db_data = wallet_db(params, db_data)?;
 
     // just making sure the process doesn't fail, that's why the underscore
     let _address = ZcashTransparentAddress::decode(params, &address).unwrap();
@@ -284,7 +282,7 @@ pub fn put_utxo(
 
     debug!("Storing UTXO in db_data");
 
-    match db_data.put_received_transparent_utxo(&output) {
+    match db_data.put_received_transparent_utxo(Arc::new(output)) {
         Ok(_) => Ok(true),
         Err(e) => Err(ZcashError::Message {
             error: format!("Error while inserting UTXO: {}", e),
@@ -303,7 +301,13 @@ pub fn scan_blocks(
     let db_data = wallet_db(params, db_data)?;
     let from_height = ZcashBlockHeight::new(from_height);
 
-    match scan_cached_blocks(params, db_cache, db_data, from_height, limit) {
+    match ZcashBackendScan().scan_cached_blocks(
+        params,
+        db_cache.into(),
+        db_data.into(),
+        from_height.into(),
+        limit,
+    ) {
         Ok(()) => Ok(true),
         Err(e) => Err(ZcashError::Message {
             error: format!(
@@ -329,11 +333,11 @@ pub fn get_memo_as_utf8(
     let txid = ZcashTxId::from_bytes(&txid_bytes[..])?;
 
     db_data
-        .get_memo(ZcashNoteId::new(
-            txid,
+        .get_memo(Arc::new(ZcashNoteId::new(
+            Arc::new(txid),
             ZcashShieldedProtocol::Sapling,
             output_index as u16,
-        ))
+        )))
         .map_err(|e| format_err!("An error occurred retrieving the memo, {}", e))
         .and_then(|memo| match memo {
             ZcashMemo::Empty => Ok("".to_string()),
@@ -355,15 +359,15 @@ pub fn init_data_db(
     params: ZcashConsensusParameters,
 ) -> ZcashResult<u8> {
     let db_data = wallet_db(params, db_path)?;
-
-    init_wallet_db(db_data, seed, params).map(|_| 0u8)
-
     // match  {
     //     Ok(()) => Ok(0),
     //     Err(MigratorError::Migration { error, .. })
     //         if matches!(error, WalletMigrationError::SeedRequired) => { Ok(1) }
     //     Err(e) => Err(format_err!("Error while initializing data DB: {}", e)),
     // }
+    ZcashWallet()
+        .init_wallet_db(Arc::new(db_data), seed, params)
+        .map(|_| 0u8)
 }
 
 pub fn rewind_to_height(
@@ -371,12 +375,10 @@ pub fn rewind_to_height(
     height: u32,
     params: ZcashConsensusParameters,
 ) -> ZcashResult<u8> {
-    let mut db_data = wallet_db(params, db_data)?;
-
-    let z_height = ZcashBlockHeight::new(height);
+    let db_data = wallet_db(params, db_data)?;
 
     db_data
-        .truncate_to_height(z_height)
+        .truncate_to_height(height)
         .map(|_| 1u8)
         .map_err(|e| ZcashError::Message {
             error: format_err!("Error while rewinding data DB to height {}: {}", height, e)
@@ -389,11 +391,10 @@ pub fn rewind_block_metadata_to_height(
     height: u32,
     params: ZcashConsensusParameters,
 ) -> ZcashResult<u8> {
-    let mut db_data = wallet_db(params, db_data)?;
-    let z_height = ZcashBlockHeight::new(height);
+    let db_data = wallet_db(params, db_data)?;
 
     db_data
-        .truncate_to_height(z_height)
+        .truncate_to_height(height)
         .map(|_| 1u8)
         .map_err(|e| ZcashError::Message {
             error: format_err!(
@@ -410,12 +411,10 @@ pub fn update_chain_tip(
     height: u32,
     params: ZcashConsensusParameters,
 ) -> ZcashResult<u8> {
-    let mut db_data = wallet_db(params, db_data)?;
-
-    let z_height = ZcashBlockHeight::new(height);
+    let db_data = wallet_db(params, db_data)?;
 
     db_data
-        .update_chain_tip(z_height)
+        .update_chain_tip(height)
         .map(|_| 1u8)
         .map_err(|e| ZcashError::Message {
             error: format_err!("Error while rewinding data DB to height {}: {}", height, e)
@@ -493,7 +492,7 @@ pub fn find_block_metadata(
     let height = ZcashBlockHeight::new(height);
 
     block_db
-        .find_block(height)
+        .find_block(Arc::new(height))
         .map_err(|e| ZcashError::Message {
             error: format_err!("Failed to read block metadata from FsBlockDb: {:?}", e).to_string(),
         })
@@ -638,16 +637,15 @@ pub fn shield_to_address(
     params: ZcashConsensusParameters,
     _use_zip317_fees: bool,
 ) -> ZcashResult<ZcashTxId> {
-    let mut db_data = wallet_db(params, db_data)?;
+    let db_data = wallet_db(params, db_data)?;
     // let usk = decode_usk(&env, usk)?;
     // let memo_bytes = env.convert_byte_array(memo).unwrap();
     // let spend_params = utils::java_string_to_rust(&env, spend_params);
     // let output_params = utils::java_string_to_rust(&env, output_params);
-
-    let min_confirmations = NonZeroU32::new(1).unwrap();
+    let min_confirmations = 1u32;
 
     let account = db_data
-        .get_account_for_ufvk((*usk.to_unified_full_viewing_key()).clone())?
+        .get_account_for_ufvk(Arc::new((*usk.to_unified_full_viewing_key()).clone()))?
         .ok_or_else(|| ZcashError::Message {
             error: "Spending key not recognized.".to_string(),
         })?;
@@ -664,7 +662,7 @@ pub fn shield_to_address(
         })
         .and_then(|anchor| {
             db_data
-                .get_transparent_balances(account, anchor)
+                .get_transparent_balances(account, Arc::new(anchor))
                 .map_err(|e| ZcashError::Message {
                     error: format!(
                         "Error while fetching transparent balances for {:?}: {}",
@@ -693,7 +691,7 @@ pub fn shield_to_address(
                 usk,
                 from_addrs,
                 memo,
-                min_confirmations,
+                NonZeroU32::new(min_confirmations).unwrap(),
             )
             .map_err(|e| ZcashError::Message {
                 error: format!("Error while creating transaction: {}", e),
@@ -790,10 +788,8 @@ fn get_transparent_balance(
     let db_data = wallet_db(params, db_data)?;
     let taddr = ZcashTransparentAddress::decode(params, &address).unwrap();
 
-    let min_confs = NonZeroU32::new(min_confirmations).unwrap();
-
     let amount = db_data
-        .get_target_and_anchor_heights(min_confs)
+        .get_target_and_anchor_heights(min_confirmations)
         .map_err(|e| ZcashError::Message {
             error: format!("Error while fetching anchor height: {}", e),
         })
@@ -804,7 +800,7 @@ fn get_transparent_balance(
         })
         .and_then(|anchor| {
             db_data
-                .get_unspent_transparent_outputs(taddr, anchor, vec![])
+                .get_unspent_transparent_outputs(Arc::new(taddr), Arc::new(anchor), vec![])
                 .map_err(|e| ZcashError::Message {
                     error: format!("Error while fetching verified balance: {}", e),
                 })
@@ -834,7 +830,7 @@ pub fn get_verified_transparent_balance(
 
 pub fn get_verified_balance(
     db_data: String,
-    aid: ZcashAccountId,
+    aid: String,
     params: ZcashConsensusParameters,
 ) -> ZcashResult<u64> {
     let db_data = wallet_db(params, db_data)?;
@@ -1058,18 +1054,15 @@ pub fn list_transparent_receivers(
 
     match db_data.get_transparent_receivers(account) {
         Ok(receivers) => {
-            let transparent_receivers = receivers
-                .keys()
-                .map(|taddr| taddr.encode(params))
-                // let taddr = match taddr {
-                //     TransparentAddress::PublicKey(data) => {
-                //         ZcashAddress::from_transparent_p2pkh(zcash_network, *data)
-                //     }
-                //     TransparentAddress::Script(data) => {
-                //         ZcashAddress::from_transparent_p2sh(zcash_network, *data)
-                //     }
-                // };
-                .collect::<Vec<String>>();
+            let transparent_receivers = receivers.keys().map(String::from).collect::<Vec<String>>();
+            // let taddr = match taddr {
+            //     TransparentAddress::PublicKey(data) => {
+            //         ZcashAddress::from_transparent_p2pkh(zcash_network, *data)
+            //     }
+            //     TransparentAddress::Script(data) => {
+            //         ZcashAddress::from_transparent_p2sh(zcash_network, *data)
+            //     }
+            // };
 
             Ok(transparent_receivers)
         }
@@ -1105,7 +1098,7 @@ pub fn list_transparent_receivers(
 pub fn suggest_scan_ranges(
     db_data: String,
     params: ZcashConsensusParameters,
-) -> ZcashResult<Vec<ZcashScanRange>> {
+) -> ZcashResult<Vec<Arc<ZcashScanRange>>> {
     let db_data = wallet_db(params, db_data)?;
 
     db_data

@@ -1,0 +1,12 @@
+interface ZcashBackendScan {
+	[Throws=ZcashError]
+	void scan_cached_blocks(ZcashConsensusParameters params, ZcashFsBlockDb z_db_cache, ZcashWalletDb z_db_data, ZcashBlockHeight height, u32 limit);
+};
+
+interface ZcashCommitmentTreeRoot {
+    [Name=from_parts]
+    constructor(ZcashBlockHeight subtree_end_height, ZcashSaplingNode root_hash);
+
+    ZcashBlockHeight subtree_end_height();
+    ZcashSaplingNode root_hash();
+};

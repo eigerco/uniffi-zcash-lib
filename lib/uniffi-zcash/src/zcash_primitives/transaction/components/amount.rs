@@ -1,3 +1,4 @@
+use std::sync::Arc;
 use zcash_primitives::transaction::components::{
     amount::{NonNegativeAmount, MAX_MONEY},
     Amount,
@@ -95,7 +96,9 @@ pub struct ZcashNonNegativeAmount(NonNegativeAmount);
 
 impl ZcashNonNegativeAmount {
     /// Returns the identity `NonNegativeAmount`
-    pub const ZERO: Self = Self(NonNegativeAmount::ZERO);
+    pub fn zero() -> Self {
+        Self(NonNegativeAmount::ZERO)
+    }
 
     pub fn from_u64(amount: u64) -> ZcashResult<Self> {
         NonNegativeAmount::from_u64(amount)
@@ -157,14 +160,16 @@ pub struct ZcashBalance(Balance);
 
 impl ZcashBalance {
     /// The [`Balance`] value having zero values for all its fields.
-    pub const ZERO: Self = Self(Balance {
-        spendable_value: NonNegativeAmount::ZERO,
-        change_pending_confirmation: NonNegativeAmount::ZERO,
-        value_pending_spendability: NonNegativeAmount::ZERO,
-    });
+    pub fn zero() -> Self {
+        Self(Balance {
+            spendable_value: NonNegativeAmount::ZERO,
+            change_pending_confirmation: NonNegativeAmount::ZERO,
+            value_pending_spendability: NonNegativeAmount::ZERO,
+        })
+    }
 
     /// Returns the total value of funds represented by this [`Balance`].
-    pub fn total(&self) -> ZcashNonNegativeAmount {
-        self.0.total().into()
+    pub fn total(&self) -> Arc<ZcashNonNegativeAmount> {
+        Arc::new(self.0.total().into())
     }
 }
