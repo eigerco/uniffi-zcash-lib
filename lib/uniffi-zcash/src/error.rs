@@ -179,7 +179,12 @@ impl From<transaction::builder::Error<fees::zip317::FeeError>> for ZcashError {
             transaction::builder::Error::Balance(_) => ZcashError::BuilderError { error },
             transaction::builder::Error::TransparentBuild(_) => ZcashError::BuilderError { error },
             transaction::builder::Error::SaplingBuild(_) => ZcashError::BuilderError { error },
-            _ => todo!(),
+            transaction::builder::Error::OrchardBuild(_) => ZcashError::BuilderError { error },
+            transaction::builder::Error::OrchardSpend(_) => ZcashError::BuilderError { error },
+            transaction::builder::Error::OrchardRecipient(_) => ZcashError::BuilderError { error },
+            transaction::builder::Error::OrchardAnchorNotAvailable => ZcashError::BuilderError { error },
+            #[cfg(feature = "zfuture")]
+            transaction::builder::Error::TzeBuild(_) => ZcashError::BuilderError { error },
         }
     }
 }
