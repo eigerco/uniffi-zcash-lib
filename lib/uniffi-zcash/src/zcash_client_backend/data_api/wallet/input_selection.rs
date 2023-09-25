@@ -6,9 +6,7 @@ use zcash_client_backend::fees::fixed::SingleOutputChangeStrategy;
 use zcash_client_sqlite::WalletDb;
 use zcash_primitives::consensus::{MainNetwork, TestNetwork};
 
-use crate::fixed::ZcashFixedSingleOutputChangeStrategy;
-
-use crate::ZcashDustOutputPolicy;
+use crate::{ZcashDustOutputPolicy, ZcashFixedSingleOutputChangeStrategy};
 
 pub type MainGreedyInputSelector =
     GreedyInputSelector<WalletDb<Connection, MainNetwork>, SingleOutputChangeStrategy>;
@@ -70,7 +68,6 @@ impl From<&dyn ZcashGreedyInputSelector> for ZcashTestGreedyInputSelector {
     }
 }
 
-// NOTE Send + Sync because UniFFI requires it for Traits
 pub trait ZcashGreedyInputSelector: Send + Sync {}
 
 impl ZcashGreedyInputSelector for ZcashMainGreedyInputSelector {}

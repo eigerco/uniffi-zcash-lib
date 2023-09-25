@@ -29,12 +29,9 @@ use crate::{
     ZcashNoteId, ZcashOutPoint, ZcashOvkPolicy, ZcashPayment, ZcashRecipientAddress, ZcashResult,
     ZcashScanRange, ZcashScript, ZcashShieldedProtocol, ZcashTransaction, ZcashTransactionRequest,
     ZcashTransparentAddress, ZcashTxId, ZcashTxOut, ZcashUnifiedAddress, ZcashUnifiedSpendingKey,
-    ZcashWallet, ZcashWalletDb, ZcashWalletTransparentOutput,
+    ZcashWallet, ZcashWalletDb, ZcashWalletTransparentOutput, ZcashFixedSingleOutputChangeStrategy,
+    ZcashGreedyInputSelector, ZcashMainGreedyInputSelector, ZcashTestGreedyInputSelector
 };
-
-use crate::fixed::ZcashFixedSingleOutputChangeStrategy;
-use crate::input_selection::ZcashGreedyInputSelector;
-use crate::input_selection::{ZcashMainGreedyInputSelector, ZcashTestGreedyInputSelector};
 
 use crate::zcash_client_backend::{decrypt_and_store_transaction, shield_transparent_funds, spend};
 

@@ -6,7 +6,7 @@ members = ["uniffi-bindgen", "uniffi-zcash", "uniffi-zcash-cli"]
 # library. Whenever such changes goes upstream, we
 # will add directly the uniffi-rs libraries from crates.io.
 [workspace.dependencies]
-uniffi = {git = "https://github.com/eigerco/uniffi-rs", rev = "4cf40b9fba1769ac65ffcb16616e1eff9c12565a"}
+uniffi = {git = "https://github.com/eigerco/uniffi-rs", rev = "57fe1a5"}
 zcash_primitives = { version = "=0.13.0-rc.1", features = ["transparent-inputs"] }
 zcash_proofs = { version = "=0.13.0-rc.1" }
 zcash_client_backend = { version = "=0.10.0-rc.2", features = ["transparent-inputs", "unstable"] }

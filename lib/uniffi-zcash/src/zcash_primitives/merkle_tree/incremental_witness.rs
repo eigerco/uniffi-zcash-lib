@@ -10,7 +10,7 @@ pub struct ZcashIncrementalWitness(RwLock<IncrementalWitness<Node, DEPTH>>);
 
 impl ZcashIncrementalWitness {
     /// Creates an `IncrementalWitness` for the most recent commitment added to the given
-    pub fn from_tree(tree: &ZcashCommitmentTree) -> Self {
+    pub fn from_tree(tree: ZcashCommitmentTree) -> Self {
         IncrementalWitness::from_tree(tree.into()).into()
     }
 

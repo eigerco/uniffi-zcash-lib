@@ -39,7 +39,7 @@ impl ZcashExtendedSpendingKey {
     }
 
     /// Returns the child key corresponding to the path derived from the master key
-    pub fn from_path(master: &ZcashExtendedSpendingKey, path: Vec<ZcashChildIndex>) -> Self {
+    pub fn from_path(master: ZcashExtendedSpendingKey, path: Vec<ZcashChildIndex>) -> Self {
         let inner_path: Vec<ChildIndex> = path.into_iter().map(|i| i.into()).collect();
         ExtendedSpendingKey::from_path(&master.into(), inner_path.as_slice()).into()
     }

@@ -6,7 +6,7 @@ interface ZcashExtendedSpendingKey {
   constructor(sequence<u8> data);
 
   [Name=from_path]
-  constructor([ByRef] ZcashExtendedSpendingKey master, sequence<ZcashChildIndex> path);
+  constructor(ZcashExtendedSpendingKey master, sequence<ZcashChildIndex> path);
 
   [Name=decode, Throws=ZcashError]
   constructor(ZcashConsensusParameters params, [ByRef] string input);

@@ -1,21 +1,18 @@
-use zcash_client_backend::data_api::wallet;
-
 use std::num::NonZeroU32;
-
 use std::sync::Arc;
 
-use crate::zcash_client_backend::data_api::NonNegativeAmount;
-use crate::{
-    ZcashConsensusParameters, ZcashError, ZcashLocalTxProver, ZcashMemoBytes, ZcashOvkPolicy,
-    ZcashResult, ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId,
-    ZcashUnifiedSpendingKey, ZcashWalletDb,
-};
-
+use zcash_client_backend::data_api::wallet;
 use zcash_client_backend::keys::UnifiedSpendingKey;
 use zcash_primitives::legacy::TransparentAddress;
 use zcash_proofs::prover::LocalTxProver;
 
-pub mod input_selection;
+use crate::{
+    ZcashConsensusParameters, ZcashError, ZcashLocalTxProver, ZcashMemoBytes, ZcashOvkPolicy,
+    ZcashResult, ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId,
+    ZcashUnifiedSpendingKey, ZcashWalletDb, ZcashNonNegativeAmount, ZcashGreedyInputSelector,
+    MainGreedyInputSelector, TestGreedyInputSelector, ZcashMainGreedyInputSelector,
+    ZcashTestGreedyInputSelector,
+};
 
 /// Scans a [`Transaction`] for any information that can be decrypted by the accounts in
 /// the wallet, and saves it to the wallet.
@@ -66,12 +63,6 @@ pub fn decrypt_and_store_transaction(
 //     <InputsT::FeeRule as FeeRule>::Error,
 //     DbT::NoteRef,
 // >,
-
-use crate::input_selection::ZcashGreedyInputSelector;
-use crate::input_selection::{
-    MainGreedyInputSelector, TestGreedyInputSelector, ZcashMainGreedyInputSelector,
-    ZcashTestGreedyInputSelector,
-};
 
 #[allow(clippy::too_many_arguments)]
 #[allow(clippy::type_complexity)]
@@ -135,7 +126,7 @@ pub fn shield_transparent_funds(
     params: ZcashConsensusParameters,
     prover: ZcashLocalTxProver,
     input_selector: Arc<dyn ZcashGreedyInputSelector>,
-    shielding_threshold: NonNegativeAmount,
+    shielding_threshold: ZcashNonNegativeAmount,
     usk: ZcashUnifiedSpendingKey,
     from_addrs: Vec<ZcashTransparentAddress>,
     memo: ZcashMemoBytes,

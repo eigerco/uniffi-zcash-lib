@@ -13,13 +13,14 @@ use crate::{
 pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyhow::Result<()> {
     // Define paths
     let udl_path = root_dir.join("uniffi-zcash").join("src").join("zcash.udl");
+    let config_path = root_dir.join("uniffi-zcash").join("uniffi.toml");
     let target_bindings_path = root_dir.join("bindings");
     let shared_libs_dir = root_dir.join("shared_libs");
 
     let linux_shared_lib_path = shared_libs_dir.join(LINUX_SHARED_LIB_NAME);
     let macos_shared_lib_path = shared_libs_dir.join(MACOS_SHARED_LIB_NAME);
 
-    dir::remove(&target_bindings_path)?;
+    // dir::remove(&target_bindings_path)?;
 
     println!("Generating language bindings ...");
     SUPPORTED_LANGUAGES
@@ -27,22 +28,24 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
         .filter(|sl| enabled_languages.contains(&sl.to_string()))
         .try_for_each(|lang| {
             println!("Generating language bindings for {}", lang);
-            cmd_success(
-                Command::new("cargo")
+            let command = Command::new("cargo")
                     .arg("run")
                     .arg("-p")
                     .arg("uniffi-bindgen")
                     .arg("generate")
                     .arg(&udl_path)
-                    .arg("--config")
-                    .arg(root_dir.join("uniffi-zcash").join("uniffi.toml"))
+                    // .arg("--config")
+                    // .arg(&config_path)
                     .arg("--language")
                     .arg(lang)
-                    .arg("--out-dir")
-                    .arg(target_bindings_path.join(lang))
+                    // .arg("--out-dir")
+                    // .arg(target_bindings_path.join(lang))
                     .spawn()?
-                    .wait(),
-            )?;
+                    .wait();
+
+            cmd_success(command)?;
+
+            println!("arrived here!");
 
             let shared_lib_dest_path = target_bindings_path.join(lang);
 
