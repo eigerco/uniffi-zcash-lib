@@ -8,15 +8,15 @@ interface ZcashOrchardBundle {
     ZcashAnchor anchor();
 
     [Throws=ZcashError]
-    void verify_proof([ByRef] ZcashVerifyingKey key);
+    void verify_proof(ZcashVerifyingKey key);
     
     [Throws=ZcashError]
-    ZcashOrchardDecryptOutput decrypt_output_with_key(u64 action_idx, [ByRef] ZcashOrchardIncomingViewingKey ivk);
+    ZcashOrchardDecryptOutput decrypt_output_with_key(u64 action_idx, ZcashOrchardIncomingViewingKey ivk);
 
     sequence<ZcashOrchardDecryptOutputForIncomingKeys> decrypt_output_with_keys(sequence<ZcashOrchardIncomingViewingKey> ivks);
 
     [Throws=ZcashError]
-    ZcashOrchardDecryptOutput recover_output_with_ovk(u64 action_idx, [ByRef] ZcashOrchardOutgoingViewingKey ovk);
+    ZcashOrchardDecryptOutput recover_output_with_ovk(u64 action_idx, ZcashOrchardOutgoingViewingKey ovk);
 
     sequence<ZcashOrchardDecryptOutputForOutgoingKeys> recover_outputs_with_ovks(sequence<ZcashOrchardOutgoingViewingKey> ovks);
 };

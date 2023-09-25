@@ -15,7 +15,7 @@ interface ZcashTransactionRequest {
 	constructor(sequence<ZcashPayment> payments);
 
 	[Name=from_uri, Throws=ZcashZip321Error]
-	constructor(ZcashConsensusParameters params, [ByRef] string uri);
+	constructor(ZcashConsensusParameters params, string uri);
 
 	sequence<ZcashPayment> payments();
 

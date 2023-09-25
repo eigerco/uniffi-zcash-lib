@@ -10,7 +10,7 @@ interface ZcashOrchardMerkleHash {
     constructor([ByRef] sequence<u8> data);
     
     [Name=from_cmx]
-    constructor([ByRef] ZcashExtractedNoteCommitment cmx);
+    constructor(ZcashExtractedNoteCommitment cmx);
 
     sequence<u8> to_bytes();
 };

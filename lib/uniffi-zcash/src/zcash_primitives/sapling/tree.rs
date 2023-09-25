@@ -7,7 +7,7 @@ pub struct ZcashSaplingNode(Node);
 
 impl ZcashSaplingNode {
     /// Creates a tree leaf from the given Sapling note commitment.
-    pub fn from_cmu(cmu: &ZcashSaplingExtractedNoteCommitment) -> Self {
+    pub fn from_cmu(cmu: ZcashSaplingExtractedNoteCommitment) -> Self {
         Self(Node::from_cmu(&cmu.0))
     }
 }

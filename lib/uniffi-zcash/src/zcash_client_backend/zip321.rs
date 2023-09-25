@@ -4,7 +4,7 @@ use zcash_client_backend::zip321::{TransactionRequest, Zip321Error};
 
 use crate::{ZcashConsensusParameters, ZcashPayment};
 
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum ZcashZip321Error {
     /// A memo field in the ZIP 321 URI was not properly base-64 encoded
     // InvalidBase64(base64::DecodeError),

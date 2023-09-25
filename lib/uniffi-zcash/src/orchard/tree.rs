@@ -101,8 +101,8 @@ impl ZcashOrchardMerkleHash {
         }
     }
 
-    pub fn from_cmx(cmx: &ZcashExtractedNoteCommitment) -> Self {
-        MerkleHashOrchard::from_cmx(&cmx.into()).into()
+    pub fn from_cmx(cmx: ZcashExtractedNoteCommitment) -> Self {
+        MerkleHashOrchard::from_cmx(&(&cmx).into()).into()
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
