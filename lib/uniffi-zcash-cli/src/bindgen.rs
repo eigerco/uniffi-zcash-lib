@@ -1,7 +1,7 @@
 use std::{path::Path, process::Command};
 
 use fs_extra::{
-    dir,
+    // dir,
     file::{self, CopyOptions},
 };
 
@@ -12,15 +12,16 @@ use crate::{
 
 pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyhow::Result<()> {
     // Define paths
-    let udl_path = root_dir.join("uniffi-zcash").join("src").join("zcash.udl");
-    let config_path = root_dir.join("uniffi-zcash").join("uniffi.toml");
+    // let config_path = root_dir.join("uniffi-zcash").join("uniffi.toml");
+    let releases_path = root_dir.join("target").join("release").join("libuniffi_zcash.dylib");
     let target_bindings_path = root_dir.join("bindings");
     let shared_libs_dir = root_dir.join("shared_libs");
 
     let linux_shared_lib_path = shared_libs_dir.join(LINUX_SHARED_LIB_NAME);
     let macos_shared_lib_path = shared_libs_dir.join(MACOS_SHARED_LIB_NAME);
 
-    dir::remove(&target_bindings_path)?;
+    // NOTE eliminate if it exists
+    // dir::remove(&target_bindings_path)?;
 
     println!("Generating language bindings ...");
     SUPPORTED_LANGUAGES
@@ -28,14 +29,16 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
         .filter(|sl| enabled_languages.contains(&sl.to_string()))
         .try_for_each(|lang| {
             println!("Generating language bindings for {}", lang);
+
             let command = Command::new("cargo")
                     .arg("run")
-                    .arg("-p")
+                    .arg("--bin")
                     .arg("uniffi-bindgen")
                     .arg("generate")
-                    .arg(&udl_path)
-                    .arg("--config")
-                    .arg(&config_path)
+                    .arg("--library")
+                    .arg(&releases_path)
+                    // .arg("--config")
+                    // .arg(&config_path)
                     .arg("--language")
                     .arg(lang)
                     .arg("--out-dir")
@@ -44,8 +47,6 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
                     .wait();
 
             cmd_success(command)?;
-
-            println!("arrived here!");
 
             let shared_lib_dest_path = target_bindings_path.join(lang);
 

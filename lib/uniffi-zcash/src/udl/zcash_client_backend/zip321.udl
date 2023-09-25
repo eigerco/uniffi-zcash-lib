@@ -1,5 +1,5 @@
 
-[Enum]
+[Error]
 interface ZcashZip321Error {
 	TooManyPayments(u32 v);
 	TransparentMemo(u32 v);
