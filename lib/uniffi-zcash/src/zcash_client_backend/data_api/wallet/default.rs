@@ -143,7 +143,7 @@ pub fn shield_transparent_funds(
                 &params,
                 <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
                 &<ZcashMainGreedyInputSelector as Into<MainGreedyInputSelector>>::into(in_sel),
-                shielding_threshold,
+                shielding_threshold.into(),
                 &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into(usk),
                 &(from_addrs
                     .iter()
@@ -167,7 +167,7 @@ pub fn shield_transparent_funds(
                 &params,
                 <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
                 &<ZcashTestGreedyInputSelector as Into<TestGreedyInputSelector>>::into(in_sel),
-                shielding_threshold,
+                shielding_threshold.into(),
                 &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into(usk),
                 &(from_addrs
                     .iter()

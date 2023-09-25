@@ -20,7 +20,7 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
     let linux_shared_lib_path = shared_libs_dir.join(LINUX_SHARED_LIB_NAME);
     let macos_shared_lib_path = shared_libs_dir.join(MACOS_SHARED_LIB_NAME);
 
-    // dir::remove(&target_bindings_path)?;
+    dir::remove(&target_bindings_path)?;
 
     println!("Generating language bindings ...");
     SUPPORTED_LANGUAGES
@@ -34,12 +34,12 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
                     .arg("uniffi-bindgen")
                     .arg("generate")
                     .arg(&udl_path)
-                    // .arg("--config")
-                    // .arg(&config_path)
+                    .arg("--config")
+                    .arg(&config_path)
                     .arg("--language")
                     .arg(lang)
-                    // .arg("--out-dir")
-                    // .arg(target_bindings_path.join(lang))
+                    .arg("--out-dir")
+                    .arg(target_bindings_path.join(lang))
                     .spawn()?
                     .wait();
 
