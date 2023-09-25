@@ -29,7 +29,12 @@ impl From<ZcashScanPriority> for ScanPriority {
     fn from(zsp: ZcashScanPriority) -> Self {
         match zsp {
             ZcashScanPriority::Ignored => Self::Ignored,
-            _ => todo!(),
+            ZcashScanPriority::Scanned => Self::Scanned,
+            ZcashScanPriority::Historic => Self::Historic,
+            ZcashScanPriority::OpenAdjacent => Self::OpenAdjacent,
+            ZcashScanPriority::FoundNote => Self::FoundNote,
+            ZcashScanPriority::ChainTip => Self::ChainTip,
+            ZcashScanPriority::Verify => Self::Verify,
         }
     }
 }
@@ -38,7 +43,12 @@ impl From<ScanPriority> for ZcashScanPriority {
     fn from(zsp: ScanPriority) -> Self {
         match zsp {
             ScanPriority::Ignored => Self::Ignored,
-            _ => todo!(),
+            ScanPriority::Scanned => Self::Scanned,
+            ScanPriority::Historic => Self::Historic,
+            ScanPriority::OpenAdjacent => Self::OpenAdjacent,
+            ScanPriority::FoundNote => Self::FoundNote,
+            ScanPriority::ChainTip => Self::ChainTip,
+            ScanPriority::Verify => Self::Verify,
         }
     }
 }
@@ -96,7 +106,7 @@ impl ZcashScanRange {
         u32::try_from(self.0.len()).unwrap()
     }
 
-    // truncate_start, truncate_end, split_at left
+    // NOTE truncate_start, truncate_end, split_at missing, not needed
 }
 
 impl From<ZcashScanRange> for ScanRange {

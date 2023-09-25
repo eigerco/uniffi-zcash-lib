@@ -3,7 +3,10 @@ use std::sync::Arc;
 use zcash_client_backend::fees::{DustAction, DustOutputPolicy};
 
 pub mod fixed;
+pub use self::fixed::*;
+
 pub mod zip317;
+pub use self::zip317::*;
 
 pub enum ZcashDustAction {
     /// Do not allow creation of dust outputs; instead, require that additional inputs be provided.

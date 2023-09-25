@@ -5,7 +5,6 @@ use zcash_client_backend::fees::ChangeStrategy;
 
 use crate::ZcashFixedFeeRule;
 
-// #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ZcashFixedSingleOutputChangeStrategy(SingleOutputChangeStrategy);
 
 impl ZcashFixedSingleOutputChangeStrategy {

@@ -23,48 +23,13 @@ use std::sync::Arc;
 
 use crate::native_utils as utils;
 use crate::{
-    ZcashAccountId,
-    ZcashAmount,
-    ZcashBackendScan,
-    // ZcashBlockHash,
-    // primitives
-    ZcashBlockHeight,
-    ZcashBlockMeta,
-    ZcashConsensusParameters,
-    ZcashDustOutputPolicy,
-    // ZcashDecodingError, // keys
-    // ZcashDiversifierIndex,
-    ZcashError,
-    ZcashFixedFeeRule,
-    ZcashFsBlockDb,
-    ZcashKeysEra,
-    ZcashLocalTxProver,
-    ZcashMemo,
-    ZcashMemoBytes,
-    ZcashNonNegativeAmount,
-    ZcashNoteId,
-    ZcashOutPoint,
-    ZcashOvkPolicy,
-    ZcashPayment,
-    ZcashRecipientAddress,
-    ZcashResult,
-    ZcashScanRange,
-    ZcashScript,
-    ZcashShieldedProtocol,
-    ZcashTransaction,
-    ZcashTransactionRequest, // zip321
-    ZcashTransparentAddress,
-    ZcashTxId,
-    ZcashTxOut,
-    ZcashUnifiedAddress, // address
-    // ZcashUnifiedFullViewingKey,
-    ZcashUnifiedSpendingKey,
-    // ZcashBranchId,
-    // zcash_client_sqlite
-    // ZcashChain, // init_blockmeta_db
-    ZcashWallet,
-    ZcashWalletDb,
-    ZcashWalletTransparentOutput, // wallet //
+    ZcashAccountId, ZcashAmount, ZcashBackendScan, ZcashBlockHeight, ZcashBlockMeta,
+    ZcashConsensusParameters, ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule, ZcashFsBlockDb,
+    ZcashKeysEra, ZcashLocalTxProver, ZcashMemo, ZcashMemoBytes, ZcashNonNegativeAmount,
+    ZcashNoteId, ZcashOutPoint, ZcashOvkPolicy, ZcashPayment, ZcashRecipientAddress, ZcashResult,
+    ZcashScanRange, ZcashScript, ZcashShieldedProtocol, ZcashTransaction, ZcashTransactionRequest,
+    ZcashTransparentAddress, ZcashTxId, ZcashTxOut, ZcashUnifiedAddress, ZcashUnifiedSpendingKey,
+    ZcashWallet, ZcashWalletDb, ZcashWalletTransparentOutput,
 };
 
 use crate::fixed::ZcashFixedSingleOutputChangeStrategy;
@@ -341,10 +306,9 @@ pub fn get_memo_as_utf8(
         .map_err(|e| format_err!("An error occurred retrieving the memo, {}", e))
         .and_then(|memo| match memo {
             ZcashMemo::Empty => Ok("".to_string()),
-            ZcashMemo::Text{v} => Ok(v),
-            ZcashMemo::Future { .. } | ZcashMemo::Arbitrary { .. } => todo!()
-            // None => Err(format_err!("Memo not available")),
-            // _ => Err(format_err!("This memo does not contain UTF-8 text")),
+            ZcashMemo::Text { v } => Ok(v),
+            ZcashMemo::Future{ v } => Ok(format!("Not supported Memo::Future({:?})", v.data())),
+            ZcashMemo::Arbitrary { v } => Ok(format!("Not supported Memo::Arbitrary({:?})", *v)),
         })
         .map_err(|e| ZcashError::Message {
             error: format_err!("some err {}", e).to_string(),

@@ -1,0 +1,3 @@
+interface ZcashFixedSingleOutputChangeStrategy {
+	constructor(ZcashFixedFeeRule fee_rule);
+};

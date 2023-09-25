@@ -24,6 +24,9 @@ pub enum ZcashWalletMigrationError {
     /// Wrapper for amount balance violations
     // BalanceError(BalanceError),
     BalanceError { v: String },
+
+    /// Wrapper for commitment tree invariant violations
+    CommitmentTreeError { v: String },
 }
 
 impl From<WalletMigrationError> for ZcashWalletMigrationError {
@@ -33,13 +36,17 @@ impl From<WalletMigrationError> for ZcashWalletMigrationError {
             WalletMigrationError::CorruptedData(v) => {
                 ZcashWalletMigrationError::CorruptedData { v }
             }
-            WalletMigrationError::DbError { .. } => ZcashWalletMigrationError::DbError {
-                v: "DbError".to_string(),
+            WalletMigrationError::DbError(e) => ZcashWalletMigrationError::DbError {
+                v: format!("DbError: {:?}", e),
             },
-            WalletMigrationError::BalanceError { .. } => ZcashWalletMigrationError::BalanceError {
-                v: "BalanceError".to_string(),
+            WalletMigrationError::BalanceError(e) => ZcashWalletMigrationError::BalanceError {
+                v: format!("BalanceError: {:?}", e),
             },
-            WalletMigrationError::CommitmentTree(_) => todo!(),
+            WalletMigrationError::CommitmentTree(e) => {
+                ZcashWalletMigrationError::CommitmentTreeError {
+                    v: format!("CommitmentTreeError: {:?}", e),
+                }
+            }
         }
     }
 }
