@@ -304,11 +304,11 @@ pub fn get_memo_as_utf8(
             output_index as u16,
         )))
         .map_err(|e| format_err!("An error occurred retrieving the memo, {}", e))
-        .and_then(|memo| match memo {
-            ZcashMemo::Empty => Ok("".to_string()),
-            ZcashMemo::Text { v } => Ok(v),
-            ZcashMemo::Future{ v } => Ok(format!("Not supported Memo::Future({:?})", v.data())),
-            ZcashMemo::Arbitrary { v } => Ok(format!("Not supported Memo::Arbitrary({:?})", *v)),
+        .map(|memo| match memo {
+            ZcashMemo::Empty => "".to_string(),
+            ZcashMemo::Text { v } => v,
+            ZcashMemo::Future{ v } => format!("Not supported Memo::Future({:?})", v.data()),
+            ZcashMemo::Arbitrary { v } => format!("Not supported Memo::Arbitrary({:?})", *v),
         })
         .map_err(|e| ZcashError::Message {
             error: format_err!("some err {}", e).to_string(),
