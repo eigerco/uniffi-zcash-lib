@@ -1,4 +1,4 @@
-[Enum]
+[Error]
 interface ZcashWalletMigrationError {
 	SeedRequired();
 	CorruptedData(string v);

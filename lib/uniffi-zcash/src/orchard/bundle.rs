@@ -47,7 +47,7 @@ impl ZcashOrchardBundle {
     /// Verifies the proof for this bundle.
     pub fn verify_proof(&self, key: Arc<ZcashVerifyingKey>) -> ZcashResult<()> {
         self.0
-            .verify_proof(&(*key).0)
+            .verify_proof(&key.0)
             .or(Err("Error verifying proof".into()))
     }
 
@@ -61,7 +61,7 @@ impl ZcashOrchardBundle {
     ) -> ZcashResult<ZcashOrchardDecryptOutput> {
         match self
             .0
-            .decrypt_output_with_key(action_idx.try_into()?, &(*ivk).0)
+            .decrypt_output_with_key(action_idx.try_into()?, &ivk.0)
         {
             Some(result) => Ok(result.into()),
             None => Err("Cannot decrypt bundle".into()),
@@ -97,7 +97,7 @@ impl ZcashOrchardBundle {
     ) -> ZcashResult<ZcashOrchardDecryptOutput> {
         match self
             .0
-            .recover_output_with_ovk(action_idx.try_into()?, &(*key).0)
+            .recover_output_with_ovk(action_idx.try_into()?, &key.0)
         {
             Some(result) => Ok(result.into()),
             None => Err("Cannot recover output".into()),

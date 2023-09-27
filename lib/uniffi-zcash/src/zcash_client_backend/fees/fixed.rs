@@ -27,7 +27,6 @@ impl From<ZcashFixedSingleOutputChangeStrategy> for SingleOutputChangeStrategy {
     }
 }
 
-// NOTE apparently implementing Copy would be more difficult, so I did this instead
 impl Clone for ZcashFixedSingleOutputChangeStrategy {
     fn clone(&self) -> Self {
         let strategy: &SingleOutputChangeStrategy = &self.0;

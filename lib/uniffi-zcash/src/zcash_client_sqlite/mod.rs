@@ -1,4 +1,3 @@
-use rusqlite::Connection;
 use std::collections::HashMap;
 use std::fmt;
 use std::num::NonZeroU32;
@@ -6,20 +5,18 @@ use std::sync::{Arc, Mutex};
 use zcash_client_backend::address::AddressMetadata;
 use zcash_client_backend::data_api::chain::CommitmentTreeRoot;
 use zcash_client_backend::data_api::scanning::ScanRange;
-use zcash_client_backend::data_api::NoteId;
-use zcash_client_backend::data_api::WalletCommitmentTrees;
-use zcash_client_backend::data_api::WalletRead;
-use zcash_client_backend::data_api::WalletWrite;
+use zcash_client_backend::data_api::{NoteId, WalletCommitmentTrees, WalletRead, WalletWrite};
 use zcash_client_backend::encoding::AddressCodec;
 use zcash_client_backend::wallet::WalletTransparentOutput;
-use zcash_client_sqlite::chain::BlockMeta;
-use zcash_client_sqlite::{FsBlockDb, WalletDb};
-use zcash_primitives::consensus;
-use zcash_primitives::consensus::{MAIN_NETWORK, TEST_NETWORK};
-use zcash_primitives::legacy::TransparentAddress;
-use zcash_primitives::sapling;
-use zcash_primitives::transaction::components::Amount;
-use zcash_primitives::transaction::components::OutPoint;
+use zcash_client_sqlite::{chain::BlockMeta, FsBlockDb, WalletDb};
+use zcash_primitives::transaction::components::{Amount, OutPoint};
+use zcash_primitives::{legacy::TransparentAddress, sapling};
+
+mod chain;
+pub use self::chain::*;
+
+mod wallet;
+pub use self::wallet::*;
 
 use crate::{
     ZcashAccountId, ZcashAddressMetadata, ZcashAmount, ZcashBlockHeight, ZcashCommitmentTreeRoot,
@@ -29,123 +26,25 @@ use crate::{
     ZcashWalletTransparentOutput,
 };
 
-mod chain;
-pub use self::chain::*;
-
-mod wallet;
-pub use self::wallet::*;
-
-/// this is needed because WalletDb uses a generic argument
-/// and UniFFI doesn't support it. So we may init all the used types
-/// in order to avoid the need of using that argument.
-
-// NOTE we could create a method that extracts the proper WalletDb, but that wouldn't
-// #[derive(Clone)]
-pub struct SuperWalletDb {
-    pub main: Mutex<WalletDb<Connection, consensus::MainNetwork>>,
-    pub test: Mutex<WalletDb<Connection, consensus::TestNetwork>>,
-}
+// use crate::zcash_client_sqlite::ZcashBlockMeta;
 
 /// A wrapper for the SQLite connection to the wallet database.
 pub struct ZcashWalletDb {
-    pub sup: Arc<SuperWalletDb>,
     pub path: String,
     pub params: ZcashConsensusParameters,
 }
 
-// #[derive(Debug)]
-// pub struct SuperDataConnStmtCache<'a> {
-//     pub main: DataConnStmtCache<'a, zcash_primitives::consensus::MainNetwork>,
-//     pub test: DataConnStmtCache<'a, zcash_primitives::consensus::TestNetwork>,
-// }
-
-// pub struct ZcashDataConnStmtCache<'a> {
-//     pub sup: Arc<SuperDataConnStmtCache<'a>>,
-//     pub params: ZcashConsensusParameters,
-// }
-
-// pub struct ZcashDataConnStmtCacheTwo<'a, P> {
-//     pub data: Arc<DataConnStmtCache<'a, P>>,
-// }
-
-// how to get WDB:
-// let zwdb = ZcashWalletDb( ... )
-// zwdb.sup.main or zwdb.sup.test
-// trait Getter {
-//     fn get(&self, params: ZcashConsensusParameters) -> Self;
-// }
-
-// enum Both {
-//     Main(WalletDb<rusqlite::Connection, consensus::MainNetwork>),
-//     Test(WalletDb<rusqlite::Connection, consensus::TestNetwork>),
-// }
-
-// impl Getter for Both {
-//     fn get(&self, params: ZcashConsensusParameters) -> Self {
-//         match params {
-//             ZcashConsensusParameters::MainNetwork => Self::Main(WalletDb::for_path(&"", MAIN_NETWORK).unwrap()),
-//             ZcashConsensusParameters::TestNetwork => Self::Test(WalletDb::for_path(&"", TEST_NETWORK).unwrap())
-//         }
-//     }
-// }
-
 fn cast_err(e: zcash_client_sqlite::error::SqliteClientError) -> ZcashError {
     ZcashError::Message {
-        error: format!("Err: {}", e),
+        error: format!("Err: {:?}", e),
     }
 }
 
 impl ZcashWalletDb {
     /// Construct a connection to the wallet database stored at the specified path.
     pub fn for_path(path: String, params: ZcashConsensusParameters) -> ZcashResult<Self> {
-        let sup = SuperWalletDb {
-            main: Mutex::new(WalletDb::for_path(&path, MAIN_NETWORK).unwrap()),
-            test: Mutex::new(WalletDb::for_path(&path, TEST_NETWORK).unwrap()),
-        };
-
-        Ok(ZcashWalletDb {
-            sup: Arc::new(sup),
-            path,
-            params,
-        })
+        Ok(ZcashWalletDb { path, params })
     }
-
-    // fn get_db(&self) -> Result<MutexGuard<'_, WalletDb<rusqlite::Connection, _>>, _> {
-    //     match self.params {
-    //         ZcashConsensusParameters::MainNetwork => self.sup.main.lock(),
-    //         ZcashConsensusParameters::TestNetwork => self.sup.test.lock()
-    //     }
-    // }
-
-    //NOTE: if I use this approach, it complains about a reference borrowed and not given back
-
-    // pub fn get_update_ops(&self) -> Arc<ZcashDataConnStmtCache> {
-    //     let man = (&self.sup).main.lock().unwrap();
-    //     let tst = (&self.sup).test.lock().unwrap();
-
-    //     let sup = SuperDataConnStmtCache {
-    //         main: man.get_update_ops().unwrap(),
-    //         test: tst.get_update_ops().unwrap(),
-    //     };
-
-    //     Arc::new(ZcashDataConnStmtCache {
-    //         sup: Arc::new(sup),
-    //         params: self.params,
-    //     })
-    // }
-
-    //NOTE: if I use this, something else is wrong
-
-    // match self.params {
-    //     ZcashConsensusParameters::MainNetwork => {
-    //         let tmp = (&self.sup).main.lock().unwrap().get_update_ops().unwrap();
-    //         Arc::new( ZcashDataConnStmtCacheTwo { data: Arc::new(tmp) } )
-    //     } ,
-    //     ZcashConsensusParameters::TestNetwork => {
-    //         let tmp = (&self.sup).test.lock().unwrap().get_update_ops().unwrap();
-    //         Arc::new( ZcashDataConnStmtCacheTwo { data: Arc::new(tmp) } )
-    //     }
-    // }
 
     pub fn put_received_transparent_utxo(
         &self,
@@ -156,111 +55,32 @@ impl ZcashWalletDb {
             .put_received_transparent_utxo(&output.0)
             .map(|x| x.0)
             .map_err(cast_err)
-
-        // match  {
-        //     Ok(utxo_id) => Ok(utxo_id.0),
-        //     Err(e) => Err(ZcashError::Message {
-        //         error: format!("Err: {}", e),
-        //     }),
-        // }
-        // match self.params {
-        //     ZcashConsensusParameters::MainNetwork => {
-        //         match self
-        //             .sup
-        //             .main
-        //             .lock()
-        //             .unwrap()
-        //             .put_received_transparent_utxo(&output.0)
-        //         {
-        //             Ok(utxo_id) => Ok(utxo_id.0),
-        //             Err(e) => Err(ZcashError::Message {
-        //                 error: format!("Err: {}", e),
-        //             }),
-        //         }
-        //     }
-        //     ZcashConsensusParameters::TestNetwork => {
-        //         match self
-        //             .sup
-        //             .test
-        //             .lock()
-        //             .unwrap()
-        //             .put_received_transparent_utxo(&output.0)
-        //         {
-        //             Ok(utxo_id) => Ok(utxo_id.0),
-        //             Err(e) => Err(ZcashError::Message {
-        //                 error: format!("Err: {}", e),
-        //             }),
-        //         }
-        //     }
-        // }
     }
 
     pub fn get_memo(&self, id_note: Arc<ZcashNoteId>) -> ZcashResult<ZcashMemo> {
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => {
-                match self.sup.main.lock().unwrap().get_memo((*id_note).into()) {
-                    // NOTE this is stupid
-                    Ok(memo) => Ok(memo.unwrap().into()),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
-            ZcashConsensusParameters::TestNetwork => {
-                match self.sup.test.lock().unwrap().get_memo((*id_note).into()) {
-                    Ok(memo) => Ok(memo.unwrap().into()),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
-        }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_memo((*id_note).into())
+            .map(|memo| memo.unwrap().into())
+            .map_err(cast_err)
     }
 
     pub fn truncate_to_height(&self, block_height: u32) -> ZcashResult<()> {
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => self
-                .sup
-                .main
-                .lock()
-                .unwrap()
-                .truncate_to_height(ZcashBlockHeight::new(block_height).into())
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-            ZcashConsensusParameters::TestNetwork => self
-                .sup
-                .test
-                .lock()
-                .unwrap()
-                .truncate_to_height(ZcashBlockHeight::new(block_height).into())
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-        }
+        let zheight = ZcashBlockHeight::new(block_height).into();
+
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .truncate_to_height(zheight)
+            .map_err(cast_err)
     }
 
     pub fn update_chain_tip(&self, tip_height: u32) -> ZcashResult<()> {
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => self
-                .sup
-                .main
-                .lock()
-                .unwrap()
-                .update_chain_tip(ZcashBlockHeight::new(tip_height).into())
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-            ZcashConsensusParameters::TestNetwork => self
-                .sup
-                .test
-                .lock()
-                .unwrap()
-                .update_chain_tip(ZcashBlockHeight::new(tip_height).into())
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-        }
+        let zheight = ZcashBlockHeight::new(tip_height).into();
+
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .update_chain_tip(zheight)
+            .map_err(cast_err)
     }
 
     pub fn get_target_and_anchor_heights(
@@ -268,37 +88,16 @@ impl ZcashWalletDb {
         min_confirmations: u32,
     ) -> ZcashResult<Option<(ZcashBlockHeight, ZcashBlockHeight)>> {
         let min = NonZeroU32::new(min_confirmations).unwrap();
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => {
-                match self
-                    .sup
-                    .main
-                    .lock()
-                    .unwrap()
-                    .get_target_and_anchor_heights(min)
-                {
-                    Ok(None) => Ok(None),
-                    Ok(Some((bh1, bh2))) => Ok(Some((bh1.into(), bh2.into()))),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
-            ZcashConsensusParameters::TestNetwork => {
-                match self
-                    .sup
-                    .test
-                    .lock()
-                    .unwrap()
-                    .get_target_and_anchor_heights(min)
-                {
-                    Ok(None) => Ok(None),
-                    Ok(Some((bh1, bh2))) => Ok(Some((bh1.into(), bh2.into()))),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
+
+        match WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_target_and_anchor_heights(min)
+        {
+            Ok(None) => Ok(None),
+            Ok(Some((bh1, bh2))) => Ok(Some((bh1.into(), bh2.into()))),
+            Err(e) => Err(ZcashError::Message {
+                error: format!("Err: {}", e),
+            }),
         }
     }
 
@@ -306,64 +105,22 @@ impl ZcashWalletDb {
         &self,
         min_confirmations: u32,
     ) -> ZcashResult<Option<Arc<ZcashWalletSummary>>> {
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => self
-                .sup
-                .main
-                .lock()
-                .unwrap()
-                .get_wallet_summary(min_confirmations)
-                .map(|x| x.map(From::from).map(Arc::new))
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-            ZcashConsensusParameters::TestNetwork => self
-                .sup
-                .test
-                .lock()
-                .unwrap()
-                .get_wallet_summary(min_confirmations)
-                .map(|x| x.map(From::from).map(Arc::new))
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-        }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_wallet_summary(min_confirmations)
+            .map(|x| x.map(From::from).map(Arc::new))
+            .map_err(cast_err)
     }
 
     pub fn get_account_for_ufvk(
         &self,
         zufvk: Arc<ZcashUnifiedFullViewingKey>,
     ) -> ZcashResult<Option<ZcashAccountId>> {
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => {
-                match self
-                    .sup
-                    .main
-                    .lock()
-                    .unwrap()
-                    .get_account_for_ufvk(&((*zufvk).clone().into()))
-                {
-                    Ok(aid) => Ok(aid.map(From::from)),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
-            ZcashConsensusParameters::TestNetwork => {
-                match self
-                    .sup
-                    .test
-                    .lock()
-                    .unwrap()
-                    .get_account_for_ufvk(&((*zufvk).clone().into()))
-                {
-                    Ok(aid) => Ok(aid.map(From::from)),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
-        }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_account_for_ufvk(&((*zufvk).clone().into()))
+            .map(|aid| aid.map(From::from))
+            .map_err(cast_err)
     }
 
     pub fn get_transparent_balances(
@@ -376,73 +133,28 @@ impl ZcashWalletDb {
                 hm.into_iter().map(|(x, y)| (x.into(), y.into())).collect()
             };
 
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => self
-                .sup
-                .main
-                .lock()
-                .unwrap()
-                .get_transparent_balances(account.into(), (*max_height).into())
-                .map(convert_hm)
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-            ZcashConsensusParameters::TestNetwork => self
-                .sup
-                .test
-                .lock()
-                .unwrap()
-                .get_transparent_balances(account.into(), (*max_height).into())
-                .map(convert_hm)
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-        }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_transparent_balances(account.into(), (*max_height).into())
+            .map(convert_hm)
+            .map_err(cast_err)
     }
 
     pub fn store_decrypted_tx(&self, d_tx: Arc<ZcashDecryptedTransaction>) -> ZcashResult<()> {
-        let a = Arc::try_unwrap(d_tx).unwrap();
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => self
-                .sup
-                .main
-                .lock()
-                .unwrap()
-                .store_decrypted_tx(a.into())
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-            ZcashConsensusParameters::TestNetwork => self
-                .sup
-                .test
-                .lock()
-                .unwrap()
-                .store_decrypted_tx(a.into())
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-        }
+        let d_tx = Arc::try_unwrap(d_tx).unwrap();
+
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .store_decrypted_tx(d_tx.into())
+            .map_err(cast_err)
     }
 
     pub fn get_min_unspent_height(&self) -> ZcashResult<Option<Arc<ZcashBlockHeight>>> {
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => {
-                match self.sup.main.lock().unwrap().get_min_unspent_height() {
-                    Ok(height) => Ok(height.map(From::from).map(Arc::new)),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
-            ZcashConsensusParameters::TestNetwork => {
-                match self.sup.test.lock().unwrap().get_min_unspent_height() {
-                    Ok(height) => Ok(height.map(From::from).map(Arc::new)),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
-        }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_min_unspent_height()
+            .map(|x| x.map(From::from).map(Arc::new))
+            .map_err(cast_err)
     }
 
     pub fn suggest_scan_ranges(&self) -> ZcashResult<Vec<Arc<ZcashScanRange>>> {
@@ -450,65 +162,22 @@ impl ZcashWalletDb {
             heights.into_iter().map(From::from).map(Arc::new).collect()
         };
 
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => self
-                .sup
-                .main
-                .lock()
-                .unwrap()
-                .suggest_scan_ranges()
-                .map(heights)
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-
-            ZcashConsensusParameters::TestNetwork => self
-                .sup
-                .test
-                .lock()
-                .unwrap()
-                .suggest_scan_ranges()
-                .map(heights)
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-        }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .suggest_scan_ranges()
+            .map(heights)
+            .map_err(cast_err)
     }
 
     pub fn get_current_address(
         &self,
         aid: ZcashAccountId,
     ) -> ZcashResult<Option<Arc<ZcashUnifiedAddress>>> {
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => {
-                match self
-                    .sup
-                    .main
-                    .lock()
-                    .unwrap()
-                    .get_current_address(aid.into())
-                {
-                    Ok(addr) => Ok(addr.map(From::from).map(Arc::new)),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
-            ZcashConsensusParameters::TestNetwork => {
-                match self
-                    .sup
-                    .test
-                    .lock()
-                    .unwrap()
-                    .get_current_address(aid.into())
-                {
-                    Ok(addr) => Ok(addr.map(From::from).map(Arc::new)),
-                    Err(e) => Err(ZcashError::Message {
-                        error: format!("Err: {}", e),
-                    }),
-                }
-            }
-        }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_current_address(aid.into())
+            .map(|x| x.map(From::from).map(Arc::new))
+            .map_err(cast_err)
     }
 
     pub fn get_transparent_receivers(
@@ -520,28 +189,11 @@ impl ZcashWalletDb {
                 hm.into_iter().map(|(x, y)| (x.encode(&self.params), Arc::new(y.into()))).collect()
             };
 
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => self
-                .sup
-                .main
-                .lock()
-                .unwrap()
-                .get_transparent_receivers(aid.into())
-                .map(convert_hm)
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-            ZcashConsensusParameters::TestNetwork => self
-                .sup
-                .test
-                .lock()
-                .unwrap()
-                .get_transparent_receivers(aid.into())
-                .map(convert_hm)
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-        }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_transparent_receivers(aid.into())
+            .map(convert_hm)
+            .map_err(cast_err)
     }
 
     pub fn put_sapling_subtree_roots(
@@ -557,26 +209,12 @@ impl ZcashWalletDb {
             })
             .collect::<Vec<CommitmentTreeRoot<sapling::Node>>>();
 
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => self
-                .sup
-                .main
-                .lock()
-                .unwrap()
-                .put_sapling_subtree_roots(start_index, &roots_arr)
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-            ZcashConsensusParameters::TestNetwork => self
-                .sup
-                .test
-                .lock()
-                .unwrap()
-                .put_sapling_subtree_roots(start_index, &roots_arr)
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-        }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .put_sapling_subtree_roots(start_index, &roots_arr)
+            .map_err(|e| ZcashError::Message {
+                error: format!("ShardTreeError: {:?}", e),
+            })
     }
 
     pub fn get_unspent_transparent_outputs(
@@ -597,26 +235,11 @@ impl ZcashWalletDb {
                     .collect()
             };
 
-        match self.params {
-            ZcashConsensusParameters::MainNetwork => self
-                .sup
-                .main
-                .lock()
-                .unwrap()
-                .get_unspent_transparent_outputs(&((*zta).into()), (*zbh).into(), &zop_arr)
-                .map(convert_arr)
-                .map_err(|e| ZcashError::Message {
-                    error: format!("Err: {}", e),
-                }),
-            ZcashConsensusParameters::TestNetwork => self
-                .sup
-                .test
-                .lock()
-                .unwrap()
-                .get_unspent_transparent_outputs(&(*zta).into(), (*zbh).into(), &zop_arr)
-                .map(convert_arr)
-                .map_err(cast_err),
-        }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_unspent_transparent_outputs(&((*zta).into()), (*zbh).into(), &zop_arr)
+            .map(convert_arr)
+            .map_err(cast_err)
     }
 }
 
@@ -643,7 +266,7 @@ impl ZcashFsBlockDb {
     pub fn find_block(
         &self,
         height: Arc<ZcashBlockHeight>,
-    ) -> ZcashResult<Option<Arc<ZcashBlockMeta>>> {
+    ) -> ZcashResult<Option<Arc<chain::ZcashBlockMeta>>> {
         match self
             .fs_block_db
             .lock()
@@ -676,18 +299,14 @@ impl ZcashFsBlockDb {
             .map(|x| (*x).into())
             .collect::<Vec<BlockMeta>>();
 
-        let res = self
-            .fs_block_db
+        self.fs_block_db
             .lock()
             .unwrap()
-            .write_block_metadata(&vec[..]);
-
-        match res {
-            Ok(_) => Ok(()),
-            Err(_e) => Err(ZcashError::Message {
-                error: "err err err".to_string(),
-            }),
-        }
+            .write_block_metadata(&vec[..])
+            .map(|_| ())
+            .map_err(|e| ZcashError::Message {
+                error: format!("FsBlockDbError: {:?}", e),
+            })
     }
 }
 

@@ -1,9 +1,6 @@
 use std::{path::Path, process::Command};
 
-use fs_extra::{
-    // dir,
-    file::{self, CopyOptions},
-};
+use fs_extra::file::{self, CopyOptions};
 
 use crate::{
     helper::{cmd_success, LINUX_SHARED_LIB_NAME, MACOS_SHARED_LIB_NAME},
@@ -13,7 +10,10 @@ use crate::{
 pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyhow::Result<()> {
     // Define paths
     // let config_path = root_dir.join("uniffi-zcash").join("uniffi.toml");
-    let releases_path = root_dir.join("target").join("release").join("libuniffi_zcash.dylib");
+    let releases_path = root_dir
+        .join("target")
+        .join("release")
+        .join("libuniffi_zcash.dylib");
     let target_bindings_path = root_dir.join("bindings");
     let shared_libs_dir = root_dir.join("shared_libs");
 

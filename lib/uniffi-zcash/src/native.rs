@@ -23,17 +23,19 @@ use std::sync::Arc;
 
 use crate::native_utils as utils;
 use crate::{
-    ZcashAccountId, ZcashAmount, ZcashBackendScan, ZcashBlockHeight, ZcashBlockMeta,
-    ZcashConsensusParameters, ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule, ZcashFsBlockDb,
-    ZcashKeysEra, ZcashLocalTxProver, ZcashMemo, ZcashMemoBytes, ZcashNonNegativeAmount,
-    ZcashNoteId, ZcashOutPoint, ZcashOvkPolicy, ZcashPayment, ZcashRecipientAddress, ZcashResult,
-    ZcashScanRange, ZcashScript, ZcashShieldedProtocol, ZcashTransaction, ZcashTransactionRequest,
-    ZcashTransparentAddress, ZcashTxId, ZcashTxOut, ZcashUnifiedAddress, ZcashUnifiedSpendingKey,
-    ZcashWallet, ZcashWalletDb, ZcashWalletTransparentOutput, ZcashFixedSingleOutputChangeStrategy,
-    ZcashGreedyInputSelector, ZcashMainGreedyInputSelector, ZcashTestGreedyInputSelector
+    ZcashAccountId, ZcashAmount, ZcashBackendScan, ZcashBlockHeight, ZcashConsensusParameters,
+    ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule, ZcashFixedSingleOutputChangeStrategy,
+    ZcashFsBlockDb, ZcashGreedyInputSelector, ZcashKeysEra, ZcashLocalTxProver,
+    ZcashMainGreedyInputSelector, ZcashMemo, ZcashMemoBytes, ZcashNonNegativeAmount, ZcashNoteId,
+    ZcashOutPoint, ZcashOvkPolicy, ZcashPayment, ZcashRecipientAddress, ZcashResult,
+    ZcashScanRange, ZcashScript, ZcashShieldedProtocol, ZcashTestGreedyInputSelector,
+    ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId, ZcashTxOut,
+    ZcashUnifiedAddress, ZcashUnifiedSpendingKey, ZcashWallet, ZcashWalletDb,
+    ZcashWalletTransparentOutput,
 };
 
 use crate::zcash_client_backend::{decrypt_and_store_transaction, shield_transparent_funds, spend};
+use crate::zcash_client_sqlite::ZcashBlockMeta;
 
 // NOTE from changelog
 // `zcash_client_sqlite::wallet::init::{init_blocks_table, init_accounts_table}`
@@ -304,7 +306,7 @@ pub fn get_memo_as_utf8(
         .map(|memo| match memo {
             ZcashMemo::Empty => "".to_string(),
             ZcashMemo::Text { v } => v,
-            ZcashMemo::Future{ v } => format!("Not supported Memo::Future({:?})", v.data()),
+            ZcashMemo::Future { v } => format!("Not supported Memo::Future({:?})", v.data()),
             ZcashMemo::Arbitrary { v } => format!("Not supported Memo::Arbitrary({:?})", *v),
         })
         .map_err(|e| ZcashError::Message {
@@ -648,7 +650,7 @@ pub fn shield_to_address(
                 params,
                 prover,
                 input_selector,
-                shielding_threshold.into(),
+                shielding_threshold,
                 usk,
                 from_addrs,
                 memo,
@@ -1068,7 +1070,7 @@ pub fn suggest_scan_ranges(
             error: format!("Error while fetching suggested scan ranges: {}", e),
         })
 
-    // NOTE maybe no need to encode it to a java object
+    // NOTE no need to encode it to a java object
     // Ok(utils::rust_vec_to_java(
     //     &env,
     //     ranges,

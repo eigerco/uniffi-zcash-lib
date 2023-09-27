@@ -1,7 +1,6 @@
 use std::sync::Arc;
 use zcash_client_backend::wallet::{OvkPolicy, WalletTransparentOutput};
 use zcash_primitives::keys::OutgoingViewingKey;
-// use zcash_primitives::transaction::components::transparent::{self, OutPoint, TxOut};
 
 use crate::{
     ZcashAmount, ZcashBlockHeight, ZcashOutPoint, ZcashResult, ZcashTransparentAddress, ZcashTxOut,

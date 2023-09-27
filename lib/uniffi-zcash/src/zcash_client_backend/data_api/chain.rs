@@ -1,6 +1,7 @@
 use std::{fmt, sync::Arc};
 use zcash_client_backend::data_api::chain;
 use zcash_client_backend::data_api::chain::CommitmentTreeRoot;
+use zcash_client_sqlite::WalletDb;
 use zcash_primitives::sapling::Node;
 
 use crate::{
@@ -21,34 +22,17 @@ impl ZcashBackendScan {
     ) -> ZcashResult<()> {
         let z_db_cache = Arc::try_unwrap(z_db_cache).unwrap();
         let db_cache = z_db_cache.fs_block_db.into_inner().unwrap();
+        let mut db_data = WalletDb::for_path(&z_db_data.path, params).unwrap();
 
-        match params {
-            ZcashConsensusParameters::MainNetwork => {
-                let mut main_db_data = z_db_data.sup.main.lock().unwrap();
-
-                chain::scan_cached_blocks(
-                    &params,
-                    &db_cache,
-                    &mut (*main_db_data),
-                    (*height).into(),
-                    limit as usize,
-                )
-                .map_err(|_| ZcashError::Unknown)
-            }
-
-            ZcashConsensusParameters::TestNetwork => {
-                let mut test_db_data = z_db_data.sup.test.lock().unwrap();
-
-                chain::scan_cached_blocks(
-                    &params,
-                    &db_cache,
-                    &mut (*test_db_data),
-                    (*height).into(),
-                    limit as usize,
-                )
-                .map_err(|_| ZcashError::Unknown)
-            }
-        }
+        chain::scan_cached_blocks(
+            &params,
+            &db_cache,
+            &mut db_data,
+            (*height).into(),
+            limit as usize,
+        )
+        // NOTE map this better
+        .map_err(|_| ZcashError::Unknown)
     }
 }
 

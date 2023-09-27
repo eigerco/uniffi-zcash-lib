@@ -1,15 +1,15 @@
+use std::{fmt, sync::Arc};
+
+use failure::format_err;
+use secrecy::SecretVec;
+
 use zcash_client_sqlite::wallet::init;
 use zcash_client_sqlite::wallet::init::WalletMigrationError;
+use zcash_client_sqlite::WalletDb;
 
 use crate::{ZcashConsensusParameters, ZcashError, ZcashResult, ZcashWalletDb};
 
-use failure::format_err;
-
-use std::sync::Arc;
-
-use secrecy::SecretVec;
-
-#[derive(Debug)]
+#[derive(Debug, thiserror::Error)]
 pub enum ZcashWalletMigrationError {
     /// The seed is required for the migration.
     SeedRequired(),
@@ -27,6 +27,21 @@ pub enum ZcashWalletMigrationError {
 
     /// Wrapper for commitment tree invariant violations
     CommitmentTreeError { v: String },
+}
+
+impl fmt::Display for ZcashWalletMigrationError {
+    // This trait requires `fmt` with this exact signature.
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            ZcashWalletMigrationError::SeedRequired() => write!(f, "SeedRequired"),
+            ZcashWalletMigrationError::CorruptedData { v } => write!(f, "CorruptedData: {}", v),
+            ZcashWalletMigrationError::DbError { v } => write!(f, "DbError: {}", v),
+            ZcashWalletMigrationError::BalanceError { v } => write!(f, "BalanceError: {}", v),
+            ZcashWalletMigrationError::CommitmentTreeError { v } => {
+                write!(f, "CommitmentTreeError: {}", v)
+            }
+        }
+    }
 }
 
 impl From<WalletMigrationError> for ZcashWalletMigrationError {
@@ -51,23 +66,6 @@ impl From<WalletMigrationError> for ZcashWalletMigrationError {
     }
 }
 
-// pub fn init_accounts_table<P: consensus::Parameters>(
-//     wdb: &WalletDb<P>,
-//     keys: &HashMap<AccountId, UnifiedFullViewingKey>,
-// ) -> Result<(), SqliteClientError> {
-// 	init::init_accounts_table(wdb, keys)
-// }
-
-// pub fn init_blocks_table<P>(
-//     wdb: &WalletDb<P>,
-//     height: ZcashBlockHeight,
-//     hash: ZcashBlockHash,
-//     time: u32,
-//     sapling_tree: &[u8],
-// ) -> Result<(), SqliteClientError> {
-// 	init::init_blocks_table(wdb, height.into(), hash.into(), time, sapling_tree)
-// }
-
 pub struct ZcashWallet();
 
 impl ZcashWallet {
@@ -77,21 +75,11 @@ impl ZcashWallet {
         seed: Vec<u8>,
         params: ZcashConsensusParameters,
     ) -> ZcashResult<()> {
-        match params {
-            ZcashConsensusParameters::MainNetwork => init::init_wallet_db(
-                &mut zwdb.sup.main.lock().unwrap(),
-                Some(SecretVec::new(seed)),
-            )
-            .map_err(|e| ZcashError::Message {
-                error: format_err!("Error while initializing data DB: {:?}", e).to_string(),
-            }),
-            ZcashConsensusParameters::TestNetwork => init::init_wallet_db(
-                &mut zwdb.sup.test.lock().unwrap(),
-                Some(SecretVec::new(seed)),
-            )
-            .map_err(|e| ZcashError::Message {
-                error: format_err!("Error while initializing data DB: {:?}", e).to_string(),
-            }),
-        }
+        let mut db_data = WalletDb::for_path(&zwdb.path, params).unwrap();
+        let secvec = SecretVec::new(seed);
+
+        init::init_wallet_db(&mut db_data, Some(secvec)).map_err(|e| ZcashError::Message {
+            error: format_err!("Error while initializing data DB: {:?}", e).to_string(),
+        })
     }
 }

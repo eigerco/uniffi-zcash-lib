@@ -3,15 +3,17 @@ use std::sync::Arc;
 
 use zcash_client_backend::data_api::wallet;
 use zcash_client_backend::keys::UnifiedSpendingKey;
+use zcash_client_sqlite::WalletDb;
+use zcash_primitives::consensus;
 use zcash_primitives::legacy::TransparentAddress;
 use zcash_proofs::prover::LocalTxProver;
 
 use crate::{
-    ZcashConsensusParameters, ZcashError, ZcashLocalTxProver, ZcashMemoBytes, ZcashOvkPolicy,
-    ZcashResult, ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId,
-    ZcashUnifiedSpendingKey, ZcashWalletDb, ZcashNonNegativeAmount, ZcashGreedyInputSelector,
-    MainGreedyInputSelector, TestGreedyInputSelector, ZcashMainGreedyInputSelector,
-    ZcashTestGreedyInputSelector,
+    MainGreedyInputSelector, TestGreedyInputSelector, ZcashConsensusParameters, ZcashError,
+    ZcashGreedyInputSelector, ZcashLocalTxProver, ZcashMainGreedyInputSelector, ZcashMemoBytes,
+    ZcashNonNegativeAmount, ZcashOvkPolicy, ZcashResult, ZcashTestGreedyInputSelector,
+    ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId,
+    ZcashUnifiedSpendingKey, ZcashWalletDb,
 };
 
 /// Scans a [`Transaction`] for any information that can be decrypted by the accounts in
@@ -21,32 +23,11 @@ pub fn decrypt_and_store_transaction(
     z_db_data: Arc<ZcashWalletDb>,
     tx: Arc<ZcashTransaction>,
 ) -> ZcashResult<()> {
-    match params {
-        ZcashConsensusParameters::MainNetwork => {
-            let mut db_data = z_db_data.sup.main.lock().unwrap();
+    let mut db_data = WalletDb::for_path(&z_db_data.path, params).unwrap();
 
-            match wallet::decrypt_and_store_transaction(
-                &params,
-                &mut (*db_data),
-                &((*tx).clone().into()),
-            ) {
-                Ok(_) => Ok(()),
-                Err(_) => Err(ZcashError::Unknown),
-            }
-        }
-
-        ZcashConsensusParameters::TestNetwork => {
-            let mut db_data = z_db_data.sup.test.lock().unwrap();
-
-            match wallet::decrypt_and_store_transaction(
-                &params,
-                &mut (*db_data),
-                &((*tx).clone().into()),
-            ) {
-                Ok(_) => Ok(()),
-                Err(_) => Err(ZcashError::Unknown),
-            }
-        }
+    match wallet::decrypt_and_store_transaction(&params, &mut db_data, &((*tx).clone().into())) {
+        Ok(_) => Ok(()),
+        Err(_) => Err(ZcashError::Unknown),
     }
 }
 
@@ -78,12 +59,11 @@ pub fn spend(
 ) -> ZcashResult<ZcashTxId> {
     match params {
         ZcashConsensusParameters::MainNetwork => {
-            let mut db_data = z_db_data.sup.main.lock().unwrap();
-
+            let mut db_data = WalletDb::for_path(&z_db_data.path, consensus::MAIN_NETWORK).unwrap();
             let in_sel: ZcashMainGreedyInputSelector = (*input_selector).into();
 
             match wallet::spend(
-                &mut (*db_data),
+                &mut db_data,
                 &params,
                 <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
                 &<ZcashMainGreedyInputSelector as Into<MainGreedyInputSelector>>::into(in_sel),
@@ -96,14 +76,12 @@ pub fn spend(
                 Err(_) => Err(ZcashError::Unknown),
             }
         }
-
         ZcashConsensusParameters::TestNetwork => {
-            let mut db_data = z_db_data.sup.test.lock().unwrap();
-
+            let mut db_data = WalletDb::for_path(&z_db_data.path, consensus::TEST_NETWORK).unwrap();
             let in_sel: ZcashTestGreedyInputSelector = (*input_selector).into();
 
             match wallet::spend(
-                &mut (*db_data),
+                &mut db_data,
                 &params,
                 <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
                 &<ZcashTestGreedyInputSelector as Into<TestGreedyInputSelector>>::into(in_sel),
@@ -134,12 +112,11 @@ pub fn shield_transparent_funds(
 ) -> ZcashResult<ZcashTxId> {
     match params {
         ZcashConsensusParameters::MainNetwork => {
-            let mut db_data = z_db_data.sup.main.lock().unwrap();
-
+            let mut db_data = WalletDb::for_path(&z_db_data.path, consensus::MAIN_NETWORK).unwrap();
             let in_sel: ZcashMainGreedyInputSelector = (*input_selector).into();
 
             match wallet::shield_transparent_funds(
-                &mut (*db_data),
+                &mut db_data,
                 &params,
                 <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
                 &<ZcashMainGreedyInputSelector as Into<MainGreedyInputSelector>>::into(in_sel),
@@ -156,14 +133,12 @@ pub fn shield_transparent_funds(
                 Err(_) => Err(ZcashError::Unknown),
             }
         }
-
         ZcashConsensusParameters::TestNetwork => {
-            let mut db_data = z_db_data.sup.test.lock().unwrap();
-
+            let mut db_data = WalletDb::for_path(&z_db_data.path, consensus::TEST_NETWORK).unwrap();
             let in_sel: ZcashTestGreedyInputSelector = (*input_selector).into();
 
             match wallet::shield_transparent_funds(
-                &mut (*db_data),
+                &mut db_data,
                 &params,
                 <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
                 &<ZcashTestGreedyInputSelector as Into<TestGreedyInputSelector>>::into(in_sel),
