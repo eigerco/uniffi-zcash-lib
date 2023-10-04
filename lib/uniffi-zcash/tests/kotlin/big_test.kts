@@ -1708,14 +1708,6 @@ fun testSaplingIvkToRepr() {
 }
 testSaplingIvkToRepr()
 
-
-// todo after transaction PRs are merged
-
-
-// todo after transaction PRs are merged
-
-
-
 fun testDiversifierIndexNew() {
     val index = ZcashDiversifierIndex()
 

@@ -92,7 +92,7 @@ fn print_debug_state() {
 // }
 
 pub fn init_on_load() {
-    let _trc_info_level = tracing_subscriber::filter::LevelFilter::INFO;
+    let trc_info_level = tracing_subscriber::filter::LevelFilter::INFO;
     // Set up the Android tracing layer.
     #[cfg(target_os = "android")]
     let android_layer = paranoid_android::layer("cash.z.rust.logs")
