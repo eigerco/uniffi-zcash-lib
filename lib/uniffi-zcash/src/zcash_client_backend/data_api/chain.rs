@@ -9,9 +9,13 @@ use crate::{
     ZcashSaplingNode, ZcashWalletDb,
 };
 
-pub struct ZcashBackendScan();
+pub struct ZcashBackendScan;
 
 impl ZcashBackendScan {
+    pub fn new() -> Self {
+        Self
+    }
+
     pub fn scan_cached_blocks(
         &self,
         params: ZcashConsensusParameters,
@@ -41,7 +45,7 @@ pub struct ZcashCommitmentTreeRoot(CommitmentTreeRoot<Node>);
 // NOTE change this
 impl fmt::Debug for ZcashCommitmentTreeRoot {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "needed for Arc taking out")
+        write!(f, "ZcashCommitmentTreeRoot")
     }
 }
 

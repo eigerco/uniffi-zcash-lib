@@ -1,5 +1,7 @@
 
 interface WalletDefault {
+	constructor();
+
 	[Throws=ZcashError]
 	void decrypt_and_store_transaction(ZcashConsensusParameters params, ZcashWalletDb z_db_data, ZcashTransaction tx);
 

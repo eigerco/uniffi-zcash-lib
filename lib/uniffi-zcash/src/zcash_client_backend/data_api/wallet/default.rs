@@ -19,6 +19,9 @@ use crate::{
 pub struct WalletDefault;
 
 impl WalletDefault {
+    pub fn new() -> Self {
+        Self
+    }
     /// Scans a [`Transaction`] for any information that can be decrypted by the accounts in
     /// the wallet, and saves it to the wallet.
     pub fn decrypt_and_store_transaction(
@@ -88,19 +91,16 @@ impl WalletDefault {
         min_confirmations: u32,
     ) -> ZcashResult<Arc<ZcashTxId>> {
         let min_confirmations = NonZeroU32::new(min_confirmations).unwrap();
-        let prover = Arc::try_unwrap(prover).unwrap();
-        let request = Arc::try_unwrap(request).unwrap();
-        let insel = Arc::try_unwrap(input_selector).unwrap();
 
-        let mut db_data = WalletDb::for_path(&z_db_data.path, consensus::TEST_NETWORK).unwrap();
+        let mut db_data = WalletDb::for_path(&z_db_data.path, consensus::TEST_NETWORK).expect("Cannot unwrap db_data!");
 
         match wallet::spend(
             &mut db_data,
             &params,
-            <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
-            &<ZcashTestGreedyInputSelector as Into<TestGreedyInputSelector>>::into(insel),
-            &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into((*usk).clone()),
-            request.into(),
+            <ZcashLocalTxProver as Into<LocalTxProver>>::into((*prover).clone()),
+            &<ZcashTestGreedyInputSelector as Into<TestGreedyInputSelector>>::into((*input_selector).clone()),
+            &((*usk).clone().into()),
+            (*request).clone().into(),
             ovk_policy.into(),
             min_confirmations,
         ) {
@@ -108,7 +108,7 @@ impl WalletDefault {
                 let x: ZcashTxId = txid.into();
                 Ok(Arc::new(x))
             }
-            Err(_) => Err(ZcashError::Unknown),
+            Err(x) => Err(ZcashError::Message{error: format!("spending error: {:?}", x) }),
         }
     }
 

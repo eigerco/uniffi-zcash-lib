@@ -1,4 +1,6 @@
 interface ZcashBackendScan {
+    constructor();
+
 	[Throws=ZcashError]
 	void scan_cached_blocks(ZcashConsensusParameters params, ZcashFsBlockDb z_db_cache, ZcashWalletDb z_db_data, ZcashBlockHeight height, u32 limit);
 };

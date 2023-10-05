@@ -46,7 +46,7 @@ pub struct ZcashDecryptedTransaction(DecryptedTransaction<'static>);
 // NOTE change this
 impl fmt::Debug for ZcashDecryptedTransaction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "needed for Arc taking out")
+        write!(f, "ZcashDecryptedTransaction")
     }
 }
 

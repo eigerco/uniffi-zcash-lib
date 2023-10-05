@@ -265,7 +265,7 @@ pub fn scan_blocks(
     let db_data = wallet_db(params, db_data)?;
     let from_height = ZcashBlockHeight::new(from_height);
 
-    match ZcashBackendScan().scan_cached_blocks(
+    match ZcashBackendScan.scan_cached_blocks(
         params,
         db_cache.into(),
         db_data.into(),
@@ -475,7 +475,7 @@ pub fn store_decrypted_transaction(
     //   from their encoding.
     // let tx_bytes = env.convert_byte_array(tx).unwrap();
     // let tx = Transaction::read(&tx_bytes[..], BranchId::Sapling)?;
-    WalletDefault
+    WalletDefault::new()
         .decrypt_and_store_transaction(params, Arc::new(db_data), Arc::new(tx))
         .map(|_| true)
         .map_err(|e| ZcashError::Message {
@@ -554,7 +554,7 @@ pub fn create_to_address(
                 ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
                 ZcashDustOutputPolicy::default().into(),
             );
-            WalletDefault
+            WalletDefault::new()
                 .spend_main(
                     Arc::new(db_data),
                     params,
@@ -575,7 +575,7 @@ pub fn create_to_address(
                 ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
                 ZcashDustOutputPolicy::default().into(),
             );
-            WalletDefault
+            WalletDefault::new()
                 .spend_test(
                     Arc::new(db_data),
                     params,
@@ -659,7 +659,7 @@ pub fn shield_to_address(
 
     let shield_transparent_funds_by_selector =
         |input_selector: Arc<dyn ZcashGreedyInputSelector>| -> ZcashResult<ZcashTxId> {
-            WalletDefault
+            WalletDefault::new()
                 .shield_transparent_funds(
                     Arc::new(db_data),
                     params,

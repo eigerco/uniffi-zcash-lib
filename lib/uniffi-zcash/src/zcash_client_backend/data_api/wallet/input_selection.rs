@@ -12,7 +12,11 @@ use crate::{ZcashDustOutputPolicy, ZcashFixedSingleOutputChangeStrategy};
 pub type MainGreedyInputSelector =
     GreedyInputSelector<WalletDb<Connection, MainNetwork>, SingleOutputChangeStrategy>;
 
-pub struct ZcashMainGreedyInputSelector(Mutex<MainGreedyInputSelector>);
+pub struct ZcashMainGreedyInputSelector {
+    internal: Mutex<MainGreedyInputSelector>,
+    change_strategy: ZcashFixedSingleOutputChangeStrategy,
+    dust_output_policy: ZcashDustOutputPolicy,
+}
 
 impl ZcashMainGreedyInputSelector {
     // use trait to generalize ZcashSingleOutputChangeStrategy
@@ -20,23 +24,34 @@ impl ZcashMainGreedyInputSelector {
         change_strategy: Arc<ZcashFixedSingleOutputChangeStrategy>,
         dust_output_policy: Arc<ZcashDustOutputPolicy>,
     ) -> Self {
-        Self(Mutex::new(GreedyInputSelector::new(
+        let insel: MainGreedyInputSelector = GreedyInputSelector::new(
             (*change_strategy).clone().into(),
             (*dust_output_policy).into(),
-        )))
+        );
+        Self {
+            internal: Mutex::new(insel),
+            change_strategy: (*change_strategy).clone(),
+            dust_output_policy: *dust_output_policy,
+        }
+    }
+}
+
+impl Clone for ZcashMainGreedyInputSelector {
+    fn clone(&self) -> Self {
+        Self::new(Arc::new(self.change_strategy.clone()), Arc::new(self.dust_output_policy))
     }
 }
 
 // NOTE change this
 impl fmt::Debug for ZcashMainGreedyInputSelector {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "needed for Arc taking out")
+        write!(f, "ZcashMainGreedyInputSelector")
     }
 }
 
 impl From<ZcashMainGreedyInputSelector> for MainGreedyInputSelector {
     fn from(outer: ZcashMainGreedyInputSelector) -> Self {
-        outer.0.into_inner().unwrap()
+        outer.internal.into_inner().unwrap()
     }
 }
 
@@ -49,7 +64,11 @@ impl From<&dyn ZcashGreedyInputSelector> for ZcashMainGreedyInputSelector {
 pub type TestGreedyInputSelector =
     GreedyInputSelector<WalletDb<Connection, TestNetwork>, SingleOutputChangeStrategy>;
 
-pub struct ZcashTestGreedyInputSelector(Mutex<TestGreedyInputSelector>);
+pub struct ZcashTestGreedyInputSelector {
+    internal: Mutex<TestGreedyInputSelector>,
+    change_strategy: ZcashFixedSingleOutputChangeStrategy,
+    dust_output_policy: ZcashDustOutputPolicy,
+}
 
 impl ZcashTestGreedyInputSelector {
     // use trait to generalize ZcashSingleOutputChangeStrategy
@@ -57,23 +76,35 @@ impl ZcashTestGreedyInputSelector {
         change_strategy: Arc<ZcashFixedSingleOutputChangeStrategy>,
         dust_output_policy: Arc<ZcashDustOutputPolicy>,
     ) -> Self {
-        Self(Mutex::new(GreedyInputSelector::new(
+        let insel: TestGreedyInputSelector = GreedyInputSelector::new(
             (*change_strategy).clone().into(),
             (*dust_output_policy).into(),
-        )))
+        );
+        Self {
+            internal: Mutex::new(insel),
+            change_strategy: (*change_strategy).clone(),
+            dust_output_policy: *dust_output_policy,
+        }
+    }
+}
+
+
+impl Clone for ZcashTestGreedyInputSelector {
+    fn clone(&self) -> Self {
+        Self::new(Arc::new(self.change_strategy.clone()), Arc::new(self.dust_output_policy))
     }
 }
 
 // NOTE change this
 impl fmt::Debug for ZcashTestGreedyInputSelector {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "needed for Arc taking out")
+        write!(f, "ZcashTestGreedyInputSelector")
     }
 }
 
 impl From<ZcashTestGreedyInputSelector> for TestGreedyInputSelector {
     fn from(outer: ZcashTestGreedyInputSelector) -> Self {
-        outer.0.into_inner().unwrap()
+        outer.internal.into_inner().unwrap()
     }
 }
 

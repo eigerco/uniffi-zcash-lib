@@ -129,6 +129,12 @@ impl ZcashTransactionRequest {
     }
 }
 
+impl Clone for ZcashTransactionRequest {
+    fn clone(&self) -> Self {
+        Self::new(self.payments()).expect("Cannot clone from payments!")
+    }
+}
+
 impl From<ZcashTransactionRequest> for TransactionRequest {
     fn from(inner: ZcashTransactionRequest) -> Self {
         inner.0

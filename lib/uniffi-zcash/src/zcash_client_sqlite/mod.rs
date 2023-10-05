@@ -140,6 +140,7 @@ impl ZcashWalletDb {
             .map_err(cast_err)
     }
 
+    // NOTE nowhere a decrypted transaction is created
     pub fn store_decrypted_tx(&self, d_tx: Arc<ZcashDecryptedTransaction>) -> ZcashResult<()> {
         let d_tx = Arc::try_unwrap(d_tx).unwrap();
 
@@ -250,7 +251,7 @@ pub struct ZcashFsBlockDb {
 // NOTE change this
 impl fmt::Debug for ZcashFsBlockDb {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "needed for Arc taking out")
+        write!(f, "ZcashFsBlockDb")
     }
 }
 
