@@ -93,7 +93,7 @@ pub type ZcashZip321Result<T> = Result<T, ZcashZip321Error>;
 /// When constructing a transaction in response to such a request,
 /// a separate output should be added to the transaction for each
 /// payment value in the request.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct ZcashTransactionRequest(TransactionRequest);
 
 impl ZcashTransactionRequest {

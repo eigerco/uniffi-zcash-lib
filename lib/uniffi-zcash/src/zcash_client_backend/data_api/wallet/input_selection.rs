@@ -1,3 +1,4 @@
+use std::fmt;
 use std::sync::{Arc, Mutex};
 
 use rusqlite::Connection;
@@ -23,6 +24,13 @@ impl ZcashMainGreedyInputSelector {
             (*change_strategy).clone().into(),
             (*dust_output_policy).into(),
         )))
+    }
+}
+
+// NOTE change this
+impl fmt::Debug for ZcashMainGreedyInputSelector {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "needed for Arc taking out")
     }
 }
 
@@ -53,6 +61,13 @@ impl ZcashTestGreedyInputSelector {
             (*change_strategy).clone().into(),
             (*dust_output_policy).into(),
         )))
+    }
+}
+
+// NOTE change this
+impl fmt::Debug for ZcashTestGreedyInputSelector {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "needed for Arc taking out")
     }
 }
 

@@ -9,6 +9,7 @@ use crate::{
 
 /// A set of viewing keys that are all associated with a single
 /// ZIP-0032 account identifier.
+#[derive(Clone, Debug)]
 pub struct ZcashUnifiedSpendingKey(UnifiedSpendingKey);
 
 impl ZcashUnifiedSpendingKey {

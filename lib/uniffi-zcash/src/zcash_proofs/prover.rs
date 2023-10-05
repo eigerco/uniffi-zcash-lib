@@ -1,8 +1,10 @@
-use std::path::Path;
+use std::{fmt, path::Path};
 
 use zcash_proofs::prover::LocalTxProver;
 
 use crate::ZcashResult;
+
+// #[derive(Clone)]
 pub struct ZcashLocalTxProver(pub(crate) LocalTxProver);
 
 impl ZcashLocalTxProver {
@@ -28,6 +30,22 @@ impl ZcashLocalTxProver {
         }
     }
 }
+
+// NOTE change this
+impl fmt::Debug for ZcashLocalTxProver {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "needed for Arc taking out")
+    }
+}
+
+// impl Clone for ZcashLocalTxProver {
+//     fn clone(&self) -> Self {
+//         value.0.
+//         let bs = (*self).to_bytes().unwrap().clone();
+
+//         Self::from_bytes(&bs, (*self).consensus_branch_id()).unwrap()
+//     }
+// }
 
 impl From<LocalTxProver> for ZcashLocalTxProver {
     fn from(inner: LocalTxProver) -> Self {

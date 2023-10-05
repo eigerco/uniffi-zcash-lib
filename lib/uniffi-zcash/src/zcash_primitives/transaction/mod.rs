@@ -233,7 +233,6 @@ pub enum ZcashFeeRules {
 /// A Zcash transaction.
 pub struct ZcashTransaction(Transaction);
 
-// NOTE apparently implementing Copy would be more difficult, so I did this instead
 impl Clone for ZcashTransaction {
     fn clone(&self) -> Self {
         let bs = (*self).to_bytes().unwrap().clone();
