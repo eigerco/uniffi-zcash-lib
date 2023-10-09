@@ -38,7 +38,10 @@ impl ZcashMainGreedyInputSelector {
 
 impl Clone for ZcashMainGreedyInputSelector {
     fn clone(&self) -> Self {
-        Self::new(Arc::new(self.change_strategy.clone()), Arc::new(self.dust_output_policy))
+        Self::new(
+            Arc::new(self.change_strategy.clone()),
+            Arc::new(self.dust_output_policy),
+        )
     }
 }
 
@@ -88,10 +91,12 @@ impl ZcashTestGreedyInputSelector {
     }
 }
 
-
 impl Clone for ZcashTestGreedyInputSelector {
     fn clone(&self) -> Self {
-        Self::new(Arc::new(self.change_strategy.clone()), Arc::new(self.dust_output_policy))
+        Self::new(
+            Arc::new(self.change_strategy.clone()),
+            Arc::new(self.dust_output_policy),
+        )
     }
 }
 

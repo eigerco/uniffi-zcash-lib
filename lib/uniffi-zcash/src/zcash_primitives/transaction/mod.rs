@@ -157,18 +157,24 @@ impl ZcashTransactionBuilder {
         match fee_rule {
             ZcashFeeRules::FixedStandard => {
                 let fee = zcash_primitives::transaction::fees::zip317::FeeRule::standard();
-                let result = builder.build(&prover.internal, &fee).map_err(ZcashError::from)?;
+                let result = builder
+                    .build(&prover.internal, &fee)
+                    .map_err(ZcashError::from)?;
                 Ok(result.into())
             }
             ZcashFeeRules::FixedNonStandard { amount } => {
                 let amount = Amount::from_u64(amount).or(Err("Error parsing amount"))?;
                 let fee = zcash_primitives::transaction::fees::fixed::FeeRule::non_standard(amount);
-                let result = builder.build(&prover.internal, &fee).map_err(ZcashError::from)?;
+                let result = builder
+                    .build(&prover.internal, &fee)
+                    .map_err(ZcashError::from)?;
                 Ok(result.into())
             }
             ZcashFeeRules::Zip317Standard => {
                 let fee = zcash_primitives::transaction::fees::zip317::FeeRule::standard();
-                let result = builder.build(&prover.internal, &fee).map_err(ZcashError::from)?;
+                let result = builder
+                    .build(&prover.internal, &fee)
+                    .map_err(ZcashError::from)?;
                 Ok(result.into())
             }
             ZcashFeeRules::Zip317NonStandard {
@@ -186,7 +192,9 @@ impl ZcashTransactionBuilder {
                     Some(fee) => fee,
                     None => return Err("p2pkh_standard_input_size and p2pkh_standard_output_size should not be zero".into()),
                 };
-                let result = builder.build(&prover.internal, &fee).map_err(ZcashError::from)?;
+                let result = builder
+                    .build(&prover.internal, &fee)
+                    .map_err(ZcashError::from)?;
                 Ok(result.into())
             }
         }

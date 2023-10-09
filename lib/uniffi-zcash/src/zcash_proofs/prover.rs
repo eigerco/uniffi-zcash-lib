@@ -5,10 +5,10 @@ use zcash_proofs::prover::LocalTxProver;
 
 use crate::ZcashResult;
 
-pub struct ZcashLocalTxProver{
+pub struct ZcashLocalTxProver {
     pub(crate) internal: LocalTxProver,
     spend_path: String,
-    output_path: String
+    output_path: String,
 }
 
 impl ZcashLocalTxProver {
@@ -17,7 +17,7 @@ impl ZcashLocalTxProver {
     /// This function will panic if the paths do not point to valid parameter files with
     /// the expected hashes.
     pub fn new(spend_path: &str, output_path: &str) -> Self {
-        Self{
+        Self {
             internal: LocalTxProver::new(Path::new(spend_path), Path::new(output_path)),
             spend_path: spend_path.to_string(),
             output_path: output_path.to_string(),
@@ -29,7 +29,7 @@ impl ZcashLocalTxProver {
         Self {
             internal: LocalTxProver::from_bytes(spend_param_bytes, output_param_bytes),
             spend_path: "".to_string(),
-            output_path: "".to_string()
+            output_path: "".to_string(),
         }
     }
 
@@ -58,7 +58,11 @@ impl Clone for ZcashLocalTxProver {
 
 impl From<LocalTxProver> for ZcashLocalTxProver {
     fn from(inner: LocalTxProver) -> Self {
-        ZcashLocalTxProver{internal: inner, spend_path: "".to_string(), output_path: "".to_string()}
+        ZcashLocalTxProver {
+            internal: inner,
+            spend_path: "".to_string(),
+            output_path: "".to_string(),
+        }
     }
 }
 

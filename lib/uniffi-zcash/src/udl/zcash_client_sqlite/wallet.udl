@@ -8,6 +8,11 @@ interface ZcashWalletMigrationError {
 };
 
 interface ZcashWallet {
+	constructor();
+
   	[Throws=ZcashError]
   	void init_wallet_db(ZcashWalletDb zwdb, sequence<u8> seed, ZcashConsensusParameters params);
+
+  	[Throws=ZcashError]
+  	ZcashUnifiedSpendingKey create_account(ZcashWalletDb zwdb, sequence<u8> seed, u32 recover_until, sequence<u8> treestate_bytes, ZcashConsensusParameters params);
 };

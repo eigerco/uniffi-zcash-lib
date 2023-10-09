@@ -145,15 +145,23 @@ pub fn create_account(
     let _db_data = wallet_db(params, db_data).unwrap();
     let account = ZcashAccountId { id: 55 };
 
-    // the seed is passed from outside
     // let seed = SecretVec::new(env.convert_byte_array(seed).unwrap());
+    // let treestate = TreeState::decode(&env.convert_byte_array(treestate).unwrap()[..])
+    //     .map_err(|e| format_err!("Invalid TreeState: {}", e))?;
+    // let recover_until = recover_until.try_into().ok();
 
-    // NOTE: is it needed to store the account created?
+    // let birthday =
+    //     AccountBirthday::from_treestate(treestate, recover_until).map_err(|e| match e {
+    //         BirthdayError::HeightInvalid(e) => {
+    //             format_err!("Invalid TreeState: Invalid height: {}", e)
+    //         }
+    //         BirthdayError::Decode(e) => {
+    //             format_err!("Invalid TreeState: Invalid frontier encoding: {}", e)
+    //         }
+    //     })?;
+
     // let (account, usk) = db_data
-    //     .create_account(&seed)
-    //     .map_err(|e| format_err!("Error while initializing accounts: {}", e))?;
-
-    // encode_usk(&env, account, usk)
+    //     .create_account(&seed, birthday)
     ZcashUnifiedSpendingKey::from_seed(params, seed, account).unwrap()
 }
 
@@ -328,7 +336,7 @@ pub fn init_data_db(
     //         if matches!(error, WalletMigrationError::SeedRequired) => { Ok(1) }
     //     Err(e) => Err(format_err!("Error while initializing data DB: {}", e)),
     // }
-    ZcashWallet()
+    ZcashWallet::new()
         .init_wallet_db(Arc::new(db_data), seed, params)
         .map(|_| 0u8)
 }

@@ -9,6 +9,7 @@ use crate::{
     ZcashSaplingNode, ZcashWalletDb,
 };
 
+#[derive(Default)]
 pub struct ZcashBackendScan;
 
 impl ZcashBackendScan {
