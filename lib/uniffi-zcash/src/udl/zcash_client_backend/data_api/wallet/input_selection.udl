@@ -1,7 +1,4 @@
 
-[Trait]
-interface ZcashGreedyInputSelector { };
-
 interface ZcashMainGreedyInputSelector {
 	constructor(ZcashFixedSingleOutputChangeStrategy change_strategy, ZcashDustOutputPolicy dust_output_policy);
 };

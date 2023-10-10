@@ -2,7 +2,7 @@ interface ZcashBackendScan {
     constructor();
 
 	[Throws=ZcashError]
-	void scan_cached_blocks(ZcashConsensusParameters params, ZcashFsBlockDb z_db_cache, ZcashWalletDb z_db_data, ZcashBlockHeight height, u32 limit);
+	void scan_cached_blocks(ZcashConsensusParameters params, string fsblockdb_root, string db_data_path, ZcashBlockHeight height, u32 limit);
 };
 
 interface ZcashCommitmentTreeRoot {

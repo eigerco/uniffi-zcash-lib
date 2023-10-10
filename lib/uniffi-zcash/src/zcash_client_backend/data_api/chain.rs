@@ -1,12 +1,11 @@
-use std::{fmt, sync::Arc};
+use std::sync::Arc;
 use zcash_client_backend::data_api::chain;
 use zcash_client_backend::data_api::chain::CommitmentTreeRoot;
-use zcash_client_sqlite::WalletDb;
+use zcash_client_sqlite::{FsBlockDb, WalletDb};
 use zcash_primitives::sapling::Node;
 
 use crate::{
-    ZcashBlockHeight, ZcashConsensusParameters, ZcashError, ZcashFsBlockDb, ZcashResult,
-    ZcashSaplingNode, ZcashWalletDb,
+    ZcashBlockHeight, ZcashConsensusParameters, ZcashError, ZcashResult, ZcashSaplingNode,
 };
 
 #[derive(Default)]
@@ -20,14 +19,13 @@ impl ZcashBackendScan {
     pub fn scan_cached_blocks(
         &self,
         params: ZcashConsensusParameters,
-        z_db_cache: Arc<ZcashFsBlockDb>,
-        z_db_data: Arc<ZcashWalletDb>,
+        fsblockdb_root: String,
+        db_data_path: String,
         height: Arc<ZcashBlockHeight>,
         limit: u32,
     ) -> ZcashResult<()> {
-        let z_db_cache = Arc::try_unwrap(z_db_cache).unwrap();
-        let db_cache = z_db_cache.fs_block_db.into_inner().unwrap();
-        let mut db_data = WalletDb::for_path(&z_db_data.path, params).unwrap();
+        let db_cache = FsBlockDb::for_path(fsblockdb_root).expect("Cannot access FsBlockDb");
+        let mut db_data = WalletDb::for_path(db_data_path, params).expect("Cannot access WalletDb");
 
         chain::scan_cached_blocks(
             &params,
@@ -36,17 +34,20 @@ impl ZcashBackendScan {
             (*height).into(),
             limit as usize,
         )
-        // NOTE map this better
-        .map_err(|_| ZcashError::Unknown)
+        .map_err(|e| ZcashError::Message {
+            error: format!("Error for scan_cached_blocks: {:?}", e),
+        })
     }
 }
 
 pub struct ZcashCommitmentTreeRoot(CommitmentTreeRoot<Node>);
 
-// NOTE change this
-impl fmt::Debug for ZcashCommitmentTreeRoot {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "ZcashCommitmentTreeRoot")
+impl Clone for ZcashCommitmentTreeRoot {
+    fn clone(&self) -> Self {
+        Self(CommitmentTreeRoot::from_parts(
+            self.0.subtree_end_height(),
+            *self.0.root_hash(),
+        ))
     }
 }
 

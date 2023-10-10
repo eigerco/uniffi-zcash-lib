@@ -43,6 +43,15 @@ impl From<ShieldedProtocol> for ZcashShieldedProtocol {
 
 pub struct ZcashDecryptedTransaction(DecryptedTransaction<'static>);
 
+impl Clone for ZcashDecryptedTransaction {
+    fn clone(&self) -> Self {
+        Self(DecryptedTransaction {
+            tx: self.0.tx,
+            sapling_outputs: self.0.sapling_outputs,
+        })
+    }
+}
+
 // NOTE change this
 impl fmt::Debug for ZcashDecryptedTransaction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

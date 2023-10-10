@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::fmt;
 use std::num::NonZeroU32;
 use std::sync::{Arc, Mutex};
 use zcash_client_backend::address::AddressMetadata;
@@ -140,13 +139,10 @@ impl ZcashWalletDb {
             .map_err(cast_err)
     }
 
-    // NOTE nowhere a decrypted transaction is created
     pub fn store_decrypted_tx(&self, d_tx: Arc<ZcashDecryptedTransaction>) -> ZcashResult<()> {
-        let d_tx = Arc::try_unwrap(d_tx).unwrap();
-
         WalletDb::for_path(&self.path, self.params)
             .expect("Cannot access the DB!")
-            .store_decrypted_tx(d_tx.into())
+            .store_decrypted_tx((*d_tx).clone().into())
             .map_err(cast_err)
     }
 
@@ -204,10 +200,7 @@ impl ZcashWalletDb {
     ) -> ZcashResult<()> {
         let roots_arr = roots
             .into_iter()
-            .map(|x| {
-                let y = Arc::try_unwrap(x).unwrap();
-                y.into()
-            })
+            .map(|x| (*x).clone().into())
             .collect::<Vec<CommitmentTreeRoot<sapling::Node>>>();
 
         WalletDb::for_path(&self.path, self.params)
@@ -246,13 +239,6 @@ impl ZcashWalletDb {
 
 pub struct ZcashFsBlockDb {
     pub fs_block_db: Mutex<FsBlockDb>,
-}
-
-// NOTE change this
-impl fmt::Debug for ZcashFsBlockDb {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "ZcashFsBlockDb")
-    }
 }
 
 impl ZcashFsBlockDb {

@@ -10,10 +10,10 @@ use zcash_proofs::prover::LocalTxProver;
 
 use crate::{
     MainGreedyInputSelector, TestGreedyInputSelector, ZcashConsensusParameters, ZcashError,
-    ZcashGreedyInputSelector, ZcashLocalTxProver, ZcashMainGreedyInputSelector, ZcashMemoBytes,
-    ZcashNonNegativeAmount, ZcashOvkPolicy, ZcashResult, ZcashTestGreedyInputSelector,
-    ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId,
-    ZcashUnifiedSpendingKey, ZcashWalletDb,
+    ZcashLocalTxProver, ZcashMainGreedyInputSelector, ZcashMemoBytes, ZcashNonNegativeAmount,
+    ZcashOvkPolicy, ZcashResult, ZcashTestGreedyInputSelector, ZcashTransaction,
+    ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId, ZcashUnifiedSpendingKey,
+    ZcashWalletDb,
 };
 
 #[derive(Default)]
@@ -54,19 +54,19 @@ impl WalletDefault {
         min_confirmations: u32,
     ) -> ZcashResult<Arc<ZcashTxId>> {
         let min_confirmations = NonZeroU32::new(min_confirmations).unwrap();
-        let prover = Arc::try_unwrap(prover).unwrap();
-        let request = Arc::try_unwrap(request).unwrap();
-        let insel = Arc::try_unwrap(input_selector).unwrap();
 
-        let mut db_data = WalletDb::for_path(&z_db_data.path, consensus::MAIN_NETWORK).unwrap();
+        let mut db_data = WalletDb::for_path(&z_db_data.path, consensus::MAIN_NETWORK)
+            .expect("Cannot unwrap db_data!");
 
         match wallet::spend(
             &mut db_data,
             &params,
-            <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
-            &<ZcashMainGreedyInputSelector as Into<MainGreedyInputSelector>>::into(insel),
-            &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into((*usk).clone()),
-            request.into(),
+            <ZcashLocalTxProver as Into<LocalTxProver>>::into((*prover).clone()),
+            &<ZcashMainGreedyInputSelector as Into<MainGreedyInputSelector>>::into(
+                (*input_selector).clone(),
+            ),
+            &((*usk).clone().into()),
+            (*request).clone().into(),
             ovk_policy.into(),
             min_confirmations,
         ) {
@@ -120,12 +120,12 @@ impl WalletDefault {
 
     #[allow(clippy::too_many_arguments)]
     #[allow(clippy::type_complexity)]
-    pub fn shield_transparent_funds(
+    pub fn shield_transparent_funds_main(
         &self,
         z_db_data: Arc<ZcashWalletDb>,
         params: ZcashConsensusParameters,
         prover: Arc<ZcashLocalTxProver>,
-        input_selector: Arc<dyn ZcashGreedyInputSelector>,
+        input_selector: Arc<ZcashMainGreedyInputSelector>,
         shielding_threshold: u64,
         usk: Arc<ZcashUnifiedSpendingKey>,
         from_addrs: Vec<Arc<ZcashTransparentAddress>>,
@@ -134,59 +134,79 @@ impl WalletDefault {
     ) -> ZcashResult<Arc<ZcashTxId>> {
         let min_confirmations = NonZeroU32::new(min_confirmations).unwrap();
         let shielding_threshold = ZcashNonNegativeAmount::from_u64(shielding_threshold).unwrap();
-        let prover = Arc::try_unwrap(prover).unwrap();
         let addresses = from_addrs
             .iter()
             .map(|x| x.as_ref().into())
             .collect::<Vec<TransparentAddress>>();
 
-        match params {
-            ZcashConsensusParameters::MainNetwork => {
-                let mut db_data =
-                    WalletDb::for_path(&z_db_data.path, consensus::MAIN_NETWORK).unwrap();
-                let in_sel: ZcashMainGreedyInputSelector = (*input_selector).into();
+        let mut db_data = WalletDb::for_path(&z_db_data.path, consensus::MAIN_NETWORK).unwrap();
 
-                match wallet::shield_transparent_funds(
-                    &mut db_data,
-                    &params,
-                    <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
-                    &<ZcashMainGreedyInputSelector as Into<MainGreedyInputSelector>>::into(in_sel),
-                    shielding_threshold.into(),
-                    &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into((*usk).clone()),
-                    &addresses[..],
-                    &((*memo).clone().into()),
-                    min_confirmations,
-                ) {
-                    Ok(txid) => {
-                        let x: ZcashTxId = txid.into();
-                        Ok(Arc::new(x))
-                    }
-                    Err(_) => Err(ZcashError::Unknown),
-                }
+        match wallet::shield_transparent_funds(
+            &mut db_data,
+            &params,
+            <ZcashLocalTxProver as Into<LocalTxProver>>::into((*prover).clone()),
+            &<ZcashMainGreedyInputSelector as Into<MainGreedyInputSelector>>::into(
+                (*input_selector).clone(),
+            ),
+            shielding_threshold.into(),
+            &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into((*usk).clone()),
+            &addresses[..],
+            &((*memo).clone().into()),
+            min_confirmations,
+        ) {
+            Ok(txid) => {
+                let x: ZcashTxId = txid.into();
+                Ok(Arc::new(x))
             }
-            ZcashConsensusParameters::TestNetwork => {
-                let mut db_data =
-                    WalletDb::for_path(&z_db_data.path, consensus::TEST_NETWORK).unwrap();
-                let in_sel: ZcashTestGreedyInputSelector = (*input_selector).into();
+            Err(x) => Err(ZcashError::Message {
+                error: format!("spending error: {:?}", x),
+            }),
+        }
+    }
 
-                match wallet::shield_transparent_funds(
-                    &mut db_data,
-                    &params,
-                    <ZcashLocalTxProver as Into<LocalTxProver>>::into(prover),
-                    &<ZcashTestGreedyInputSelector as Into<TestGreedyInputSelector>>::into(in_sel),
-                    shielding_threshold.into(),
-                    &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into((*usk).clone()),
-                    &addresses[..],
-                    &((*memo).clone().into()),
-                    min_confirmations,
-                ) {
-                    Ok(txid) => {
-                        let x: ZcashTxId = txid.into();
-                        Ok(Arc::new(x))
-                    }
-                    Err(_) => Err(ZcashError::Unknown),
-                }
+    #[allow(clippy::too_many_arguments)]
+    #[allow(clippy::type_complexity)]
+    pub fn shield_transparent_funds_test(
+        &self,
+        z_db_data: Arc<ZcashWalletDb>,
+        params: ZcashConsensusParameters,
+        prover: Arc<ZcashLocalTxProver>,
+        input_selector: Arc<ZcashTestGreedyInputSelector>,
+        shielding_threshold: u64,
+        usk: Arc<ZcashUnifiedSpendingKey>,
+        from_addrs: Vec<Arc<ZcashTransparentAddress>>,
+        memo: Arc<ZcashMemoBytes>,
+        min_confirmations: u32,
+    ) -> ZcashResult<Arc<ZcashTxId>> {
+        let min_confirmations = NonZeroU32::new(min_confirmations).unwrap();
+        let shielding_threshold = ZcashNonNegativeAmount::from_u64(shielding_threshold).unwrap();
+        let addresses = from_addrs
+            .iter()
+            .map(|x| x.as_ref().into())
+            .collect::<Vec<TransparentAddress>>();
+
+        let mut db_data = WalletDb::for_path(&z_db_data.path, consensus::TEST_NETWORK).unwrap();
+
+        match wallet::shield_transparent_funds(
+            &mut db_data,
+            &params,
+            <ZcashLocalTxProver as Into<LocalTxProver>>::into((*prover).clone()),
+            &<ZcashTestGreedyInputSelector as Into<TestGreedyInputSelector>>::into(
+                (*input_selector).clone(),
+            ),
+            shielding_threshold.into(),
+            &<ZcashUnifiedSpendingKey as Into<UnifiedSpendingKey>>::into((*usk).clone()),
+            &addresses[..],
+            &((*memo).clone().into()),
+            min_confirmations,
+        ) {
+            Ok(txid) => {
+                let x: ZcashTxId = txid.into();
+                Ok(Arc::new(x))
             }
+            Err(x) => Err(ZcashError::Message {
+                error: format!("spending error: {:?}", x),
+            }),
         }
     }
 }

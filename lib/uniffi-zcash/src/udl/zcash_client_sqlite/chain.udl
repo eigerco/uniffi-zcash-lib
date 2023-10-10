@@ -4,6 +4,11 @@ interface ZcashBlockMeta {
 };
 
 interface ZcashChain {
+	constructor();
+
   	[Throws=ZcashError]
   	void init_blockmeta_db(string blocks_dir);
+
+  	[Throws=ZcashError]
+  	u32 get_nearest_rewind_height(string db_data, u32 height, ZcashConsensusParameters params);
 };

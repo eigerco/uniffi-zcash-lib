@@ -25,13 +25,12 @@ use crate::native_utils as utils;
 use crate::{
     ZcashAccountId, ZcashAmount, ZcashBackendScan, ZcashBlockHeight, ZcashConsensusParameters,
     ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule, ZcashFixedSingleOutputChangeStrategy,
-    ZcashFsBlockDb, ZcashGreedyInputSelector, ZcashKeysEra, ZcashLocalTxProver,
-    ZcashMainGreedyInputSelector, ZcashMemo, ZcashMemoBytes, ZcashNonNegativeAmount, ZcashNoteId,
-    ZcashOutPoint, ZcashOvkPolicy, ZcashPayment, ZcashRecipientAddress, ZcashResult,
-    ZcashScanRange, ZcashScript, ZcashShieldedProtocol, ZcashTestGreedyInputSelector,
-    ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId, ZcashTxOut,
-    ZcashUnifiedAddress, ZcashUnifiedSpendingKey, ZcashWallet, ZcashWalletDb,
-    ZcashWalletTransparentOutput,
+    ZcashFsBlockDb, ZcashKeysEra, ZcashLocalTxProver, ZcashMainGreedyInputSelector, ZcashMemo,
+    ZcashMemoBytes, ZcashNonNegativeAmount, ZcashNoteId, ZcashOutPoint, ZcashOvkPolicy,
+    ZcashPayment, ZcashRecipientAddress, ZcashResult, ZcashScanRange, ZcashScript,
+    ZcashShieldedProtocol, ZcashTestGreedyInputSelector, ZcashTransaction, ZcashTransactionRequest,
+    ZcashTransparentAddress, ZcashTxId, ZcashTxOut, ZcashUnifiedAddress, ZcashUnifiedSpendingKey,
+    ZcashWallet, ZcashWalletDb, ZcashWalletTransparentOutput,
 };
 
 use crate::zcash_client_backend::WalletDefault; //{decrypt_and_store_transaction, shield_transparent_funds, spend};
@@ -269,17 +268,10 @@ pub fn scan_blocks(
     limit: u32,
     params: ZcashConsensusParameters,
 ) -> ZcashResult<bool> {
-    let db_cache = block_db(db_cache)?;
-    let db_data = wallet_db(params, db_data)?;
     let from_height = ZcashBlockHeight::new(from_height);
 
-    match ZcashBackendScan.scan_cached_blocks(
-        params,
-        db_cache.into(),
-        db_data.into(),
-        from_height.into(),
-        limit,
-    ) {
+    match ZcashBackendScan.scan_cached_blocks(params, db_cache, db_data, from_height.into(), limit)
+    {
         Ok(()) => Ok(true),
         Err(e) => Err(ZcashError::Message {
             error: format!(
@@ -665,14 +657,20 @@ pub fn shield_to_address(
 
     let shielding_threshold = 100000;
 
-    let shield_transparent_funds_by_selector =
-        |input_selector: Arc<dyn ZcashGreedyInputSelector>| -> ZcashResult<ZcashTxId> {
+    let fixed_rule = ZcashFixedFeeRule::standard().into();
+    let fixed_strategy = ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into();
+    let do_policy = ZcashDustOutputPolicy::default().into();
+
+    match params {
+        ZcashConsensusParameters::MainNetwork => {
+            let insel = ZcashMainGreedyInputSelector::new(fixed_strategy, do_policy);
+
             WalletDefault::new()
-                .shield_transparent_funds(
+                .shield_transparent_funds_main(
                     Arc::new(db_data),
                     params,
                     Arc::new(prover),
-                    input_selector,
+                    Arc::new(insel),
                     shielding_threshold,
                     Arc::new(usk),
                     from_addrs,
@@ -683,23 +681,26 @@ pub fn shield_to_address(
                 .map_err(|e| ZcashError::Message {
                     error: format!("Error while creating transaction: {}", e),
                 })
-        };
-
-    let fixed_rule = ZcashFixedFeeRule::standard().into();
-    let fixed_strategy = ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into();
-
-    match params {
-        ZcashConsensusParameters::MainNetwork => {
-            shield_transparent_funds_by_selector(Arc::new(ZcashMainGreedyInputSelector::new(
-                fixed_strategy,
-                ZcashDustOutputPolicy::default().into(),
-            )))
         }
         ZcashConsensusParameters::TestNetwork => {
-            shield_transparent_funds_by_selector(Arc::new(ZcashMainGreedyInputSelector::new(
-                fixed_strategy,
-                ZcashDustOutputPolicy::default().into(),
-            )))
+            let insel = ZcashTestGreedyInputSelector::new(fixed_strategy, do_policy);
+
+            WalletDefault::new()
+                .shield_transparent_funds_test(
+                    Arc::new(db_data),
+                    params,
+                    Arc::new(prover),
+                    Arc::new(insel),
+                    shielding_threshold,
+                    Arc::new(usk),
+                    from_addrs,
+                    Arc::new(memo),
+                    min_confirmations,
+                )
+                .map(|x| *x)
+                .map_err(|e| ZcashError::Message {
+                    error: format!("Error while creating transaction: {}", e),
+                })
         }
     }
 }

@@ -1,5 +1,5 @@
 // use std::sync::Arc;
-use std::{fmt, path::Path};
+use std::path::Path;
 
 use zcash_proofs::prover::LocalTxProver;
 
@@ -40,13 +40,6 @@ impl ZcashLocalTxProver {
             Some(prover) => Ok(prover.into()),
             None => Err("Parameters cannot be found in default location".into()),
         }
-    }
-}
-
-// NOTE change this
-impl fmt::Debug for ZcashLocalTxProver {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "ZcashLocalTxProver")
     }
 }
 

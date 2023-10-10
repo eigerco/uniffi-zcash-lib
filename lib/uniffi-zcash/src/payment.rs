@@ -29,9 +29,9 @@ impl From<&Payment> for ZcashPayment {
 impl From<ZcashPayment> for Payment {
     fn from(inner: ZcashPayment) -> Self {
         Payment {
-            recipient_address: Arc::try_unwrap(inner.recipient_address).unwrap().into(),
-            amount: Arc::try_unwrap(inner.amount).unwrap().into(),
-            memo: inner.memo.map(|x| Arc::try_unwrap(x).unwrap().into()),
+            recipient_address: (*inner.recipient_address).clone().into(),
+            amount: (*inner.amount).into(),
+            memo: inner.memo.map(|x| (*x).clone().into()),
             label: inner.label,
             message: inner.message,
             other_params: inner.other_params.into_iter().map(From::from).collect(),

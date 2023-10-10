@@ -1,4 +1,3 @@
-use std::fmt;
 use std::sync::{Arc, Mutex};
 
 use rusqlite::Connection;
@@ -45,22 +44,9 @@ impl Clone for ZcashMainGreedyInputSelector {
     }
 }
 
-// NOTE change this
-impl fmt::Debug for ZcashMainGreedyInputSelector {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "ZcashMainGreedyInputSelector")
-    }
-}
-
 impl From<ZcashMainGreedyInputSelector> for MainGreedyInputSelector {
     fn from(outer: ZcashMainGreedyInputSelector) -> Self {
         outer.internal.into_inner().unwrap()
-    }
-}
-
-impl From<&dyn ZcashGreedyInputSelector> for ZcashMainGreedyInputSelector {
-    fn from(z_insel: &dyn ZcashGreedyInputSelector) -> ZcashMainGreedyInputSelector {
-        z_insel.into()
     }
 }
 
@@ -100,26 +86,8 @@ impl Clone for ZcashTestGreedyInputSelector {
     }
 }
 
-// NOTE change this
-impl fmt::Debug for ZcashTestGreedyInputSelector {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "ZcashTestGreedyInputSelector")
-    }
-}
-
 impl From<ZcashTestGreedyInputSelector> for TestGreedyInputSelector {
     fn from(outer: ZcashTestGreedyInputSelector) -> Self {
         outer.internal.into_inner().unwrap()
     }
 }
-
-impl From<&dyn ZcashGreedyInputSelector> for ZcashTestGreedyInputSelector {
-    fn from(z_insel: &dyn ZcashGreedyInputSelector) -> ZcashTestGreedyInputSelector {
-        z_insel.into()
-    }
-}
-
-pub trait ZcashGreedyInputSelector: Send + Sync {}
-
-impl ZcashGreedyInputSelector for ZcashMainGreedyInputSelector {}
-impl ZcashGreedyInputSelector for ZcashTestGreedyInputSelector {}
