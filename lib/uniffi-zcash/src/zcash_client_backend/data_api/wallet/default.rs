@@ -36,7 +36,9 @@ impl WalletDefault {
         match wallet::decrypt_and_store_transaction(&params, &mut db_data, &((*tx).clone().into()))
         {
             Ok(_) => Ok(()),
-            Err(_) => Err(ZcashError::Unknown),
+            Err(x) => Err(ZcashError::Message {
+                error: format!("decrypt and store transaction error: {:?}", x),
+            }),
         }
     }
 
@@ -74,7 +76,9 @@ impl WalletDefault {
                 let x: ZcashTxId = txid.into();
                 Ok(Arc::new(x))
             }
-            Err(_) => Err(ZcashError::Unknown),
+            Err(x) => Err(ZcashError::Message {
+                error: format!("spending error (spend_main): {:?}", x),
+            }),
         }
     }
 
@@ -113,7 +117,7 @@ impl WalletDefault {
                 Ok(Arc::new(x))
             }
             Err(x) => Err(ZcashError::Message {
-                error: format!("spending error: {:?}", x),
+                error: format!("spending error (spend test): {:?}", x),
             }),
         }
     }

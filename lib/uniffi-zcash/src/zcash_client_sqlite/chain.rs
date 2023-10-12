@@ -1,6 +1,7 @@
+use std::sync::Arc;
 use zcash_client_sqlite::chain::BlockMeta;
 
-use crate::{ZcashConsensusParameters, ZcashError, ZcashResult};
+use crate::{ZcashBlockHash, ZcashBlockHeight, ZcashConsensusParameters, ZcashError, ZcashResult};
 use zcash_client_backend::data_api::WalletRead;
 use zcash_client_sqlite::{chain::init, FsBlockDb, WalletDb};
 
@@ -10,8 +11,23 @@ use zcash_client_sqlite::{chain::init, FsBlockDb, WalletDb};
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct ZcashBlockMeta(pub BlockMeta);
 
-// #[cfg(feature = "unstable")]
 impl ZcashBlockMeta {
+    pub fn new(
+        height: Arc<ZcashBlockHeight>,
+        block_hash: Arc<ZcashBlockHash>,
+        block_time: u32,
+        sapling_outputs_count: u32,
+        orchard_actions_count: u32,
+    ) -> Self {
+        Self(BlockMeta {
+            height: (*height).into(),
+            block_hash: (*block_hash).into(),
+            block_time,
+            sapling_outputs_count,
+            orchard_actions_count,
+        })
+    }
+
     pub fn block_file_path(&self, blocks_dir: String) -> String {
         self.0
             .block_file_path(&blocks_dir)

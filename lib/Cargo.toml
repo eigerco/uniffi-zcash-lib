@@ -8,6 +8,7 @@ members = ["uniffi-bindgen", "uniffi-zcash", "uniffi-zcash-cli"]
 [workspace.dependencies]
 uniffi = {git = "https://github.com/eigerco/uniffi-rs", rev = "57fe1a5"}
 zcash_primitives = { version = "=0.13.0", features = ["transparent-inputs"] }
+# zcash_primitives = { path = "../librustzcash/zcash_primitives", features = ["transparent-inputs"] }
 zcash_proofs = { version = "=0.13.0" }
 zcash_client_backend = { version = "=0.10.0", features = ["transparent-inputs", "unstable"] }
 zcash_address = "0.3"
