@@ -55,4 +55,12 @@ namespace zcash {
     ZcashConsensusParameters params,
     ZcashTransparentAddress addr
   );
+
+  /* zcash_client_backend::decrypt */
+  sequence<ZcashDecryptedOutput> decrypt_transaction(
+      ZcashConsensusParameters params,
+      ZcashBlockHeight height,
+      ZcashTransaction tx,
+      record<ZcashAccountId, ZcashUnifiedFullViewingKey> ufvks
+  );
 };

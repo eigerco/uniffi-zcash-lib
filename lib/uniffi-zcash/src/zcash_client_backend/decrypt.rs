@@ -91,11 +91,11 @@ pub fn decrypt_transaction(
     params: ZcashConsensusParameters,
     height: Arc<ZcashBlockHeight>,
     tx: Arc<ZcashTransaction>,
-    ufvks: HashMap<ZcashAccountId, ZcashUnifiedFullViewingKey>,
+    ufvks: HashMap<ZcashAccountId, Arc<ZcashUnifiedFullViewingKey>>,
 ) -> Vec<Arc<ZcashDecryptedOutput>> {
     let ufvks: HashMap<AccountId, UnifiedFullViewingKey> = ufvks
         .into_iter()
-        .map(|(x, y)| (x.into(), y.into()))
+        .map(|(x, y)| (x.into(), (*y).clone().into()))
         .collect();
 
     zcash_client_backend::decrypt_transaction(
