@@ -1,0 +1,14 @@
+
+enum ZcashTransferType {
+	"Incoming",
+	"WalletInternal",
+	"Outgoing"
+};
+
+interface ZcashDecryptedOutput {
+	u64 index();
+	ZcashSaplingNote note();
+	ZcashAccountId account();
+	ZcashMemoBytes memo();
+	ZcashTransferType transfer_type();
+};
