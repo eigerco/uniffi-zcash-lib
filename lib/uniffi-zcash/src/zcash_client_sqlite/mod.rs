@@ -20,11 +20,11 @@ mod wallet;
 pub use self::wallet::*;
 
 use crate::{
-    ZcashAccountId, ZcashAddressMetadata, ZcashAmount, ZcashBlockHeight, ZcashCommitmentTreeRoot,
-    ZcashConsensusParameters, ZcashDecryptedTransaction, ZcashError, ZcashMemo, ZcashOutPoint,
-    ZcashResult, ZcashScanRange, ZcashShieldedProtocol, ZcashTransparentAddress, ZcashTxId,
-    ZcashUnifiedAddress, ZcashUnifiedFullViewingKey, ZcashWalletSummary,
-    ZcashWalletTransparentOutput,
+    ZcashAccountId, ZcashAddressMetadata, ZcashAmount, ZcashBlockHeight, ZcashBlockMetadata,
+    ZcashCommitmentTreeRoot, ZcashConsensusParameters, ZcashDecryptedTransaction, ZcashError,
+    ZcashMemo, ZcashOutPoint, ZcashResult, ZcashScanRange, ZcashShieldedProtocol,
+    ZcashTransparentAddress, ZcashTxId, ZcashUnifiedAddress, ZcashUnifiedFullViewingKey,
+    ZcashWalletSummary, ZcashWalletTransparentOutput,
 };
 
 pub struct MinAndMaxZcashBlockHeight {
@@ -48,6 +48,41 @@ impl ZcashWalletDb {
     /// Construct a connection to the wallet database stored at the specified path.
     pub fn for_path(path: String, params: ZcashConsensusParameters) -> ZcashResult<Self> {
         Ok(ZcashWalletDb { path, params })
+    }
+
+    pub fn chain_height(&self) -> ZcashResult<Option<Arc<ZcashBlockHeight>>> {
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .chain_height()
+            .map(|x| x.map(|y| Arc::new(y.into())))
+            .map_err(cast_err)
+    }
+
+    pub fn block_metadata(
+        &self,
+        height: Arc<ZcashBlockHeight>,
+    ) -> ZcashResult<Option<Arc<ZcashBlockMetadata>>> {
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .block_metadata((*height).into())
+            .map(|x| x.map(|y| Arc::new(y.into())))
+            .map_err(cast_err)
+    }
+
+    pub fn block_fully_scanned(&self) -> ZcashResult<Option<Arc<ZcashBlockMetadata>>> {
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .block_fully_scanned()
+            .map(|x| x.map(|y| Arc::new(y.into())))
+            .map_err(cast_err)
+    }
+
+    pub fn block_max_scanned(&self) -> ZcashResult<Option<Arc<ZcashBlockMetadata>>> {
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .block_max_scanned()
+            .map(|x| x.map(|y| Arc::new(y.into())))
+            .map_err(cast_err)
     }
 
     pub fn get_unified_full_viewing_keys(

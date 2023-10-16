@@ -25,4 +25,15 @@ interface ZcashAccountBalance {
 
 	ZcashNonNegativeAmount total();
 	ZcashNonNegativeAmount sapling_spendable_value();
+	ZcashNonNegativeAmount unshielded();
+};
+
+
+interface ZcashBlockMetadata {
+	[Name=from_parts]
+	constructor(ZcashBlockHeight block_height, ZcashBlockHash block_hash, u32 sapling_tree_size);
+
+	ZcashBlockHeight block_height();
+	ZcashBlockHash block_hash();
+	u32 sapling_tree_size();
 };

@@ -33,7 +33,7 @@ pub fn kotlin(sources_dir: &Path, target_dir: &Path) -> anyhow::Result<()> {
     let dokka_install_dir = dokka_install_dir();
     let dokka_cli = dokka_install_dir.join("dokka-cli-1.8.20.jar");
 
-    let plugins = vec![
+    let plugins = [
         "dokka-base-1.8.20.jar",
         "dokka-analysis-1.8.20.jar",
         "kotlin-analysis-intellij-1.8.20.jar",

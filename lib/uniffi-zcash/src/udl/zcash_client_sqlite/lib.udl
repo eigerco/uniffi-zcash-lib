@@ -8,6 +8,18 @@ interface ZcashWalletDb {
 	constructor(string path, ZcashConsensusParameters params);
 
 	[Throws=ZcashError]
+	ZcashBlockHeight? chain_height();
+
+	[Throws=ZcashError]
+	ZcashBlockMetadata? block_metadata(ZcashBlockHeight height);
+
+	[Throws=ZcashError]
+	ZcashBlockMetadata? block_fully_scanned();
+
+	[Throws=ZcashError]
+	ZcashBlockMetadata? block_max_scanned();
+
+	[Throws=ZcashError]
 	record<ZcashAccountId, ZcashUnifiedFullViewingKey> get_unified_full_viewing_keys();
 
 	[Throws=ZcashError]

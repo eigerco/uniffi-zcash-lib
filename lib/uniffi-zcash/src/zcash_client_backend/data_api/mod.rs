@@ -12,10 +12,11 @@ use std::collections::HashMap;
 use std::fmt;
 use std::sync::Arc;
 
-use crate::{ZcashBlockHeight, ZcashNonNegativeAmount};
+use crate::{ZcashBlockHash, ZcashBlockHeight, ZcashNonNegativeAmount};
 
 use zcash_client_backend::data_api::{
-    AccountBalance, Balance, DecryptedTransaction, Ratio, ShieldedProtocol, WalletSummary,
+    AccountBalance, Balance, BlockMetadata, DecryptedTransaction, Ratio, ShieldedProtocol,
+    WalletSummary,
 };
 use zcash_primitives::transaction::components::amount::NonNegativeAmount;
 use zcash_primitives::zip32::AccountId;
@@ -193,7 +194,12 @@ impl ZcashAccountBalance {
         Arc::new(self.0.total().into())
     }
 
-    /// Returns the total value of funds belonging to the account.
+    /// custom function to return unshielded value
+    pub fn unshielded(&self) -> Arc<ZcashNonNegativeAmount> {
+        Arc::new(self.0.unshielded.into())
+    }
+
+    /// custom function to return sapling spendable balance
     pub fn sapling_spendable_value(&self) -> Arc<ZcashNonNegativeAmount> {
         Arc::new(self.0.sapling_balance.spendable_value.into())
     }
@@ -208,5 +214,51 @@ impl From<ZcashAccountBalance> for AccountBalance {
 impl From<AccountBalance> for ZcashAccountBalance {
     fn from(e: AccountBalance) -> Self {
         ZcashAccountBalance(e)
+    }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct ZcashBlockMetadata(BlockMetadata);
+
+impl ZcashBlockMetadata {
+    /// Constructs a new [`BlockMetadata`] value from its constituent parts.
+    pub fn from_parts(
+        block_height: Arc<ZcashBlockHeight>,
+        block_hash: Arc<ZcashBlockHash>,
+        sapling_tree_size: u32,
+    ) -> Self {
+        Self(BlockMetadata::from_parts(
+            (*block_height).into(),
+            (*block_hash).into(),
+            sapling_tree_size,
+        ))
+    }
+
+    /// Returns the block height.
+    pub fn block_height(&self) -> Arc<ZcashBlockHeight> {
+        Arc::new(self.0.block_height().into())
+    }
+
+    /// Returns the hash of the block
+    pub fn block_hash(&self) -> Arc<ZcashBlockHash> {
+        Arc::new(self.0.block_hash().into())
+    }
+
+    /// Returns the size of the Sapling note commitment tree as of the block that this
+    /// [`BlockMetadata`] describes.
+    pub fn sapling_tree_size(&self) -> u32 {
+        self.0.sapling_tree_size()
+    }
+}
+
+impl From<ZcashBlockMetadata> for BlockMetadata {
+    fn from(inner: ZcashBlockMetadata) -> Self {
+        inner.0
+    }
+}
+
+impl From<BlockMetadata> for ZcashBlockMetadata {
+    fn from(e: BlockMetadata) -> Self {
+        ZcashBlockMetadata(e)
     }
 }

@@ -294,15 +294,15 @@ impl ZcashTransaction {
     // TODO: investigate alternative ways of exposing this to FFI, as it accepts a closure as parameter.
 
     pub fn transparent_bundle(&self) -> Option<Arc<ZcashTransparentBundle>> {
-        self.0.transparent_bundle().map(|b| b.into()).map(Arc::new)
+        self.0.transparent_bundle().map(From::from).map(Arc::new)
     }
 
     pub fn sapling_bundle(&self) -> Option<Arc<ZcashSaplingBundle>> {
-        self.0.sapling_bundle().map(|b| b.into()).map(Arc::new)
+        self.0.sapling_bundle().map(From::from).map(Arc::new)
     }
 
     pub fn orchard_bundle(&self) -> Option<Arc<ZcashOrchardBundle>> {
-        self.0.orchard_bundle().map(|b| b.into()).map(Arc::new)
+        self.0.orchard_bundle().map(From::from).map(Arc::new)
     }
 }
 

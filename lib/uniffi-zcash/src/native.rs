@@ -721,7 +721,7 @@ fn decode_usk(zusk: ZcashUnifiedSpendingKey) -> ZcashResult<ZcashUnifiedSpending
 }
 
 pub fn is_valid_spending_key(zusk: ZcashUnifiedSpendingKey) -> bool {
-    matches!(decode_usk(zusk), Ok(_))
+    decode_usk(zusk).is_ok()
 }
 
 pub fn is_valid_shielded_address(
