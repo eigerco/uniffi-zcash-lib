@@ -6,9 +6,11 @@ use zcash_client_backend::data_api::chain::CommitmentTreeRoot;
 use zcash_client_backend::data_api::scanning::ScanRange;
 use zcash_client_backend::data_api::{NoteId, WalletCommitmentTrees, WalletRead, WalletWrite};
 use zcash_client_backend::encoding::AddressCodec;
+use zcash_client_backend::keys::UnifiedFullViewingKey;
 use zcash_client_backend::wallet::WalletTransparentOutput;
 use zcash_client_sqlite::{chain::BlockMeta, FsBlockDb, WalletDb};
 use zcash_primitives::transaction::components::{Amount, OutPoint};
+use zcash_primitives::zip32::AccountId;
 use zcash_primitives::{legacy::TransparentAddress, sapling};
 
 mod chain;
@@ -25,7 +27,10 @@ use crate::{
     ZcashWalletTransparentOutput,
 };
 
-// use crate::zcash_client_sqlite::ZcashBlockMeta;
+pub struct MinAndMaxZcashBlockHeight {
+    pub min: Arc<ZcashBlockHeight>,
+    pub max: Arc<ZcashBlockHeight>,
+}
 
 /// A wrapper for the SQLite connection to the wallet database.
 pub struct ZcashWalletDb {
@@ -43,6 +48,21 @@ impl ZcashWalletDb {
     /// Construct a connection to the wallet database stored at the specified path.
     pub fn for_path(path: String, params: ZcashConsensusParameters) -> ZcashResult<Self> {
         Ok(ZcashWalletDb { path, params })
+    }
+
+    pub fn get_unified_full_viewing_keys(
+        &self,
+    ) -> ZcashResult<HashMap<ZcashAccountId, Arc<ZcashUnifiedFullViewingKey>>> {
+        let convert_hm =
+            |hm: HashMap<AccountId, UnifiedFullViewingKey>| -> HashMap<ZcashAccountId, Arc<ZcashUnifiedFullViewingKey>> {
+                hm.into_iter().map(|(x, y)| (x.into(), Arc::new(y.into()))).collect()
+            };
+
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_unified_full_viewing_keys()
+            .map(convert_hm)
+            .map_err(cast_err)
     }
 
     pub fn put_received_transparent_utxo(
@@ -85,7 +105,7 @@ impl ZcashWalletDb {
     pub fn get_target_and_anchor_heights(
         &self,
         min_confirmations: u32,
-    ) -> ZcashResult<Option<(ZcashBlockHeight, ZcashBlockHeight)>> {
+    ) -> ZcashResult<Option<MinAndMaxZcashBlockHeight>> {
         let min = NonZeroU32::new(min_confirmations).unwrap();
 
         match WalletDb::for_path(&self.path, self.params)
@@ -93,7 +113,10 @@ impl ZcashWalletDb {
             .get_target_and_anchor_heights(min)
         {
             Ok(None) => Ok(None),
-            Ok(Some((bh1, bh2))) => Ok(Some((bh1.into(), bh2.into()))),
+            Ok(Some((bh1, bh2))) => Ok(Some(MinAndMaxZcashBlockHeight {
+                min: Arc::new(bh1.into()),
+                max: Arc::new(bh2.into()),
+            })),
             Err(e) => Err(ZcashError::Message {
                 error: format!("Err: {}", e),
             }),
@@ -126,10 +149,10 @@ impl ZcashWalletDb {
         &self,
         account: ZcashAccountId,
         max_height: Arc<ZcashBlockHeight>,
-    ) -> ZcashResult<HashMap<ZcashTransparentAddress, ZcashAmount>> {
+    ) -> ZcashResult<HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAmount>>> {
         let convert_hm =
-            |hm: HashMap<TransparentAddress, Amount>| -> HashMap<ZcashTransparentAddress, ZcashAmount> {
-                hm.into_iter().map(|(x, y)| (x.into(), y.into())).collect()
+            |hm: HashMap<TransparentAddress, Amount>| -> HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAmount>> {
+                hm.into_iter().map(|(x, y)| (Arc::new(x.into()), Arc::new(y.into()))).collect()
             };
 
         WalletDb::for_path(&self.path, self.params)

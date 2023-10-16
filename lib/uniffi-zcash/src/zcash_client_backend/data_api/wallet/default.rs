@@ -23,6 +23,7 @@ impl WalletDefault {
     pub fn new() -> Self {
         Self
     }
+
     /// Scans a [`Transaction`] for any information that can be decrypted by the accounts in
     /// the wallet, and saves it to the wallet.
     pub fn decrypt_and_store_transaction(

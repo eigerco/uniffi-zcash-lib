@@ -1,0 +1,7 @@
+[Enum]
+interface ZcashMemo {
+    Empty();
+    Text(string v);
+    Future(sequence<u8> v);
+    Arbitrary(sequence<u8> v);
+};

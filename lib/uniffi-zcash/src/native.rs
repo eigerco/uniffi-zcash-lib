@@ -23,14 +23,15 @@ use std::sync::Arc;
 
 use crate::native_utils as utils;
 use crate::{
-    ZcashAccountId, ZcashAmount, ZcashBackendScan, ZcashBlockHeight, ZcashConsensusParameters,
-    ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule, ZcashFixedSingleOutputChangeStrategy,
-    ZcashFsBlockDb, ZcashKeysEra, ZcashLocalTxProver, ZcashMainGreedyInputSelector, ZcashMemo,
-    ZcashMemoBytes, ZcashNonNegativeAmount, ZcashNoteId, ZcashOutPoint, ZcashOvkPolicy,
-    ZcashPayment, ZcashRecipientAddress, ZcashResult, ZcashScanRange, ZcashScript,
-    ZcashShieldedProtocol, ZcashTestGreedyInputSelector, ZcashTransaction, ZcashTransactionRequest,
-    ZcashTransparentAddress, ZcashTxId, ZcashTxOut, ZcashUnifiedAddress, ZcashUnifiedSpendingKey,
-    ZcashWallet, ZcashWalletDb, ZcashWalletTransparentOutput,
+    MinAndMaxZcashBlockHeight, ZcashAccountId, ZcashAmount, ZcashBackendScan, ZcashBlockHeight,
+    ZcashConsensusParameters, ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule,
+    ZcashFixedSingleOutputChangeStrategy, ZcashFsBlockDb, ZcashKeysEra, ZcashLocalTxProver,
+    ZcashMainGreedyInputSelector, ZcashMemo, ZcashMemoBytes, ZcashNonNegativeAmount, ZcashNoteId,
+    ZcashOutPoint, ZcashOvkPolicy, ZcashPayment, ZcashRecipientAddress, ZcashResult,
+    ZcashScanRange, ZcashScript, ZcashShieldedProtocol, ZcashTestGreedyInputSelector,
+    ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId, ZcashTxOut,
+    ZcashUnifiedAddress, ZcashUnifiedSpendingKey, ZcashWallet, ZcashWalletDb,
+    ZcashWalletTransparentOutput,
 };
 
 use crate::zcash_client_backend::WalletDefault; //{decrypt_and_store_transaction, shield_transparent_funds, spend};
@@ -306,8 +307,8 @@ pub fn get_memo_as_utf8(
         .map(|memo| match memo {
             ZcashMemo::Empty => "".to_string(),
             ZcashMemo::Text { v } => v,
-            ZcashMemo::Future { v } => format!("Not supported Memo::Future({:?})", v.data()),
-            ZcashMemo::Arbitrary { v } => format!("Not supported Memo::Arbitrary({:?})", *v),
+            ZcashMemo::Future { v } => format!("Not supported Memo::Future({:?})", v),
+            ZcashMemo::Arbitrary { v } => format!("Not supported Memo::Arbitrary({:?})", v),
         })
         .map_err(|e| ZcashError::Message {
             error: format_err!("some err {}", e).to_string(),
@@ -632,13 +633,15 @@ pub fn shield_to_address(
             error: format!("Error while fetching anchor height: {}", e),
         })
         .and_then(|opt_anchor| {
-            opt_anchor.map(|(_, a)| a).ok_or(ZcashError::Message {
-                error: "Anchor height not available; scan required.".to_string(),
-            })
+            opt_anchor
+                .map(|MinAndMaxZcashBlockHeight { max, .. }| max)
+                .ok_or(ZcashError::Message {
+                    error: "Anchor height not available; scan required.".to_string(),
+                })
         })
         .and_then(|anchor| {
             db_data
-                .get_transparent_balances(account, Arc::new(anchor))
+                .get_transparent_balances(account, anchor)
                 .map_err(|e| ZcashError::Message {
                     error: format!(
                         "Error while fetching transparent balances for {:?}: {}",
@@ -647,7 +650,6 @@ pub fn shield_to_address(
                 })
         })?
         .into_keys()
-        .map(Arc::new)
         .collect();
 
     // let memo = Memo::from_bytes(&memo_bytes).unwrap();
@@ -782,13 +784,15 @@ fn get_transparent_balance(
             error: format!("Error while fetching anchor height: {}", e),
         })
         .and_then(|opt_anchor| {
-            opt_anchor.map(|(_, a)| a).ok_or(ZcashError::Message {
-                error: "Anchor height not available; scan required.".to_string(),
-            })
+            opt_anchor
+                .map(|MinAndMaxZcashBlockHeight { max, .. }| max)
+                .ok_or(ZcashError::Message {
+                    error: "Anchor height not available; scan required.".to_string(),
+                })
         })
         .and_then(|anchor| {
             db_data
-                .get_unspent_transparent_outputs(Arc::new(taddr), Arc::new(anchor), vec![])
+                .get_unspent_transparent_outputs(Arc::new(taddr), anchor, vec![])
                 .map_err(|e| ZcashError::Message {
                     error: format!("Error while fetching verified balance: {}", e),
                 })

@@ -1,13 +1,20 @@
+dictionary MinAndMaxZcashBlockHeight {
+	ZcashBlockHeight min;
+	ZcashBlockHeight max;
+};
 
 interface ZcashWalletDb {
   	[Name=for_path, Throws=ZcashError]
 	constructor(string path, ZcashConsensusParameters params);
 
 	[Throws=ZcashError]
+	record<ZcashAccountId, ZcashUnifiedFullViewingKey> get_unified_full_viewing_keys();
+
+	[Throws=ZcashError]
 	i64 put_received_transparent_utxo(ZcashWalletTransparentOutput output);
 
-	// [Throws=ZcashError]
-	// ZcashMemo get_memo(ZcashNoteId id_note);
+	[Throws=ZcashError]
+	ZcashMemo get_memo(ZcashNoteId id_note);
 
 	[Throws=ZcashError]
 	void truncate_to_height(u32 block_height);
@@ -21,12 +28,11 @@ interface ZcashWalletDb {
 	[Throws=ZcashError]
     ZcashAccountId? get_account_for_ufvk(ZcashUnifiedFullViewingKey zufvk);
 
-    /*
 	[Throws=ZcashError]
-    (ZcashBlockHeight, ZcashBlockHeight)? get_target_and_anchor_heights(ZcashNonZeroU32 min_confirmations);
+    MinAndMaxZcashBlockHeight? get_target_and_anchor_heights(u32 min_confirmations);
+
 	[Throws=ZcashError]
-    record<ZcashTransparentAddress, ZcashAmount> get_transparent_balances(account: ZcashAccountId, max_height: ZcashBlockHeight);
-    */
+    record<ZcashTransparentAddress, ZcashAmount> get_transparent_balances(ZcashAccountId account, ZcashBlockHeight max_height);
 
 	[Throws=ZcashError]
     void store_decrypted_tx(ZcashDecryptedTransaction d_tx);
