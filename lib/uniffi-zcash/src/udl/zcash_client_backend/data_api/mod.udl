@@ -28,7 +28,6 @@ interface ZcashAccountBalance {
 	ZcashNonNegativeAmount unshielded();
 };
 
-
 interface ZcashBlockMetadata {
 	[Name=from_parts]
 	constructor(ZcashBlockHeight block_height, ZcashBlockHash block_hash, u32 sapling_tree_size);
@@ -36,4 +35,15 @@ interface ZcashBlockMetadata {
 	ZcashBlockHeight block_height();
 	ZcashBlockHash block_hash();
 	u32 sapling_tree_size();
+};
+
+interface MerkleTreeFrontier {};
+
+interface ZcashAccountBirthday {
+	[Name=from_treestate, Throws=ZcashError]
+	constructor(ZcashTreeState treestate, ZcashBlockHeight? recover_until);
+
+    MerkleTreeFrontier sapling_frontier();
+    ZcashBlockHeight height();
+    ZcashBlockHeight? recover_until();
 };

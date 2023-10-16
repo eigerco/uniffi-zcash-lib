@@ -23,14 +23,14 @@ use std::sync::Arc;
 
 use crate::native_utils as utils;
 use crate::{
-    MinAndMaxZcashBlockHeight, ZcashAccountId, ZcashAmount, ZcashBackendScan, ZcashBlockHeight,
+    TupleMinAndMaxBlockHeight, ZcashAccountId, ZcashAmount, ZcashBackendScan, ZcashBlockHeight,
     ZcashConsensusParameters, ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule,
     ZcashFixedSingleOutputChangeStrategy, ZcashFsBlockDb, ZcashKeysEra, ZcashLocalTxProver,
     ZcashMainGreedyInputSelector, ZcashMemo, ZcashMemoBytes, ZcashNonNegativeAmount, ZcashNoteId,
     ZcashOutPoint, ZcashOvkPolicy, ZcashPayment, ZcashRecipientAddress, ZcashResult,
     ZcashScanRange, ZcashScript, ZcashShieldedProtocol, ZcashTestGreedyInputSelector,
     ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId, ZcashTxOut,
-    ZcashUnifiedAddress, ZcashUnifiedSpendingKey, ZcashWallet, ZcashWalletDb,
+    ZcashUnifiedAddress, ZcashUnifiedSpendingKey, ZcashWalletDb,
     ZcashWalletTransparentOutput,
 };
 
@@ -134,36 +134,36 @@ pub fn init_on_load() {
 
 // NOTE: need to get WalletDB translated first
 
-pub fn create_account(
-    db_data: String,
-    seed: Vec<u8>,
-    params: ZcashConsensusParameters,
-) -> ZcashUnifiedSpendingKey {
-    // not needed because we may pass the full param instead of the id
-    // let network = parse_network(network_id)?;
+// pub fn create_account(
+//     db_data: String,
+//     seed: Vec<u8>,
+//     params: ZcashConsensusParameters,
+// ) -> ZcashUnifiedSpendingKey {
+//     // not needed because we may pass the full param instead of the id
+//     // let network = parse_network(network_id)?;
 
-    let _db_data = wallet_db(params, db_data).unwrap();
-    let account = ZcashAccountId { id: 55 };
+//     let _db_data = wallet_db(params, db_data).unwrap();
+//     let account = ZcashAccountId { id: 55 };
 
-    // let seed = SecretVec::new(env.convert_byte_array(seed).unwrap());
-    // let treestate = TreeState::decode(&env.convert_byte_array(treestate).unwrap()[..])
-    //     .map_err(|e| format_err!("Invalid TreeState: {}", e))?;
-    // let recover_until = recover_until.try_into().ok();
+//     // let seed = SecretVec::new(env.convert_byte_array(seed).unwrap());
+//     // let treestate = TreeState::decode(&env.convert_byte_array(treestate).unwrap()[..])
+//     //     .map_err(|e| format_err!("Invalid TreeState: {}", e))?;
+//     // let recover_until = recover_until.try_into().ok();
 
-    // let birthday =
-    //     AccountBirthday::from_treestate(treestate, recover_until).map_err(|e| match e {
-    //         BirthdayError::HeightInvalid(e) => {
-    //             format_err!("Invalid TreeState: Invalid height: {}", e)
-    //         }
-    //         BirthdayError::Decode(e) => {
-    //             format_err!("Invalid TreeState: Invalid frontier encoding: {}", e)
-    //         }
-    //     })?;
+//     // let birthday =
+//     //     AccountBirthday::from_treestate(treestate, recover_until).map_err(|e| match e {
+//     //         BirthdayError::HeightInvalid(e) => {
+//     //             format_err!("Invalid TreeState: Invalid height: {}", e)
+//     //         }
+//     //         BirthdayError::Decode(e) => {
+//     //             format_err!("Invalid TreeState: Invalid frontier encoding: {}", e)
+//     //         }
+//     //     })?;
 
-    // let (account, usk) = db_data
-    //     .create_account(&seed, birthday)
-    ZcashUnifiedSpendingKey::from_seed(params, seed, account).unwrap()
-}
+//     // let (account, usk) = db_data
+//     //     .create_account(&seed, birthday)
+//     ZcashUnifiedSpendingKey::from_seed(params, seed, account).unwrap()
+// }
 
 // DEPR_NOTE get_balance_at was deprecated in newer version, instead get_wallet_summary was used
 pub fn get_balance(
@@ -329,8 +329,8 @@ pub fn init_data_db(
     //         if matches!(error, WalletMigrationError::SeedRequired) => { Ok(1) }
     //     Err(e) => Err(format_err!("Error while initializing data DB: {}", e)),
     // }
-    ZcashWallet::new()
-        .init_wallet_db(Arc::new(db_data), seed, params)
+    db_data
+        .init(seed)
         .map(|_| 0u8)
 }
 
@@ -634,7 +634,7 @@ pub fn shield_to_address(
         })
         .and_then(|opt_anchor| {
             opt_anchor
-                .map(|MinAndMaxZcashBlockHeight { max, .. }| max)
+                .map(|TupleMinAndMaxBlockHeight { max, .. }| max)
                 .ok_or(ZcashError::Message {
                     error: "Anchor height not available; scan required.".to_string(),
                 })
@@ -785,7 +785,7 @@ fn get_transparent_balance(
         })
         .and_then(|opt_anchor| {
             opt_anchor
-                .map(|MinAndMaxZcashBlockHeight { max, .. }| max)
+                .map(|TupleMinAndMaxBlockHeight { max, .. }| max)
                 .ok_or(ZcashError::Message {
                     error: "Anchor height not available; scan required.".to_string(),
                 })
@@ -1041,12 +1041,12 @@ pub fn list_transparent_receivers(
     db_data: String,
     account: ZcashAccountId,
     params: ZcashConsensusParameters,
-) -> ZcashResult<Vec<String>> {
+) -> ZcashResult<Vec<ZcashTransparentAddress>> {
     let db_data = wallet_db(params, db_data)?;
 
     match db_data.get_transparent_receivers(account) {
         Ok(receivers) => {
-            let transparent_receivers = receivers.keys().map(String::from).collect::<Vec<String>>();
+            let transparent_receivers = receivers.keys().map(|x| **x).collect();
             // let taddr = match taddr {
             //     TransparentAddress::PublicKey(data) => {
             //         ZcashAddress::from_transparent_p2pkh(zcash_network, *data)

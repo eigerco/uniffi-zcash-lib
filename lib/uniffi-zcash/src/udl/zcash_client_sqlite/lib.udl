@@ -1,11 +1,19 @@
-dictionary MinAndMaxZcashBlockHeight {
+dictionary TupleMinAndMaxBlockHeight {
 	ZcashBlockHeight min;
 	ZcashBlockHeight max;
+};
+
+dictionary TupleAccountIdAndUnifiedSpendingKey {
+    ZcashAccountId account_id;
+    ZcashUnifiedSpendingKey unified_spending_key;
 };
 
 interface ZcashWalletDb {
   	[Name=for_path, Throws=ZcashError]
 	constructor(string path, ZcashConsensusParameters params);
+
+  	[Throws=ZcashError]
+  	void init(sequence<u8> seed);
 
 	[Throws=ZcashError]
 	ZcashBlockHeight? chain_height();
@@ -41,7 +49,7 @@ interface ZcashWalletDb {
     ZcashAccountId? get_account_for_ufvk(ZcashUnifiedFullViewingKey zufvk);
 
 	[Throws=ZcashError]
-    MinAndMaxZcashBlockHeight? get_target_and_anchor_heights(u32 min_confirmations);
+    TupleMinAndMaxBlockHeight? get_target_and_anchor_heights(u32 min_confirmations);
 
 	[Throws=ZcashError]
     record<ZcashTransparentAddress, ZcashAmount> get_transparent_balances(ZcashAccountId account, ZcashBlockHeight max_height);
@@ -59,7 +67,10 @@ interface ZcashWalletDb {
     ZcashUnifiedAddress? get_current_address(ZcashAccountId aid);
 
 	[Throws=ZcashError]
-    record<string, ZcashAddressMetadata> get_transparent_receivers(ZcashAccountId aid);
+    record<ZcashTransparentAddress, ZcashAddressMetadata> get_transparent_receivers(ZcashAccountId aid);
+
+  	[Throws=ZcashError]
+  	TupleAccountIdAndUnifiedSpendingKey create_account(sequence<u8> seed, ZcashAccountBirthday birthday);
 
 	[Throws=ZcashError]
     void put_sapling_subtree_roots(u64 start_index, sequence<ZcashCommitmentTreeRoot> roots);

@@ -9,15 +9,21 @@ pub use self::scanning::*;
 
 use std::collections::BTreeMap;
 use std::collections::HashMap;
-use std::fmt;
 use std::sync::Arc;
 
-use crate::{ZcashBlockHash, ZcashBlockHeight, ZcashNonNegativeAmount};
+use incrementalmerkletree::frontier::Frontier;
 
+use crate::{
+    ZcashBlockHash, ZcashBlockHeight, ZcashError, ZcashNonNegativeAmount, ZcashResult,
+    ZcashTreeState,
+};
+
+use zcash_client_backend::data_api::AccountBirthday;
 use zcash_client_backend::data_api::{
     AccountBalance, Balance, BlockMetadata, DecryptedTransaction, Ratio, ShieldedProtocol,
     WalletSummary,
 };
+use zcash_primitives::sapling;
 use zcash_primitives::transaction::components::amount::NonNegativeAmount;
 use zcash_primitives::zip32::AccountId;
 
@@ -50,13 +56,6 @@ impl Clone for ZcashDecryptedTransaction {
             tx: self.0.tx,
             sapling_outputs: self.0.sapling_outputs,
         })
-    }
-}
-
-// NOTE change this
-impl fmt::Debug for ZcashDecryptedTransaction {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "ZcashDecryptedTransaction")
     }
 }
 
@@ -260,5 +259,78 @@ impl From<ZcashBlockMetadata> for BlockMetadata {
 impl From<BlockMetadata> for ZcashBlockMetadata {
     fn from(e: BlockMetadata) -> Self {
         ZcashBlockMetadata(e)
+    }
+}
+
+type SaplingFrontier = Frontier<sapling::Node, { sapling::NOTE_COMMITMENT_TREE_DEPTH }>;
+
+pub struct MerkleTreeFrontier(SaplingFrontier);
+
+impl From<MerkleTreeFrontier> for SaplingFrontier {
+    fn from(inner: MerkleTreeFrontier) -> Self {
+        inner.0
+    }
+}
+
+impl From<SaplingFrontier> for MerkleTreeFrontier {
+    fn from(e: SaplingFrontier) -> Self {
+        Self(e)
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct ZcashAccountBirthday(AccountBirthday);
+
+impl ZcashAccountBirthday {
+    /// Constructs a new [`AccountBirthday`] from a [`TreeState`] returned from `lightwalletd`.
+    ///
+    /// * `treestate`: The tree state corresponding to the last block prior to the wallet's
+    ///    birthday height.
+    /// * `recover_until`: An optional height at which the wallet should exit "recovery mode". In
+    ///    order to avoid confusing shifts in wallet balance and spendability that may temporarily be
+    ///    visible to a user during the process of recovering from seed, wallets may optionally set a
+    ///    "recover until" height. The wallet is considered to be in "recovery mode" until there
+    ///    exist no unscanned ranges between the wallet's birthday height and the provided
+    ///    `recover_until` height, exclusive.
+    pub fn from_treestate(
+        treestate: Arc<ZcashTreeState>,
+        recover_until: Option<Arc<ZcashBlockHeight>>,
+    ) -> ZcashResult<Self> {
+        AccountBirthday::from_treestate(
+            (*treestate).clone().into(),
+            recover_until.map(|x| (*x).into()),
+        )
+        .map(Self)
+        .map_err(|_| ZcashError::Message {
+            error: "Error creating birthday struct".to_string(),
+        })
+    }
+
+    // /// Returns the Sapling note commitment tree frontier as of the end of the block at
+    // /// [`Self::height`].
+    pub fn sapling_frontier(&self) -> Arc<MerkleTreeFrontier> {
+        Arc::new((*self.0.sapling_frontier()).clone().into())
+    }
+
+    /// Returns the birthday height of the account.
+    pub fn height(&self) -> Arc<ZcashBlockHeight> {
+        Arc::new(self.0.height().into())
+    }
+
+    /// Returns the height at which the wallet should exit "recovery mode".
+    pub fn recover_until(&self) -> Option<Arc<ZcashBlockHeight>> {
+        self.0.recover_until().map(From::from).map(Arc::new)
+    }
+}
+
+impl From<ZcashAccountBirthday> for AccountBirthday {
+    fn from(inner: ZcashAccountBirthday) -> Self {
+        inner.0
+    }
+}
+
+impl From<AccountBirthday> for ZcashAccountBirthday {
+    fn from(e: AccountBirthday) -> Self {
+        ZcashAccountBirthday(e)
     }
 }

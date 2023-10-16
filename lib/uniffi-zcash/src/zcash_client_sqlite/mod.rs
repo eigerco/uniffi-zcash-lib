@@ -1,3 +1,4 @@
+use secrecy::SecretVec;
 use std::collections::HashMap;
 use std::num::NonZeroU32;
 use std::sync::{Arc, Mutex};
@@ -5,13 +6,13 @@ use zcash_client_backend::address::AddressMetadata;
 use zcash_client_backend::data_api::chain::CommitmentTreeRoot;
 use zcash_client_backend::data_api::scanning::ScanRange;
 use zcash_client_backend::data_api::{NoteId, WalletCommitmentTrees, WalletRead, WalletWrite};
-use zcash_client_backend::encoding::AddressCodec;
 use zcash_client_backend::keys::UnifiedFullViewingKey;
 use zcash_client_backend::wallet::WalletTransparentOutput;
 use zcash_client_sqlite::{chain::BlockMeta, FsBlockDb, WalletDb};
 use zcash_primitives::transaction::components::{Amount, OutPoint};
 use zcash_primitives::zip32::AccountId;
 use zcash_primitives::{legacy::TransparentAddress, sapling};
+use zcash_client_sqlite::wallet::init;
 
 mod chain;
 pub use self::chain::*;
@@ -20,16 +21,22 @@ mod wallet;
 pub use self::wallet::*;
 
 use crate::{
-    ZcashAccountId, ZcashAddressMetadata, ZcashAmount, ZcashBlockHeight, ZcashBlockMetadata,
-    ZcashCommitmentTreeRoot, ZcashConsensusParameters, ZcashDecryptedTransaction, ZcashError,
-    ZcashMemo, ZcashOutPoint, ZcashResult, ZcashScanRange, ZcashShieldedProtocol,
-    ZcashTransparentAddress, ZcashTxId, ZcashUnifiedAddress, ZcashUnifiedFullViewingKey,
-    ZcashWalletSummary, ZcashWalletTransparentOutput,
+    ZcashAccountBirthday, ZcashAccountId, ZcashAddressMetadata, ZcashAmount, ZcashBlockHeight,
+    ZcashBlockMetadata, ZcashCommitmentTreeRoot, ZcashConsensusParameters,
+    ZcashDecryptedTransaction, ZcashError, ZcashMemo, ZcashOutPoint, ZcashResult, ZcashScanRange,
+    ZcashShieldedProtocol, ZcashTransparentAddress, ZcashTxId, ZcashUnifiedAddress,
+    ZcashUnifiedFullViewingKey, ZcashUnifiedSpendingKey, ZcashWalletSummary,
+    ZcashWalletTransparentOutput,
 };
 
-pub struct MinAndMaxZcashBlockHeight {
+pub struct TupleMinAndMaxBlockHeight {
     pub min: Arc<ZcashBlockHeight>,
     pub max: Arc<ZcashBlockHeight>,
+}
+
+pub struct TupleAccountIdAndUnifiedSpendingKey {
+    pub account_id: ZcashAccountId,
+    pub unified_spending_key: Arc<ZcashUnifiedSpendingKey>,
 }
 
 /// A wrapper for the SQLite connection to the wallet database.
@@ -50,11 +57,21 @@ impl ZcashWalletDb {
         Ok(ZcashWalletDb { path, params })
     }
 
+    /// From wallet::init
+    pub fn init(&self, seed: Vec<u8>) -> ZcashResult<()> {
+        let mut db_data = WalletDb::for_path(&self.path, self.params).expect("Cannot access the DB!");
+        let secvec = SecretVec::new(seed);
+
+        init::init_wallet_db(&mut db_data, Some(secvec)).map_err(|e| ZcashError::Message {
+            error: format!("Error while initializing data DB: {:?}", e),
+        })
+    }
+
     pub fn chain_height(&self) -> ZcashResult<Option<Arc<ZcashBlockHeight>>> {
         WalletDb::for_path(&self.path, self.params)
             .expect("Cannot access the DB!")
             .chain_height()
-            .map(|x| x.map(|y| Arc::new(y.into())))
+            .map(|x| x.map(From::from).map(Arc::new))
             .map_err(cast_err)
     }
 
@@ -65,7 +82,7 @@ impl ZcashWalletDb {
         WalletDb::for_path(&self.path, self.params)
             .expect("Cannot access the DB!")
             .block_metadata((*height).into())
-            .map(|x| x.map(|y| Arc::new(y.into())))
+            .map(|x| x.map(From::from).map(Arc::new))
             .map_err(cast_err)
     }
 
@@ -73,7 +90,7 @@ impl ZcashWalletDb {
         WalletDb::for_path(&self.path, self.params)
             .expect("Cannot access the DB!")
             .block_fully_scanned()
-            .map(|x| x.map(|y| Arc::new(y.into())))
+            .map(|x| x.map(From::from).map(Arc::new))
             .map_err(cast_err)
     }
 
@@ -81,7 +98,69 @@ impl ZcashWalletDb {
         WalletDb::for_path(&self.path, self.params)
             .expect("Cannot access the DB!")
             .block_max_scanned()
-            .map(|x| x.map(|y| Arc::new(y.into())))
+            .map(|x| x.map(From::from).map(Arc::new))
+            .map_err(cast_err)
+    }
+
+    pub fn suggest_scan_ranges(&self) -> ZcashResult<Vec<Arc<ZcashScanRange>>> {
+        let heights = |heights: Vec<ScanRange>| -> Vec<Arc<ZcashScanRange>> {
+            heights.into_iter().map(From::from).map(Arc::new).collect()
+        };
+
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .suggest_scan_ranges()
+            .map(heights)
+            .map_err(cast_err)
+    }
+
+    pub fn get_target_and_anchor_heights(
+        &self,
+        min_confirmations: u32,
+    ) -> ZcashResult<Option<TupleMinAndMaxBlockHeight>> {
+        let min = NonZeroU32::new(min_confirmations).unwrap();
+
+        match WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_target_and_anchor_heights(min)
+        {
+            Ok(None) => Ok(None),
+            Ok(Some((bh1, bh2))) => Ok(Some(TupleMinAndMaxBlockHeight {
+                min: Arc::new(bh1.into()),
+                max: Arc::new(bh2.into()),
+            })),
+            Err(e) => Err(ZcashError::Message {
+                error: format!("Err: {}", e),
+            }),
+        }
+    }
+
+    pub fn get_min_unspent_height(&self) -> ZcashResult<Option<Arc<ZcashBlockHeight>>> {
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_min_unspent_height()
+            .map(|x| x.map(From::from).map(Arc::new))
+            .map_err(cast_err)
+    }
+
+    // get_block_hash
+
+    // get_max_height_hash
+
+    // get_tx_height
+
+    // get_wallet_birthday
+
+    // get_account_birthday
+
+    pub fn get_current_address(
+        &self,
+        aid: ZcashAccountId,
+    ) -> ZcashResult<Option<Arc<ZcashUnifiedAddress>>> {
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_current_address(aid.into())
+            .map(|x| x.map(From::from).map(Arc::new))
             .map_err(cast_err)
     }
 
@@ -100,63 +179,18 @@ impl ZcashWalletDb {
             .map_err(cast_err)
     }
 
-    pub fn put_received_transparent_utxo(
+    pub fn get_account_for_ufvk(
         &self,
-        output: Arc<ZcashWalletTransparentOutput>,
-    ) -> ZcashResult<i64> {
+        zufvk: Arc<ZcashUnifiedFullViewingKey>,
+    ) -> ZcashResult<Option<ZcashAccountId>> {
         WalletDb::for_path(&self.path, self.params)
             .expect("Cannot access the DB!")
-            .put_received_transparent_utxo(&output.0)
-            .map(|x| x.0)
+            .get_account_for_ufvk(&((*zufvk).clone().into()))
+            .map(|aid| aid.map(From::from))
             .map_err(cast_err)
     }
 
-    pub fn get_memo(&self, id_note: Arc<ZcashNoteId>) -> ZcashResult<ZcashMemo> {
-        WalletDb::for_path(&self.path, self.params)
-            .expect("Cannot access the DB!")
-            .get_memo((*id_note).into())
-            .map(|memo| memo.unwrap().into())
-            .map_err(cast_err)
-    }
-
-    pub fn truncate_to_height(&self, block_height: u32) -> ZcashResult<()> {
-        let zheight = ZcashBlockHeight::new(block_height).into();
-
-        WalletDb::for_path(&self.path, self.params)
-            .expect("Cannot access the DB!")
-            .truncate_to_height(zheight)
-            .map_err(cast_err)
-    }
-
-    pub fn update_chain_tip(&self, tip_height: u32) -> ZcashResult<()> {
-        let zheight = ZcashBlockHeight::new(tip_height).into();
-
-        WalletDb::for_path(&self.path, self.params)
-            .expect("Cannot access the DB!")
-            .update_chain_tip(zheight)
-            .map_err(cast_err)
-    }
-
-    pub fn get_target_and_anchor_heights(
-        &self,
-        min_confirmations: u32,
-    ) -> ZcashResult<Option<MinAndMaxZcashBlockHeight>> {
-        let min = NonZeroU32::new(min_confirmations).unwrap();
-
-        match WalletDb::for_path(&self.path, self.params)
-            .expect("Cannot access the DB!")
-            .get_target_and_anchor_heights(min)
-        {
-            Ok(None) => Ok(None),
-            Ok(Some((bh1, bh2))) => Ok(Some(MinAndMaxZcashBlockHeight {
-                min: Arc::new(bh1.into()),
-                max: Arc::new(bh2.into()),
-            })),
-            Err(e) => Err(ZcashError::Message {
-                error: format!("Err: {}", e),
-            }),
-        }
-    }
+    // is_valid_account_extfvk
 
     pub fn get_wallet_summary(
         &self,
@@ -169,79 +203,29 @@ impl ZcashWalletDb {
             .map_err(cast_err)
     }
 
-    pub fn get_account_for_ufvk(
-        &self,
-        zufvk: Arc<ZcashUnifiedFullViewingKey>,
-    ) -> ZcashResult<Option<ZcashAccountId>> {
+    pub fn get_memo(&self, id_note: Arc<ZcashNoteId>) -> ZcashResult<ZcashMemo> {
         WalletDb::for_path(&self.path, self.params)
             .expect("Cannot access the DB!")
-            .get_account_for_ufvk(&((*zufvk).clone().into()))
-            .map(|aid| aid.map(From::from))
+            .get_memo((*id_note).into())
+            .map(|memo| memo.unwrap().into())
             .map_err(cast_err)
     }
 
-    pub fn get_transparent_balances(
-        &self,
-        account: ZcashAccountId,
-        max_height: Arc<ZcashBlockHeight>,
-    ) -> ZcashResult<HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAmount>>> {
-        let convert_hm =
-            |hm: HashMap<TransparentAddress, Amount>| -> HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAmount>> {
-                hm.into_iter().map(|(x, y)| (Arc::new(x.into()), Arc::new(y.into()))).collect()
-            };
+    // get_transaction
 
-        WalletDb::for_path(&self.path, self.params)
-            .expect("Cannot access the DB!")
-            .get_transparent_balances(account.into(), (*max_height).into())
-            .map(convert_hm)
-            .map_err(cast_err)
-    }
+    // get_sapling_nullifiers
 
-    pub fn store_decrypted_tx(&self, d_tx: Arc<ZcashDecryptedTransaction>) -> ZcashResult<()> {
-        WalletDb::for_path(&self.path, self.params)
-            .expect("Cannot access the DB!")
-            .store_decrypted_tx((*d_tx).clone().into())
-            .map_err(cast_err)
-    }
+    // get_spendable_sapling_notes
 
-    pub fn get_min_unspent_height(&self) -> ZcashResult<Option<Arc<ZcashBlockHeight>>> {
-        WalletDb::for_path(&self.path, self.params)
-            .expect("Cannot access the DB!")
-            .get_min_unspent_height()
-            .map(|x| x.map(From::from).map(Arc::new))
-            .map_err(cast_err)
-    }
-
-    pub fn suggest_scan_ranges(&self) -> ZcashResult<Vec<Arc<ZcashScanRange>>> {
-        let heights = |heights: Vec<ScanRange>| -> Vec<Arc<ZcashScanRange>> {
-            heights.into_iter().map(From::from).map(Arc::new).collect()
-        };
-
-        WalletDb::for_path(&self.path, self.params)
-            .expect("Cannot access the DB!")
-            .suggest_scan_ranges()
-            .map(heights)
-            .map_err(cast_err)
-    }
-
-    pub fn get_current_address(
-        &self,
-        aid: ZcashAccountId,
-    ) -> ZcashResult<Option<Arc<ZcashUnifiedAddress>>> {
-        WalletDb::for_path(&self.path, self.params)
-            .expect("Cannot access the DB!")
-            .get_current_address(aid.into())
-            .map(|x| x.map(From::from).map(Arc::new))
-            .map_err(cast_err)
-    }
+    // select_spendable_sapling_notes
 
     pub fn get_transparent_receivers(
         &self,
         aid: ZcashAccountId,
-    ) -> ZcashResult<HashMap<String, Arc<ZcashAddressMetadata>>> {
+    ) -> ZcashResult<HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAddressMetadata>>> {
         let convert_hm =
-            |hm: HashMap<TransparentAddress, AddressMetadata>| -> HashMap<String, Arc<ZcashAddressMetadata>> {
-                hm.into_iter().map(|(x, y)| (x.encode(&self.params), Arc::new(y.into()))).collect()
+            |hm: HashMap<TransparentAddress, AddressMetadata>| -> HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAddressMetadata>> {
+                hm.into_iter().map(|(x, y)| (Arc::new(x.into()), Arc::new(y.into()))).collect()
             };
 
         WalletDb::for_path(&self.path, self.params)
@@ -249,24 +233,6 @@ impl ZcashWalletDb {
             .get_transparent_receivers(aid.into())
             .map(convert_hm)
             .map_err(cast_err)
-    }
-
-    pub fn put_sapling_subtree_roots(
-        &self,
-        start_index: u64,
-        roots: Vec<Arc<ZcashCommitmentTreeRoot>>,
-    ) -> ZcashResult<()> {
-        let roots_arr = roots
-            .into_iter()
-            .map(|x| (*x).clone().into())
-            .collect::<Vec<CommitmentTreeRoot<sapling::Node>>>();
-
-        WalletDb::for_path(&self.path, self.params)
-            .expect("Cannot access the DB!")
-            .put_sapling_subtree_roots(start_index, &roots_arr)
-            .map_err(|e| ZcashError::Message {
-                error: format!("ShardTreeError: {:?}", e),
-            })
     }
 
     pub fn get_unspent_transparent_outputs(
@@ -293,6 +259,106 @@ impl ZcashWalletDb {
             .map(convert_arr)
             .map_err(cast_err)
     }
+
+    pub fn get_transparent_balances(
+        &self,
+        account: ZcashAccountId,
+        max_height: Arc<ZcashBlockHeight>,
+    ) -> ZcashResult<HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAmount>>> {
+        let convert_hm =
+            |hm: HashMap<TransparentAddress, Amount>| -> HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAmount>> {
+                hm.into_iter().map(|(x, y)| (Arc::new(x.into()), Arc::new(y.into()))).collect()
+            };
+
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_transparent_balances(account.into(), (*max_height).into())
+            .map(convert_hm)
+            .map_err(cast_err)
+    }
+
+    // WalletWrite implementation methods
+
+    pub fn create_account(
+        &self,
+        seed: Vec<u8>,
+        birthday: Arc<ZcashAccountBirthday>,
+    ) -> ZcashResult<TupleAccountIdAndUnifiedSpendingKey> {
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .create_account(&SecretVec::new(seed), (*birthday).clone().into())
+            .map(|(aid, usk)| TupleAccountIdAndUnifiedSpendingKey {
+                account_id: aid.into(),
+                unified_spending_key: Arc::new(usk.into()),
+            })
+            .map_err(cast_err)
+    }
+
+    // get_next_available_address
+
+    // put_blocks
+
+    pub fn update_chain_tip(&self, tip_height: u32) -> ZcashResult<()> {
+        let zheight = ZcashBlockHeight::new(tip_height).into();
+
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .update_chain_tip(zheight)
+            .map_err(cast_err)
+    }
+
+    pub fn store_decrypted_tx(&self, d_tx: Arc<ZcashDecryptedTransaction>) -> ZcashResult<()> {
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .store_decrypted_tx((*d_tx).clone().into())
+            .map_err(cast_err)
+    }
+
+    // store_sent_tx
+
+    pub fn truncate_to_height(&self, block_height: u32) -> ZcashResult<()> {
+        let zheight = ZcashBlockHeight::new(block_height).into();
+
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .truncate_to_height(zheight)
+            .map_err(cast_err)
+    }
+
+    pub fn put_received_transparent_utxo(
+        &self,
+        output: Arc<ZcashWalletTransparentOutput>,
+    ) -> ZcashResult<i64> {
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .put_received_transparent_utxo(&output.0)
+            .map(|x| x.0)
+            .map_err(cast_err)
+    }
+
+    // WalletCommitmentTrees implementation methods
+
+    // with_sapling_tree_mut
+
+    pub fn put_sapling_subtree_roots(
+        &self,
+        start_index: u64,
+        roots: Vec<Arc<ZcashCommitmentTreeRoot>>,
+    ) -> ZcashResult<()> {
+        let roots_arr = roots
+            .into_iter()
+            .map(|x| (*x).clone().into())
+            .collect::<Vec<CommitmentTreeRoot<sapling::Node>>>();
+
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .put_sapling_subtree_roots(start_index, &roots_arr)
+            .map_err(|e| ZcashError::Message {
+                error: format!("ShardTreeError: {:?}", e),
+            })
+    }
+
+    // get_checkpoint_depth
 }
 
 pub struct ZcashFsBlockDb {

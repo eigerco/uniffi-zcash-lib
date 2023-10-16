@@ -29,6 +29,9 @@ pub use self::zip321::*;
 mod decrypt;
 pub use self::decrypt::*;
 
+mod service;
+pub use self::service::*;
+
 pub struct ZcashUnifiedAddressAndDiversifierIndex {
     pub address: Arc<ZcashUnifiedAddress>,
     pub diversifier_index: Arc<ZcashDiversifierIndex>,
