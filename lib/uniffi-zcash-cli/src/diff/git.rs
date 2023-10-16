@@ -15,12 +15,9 @@ pub(crate) fn init_libs_repo(
     version: String,
 ) -> anyhow::Result<()> {
     let tag = format!("{}-{}", lib_name, version);
-    let repo = match Repository::open(repo_path.to_owned()) {
-        Ok(r) => r,
-        Err(_) => {
-            Repository::clone(LIBS_REPO_URL, repo_path).context("failed to clone current repo")?
-        }
-    };
+    let repo = Repository::open(repo_path.to_owned())
+        .or_else(|_| Repository::clone(LIBS_REPO_URL, repo_path))
+        .context("failed to clone current repo")?;
 
     if repo.find_reference(&tag).is_err() {
         checkout_tag(&repo, &tag)?;
