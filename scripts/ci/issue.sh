@@ -19,7 +19,10 @@ generate_issue_labels() {
 
 	# Export ISSUE_LABELS in format - "crate_name-current_version-latest_version;..."
 	local issue_labels
-	issue_labels=$(echo "$outdated_libs_json" | jq -r 'select(.crate_name | startswith("uniffi-") or .=="zcash").dependencies[] | select(.project != .latest) | (.name+"-"+.project+"-"+.latest)' | sort -u | tr '\n' ';')
+	issue_labels=$(echo "$outdated_libs_json" |
+	        jq -r 'select(.crate_name | startswith("uniffi-") or .=="zcash").dependencies[] | select(.project != .latest) | (.name+"-"+.project+"-"+.latest)' |
+	        sort -u |
+	        tr '\n' ';')
 
 	echo "$issue_labels"
 }

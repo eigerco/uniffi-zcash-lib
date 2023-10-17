@@ -23,8 +23,8 @@ diff() {
 		exit 1
 	fi
 
-	IFS=';' read -ra arr <<<"$outdated_libs"
-	for lib_name in "${arr[@]}"; do
+	echo "$outdated_libs" |
+	IFS=';' while read -r lib_name; do
 		if [[ -z "$lib_name" ]]; then
 			continue
 		fi

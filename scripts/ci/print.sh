@@ -12,8 +12,8 @@ print_workflow_diff() {
 	local outdated_libs=$1
 	local diff_result_workflow_url=$2
 
-	echo -e "# :warning: New versions of librustzcash libraries are present :warning: \n"
-	echo -e "You can view a better colored result of the diff in the **[CI logs]($diff_result_workflow_url)**.\n"
+	echo "# :warning: New versions of librustzcash libraries are present :warning:"
+	echo "You can view a better colored result of the diff in the **[CI logs]($diff_result_workflow_url)**."
 
 	IFS=';' read -ra arr <<<"$outdated_libs"
 	for lib_name in "${arr[@]}"; do
@@ -51,8 +51,7 @@ print_workflow_build_result() {
 		echo "# :warning: Build fails after bumping to the newer versions with the following output: :warning: "
 		echo "You can also view the build result in the **[CI logs]($build_result_workflow_url)**."
 		echo "\`\`\`"
-		output=$(cat build_output)
-		echo "$output"
+		cat build_output
 		echo "\`\`\`"
 	fi
 

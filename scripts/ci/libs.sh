@@ -20,11 +20,17 @@ get_libs() {
 	fi
 
 	local output
-	output=$(
-		cargo metadata --format-version=1 --no-deps --quiet --manifest-path="$librustzcash_cargo_path" |
-			jq -r '.packages[] | .name' |
-			xargs -I {} sh -c "cargo metadata --quiet --format-version=1 --no-deps --manifest-path=$uniffi_cargo_path | jq -r '.packages[] | .dependencies[] | .name' | grep '{}' | sort -u | tr '\n' ';'"
-	)
+	cargo metadata --format-version=1 --no-deps --quiet --manifest-path="$librustzcash_cargo_path" |
+            jq -r '.packages[] | .name' |
+            while read -r pkg_name; do
+                    local result
+                    result=$(cargo metadata --quiet --format-version=1 --no-deps --manifest-path=$uniffi_cargo_path |
+                            jq -r '.packages[] | .dependencies[] | .name' |
+                            grep "$pkg_name" |
+                            sort -u |
+                            tr '\n' ';'")
+                    output="$output$result"
+            done
 
 	echo "$output"
 }
