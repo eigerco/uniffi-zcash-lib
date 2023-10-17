@@ -15,16 +15,16 @@ set -eou pipefail
 # ${lib_name}.diff file for every outdated library - for output in the issue
 
 diff() {
-	local outdated_libs=$1
-	local uniffi_cargo_path=$2
-	local grep_dir=$3
+	local outdated_libs="$1"
+	local uniffi_cargo_path="$2"
+	local grep_dir="$3"
 	if [[ -z "$outdated_libs" || -z "$uniffi_cargo_path" || -z "$grep_dir" ]]; then
 		echo "required parameter for diff() is empty" 1>&2
 		exit 1
 	fi
 
-	echo "$outdated_libs" |
-	IFS=';' while read -r lib_name; do
+	IFS=';' read -ra arr <<<"$outdated_libs"
+	for lib_name in "${arr[@]}"; do
 		if [[ -z "$lib_name" ]]; then
 			continue
 		fi
@@ -34,7 +34,8 @@ diff() {
 		lib_latest_version=$(curl --silent "https://crates.io/api/v1/crates/$lib_name" | jq -r '.crate.max_stable_version')
 		# this is faster than "cargo outdated", especially in a loop
 		local lib_current_version
-		lib_current_version=$(cargo metadata --format-version=1 -q --manifest-path="$uniffi_cargo_path" | jq -r --arg lib_name "$lib_name" '.packages[] | select(.name == $lib_name) | .version')
+		lib_current_version=$(cargo metadata --format-version=1 -q --manifest-path="$uniffi_cargo_path" |
+			jq -r --arg lib_name "$lib_name" '.packages[] | select(.name == $lib_name) | .version')
 
 		# write the diffs to files, which we show in a separate step for better readability
 		# for colored output ANSI color codes are written in the file and can't be rendered in markdown
