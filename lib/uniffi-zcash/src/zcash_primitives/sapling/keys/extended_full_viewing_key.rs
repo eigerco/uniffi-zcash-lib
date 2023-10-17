@@ -15,12 +15,19 @@ impl From<ExtendedFullViewingKey> for ZcashExtendedFullViewingKey {
     }
 }
 
+impl From<ZcashExtendedFullViewingKey> for ExtendedFullViewingKey {
+    fn from(key: ZcashExtendedFullViewingKey) -> Self {
+        key.0.clone()
+    }
+}
+
 impl From<&ZcashExtendedFullViewingKey> for ExtendedFullViewingKey {
     fn from(key: &ZcashExtendedFullViewingKey) -> Self {
         key.0.clone()
     }
 }
 
+#[derive(Clone)]
 pub struct ZcashExtendedFullViewingKey(ExtendedFullViewingKey);
 
 impl ZcashExtendedFullViewingKey {

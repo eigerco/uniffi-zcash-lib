@@ -1,8 +1,10 @@
-[Enum]
-interface ZcashOvkPolicy {
-	Sender();
-	Custom(sequence<u8> bytes);
-	Discard();
+
+interface ZcashWalletSaplingSpend {};
+
+interface ZcashWalletSaplingOutput {};
+
+interface ZcashWalletTx {
+	constructor(ZcashTxId txid, u32 index, sequence<ZcashWalletSaplingSpend> sapling_spends, sequence<ZcashWalletSaplingOutput> sapling_outputs);
 };
 
 interface ZcashWalletTransparentOutput {
@@ -13,4 +15,11 @@ interface ZcashWalletTransparentOutput {
 	ZcashBlockHeight height();
 	ZcashTransparentAddress recipient_address();
 	ZcashAmount value();
+};
+
+[Enum]
+interface ZcashOvkPolicy {
+	Sender();
+	Custom(sequence<u8> bytes);
+	Discard();
 };

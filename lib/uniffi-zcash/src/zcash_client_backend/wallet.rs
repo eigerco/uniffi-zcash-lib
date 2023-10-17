@@ -1,10 +1,140 @@
 use std::sync::Arc;
-use zcash_client_backend::wallet::{OvkPolicy, WalletTransparentOutput};
+use zcash_client_backend::wallet::{
+    OvkPolicy, WalletSaplingOutput, WalletSaplingSpend, WalletTransparentOutput, WalletTx,
+};
 use zcash_primitives::keys::OutgoingViewingKey;
+use zcash_primitives::sapling;
 
 use crate::{
-    ZcashAmount, ZcashBlockHeight, ZcashOutPoint, ZcashResult, ZcashTransparentAddress, ZcashTxOut,
+    ZcashAmount, ZcashBlockHeight, ZcashOutPoint, ZcashResult, ZcashTransparentAddress, ZcashTxId,
+    ZcashTxOut,
 };
+
+pub struct ZcashWalletSaplingSpend(WalletSaplingSpend);
+
+impl Clone for ZcashWalletSaplingSpend {
+    fn clone(&self) -> Self {
+        Self(WalletSaplingSpend::from_parts(
+            self.0.index(),
+            *self.0.nf(),
+            self.0.account(),
+        ))
+    }
+}
+
+impl From<WalletSaplingSpend> for ZcashWalletSaplingSpend {
+    fn from(inner: WalletSaplingSpend) -> Self {
+        Self(inner)
+    }
+}
+
+impl From<ZcashWalletSaplingSpend> for WalletSaplingSpend {
+    fn from(outer: ZcashWalletSaplingSpend) -> Self {
+        outer.0
+    }
+}
+
+pub struct ZcashWalletSaplingOutput(WalletSaplingOutput<sapling::Nullifier>);
+
+impl Clone for ZcashWalletSaplingOutput {
+    fn clone(&self) -> Self {
+        Self(WalletSaplingOutput::from_parts(
+            self.0.index(),
+            *self.0.cmu(),
+            self.0.ephemeral_key().clone(),
+            self.0.account(),
+            self.0.note().clone(),
+            self.0.is_change(),
+            self.0.note_commitment_tree_position(),
+            *self.0.nf(),
+        ))
+    }
+}
+
+impl From<WalletSaplingOutput<sapling::Nullifier>> for ZcashWalletSaplingOutput {
+    fn from(inner: WalletSaplingOutput<sapling::Nullifier>) -> Self {
+        Self(inner)
+    }
+}
+
+impl From<ZcashWalletSaplingOutput> for WalletSaplingOutput<sapling::Nullifier> {
+    fn from(outer: ZcashWalletSaplingOutput) -> Self {
+        outer.0
+    }
+}
+
+/// A subset of a [`ZcashTransaction`] relevant to wallets and light clients.
+pub struct ZcashWalletTx(WalletTx<sapling::Nullifier>);
+
+impl ZcashWalletTx {
+    pub fn new(
+        txid: Arc<ZcashTxId>,
+        index: u32,
+        sapling_spends: Vec<Arc<ZcashWalletSaplingSpend>>,
+        sapling_outputs: Vec<Arc<ZcashWalletSaplingOutput>>,
+    ) -> Self {
+        Self(WalletTx {
+            txid: (*txid).into(),
+            index: index.try_into().unwrap(),
+            sapling_spends: sapling_spends
+                .into_iter()
+                .map(|x| (*x).clone().into())
+                .collect(),
+            sapling_outputs: sapling_outputs
+                .into_iter()
+                .map(|x| (*x).clone().into())
+                .collect(),
+        })
+    }
+}
+
+impl Clone for ZcashWalletTx {
+    fn clone(&self) -> Self {
+        let sapling_outputs = self
+            .0
+            .sapling_outputs
+            .iter()
+            .map(|x| {
+                WalletSaplingOutput::from_parts(
+                    x.index(),
+                    *x.cmu(),
+                    x.ephemeral_key().clone(),
+                    x.account(),
+                    x.note().clone(),
+                    x.is_change(),
+                    x.note_commitment_tree_position(),
+                    *x.nf(),
+                )
+            })
+            .collect::<Vec<WalletSaplingOutput<sapling::Nullifier>>>();
+
+        let sapling_spends = self
+            .0
+            .sapling_spends
+            .iter()
+            .map(|x| WalletSaplingSpend::from_parts(x.index(), *x.nf(), x.account()))
+            .collect::<Vec<WalletSaplingSpend>>();
+
+        Self(WalletTx {
+            txid: self.0.txid,
+            index: self.0.index,
+            sapling_spends,
+            sapling_outputs,
+        })
+    }
+}
+
+impl From<WalletTx<sapling::Nullifier>> for ZcashWalletTx {
+    fn from(inner: WalletTx<sapling::Nullifier>) -> Self {
+        Self(inner)
+    }
+}
+
+impl From<ZcashWalletTx> for WalletTx<sapling::Nullifier> {
+    fn from(outer: ZcashWalletTx) -> Self {
+        outer.0
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct ZcashWalletTransparentOutput(pub WalletTransparentOutput);
@@ -50,7 +180,7 @@ impl ZcashWalletTransparentOutput {
 
 impl From<WalletTransparentOutput> for ZcashWalletTransparentOutput {
     fn from(inner: WalletTransparentOutput) -> Self {
-        ZcashWalletTransparentOutput(inner)
+        Self(inner)
     }
 }
 

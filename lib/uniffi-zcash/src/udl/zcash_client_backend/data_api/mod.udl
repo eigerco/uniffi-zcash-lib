@@ -37,6 +37,29 @@ interface ZcashBlockMetadata {
 	u32 sapling_tree_size();
 };
 
+interface MerkleTreeRetention {};
+
+dictionary TripleSaplingNullifierMap {
+	ZcashTxId txid;
+    u16 tx_idx;
+    sequence<ZcashSaplingNullifier> nullifiers;
+};
+
+dictionary TupleSaplingCommitments {
+	ZcashSaplingNode node;
+	MerkleTreeRetention retention;
+};
+
+interface ZcashScannedBlock {
+	[Name=from_parts]
+	constructor(ZcashBlockMetadata metadata, u32 block_time, sequence<ZcashWalletTx> transactions, sequence<TripleSaplingNullifierMap> sapling_nullifier_map, sequence<TupleSaplingCommitments> sapling_commitments);
+
+	ZcashBlockHeight height();
+	ZcashBlockHash block_hash();
+	u32 block_time();
+	ZcashBlockMetadata metadata();
+};
+
 interface MerkleTreeFrontier {};
 
 interface ZcashAccountBirthday {

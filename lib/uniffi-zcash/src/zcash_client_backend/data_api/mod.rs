@@ -11,21 +11,25 @@ use std::collections::BTreeMap;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use incrementalmerkletree::frontier::Frontier;
+use zcash_client_backend::data_api::{
+    AccountBalance, AccountBirthday, Balance, BlockMetadata, DecryptedTransaction, Ratio,
+    ScannedBlock, ShieldedProtocol, WalletSummary,
+};
+use zcash_client_backend::wallet::WalletTx;
+use zcash_primitives::sapling;
+use zcash_primitives::transaction::components::amount::NonNegativeAmount;
+use zcash_primitives::transaction::TxId;
+use zcash_primitives::zip32::AccountId;
 
 use crate::{
     ZcashBlockHash, ZcashBlockHeight, ZcashError, ZcashNonNegativeAmount, ZcashResult,
-    ZcashTreeState,
+    ZcashSaplingNode, ZcashSaplingNullifier, ZcashTreeState, ZcashTxId, ZcashWalletTx,
 };
 
-use zcash_client_backend::data_api::AccountBirthday;
-use zcash_client_backend::data_api::{
-    AccountBalance, Balance, BlockMetadata, DecryptedTransaction, Ratio, ShieldedProtocol,
-    WalletSummary,
-};
-use zcash_primitives::sapling;
-use zcash_primitives::transaction::components::amount::NonNegativeAmount;
-use zcash_primitives::zip32::AccountId;
+use incrementalmerkletree::Retention;
+use zcash_primitives::consensus::BlockHeight;
+
+use incrementalmerkletree::frontier::Frontier;
 
 pub enum ZcashShieldedProtocol {
     // Orchard
@@ -260,6 +264,128 @@ impl From<BlockMetadata> for ZcashBlockMetadata {
     fn from(e: BlockMetadata) -> Self {
         ZcashBlockMetadata(e)
     }
+}
+
+#[derive(Copy, Clone)]
+pub struct MerkleTreeRetention(Retention<BlockHeight>);
+
+impl From<MerkleTreeRetention> for Retention<BlockHeight> {
+    fn from(inner: MerkleTreeRetention) -> Self {
+        inner.0
+    }
+}
+
+impl From<Retention<BlockHeight>> for MerkleTreeRetention {
+    fn from(e: Retention<BlockHeight>) -> Self {
+        Self(e)
+    }
+}
+
+pub struct TripleSaplingNullifierMap {
+    pub txid: Arc<ZcashTxId>,
+    pub tx_idx: u16,
+    pub nullifiers: Vec<Arc<ZcashSaplingNullifier>>,
+}
+
+impl From<TripleSaplingNullifierMap> for (TxId, u16, Vec<sapling::Nullifier>) {
+    fn from(triple: TripleSaplingNullifierMap) -> Self {
+        (
+            (*triple.txid).into(),
+            triple.tx_idx,
+            triple.nullifiers.into_iter().map(|x| (*x).into()).collect(),
+        )
+    }
+}
+
+pub struct TupleSaplingCommitments {
+    pub node: Arc<ZcashSaplingNode>,
+    pub retention: Arc<MerkleTreeRetention>,
+}
+
+impl From<TupleSaplingCommitments> for (sapling::Node, Retention<BlockHeight>) {
+    fn from(outer: TupleSaplingCommitments) -> Self {
+        ((*outer.node).into(), (*outer.retention).into())
+    }
+}
+
+/// The subset of information that is relevant to this wallet that has been
+/// decrypted and extracted from a [`CompactBlock`].
+///
+/// [`CompactBlock`]: crate::proto::compact_formats::CompactBlock
+pub struct ZcashScannedBlock(ScannedBlock<sapling::Nullifier>);
+
+
+impl ZcashScannedBlock {
+    /// Constructs a new `ScannedBlock`
+    pub fn from_parts(
+        metadata: Arc<ZcashBlockMetadata>,
+        block_time: u32,
+        transactions: Vec<Arc<ZcashWalletTx>>,
+        sapling_nullifier_map: Vec<TripleSaplingNullifierMap>,
+        sapling_commitments: Vec<TupleSaplingCommitments>,
+    ) -> Self {
+        Self(ScannedBlock::from_parts(
+            (*metadata).into(),
+            block_time,
+            transactions
+                .into_iter()
+                .map(|x| (*x).clone().into())
+                .collect::<Vec<WalletTx<sapling::Nullifier>>>(),
+            sapling_nullifier_map.into_iter().map(From::from).collect(),
+            sapling_commitments.into_iter().map(From::from).collect(),
+        ))
+    }
+
+    /// Returns the height of the block that was scanned.
+    pub fn height(&self) -> Arc<ZcashBlockHeight> {
+        Arc::new(self.0.height().into())
+    }
+
+    /// Returns the block hash of the block that was scanned.
+    pub fn block_hash(&self) -> Arc<ZcashBlockHash> {
+        Arc::new(self.0.block_hash().into())
+    }
+
+    /// Returns the block time of the block that was scanned, as a Unix timestamp in seconds.
+    pub fn block_time(&self) -> u32 {
+        self.0.block_time()
+    }
+
+    /// Returns the metadata describing the state of the note commitment trees as of the end of the
+    /// scanned block.
+    ///
+    /// The metadata returned from this method is guaranteed to be consistent with what is returned
+    /// by [`Self::height`] and [`Self::block_hash`].
+    pub fn metadata(&self) -> Arc<ZcashBlockMetadata> {
+        Arc::new((*self.0.metadata()).into())
+    }
+
+    // /// Returns the list of transactions from the block that are relevant to the wallet.
+    // pub fn transactions(&self) -> &[WalletTx<Nf>] {
+    //     &self.transactions
+    // }
+
+    // /// Returns the vector of Sapling nullifiers for each transaction in the block.
+    // ///
+    // /// The returned tuple is keyed by both transaction ID and the index of the transaction within
+    // /// the block, so that either the txid or the combination of the block hash available from
+    // /// [`Self::block_hash`] and returned transaction index may be used to uniquely identify the
+    // /// transaction, depending upon the needs of the caller.
+    // pub fn sapling_nullifier_map(&self) -> &[(TxId, u16, Vec<sapling::Nullifier>)] {
+    //     &self.sapling_nullifier_map
+    // }
+
+    // /// Returns the ordered list of Sapling note commitments to be added to the note commitment
+    // /// tree.
+    // pub fn sapling_commitments(&self) -> &[(sapling::Node, Retention<BlockHeight>)] {
+    //     &self.sapling_commitments
+    // }
+
+    // /// Consumes `self` and returns the list of Sapling note commitments associated with the
+    // /// scanned block as an owned value.
+    // pub fn into_sapling_commitments(self) -> Vec<(sapling::Node, Retention<BlockHeight>)> {
+    //     self.sapling_commitments
+    // }
 }
 
 type SaplingFrontier = Frontier<sapling::Node, { sapling::NOTE_COMMITMENT_TREE_DEPTH }>;
