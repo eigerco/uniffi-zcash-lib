@@ -260,7 +260,7 @@ pub fn validator_regex(regex: &'static str, err_msg: &'static str) -> ValueParse
 /// Validates if a path exists
 pub fn validator_existing_path() -> ValueParser {
     ValueParser::from(move |input: &str| -> anyhow::Result<String> {
-        ensure!(Path::new(input).is_dir(), "path \"{input}\" not found");
+        anyhow::ensure!(Path::new(input).is_dir(), "path \"{input}\" not found");
         Ok(input.to_string())
     })
 }

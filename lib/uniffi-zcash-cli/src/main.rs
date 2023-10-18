@@ -262,21 +262,15 @@ fn main() -> anyhow::Result<()> {
             }
         }
         Some(("diff", args)) => {
-            let lib_name = args.try_get_one::<String>("lib_name")?.unwrap().to_owned();
+            let lib_name = args.try_get_one::<String>("lib_name")?.unwrap();
             let color = args
                 .try_get_one::<ColorChoice>("color")?
                 .unwrap_or(&ColorChoice::Never)
                 .to_owned();
-            let lib_old_version = args
-                .try_get_one::<String>("lib_old_version")?
-                .unwrap()
-                .to_owned();
-            let lib_new_version = args
-                .try_get_one::<String>("lib_new_version")?
-                .unwrap()
-                .to_owned();
+            let lib_old_version = args.try_get_one::<String>("lib_old_version")?.unwrap();
+            let lib_new_version = args.try_get_one::<String>("lib_new_version")?.unwrap();
 
-            let grep_dir = args.try_get_one::<String>("grep_dir")?.unwrap().to_owned();
+            let grep_dir = args.try_get_one::<String>("grep_dir")?.unwrap();
 
             generate_diff(lib_name, lib_new_version, lib_old_version, grep_dir, color)?;
 

@@ -33,31 +33,25 @@ impl std::fmt::Display for GrepType {
 
 // "Struct field" doesn't come from the public_api lib,
 // so there's no need to convert from it.
-// NOTE: Using From rather that FromStr, because FromStr requires "Err" implementation
+// NOTE: Using From rather that FromStr, because FromStr requires "Err" implementation and here we
+// have no errors.
 impl<T> From<T> for GrepType
 where
     T: Into<String>,
 {
     fn from(value: T) -> Self {
-        let val_str = value.into().to_string();
-        if val_str == "fn" {
-            GrepType::Fn
-        } else if val_str == "enum" {
-            GrepType::Enum
-        } else if val_str == "struct" {
-            GrepType::Struct
-        } else if val_str == "const" {
-            GrepType::Const
-        } else if val_str == "impl" {
-            GrepType::Impl
-        } else if val_str == "trait" {
-            GrepType::Trait
-        } else if val_str == "type" {
-            GrepType::Type
-        } else if val_str == "mod" {
-            GrepType::Mod
-        } else {
-            GrepType::Empty
+        let val_str = value.into();
+
+        match val_str.as_str() {
+            "fn" => GrepType::Fn,
+            "enum" => GrepType::Enum,
+            "struct" => GrepType::Struct,
+            "const" => GrepType::Const,
+            "impl" => GrepType::Impl,
+            "trait" => GrepType::Trait,
+            "type" => GrepType::Type,
+            "mod" => GrepType::Mod,
+            _ => GrepType::Empty,
         }
     }
 }

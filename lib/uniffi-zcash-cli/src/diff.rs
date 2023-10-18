@@ -1,6 +1,7 @@
 use clap::ColorChoice;
 use public_api::{diff::PublicApiDiff, tokens::Token, PublicApi};
 use std::path::Path;
+use tempdir::TempDir;
 
 use self::{
     colors::{color_item_with_diff, color_token_stream},
@@ -8,9 +9,6 @@ use self::{
     grep_item::GrepItem,
     utils::{copy_if_not_exists, get_manifest_from_package_name},
 };
-
-const LIBS_REPO_LATEST_FOLDER: &str = "/tmp/librustzcash-diff/latest";
-const LIBS_REPO_CURRENT_FOLDER: &str = "/tmp/librustzcash-diff/current";
 
 mod colors;
 mod git;
@@ -23,34 +21,32 @@ mod utils;
 /// Then based on that difference, greps a given codebase for possible usage
 /// of a changed item of that librarie's public API.
 pub fn generate_diff(
-    package_name: String,
-    package_new_version: String,
-    package_old_version: String,
-    grep_dir: String,
+    package_name: &str,
+    package_new_version: &str,
+    package_old_version: &str,
+    grep_dir: &str,
     color: ColorChoice,
 ) -> anyhow::Result<()> {
-    let _ = init_libs_repo(
-        &package_name,
-        String::from(LIBS_REPO_CURRENT_FOLDER),
-        package_old_version,
-    )?;
+    let temp_dir_latest = TempDir::new("librustzcash-latest")?;
+    let temp_dir_current = TempDir::new("librustzcash-current")?;
+
+    let libs_repo_current_folder = &temp_dir_latest.path().display().to_string();
+    let libs_repo_latest_folder = &temp_dir_current.path().display().to_string();
+
+    let _ = init_libs_repo(package_name, libs_repo_current_folder, package_old_version)?;
 
     // copy instead of cloning it again
     copy_if_not_exists(
-        Path::new(LIBS_REPO_CURRENT_FOLDER),
-        Path::new(LIBS_REPO_LATEST_FOLDER),
+        Path::new(libs_repo_current_folder),
+        Path::new(libs_repo_latest_folder),
     )?;
 
-    let _ = init_libs_repo(
-        &package_name,
-        String::from(LIBS_REPO_LATEST_FOLDER),
-        package_new_version,
-    )?;
+    let _ = init_libs_repo(package_name, libs_repo_latest_folder, package_new_version)?;
 
     rustup_toolchain::install(public_api::MINIMUM_NIGHTLY_RUST_VERSION)?;
 
-    let current_api = get_public_api(LIBS_REPO_CURRENT_FOLDER, &package_name)?;
-    let latest_api = get_public_api(LIBS_REPO_LATEST_FOLDER, &package_name)?;
+    let current_api = get_public_api(libs_repo_current_folder, &package_name)?;
+    let latest_api = get_public_api(libs_repo_latest_folder, &package_name)?;
     let public_api_diff = PublicApiDiff::between(current_api, latest_api);
 
     for diff in public_api_diff.removed {
@@ -62,7 +58,7 @@ pub fn generate_diff(
             grep_item.api_diff = format!("-{}", color_token_stream(diff.tokens(), None));
         }
 
-        grep_item.grep(&grep_dir)?.print_result();
+        grep_item.grep(grep_dir)?.print_result();
     }
 
     for diff in public_api_diff.changed {

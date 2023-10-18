@@ -1,4 +1,4 @@
-use anyhow::anyhow;
+use anyhow::{anyhow, Context};
 use clap::ColorChoice;
 use nu_ansi_term::{self, Color};
 use public_api::tokens::Token;
@@ -41,7 +41,7 @@ pub(crate) struct GrepItem {
 impl GrepItem {
     /// Runs ast-grep (sg command), which contextually searches for a pattern, based on the programming
     /// language
-    pub(crate) fn grep(&mut self, grep_dir: &String) -> anyhow::Result<&Self> {
+    pub(crate) fn grep(&mut self, grep_dir: &str) -> anyhow::Result<&Self> {
         let output = std::process::Command::new("sg")
             .arg("run")
             .arg("-p")
@@ -56,27 +56,20 @@ impl GrepItem {
             .arg("1")
             .arg(grep_dir)
             .arg("--json")
-            .output();
+            .output()
+            .with_context(|| format!("failed to grep for \"{}\"", self.pattern))?;
 
-        match output {
-            Ok(o) => {
-                // treat erroneous grep results as empty
-                if !o.status.success() || o.stdout.is_empty() {
-                    self.grep_output = None;
-                } else {
-                    let stdout = String::from_utf8_lossy(&o.stdout);
-                    let grep_matches = serde_json::from_str::<Vec<Match>>(stdout.as_ref())?;
+        // treat erroneous grep results as empty
+        if !output.status.success() || output.stdout.is_empty() {
+            self.grep_output = None;
+        } else {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let grep_matches = serde_json::from_str::<Vec<Match>>(stdout.as_ref())?;
 
-                    self.matches = grep_matches;
-                    self.grep_output = Some(stdout.to_string());
-                }
-                Ok(self)
-            }
-            Err(e) => Err(anyhow!(format!(
-                "failed to grep for \"{}\" with error: {}",
-                self.pattern, e
-            ))),
+            self.matches = grep_matches;
+            self.grep_output = Some(stdout.to_string());
         }
+        Ok(self)
     }
 
     /// Prints the grep results for the GrepItem
