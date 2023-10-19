@@ -1,6 +1,7 @@
 on:
-  schedule:
-    - cron: 0 0 * * * # at the end of each day
+  push:
+  # schedule:
+  #   - cron: 0 0 * * * # at the end of each day
 
 jobs:
   check_for_public_api_diffs:
@@ -11,11 +12,14 @@ jobs:
         with:
           repository: zcash/librustzcash
           path: librustzcash
+          fetch-depth: 0
+          fetch-tags: true
 
       - uses: actions/checkout@v4
         with:
           repository: ctoyan/uniffi-zcash-lib
           path: uniffi-zcash-lib
+          ref: test-tool
 
       - name: Install cargo
         uses: actions-rs/toolchain@v1
@@ -30,12 +34,16 @@ jobs:
       # USED_LIBS - list of librustzcash library names, separated by ';', which are used in the uniffi projects (ex - 'zcash_primitives;zcash_address;')
       - name: Get librustzcash libraries used in uniffi-zcash-lib
         run: |
-          {
-            echo 'USED_LIBS<<EOF'
-            source ./uniffi-zcash-lib/scripts/ci/libs.sh
-            get_libs librustzcash/Cargo.toml uniffi-zcash-lib/lib/Cargo.toml
-            echo EOF
-          }>> "$GITHUB_ENV"
+          source ./uniffi-zcash-lib/scripts/ci/libs.sh
+          kor=$(get_libs librustzcash/Cargo.toml uniffi-zcash-lib/lib/Cargo.toml)
+          echo "$kor"
+          echo "USED_LIBS=$kor" >> $GITHUB_ENV
+          # {
+          #   echo 'USED_LIBS<<EOF'
+          #   source ./uniffi-zcash-lib/scripts/ci/libs.sh
+          #   get_libs librustzcash/Cargo.toml uniffi-zcash-lib/lib/Cargo.toml
+          #   echo EOF
+          # } >> "$GITHUB_ENV"
 
         # Exports:
         # OUTDATED_LIBS - list of library names, separated by ';', which are outdated (ex - 'zcash_primitives;zcash_address;')
@@ -117,8 +125,9 @@ jobs:
           cargo install ast-grep
 
           grep_dir_absolute_path=$(realpath ./uniffi-zcash-lib/lib/uniffi-zcash)
+          librustzcash_absolute_path=$(realpath ./librustzcash)
           source ./uniffi-zcash-lib/scripts/ci/diff.sh
-          diff "$OUTDATED_LIBS" uniffi-zcash-lib/lib/Cargo.toml "$grep_dir_absolute_path"
+          diff "$OUTDATED_LIBS" uniffi-zcash-lib/lib/Cargo.toml "$grep_dir_absolute_path" "$librustzcash_absolute_path"
 
       # Step only for better diff visibility and linkability
       # If you change the name of this step, make sure it's changed in the "Create workflow summary" gh command too
@@ -176,7 +185,7 @@ jobs:
           diff_job_url=$(get_diff_job_url)
           print_issue_diff $OUTDATED_LIBS $diff_job_url >> issue_body
 
-          _build_job_url=$(get_build_job_url)
+          build_job_url=$(get_build_job_url)
           print_issue_build_result $BUILD_FAILING $build_job_url >> issue_body
 
           cut_issue_body

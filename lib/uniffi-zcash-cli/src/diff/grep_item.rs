@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Context};
+use anyhow::Context;
 use clap::ColorChoice;
 use nu_ansi_term::{self, Color};
 use public_api::tokens::Token;

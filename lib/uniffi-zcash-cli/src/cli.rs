@@ -186,12 +186,17 @@ pub fn get_matches() -> ArgMatches {
                 .required(true)
                 .value_parser(validator_existing_path())
                 .help("The absolute path of the crate, where the tool will grep for usage of the changed API.")
-            )
-            .arg(
+            ).arg(
                 Arg::new("color")
                 .long("color")
                 .value_parser(clap::builder::EnumValueParser::<ColorChoice>::new())
                 .help("Color the output of the diff and the grep results. Use \"never\" if you're going to use the render the output in markdown, since ANSI color codes are not supported in markdown.")
+                .required(false)
+            ).arg(
+                Arg::new("librustzcash_path")
+                .long("librustzcash-path")
+                .value_parser(validator_existing_path())
+                .help("Absolute path to an existing fully fetched librustzcash repository. Helps the program run faster.")
                 .required(false)
             )
         )

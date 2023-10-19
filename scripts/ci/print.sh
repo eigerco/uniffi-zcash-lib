@@ -138,11 +138,11 @@ cut_issue_body() {
 # Echoes the build job URL, which points to the build logs in the Github CI console
 get_build_job_url() {
 	local result
-	result=gh run \
+	result=$(gh run \
 		--repo "$GITHUB_REPOSITORY" view "$GITHUB_RUN_ID" \
 		--json jobs \
-		--jq '.jobs[] | select(.name == '"$GITHUB_JOB_ID"') | .url, (.steps[] | select(.name == "Show public API diffs") | "#step:\(.number):1")' |
-		tr -d "\n"
+		--jq '.jobs[] | select(.name == "'$GITHUB_JOB'") | .url, (.steps[] | select(.name == "Show public API diffs") | "#step:\(.number):1")' |
+		tr -d "\n")
 
 	echo "$result"
 }
@@ -150,11 +150,11 @@ get_build_job_url() {
 # Echoes the diff job URL, which points to the colored public API diff logs in the Github CI console
 get_diff_job_url() {
 	local result
-	result=gh run \
+	result=$(gh run \
 		--repo "$GITHUB_REPOSITORY" view "$GITHUB_RUN_ID" \
 		--json jobs \
-		--jq '.jobs[] | select(.name == '"$GITHUB_JOB_ID"') | .url, (.steps[] | select(.name == "Check if uniffi-zcash-lib build is failing") | "#step:\(.number):1")' |
-		tr -d "\n"
+		--jq '.jobs[] | select(.name == "'$GITHUB_JOB'") | .url, (.steps[] | select(.name == "Check if uniffi-zcash-lib build is failing") | "#step:\(.number):1")' |
+		tr -d "\n")
 
 	echo "$result"
 }

@@ -10,7 +10,7 @@ set -eou pipefail
 # $2 - uniffi-zcash-lib Cargo.toml path
 #
 # Returns:
-# - The labels that are used when searching for or creating a Github issue, in format 'lib_name-current_ver-latest_ver'
+# - The librustzcash libraries that are used as dependencies in uniffi-zcash-lib
 get_libs() {
 	local librustzcash_cargo_path="$1"
 	local uniffi_cargo_path="$2"
@@ -19,18 +19,16 @@ get_libs() {
 		exit 1
 	fi
 
+	local librustzcash_packages
+	librustzcash_packages=$(cargo metadata --format-version=1 --no-deps --quiet --manifest-path="$librustzcash_cargo_path" |
+		jq -r '.packages[] | .name' | tr '\n' '|' | sed 's/|$//')
+
 	local output
-	cargo metadata --format-version=1 --no-deps --quiet --manifest-path="$librustzcash_cargo_path" |
-		jq -r '.packages[] | .name' |
-		while read -r pkg_name; do
-			local result
-			result=$(cargo metadata --quiet --format-version=1 --no-deps --manifest-path="$uniffi_cargo_path" |
-				jq -r '.packages[] | .dependencies[] | .name' |
-				grep "$pkg_name" |
-				sort -u |
-				tr '\n' ';')
-			output="$result"
-		done
+	output=$(cargo metadata --format-version=1 --no-deps --manifest-path="$uniffi_cargo_path" |
+		jq -r '.packages[] | .dependencies[] | .name' |
+		grep -Ei "$librustzcash_packages" |
+		sort -u |
+		tr '\n' ';')
 
 	echo "$output"
 }

@@ -1,13 +1,12 @@
 use clap::ColorChoice;
 use public_api::{diff::PublicApiDiff, tokens::Token, PublicApi};
 use std::path::Path;
-use tempdir::TempDir;
 
 use self::{
     colors::{color_item_with_diff, color_token_stream},
     git::init_libs_repo,
     grep_item::GrepItem,
-    utils::{copy_if_not_exists, get_manifest_from_package_name},
+    utils::{copy_dir_if_not_exists, get_manifest_from_package_name, get_temp_path_for},
 };
 
 mod colors;
@@ -26,27 +25,37 @@ pub fn generate_diff(
     package_old_version: &str,
     grep_dir: &str,
     color: ColorChoice,
+    librustzcash_path: &str,
 ) -> anyhow::Result<()> {
-    let temp_dir_latest = TempDir::new("librustzcash-latest")?;
-    let temp_dir_current = TempDir::new("librustzcash-current")?;
+    let temp_path_current = get_temp_path_for("librustzcash-current");
+    let temp_path_latest = get_temp_path_for("librustzcash-latest");
 
-    let libs_repo_current_folder = &temp_dir_latest.path().display().to_string();
-    let libs_repo_latest_folder = &temp_dir_current.path().display().to_string();
+    if !librustzcash_path.is_empty() {
+        copy_dir_if_not_exists(Path::new(librustzcash_path), temp_path_current.as_path())?;
+        copy_dir_if_not_exists(Path::new(librustzcash_path), temp_path_latest.as_path())?;
+    }
 
-    let _ = init_libs_repo(package_name, libs_repo_current_folder, package_old_version)?;
-
-    // copy instead of cloning it again
-    copy_if_not_exists(
-        Path::new(libs_repo_current_folder),
-        Path::new(libs_repo_latest_folder),
+    let _ = init_libs_repo(
+        package_name,
+        temp_path_current.as_path(),
+        package_old_version,
     )?;
 
-    let _ = init_libs_repo(package_name, libs_repo_latest_folder, package_new_version)?;
+    if librustzcash_path.is_empty() {
+        // copy instead of cloning it again
+        copy_dir_if_not_exists(temp_path_current.as_path(), temp_path_latest.as_path())?;
+    }
+
+    let _ = init_libs_repo(
+        package_name,
+        temp_path_latest.as_path(),
+        package_new_version,
+    )?;
 
     rustup_toolchain::install(public_api::MINIMUM_NIGHTLY_RUST_VERSION)?;
 
-    let current_api = get_public_api(libs_repo_current_folder, &package_name)?;
-    let latest_api = get_public_api(libs_repo_latest_folder, &package_name)?;
+    let current_api = get_public_api(temp_path_current.as_path(), &package_name)?;
+    let latest_api = get_public_api(temp_path_latest.as_path(), &package_name)?;
     let public_api_diff = PublicApiDiff::between(current_api, latest_api);
 
     for diff in public_api_diff.removed {
@@ -86,9 +95,11 @@ pub fn generate_diff(
 
 // Get an object of the type PublicApi, which contains the public API of a certain crate.
 // Crate is specified by the path to it's Cargo.toml file.
-fn get_public_api(repo_folder: &str, package_name: &str) -> anyhow::Result<PublicApi> {
-    let manifest_path =
-        get_manifest_from_package_name(format!("{}/Cargo.toml", repo_folder), package_name)?;
+fn get_public_api(repo_path: &Path, package_name: &str) -> anyhow::Result<PublicApi> {
+    let manifest_path = get_manifest_from_package_name(
+        format!("{}/Cargo.toml", repo_path.display()),
+        package_name,
+    )?;
     let json = rustdoc_json::Builder::default()
         .toolchain("nightly")
         .manifest_path(manifest_path)

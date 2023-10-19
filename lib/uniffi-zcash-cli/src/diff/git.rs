@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use anyhow::Context;
 use git2::Repository;
 
@@ -6,7 +8,11 @@ const LIBS_REPO_URL: &str = "https://github.com/zcash/librustzcash.git";
 // NOTE: The tag is constructed in a format used by `librustzcash`, which is "libName-livVersion".
 // For example: zcash_primitives-0.10.2
 // So if the naming convention is not applied, the code will not be able to checkout the tag.
-pub(crate) fn init_libs_repo(lib_name: &str, repo_path: &str, version: &str) -> anyhow::Result<()> {
+pub(crate) fn init_libs_repo(
+    lib_name: &str,
+    repo_path: &Path,
+    version: &str,
+) -> anyhow::Result<()> {
     let tag = format!("{}-{}", lib_name, version);
     let repo = Repository::open(repo_path.to_owned())
         .or_else(|_| Repository::clone(LIBS_REPO_URL, repo_path))

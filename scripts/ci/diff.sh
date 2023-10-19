@@ -18,6 +18,7 @@ diff() {
 	local outdated_libs="$1"
 	local uniffi_cargo_path="$2"
 	local grep_dir="$3"
+	local librustzcash_abs_path="$4"
 	if [[ -z "$outdated_libs" || -z "$uniffi_cargo_path" || -z "$grep_dir" ]]; then
 		echo "required parameter for diff() is empty" 1>&2
 		exit 1
@@ -48,7 +49,8 @@ diff() {
 			--lib-name "$lib_name" \
 			--lib-old-version "$lib_current_version" \
 			--lib-new-version "$lib_latest_version" \
-			--color always >"${lib_name}_colored.diff"
+			--color always \
+			--librustzcash-path "$librustzcash_abs_path" >"${lib_name}_colored.diff"
 
 		# non-colored output
 		cargo run \
@@ -58,6 +60,7 @@ diff() {
 			--lib-name "$lib_name" \
 			--lib-old-version "$lib_current_version" \
 			--lib-new-version "$lib_latest_version" \
-			--color never >"${lib_name}.diff"
+			--color never \
+			--librustzcash-path "$librustzcash_abs_path" >"${lib_name}.diff"
 	done
 }

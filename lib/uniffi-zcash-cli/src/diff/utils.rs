@@ -1,5 +1,9 @@
 use anyhow::anyhow;
-use std::{fs, path::Path};
+use std::{
+    env::temp_dir,
+    fs,
+    path::{Path, PathBuf},
+};
 
 use cargo_metadata::MetadataCommand;
 
@@ -24,7 +28,7 @@ pub(crate) fn get_manifest_from_package_name(
 }
 
 // Copy files from source to destination recursively.
-pub(crate) fn copy_if_not_exists(
+pub(crate) fn copy_dir_if_not_exists(
     source: impl AsRef<Path>,
     destination: impl AsRef<Path>,
 ) -> anyhow::Result<()> {
@@ -37,10 +41,16 @@ pub(crate) fn copy_if_not_exists(
         let entry = entry?;
         let filetype = entry.file_type()?;
         if filetype.is_dir() {
-            copy_if_not_exists(entry.path(), destination.as_ref().join(entry.file_name()))?;
+            copy_dir_if_not_exists(entry.path(), destination.as_ref().join(entry.file_name()))?;
         } else {
             fs::copy(entry.path(), destination.as_ref().join(entry.file_name()))?;
         }
     }
     Ok(())
+}
+
+// Get a temporray path (without creating anything) for a certain direcotry name
+pub(crate) fn get_temp_path_for(dir_name: &str) -> PathBuf {
+    let new_temp_dir = temp_dir().join(dir_name);
+    new_temp_dir
 }
