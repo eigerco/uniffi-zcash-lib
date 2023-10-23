@@ -5,12 +5,13 @@ use std::sync::{Arc, Mutex};
 use zcash_client_backend::address::AddressMetadata;
 use zcash_client_backend::data_api::chain::CommitmentTreeRoot;
 use zcash_client_backend::data_api::scanning::ScanRange;
+use zcash_client_backend::data_api::ScannedBlock;
 use zcash_client_backend::data_api::{NoteId, WalletCommitmentTrees, WalletRead, WalletWrite};
 use zcash_client_backend::keys::UnifiedFullViewingKey;
 use zcash_client_backend::wallet::WalletTransparentOutput;
 
 use zcash_client_sqlite::wallet::init;
-use zcash_client_sqlite::{chain::BlockMeta, FsBlockDb, WalletDb};
+use zcash_client_sqlite::{chain::BlockMeta, FsBlockDb, ReceivedNoteId, WalletDb};
 
 use zcash_primitives::legacy::TransparentAddress;
 use zcash_primitives::sapling;
@@ -28,10 +29,12 @@ pub use self::wallet::*;
 use crate::{
     ZcashAccountBirthday, ZcashAccountId, ZcashAddressMetadata, ZcashAmount, ZcashBlockHash,
     ZcashBlockHeight, ZcashBlockMetadata, ZcashCommitmentTreeRoot, ZcashConsensusParameters,
-    ZcashDecryptedTransaction, ZcashError, ZcashExtendedFullViewingKey, ZcashMemo, ZcashOutPoint,
-    ZcashResult, ZcashScanRange, ZcashShieldedProtocol, ZcashTransaction, ZcashTransparentAddress,
-    ZcashTxId, ZcashUnifiedAddress, ZcashUnifiedFullViewingKey, ZcashUnifiedSpendingKey,
-    ZcashWalletSummary, ZcashWalletTransparentOutput,
+    ZcashDecryptedTransaction, ZcashError, ZcashExtendedFullViewingKey, ZcashMemo,
+    ZcashNullifierQuery, ZcashOutPoint, ZcashReceivedSaplingNote, ZcashResult,
+    ZcashSaplingNullifier, ZcashScanRange, ZcashScannedBlock, ZcashSentTransaction,
+    ZcashShieldedProtocol, ZcashTransaction, ZcashTransparentAddress, ZcashTxId,
+    ZcashUnifiedAddress, ZcashUnifiedFullViewingKey, ZcashUnifiedSpendingKey, ZcashWalletSummary,
+    ZcashWalletTransparentOutput,
 };
 
 pub struct TupleMinAndMaxBlockHeight {
@@ -42,6 +45,11 @@ pub struct TupleMinAndMaxBlockHeight {
 pub struct TupleAccountIdAndUnifiedSpendingKey {
     pub account_id: ZcashAccountId,
     pub unified_spending_key: Arc<ZcashUnifiedSpendingKey>,
+}
+
+pub struct TupleAccountIdAndSaplingNullifier {
+    pub account_id: ZcashAccountId,
+    pub sapling_nullifier: Arc<ZcashSaplingNullifier>,
 }
 
 pub struct TupleBlockHeightAndHash {
@@ -66,6 +74,42 @@ type UFVKMap = HashMap<ZcashAccountId, Arc<ZcashUnifiedFullViewingKey>>;
 type TransparentReceiversMap = HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAddressMetadata>>;
 
 type TransparentBalancesMap = HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAmount>>;
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct ZcashReceivedNoteId(ReceivedNoteId);
+
+impl From<ReceivedNoteId> for ZcashReceivedNoteId {
+    fn from(e: ReceivedNoteId) -> Self {
+        Self(e)
+    }
+}
+
+impl From<ZcashReceivedNoteId> for ReceivedNoteId {
+    fn from(inner: ZcashReceivedNoteId) -> Self {
+        inner.0
+    }
+}
+
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+pub struct ZcashNoteId(NoteId);
+
+impl ZcashNoteId {
+    pub fn new(txid: Arc<ZcashTxId>, zsp: ZcashShieldedProtocol, output_index: u16) -> Self {
+        Self(NoteId::new((*txid).into(), zsp.into(), output_index))
+    }
+}
+
+impl From<NoteId> for ZcashNoteId {
+    fn from(e: NoteId) -> Self {
+        Self(e)
+    }
+}
+
+impl From<ZcashNoteId> for NoteId {
+    fn from(inner: ZcashNoteId) -> Self {
+        inner.0
+    }
+}
 
 impl ZcashWalletDb {
     /// Construct a connection to the wallet database stored at the specified path.
@@ -294,25 +338,59 @@ impl ZcashWalletDb {
             .map_err(cast_err)
     }
 
-    // fn get_sapling_nullifiers(
-    //     &self,
-    //     query: NullifierQuery,
-    // ) -> Result<Vec<(AccountId, sapling::Nullifier)>, Self::Error> {
+    pub fn get_sapling_nullifiers(
+        &self,
+        query: ZcashNullifierQuery,
+    ) -> ZcashResult<Vec<TupleAccountIdAndSaplingNullifier>> {
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_sapling_nullifiers(query.into())
+            .map(|x| {
+                x.iter()
+                    .map(|(aid, nf)| TupleAccountIdAndSaplingNullifier {
+                        account_id: (*aid).into(),
+                        sapling_nullifier: Arc::new(nf.into()),
+                    })
+                    .collect()
+            })
+            .map_err(cast_err)
+    }
 
-    // pub fn get_spendable_sapling_notes(
-    //     &self,
-    //     account: AccountId,
-    //     anchor_height: BlockHeight,
-    //     exclude: &[Self::NoteRef],
-    // ) -> ZcashResult<Vec<ReceivedSaplingNote<Self::NoteRef>>> {}
+    pub fn get_spendable_sapling_notes(
+        &self,
+        account: ZcashAccountId,
+        anchor_height: Arc<ZcashBlockHeight>,
+        exclude: Vec<Arc<ZcashReceivedNoteId>>,
+    ) -> ZcashResult<Vec<Arc<ZcashReceivedSaplingNote>>> {
+        let exclude: Vec<ReceivedNoteId> = exclude.iter().map(|x| (**x).into()).collect();
 
-    // pub fn select_spendable_sapling_notes(
-    //     &self,
-    //     account: AccountId,
-    //     target_value: Amount,
-    //     anchor_height: BlockHeight,
-    //     exclude: &[Self::NoteRef],
-    // ) -> ZcashResult<Vec<ReceivedSaplingNote<Self::NoteRef>>> {}
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_spendable_sapling_notes(account.into(), (*anchor_height).into(), &exclude[..])
+            .map(|notes| notes.into_iter().map(From::from).map(Arc::new).collect())
+            .map_err(cast_err)
+    }
+
+    pub fn select_spendable_sapling_notes(
+        &self,
+        account: ZcashAccountId,
+        target_value: Arc<ZcashAmount>,
+        anchor_height: Arc<ZcashBlockHeight>,
+        exclude: Vec<Arc<ZcashReceivedNoteId>>,
+    ) -> ZcashResult<Vec<Arc<ZcashReceivedSaplingNote>>> {
+        let exclude: Vec<ReceivedNoteId> = exclude.iter().map(|x| (**x).into()).collect();
+
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .select_spendable_sapling_notes(
+                account.into(),
+                (*target_value).into(),
+                (*anchor_height).into(),
+                &exclude[..],
+            )
+            .map(|notes| notes.into_iter().map(From::from).map(Arc::new).collect())
+            .map_err(cast_err)
+    }
 
     pub fn get_transparent_receivers(
         &self,
@@ -405,9 +483,15 @@ impl ZcashWalletDb {
             .map_err(cast_err)
     }
 
-    // pub fn put_blocks(&self, blocks: Vec<ZcashScannedBlock>) -> ZcashResult<()> {
+    pub fn put_blocks(&self, blocks: Vec<Arc<ZcashScannedBlock>>) -> ZcashResult<()> {
+        let blocks: Vec<ScannedBlock<sapling::Nullifier>> =
+            blocks.iter().map(|x| (**x).clone().into()).collect();
 
-    // }
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .put_blocks(blocks)
+            .map_err(cast_err)
+    }
 
     pub fn update_chain_tip(&self, tip_height: u32) -> ZcashResult<()> {
         let zheight = ZcashBlockHeight::new(tip_height).into();
@@ -425,7 +509,12 @@ impl ZcashWalletDb {
             .map_err(cast_err)
     }
 
-    // store_sent_tx
+    pub fn store_sent_tx(&self, sent_tx: ZcashSentTransaction) -> ZcashResult<()> {
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .store_sent_tx(&(&sent_tx).into())
+            .map_err(cast_err)
+    }
 
     pub fn truncate_to_height(&self, block_height: u32) -> ZcashResult<()> {
         let zheight = ZcashBlockHeight::new(block_height).into();
@@ -469,7 +558,17 @@ impl ZcashWalletDb {
             })
     }
 
-    // get_checkpoint_depth
+    pub fn get_checkpoint_depth(&self, min_confirmations: u32) -> ZcashResult<u32> {
+        let min_confirmations = NonZeroU32::new(min_confirmations).unwrap();
+
+        WalletDb::for_path(&self.path, self.params)
+            .expect("Cannot access the DB!")
+            .get_checkpoint_depth(min_confirmations)
+            .map(|x| x.try_into().unwrap())
+            .map_err(|e| ZcashError::Message {
+                error: format!("ShardTreeError: {:?}", e),
+            })
+    }
 }
 
 pub struct ZcashFsBlockDb {
@@ -529,26 +628,5 @@ impl ZcashFsBlockDb {
             .map_err(|e| ZcashError::Message {
                 error: format!("FsBlockDbError: {:?}", e),
             })
-    }
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
-pub struct ZcashNoteId(NoteId);
-
-impl ZcashNoteId {
-    pub fn new(txid: Arc<ZcashTxId>, zsp: ZcashShieldedProtocol, output_index: u16) -> Self {
-        ZcashNoteId(NoteId::new((*txid).into(), zsp.into(), output_index))
-    }
-}
-
-impl From<NoteId> for ZcashNoteId {
-    fn from(e: NoteId) -> Self {
-        ZcashNoteId(e)
-    }
-}
-
-impl From<ZcashNoteId> for NoteId {
-    fn from(inner: ZcashNoteId) -> Self {
-        inner.0
     }
 }

@@ -1,3 +1,27 @@
+
+enum ZcashShieldedProtocol {
+  "Sapling"
+};
+
+enum ZcashNullifierQuery {
+    "Unspent",
+    "All",
+};
+
+interface ZcashDecryptedTransaction {};
+interface TimeOffsetDateTime {};
+
+dictionary ZcashSentTransaction {
+    ZcashTransaction tx;
+    TimeOffsetDateTime created;
+    ZcashAccountId account;
+    sequence<ZcashSentTransactionOutput> outputs;
+    ZcashAmount fee_amount;
+    sequence<ZcashOutPoint> utxos_spent;
+};
+
+interface MerkleTreeFrontier {};
+
 interface ZcashWalletSummary {
 	constructor(record<string, ZcashAccountBalance> account_balances, ZcashBlockHeight chain_tip_height, ZcashBlockHeight fully_scanned_height, ZcashRatio? scan_progress);
 
@@ -58,9 +82,47 @@ interface ZcashScannedBlock {
 	ZcashBlockHash block_hash();
 	u32 block_time();
 	ZcashBlockMetadata metadata();
+	sequence<ZcashWalletTx> transactions();
+	sequence<TripleSaplingNullifierMap> sapling_nullifier_map();
+	sequence<TupleSaplingCommitments> sapling_commitments();
 };
 
-interface MerkleTreeFrontier {};
+[Enum]
+interface ZcashPoolType {
+    /// The transparent value pool
+    Transparent();
+    /// A shielded value pool.
+    Shielded(ZcashShieldedProtocol v);
+};
+
+[Enum]
+interface ZcashRecipient {
+    Transparent(sequence<u8> script);
+    Sapling(sequence<u8> payment_address_bytes);
+    Unified(string uae, ZcashConsensusParameters params, ZcashPoolType zpt);
+    InternalAccount(ZcashAccountId aid, ZcashPoolType zpt);
+};
+
+dictionary TupleAccountIdAndSaplingNote {
+    ZcashAccountId account_id;
+    ZcashSaplingNote sapling_note;
+};
+
+interface ZcashSentTransactionOutput {
+	[Name=from_parts]
+	constructor(
+        u32 output_index,
+        ZcashRecipient recipient,
+        ZcashAmount value,
+        ZcashMemoBytes? memo,
+        TupleAccountIdAndSaplingNote? sapling_change_to
+    );
+    u32 output_index();
+    ZcashRecipient recipient();
+    ZcashAmount value();
+    ZcashMemoBytes? memo();
+    TupleAccountIdAndSaplingNote? sapling_change_to();
+};
 
 interface ZcashAccountBirthday {
 	[Name=from_treestate, Throws=ZcashError]

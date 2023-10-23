@@ -239,6 +239,7 @@ pub enum ZcashFeeRules {
 }
 
 /// A Zcash transaction.
+#[derive(Debug, PartialEq)]
 pub struct ZcashTransaction(Transaction);
 
 impl Clone for ZcashTransaction {
@@ -309,6 +310,12 @@ impl ZcashTransaction {
 impl From<ZcashTransaction> for Transaction {
     fn from(inner: ZcashTransaction) -> Self {
         inner.0
+    }
+}
+
+impl<'a> From<&'a ZcashTransaction> for &'a Transaction {
+    fn from(inner: &'a ZcashTransaction) -> Self {
+        &inner.0
     }
 }
 

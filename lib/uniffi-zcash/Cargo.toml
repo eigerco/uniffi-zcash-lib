@@ -45,6 +45,12 @@ jni = { version = "0.20", default-features = false }
 dlopen2 = "0.4"
 libc = "0.2"
 
+
+# Dependencies exposed in a public API:
+# (Breaking upgrades to these require a breaking upgrade to this crate.)
+# - Data Access API
+time = "0.3.22"
+
 # Logging
 log-panics = "2.0.0"
 paranoid-android = "0.2"

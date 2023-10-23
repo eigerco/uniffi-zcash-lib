@@ -1,14 +1,21 @@
 use std::sync::Arc;
+
 use zcash_client_backend::wallet::{
-    OvkPolicy, WalletSaplingOutput, WalletSaplingSpend, WalletTransparentOutput, WalletTx,
+    OvkPolicy, ReceivedSaplingNote, WalletSaplingOutput, WalletSaplingSpend,
+    WalletTransparentOutput, WalletTx,
 };
+
 use zcash_primitives::keys::OutgoingViewingKey;
 use zcash_primitives::sapling;
+// use zcash_primitives::transaction::components::sapling::fees::InputView;
 
 use crate::{
-    ZcashAmount, ZcashBlockHeight, ZcashOutPoint, ZcashResult, ZcashTransparentAddress, ZcashTxId,
-    ZcashTxOut,
+    ZcashAmount, ZcashBlockHeight, ZcashDiversifier, ZcashOutPoint, ZcashReceivedNoteId,
+    ZcashResult, ZcashTransparentAddress, ZcashTxId, ZcashTxOut,
 };
+use zcash_client_sqlite::ReceivedNoteId;
+
+use incrementalmerkletree::Position;
 
 pub struct ZcashWalletSaplingSpend(WalletSaplingSpend);
 
@@ -184,11 +191,89 @@ impl From<WalletTransparentOutput> for ZcashWalletTransparentOutput {
     }
 }
 
-// impl From<&ZcashWalletTransparentOutput> for &WalletTransparentOutput {
-//     fn from(output: &ZcashWalletTransparentOutput) -> Self {
-//         &output.0
-//     }
-// }
+#[derive(Copy, Clone)]
+pub struct MerkleTreePosition(Position);
+
+impl From<MerkleTreePosition> for Position {
+    fn from(inner: MerkleTreePosition) -> Self {
+        inner.0
+    }
+}
+
+impl From<Position> for MerkleTreePosition {
+    fn from(e: Position) -> Self {
+        Self(e)
+    }
+}
+
+#[derive(Debug)]
+pub struct ZcashReceivedSaplingNote(ReceivedSaplingNote<ReceivedNoteId>);
+
+impl ZcashReceivedSaplingNote {
+    // pub fn from_parts(
+    //     note_id: Arc<ReceivedNoteId>,
+    //     txid: Arc<ZcashTxId>,
+    //     output_index: u16,
+    //     diversifier: Arc<ZcashDiversifier>,
+    //     note_value: Arc<ZcashAmount>,
+    //     rseed: Arc<ZcashRseed>,
+    //     note_commitment_tree_position: Arc<MerkleTreePosition>,
+    // ) -> Self {
+    //     let note_id: ReceivedNoteId = (*note_id).into();
+
+    //     Self(
+    //         ReceivedSaplingNote::from_parts(
+    //             note_id,
+    //             (*txid).into(),
+    //             output_index,
+    //             (*diversifier).into(),
+    //             (*note_value).into(),
+    //             (*rseed).into(),
+    //             (*note_commitment_tree_position).into(),
+    //         )
+    //     )
+    // }
+
+    pub fn internal_note_id(&self) -> Arc<ZcashReceivedNoteId> {
+        Arc::new(self.0.note_id.into())
+    }
+
+    // pub fn txid(&self) -> Arc<ZcashTxId> {
+    //     Arc::new(self.0.txid().into())
+    // }
+
+    // pub fn output_index(&self) -> u16 {
+    //     self.0.output_index()
+    // }
+
+    pub fn diversifier(&self) -> Arc<ZcashDiversifier> {
+        Arc::new(self.0.diversifier.into())
+    }
+
+    pub fn value(&self) -> Arc<ZcashAmount> {
+        Arc::new(self.0.note_value.into())
+    }
+
+    // pub fn rseed(&self) -> Arc<ZcashRseed> {
+    //     Arc::new(self.0.rseed.into())
+    // }
+
+    pub fn note_commitment_tree_position(&self) -> Arc<MerkleTreePosition> {
+        Arc::new(self.0.note_commitment_tree_position.into())
+    }
+}
+
+impl From<ZcashReceivedSaplingNote> for ReceivedSaplingNote<ReceivedNoteId> {
+    fn from(inner: ZcashReceivedSaplingNote) -> Self {
+        inner.0
+    }
+}
+
+impl From<ReceivedSaplingNote<ReceivedNoteId>> for ZcashReceivedSaplingNote {
+    fn from(e: ReceivedSaplingNote<ReceivedNoteId>) -> Self {
+        Self(e)
+    }
+}
 
 pub enum ZcashOvkPolicy {
     /// Use the outgoing viewing key from the sender's [`ExtendedFullViewingKey`].

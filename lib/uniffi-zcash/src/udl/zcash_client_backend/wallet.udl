@@ -3,6 +3,22 @@ interface ZcashWalletSaplingSpend {};
 
 interface ZcashWalletSaplingOutput {};
 
+interface MerkleTreePosition {};
+
+interface ZcashReceivedSaplingNote {
+	// constructor
+
+    ZcashReceivedNoteId internal_note_id();
+
+    ZcashDiversifier diversifier();
+
+    ZcashAmount value();
+
+    // rseed
+
+    MerkleTreePosition note_commitment_tree_position();
+};
+
 interface ZcashWalletTx {
 	constructor(ZcashTxId txid, u32 index, sequence<ZcashWalletSaplingSpend> sapling_spends, sequence<ZcashWalletSaplingOutput> sapling_outputs);
 };
