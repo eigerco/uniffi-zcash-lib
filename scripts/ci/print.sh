@@ -73,7 +73,7 @@ print_issue_diff() {
 	local diff_result_workflow_url="$2"
 
 	echo "# :warning: New versions of librustzcash libraries are present :warning: "
-	echo "You can view the also public API diff between versions in the **[CI logs]($diff_result_workflow_url)**."
+	echo "You can view a better colored result of the diff in the **[CI logs]($diff_result_workflow_url)**."
 
 	IFS=';' read -ra arr <<<"$outdated_libs"
 	for lib_name in "${arr[@]}"; do
@@ -141,7 +141,7 @@ get_build_job_url() {
 	result=$(gh run \
 		--repo "$GITHUB_REPOSITORY" view "$GITHUB_RUN_ID" \
 		--json jobs \
-		--jq '.jobs[] | select(.name == "'$GITHUB_JOB'") | .url, (.steps[] | select(.name == "Show public API diffs") | "#step:\(.number):1")' |
+		--jq '.jobs[] | select(.name == "'$GITHUB_JOB'") | .url, (.steps[] | select(.name == "Check if uniffi-zcash-lib build is failing") | "#step:\(.number):1")' |
 		tr -d "\n")
 
 	echo "$result"
@@ -153,7 +153,7 @@ get_diff_job_url() {
 	result=$(gh run \
 		--repo "$GITHUB_REPOSITORY" view "$GITHUB_RUN_ID" \
 		--json jobs \
-		--jq '.jobs[] | select(.name == "'$GITHUB_JOB'") | .url, (.steps[] | select(.name == "Check if uniffi-zcash-lib build is failing") | "#step:\(.number):1")' |
+		--jq '.jobs[] | select(.name == "'$GITHUB_JOB'") | .url, (.steps[] | select(.name == "Show public API diffs") | "#step:\(.number):1")' |
 		tr -d "\n")
 
 	echo "$result"
