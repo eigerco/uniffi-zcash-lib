@@ -1,7 +1,7 @@
 on:
   push:
-  # schedule:
-  #   - cron: 0 0 * * * # at the end of each day
+  schedule:
+    - cron: 0 0 * * * # at the end of each day
 
 jobs:
   check_for_public_api_diffs:
@@ -17,9 +17,8 @@ jobs:
 
       - uses: actions/checkout@v4
         with:
-          repository: ctoyan/uniffi-zcash-lib
+          repository: eigerco/uniffi-zcash-lib
           path: uniffi-zcash-lib
-          ref: test-tool
 
       - name: Install cargo
         uses: actions-rs/toolchain@v1
@@ -35,15 +34,8 @@ jobs:
       - name: Get librustzcash libraries used in uniffi-zcash-lib
         run: |
           source ./uniffi-zcash-lib/scripts/ci/libs.sh
-          kor=$(get_libs librustzcash/Cargo.toml uniffi-zcash-lib/lib/Cargo.toml)
-          echo "$kor"
-          echo "USED_LIBS=$kor" >> $GITHUB_ENV
-          # {
-          #   echo 'USED_LIBS<<EOF'
-          #   source ./uniffi-zcash-lib/scripts/ci/libs.sh
-          #   get_libs librustzcash/Cargo.toml uniffi-zcash-lib/lib/Cargo.toml
-          #   echo EOF
-          # } >> "$GITHUB_ENV"
+          used_libs=$(get_libs librustzcash/Cargo.toml uniffi-zcash-lib/lib/Cargo.toml)
+          echo "USED_LIBS=$used_libs" >> $GITHUB_ENV
 
         # Exports:
         # OUTDATED_LIBS - list of library names, separated by ';', which are outdated (ex - 'zcash_primitives;zcash_address;')
@@ -140,9 +132,9 @@ jobs:
             if [[ -z "$lib_name" ]]; then
               continue
             fi
-            echo "---"
-            echo "${lib_name}"
-            echo "---"
+            echo "-----------------------"
+            echo "::warning::Diffs for ${lib_name}"
+            echo "-----------------------"
             cat "${lib_name}_colored.diff"
             echo ""
           done

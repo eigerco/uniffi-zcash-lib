@@ -29,9 +29,13 @@ print_workflow_diff() {
 		lib_current_version=$(cargo metadata --format-version=1 -q --manifest-path=./uniffi-zcash-lib/lib/Cargo.toml |
 			jq -r ".packages[] | select(.name == \"$lib_name\") | .version")
 
+		local changelog_url
+		changelog_url=$(get_pkg_changelog_url "$lib_name" "$lib_latest_version")
+
 		echo "## ${lib_name}"
 		echo "\`CURRENTLY USED VERSION\`    :arrow_right: ${lib_current_version}"
 		echo "\`LATEST PUBLISHED VERSION\`  :arrow_right: ${lib_latest_version}"
+		echo "\`CHECK CHANGELOG IN REPO\`   :arrow_right: [CHANGELOG.md link](${changelog_url})"
 		echo ""
 		echo "\`\`\`diff"
 		cat "$lib_name".diff
@@ -89,14 +93,51 @@ print_issue_diff() {
 		lib_current_version=$(cargo metadata --format-version=1 -q --manifest-path=./uniffi-zcash-lib/lib/Cargo.toml |
 			jq -r ".packages[] | select(.name == \"$lib_name\") | .version")
 
+		local changelog_url
+		changelog_url=$(get_pkg_changelog_url "$lib_name" "$lib_latest_version")
+
 		echo "## ${lib_name}"
 		echo "\`CURRENTLY USED VERSION\`    :arrow_right: ${lib_current_version}"
 		echo "\`LATEST PUBLISHED VERSION\`  :arrow_right: ${lib_latest_version}"
+		echo "\`CHECK CHANGELOG IN REPO\`   :arrow_right: [CHANGELOG.md link](${changelog_url})"
 		echo ""
 		echo "\`\`\`diff"
 		cat "$lib_name".diff
 		echo "\`\`\`"
 	done
+}
+
+# Generates the URL for the CHANGELOG.md for the specific librustzcash package
+#
+# Takes the following function args:
+# $1 - the librustzcash package name
+# $2 - the latest tag for which to construct the URL
+#
+# Returns:
+# - the changelog url, for example - https://github.com/zcash/librustzcash/blob/zcash_address-0.3.0/components/zcash_address/CHANGELOG.md
+get_pkg_changelog_url() {
+	local lib_name="$1"
+	local lib_latest_version="$2"
+	#
+	# the repo path - for example /home/user/librustzcash
+	local librustzcash_path
+	librustzcash_path="$(pwd)/librustzcash"
+
+	# the absolute manifest path for the package - for example /home/user/librustzcash/zcash_primitives/Cargo.toml
+	local abs_manifest_path
+	abs_manifest_path=$(cargo metadata --format-version=1 -q --manifest-path=./librustzcash/Cargo.toml |
+		jq -r ".packages[] | select(.name==\"$lib_name\") | .manifest_path")
+
+	# the intersection leftover of the two paths - for example /zcash_primitives/Cargo.toml
+	local relative_manifest_path=${abs_manifest_path#$librustzcash_path}
+
+	# substitute Cargo.toml with CHANGELOG.md - for example /zcash_primitives/CHANGELOG.md
+	local changelog_relative_path="${relative_manifest_path/Cargo.toml/CHANGELOG.md}"
+
+	# for example - https://github.com/zcash/librustzcash/tree/zcash_primitives-0.13.0/zcash_primitives/CHANGELOG.md
+	local changelog_url="https://github.com/zcash/librustzcash/tree/$lib_name-$lib_latest_version$changelog_relative_path"
+
+	echo "$changelog_url"
 }
 
 # Print the public API diff from the cli tool in the Github workflow summary

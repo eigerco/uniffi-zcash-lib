@@ -40,8 +40,7 @@ diff() {
 
 		# write the diffs to files, which we show in a separate step for better readability
 		# for colored output ANSI color codes are written in the file and can't be rendered in markdown
-		#
-		# colored output
+
 		cargo run \
 			--manifest-path="$uniffi_cargo_path" \
 			-p uniffi-zcash-cli diff \
