@@ -11,7 +11,8 @@ use zcash_client_backend::encoding::AddressCodec;
 use zcash_client_backend::keys::UnifiedFullViewingKey;
 use zcash_client_backend::wallet::WalletTransparentOutput;
 
-use zcash_client_sqlite::wallet::init;
+use zcash_client_sqlite::chain::init::init_blockmeta_db;
+use zcash_client_sqlite::wallet::init::init_wallet_db;
 use zcash_client_sqlite::{chain::BlockMeta, FsBlockDb, ReceivedNoteId, WalletDb};
 
 use zcash_primitives::legacy::TransparentAddress;
@@ -124,7 +125,7 @@ impl ZcashWalletDb {
             WalletDb::for_path(&self.path, self.params).expect("Cannot access the DB!");
         let secvec = SecretVec::new(seed);
 
-        init::init_wallet_db(&mut db_data, Some(secvec)).map_err(|e| ZcashError::Message {
+        init_wallet_db(&mut db_data, Some(secvec)).map_err(|e| ZcashError::Message {
             error: format!("Error while initializing data DB: {:?}", e),
         })
     }
@@ -581,6 +582,18 @@ impl ZcashFsBlockDb {
         Ok(ZcashFsBlockDb {
             fs_block_db: Mutex::new(FsBlockDb::for_path(fsblockdb_root).unwrap()),
         })
+    }
+
+    // init_blockmeta_db
+    pub fn init(&self, blocks_dir: String) -> Result<(), ZcashError> {
+        let mut db = FsBlockDb::for_path(blocks_dir).unwrap();
+
+        match init_blockmeta_db(&mut db) {
+            Ok(()) => Ok(()),
+            _ => Err(ZcashError::Message {
+                error: "MigratorError".to_string(),
+            }),
+        }
     }
 
     /// Returns the metadata for the block with the given height, if it exists in the

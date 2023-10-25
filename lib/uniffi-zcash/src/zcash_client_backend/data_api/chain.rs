@@ -8,36 +8,26 @@ use crate::{
     ZcashBlockHeight, ZcashConsensusParameters, ZcashError, ZcashResult, ZcashSaplingNode,
 };
 
-#[derive(Default)]
-pub struct ZcashBackendScan;
+pub fn scan_cached_blocks(
+    params: ZcashConsensusParameters,
+    fsblockdb_root: String,
+    db_data_path: String,
+    height: Arc<ZcashBlockHeight>,
+    limit: u32,
+) -> ZcashResult<()> {
+    let db_cache = FsBlockDb::for_path(fsblockdb_root).expect("Cannot access FsBlockDb");
+    let mut db_data = WalletDb::for_path(db_data_path, params).expect("Cannot access WalletDb");
 
-impl ZcashBackendScan {
-    pub fn new() -> Self {
-        Self
-    }
-
-    pub fn scan_cached_blocks(
-        &self,
-        params: ZcashConsensusParameters,
-        fsblockdb_root: String,
-        db_data_path: String,
-        height: Arc<ZcashBlockHeight>,
-        limit: u32,
-    ) -> ZcashResult<()> {
-        let db_cache = FsBlockDb::for_path(fsblockdb_root).expect("Cannot access FsBlockDb");
-        let mut db_data = WalletDb::for_path(db_data_path, params).expect("Cannot access WalletDb");
-
-        chain::scan_cached_blocks(
-            &params,
-            &db_cache,
-            &mut db_data,
-            (*height).into(),
-            limit as usize,
-        )
-        .map_err(|e| ZcashError::Message {
-            error: format!("Error for scan_cached_blocks: {:?}", e),
-        })
-    }
+    chain::scan_cached_blocks(
+        &params,
+        &db_cache,
+        &mut db_data,
+        (*height).into(),
+        limit as usize,
+    )
+    .map_err(|e| ZcashError::Message {
+        error: format!("Error for scan_cached_blocks: {:?}", e),
+    })
 }
 
 pub struct ZcashCommitmentTreeRoot(CommitmentTreeRoot<Node>);
