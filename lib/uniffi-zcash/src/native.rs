@@ -647,6 +647,8 @@ pub fn shield_to_address(
                 })
         })?
         .into_keys()
+        .map(|x| ZcashTransparentAddress::decode(params, &x).expect("should decode without issues"))
+        .map(Arc::new)
         .collect();
 
     // let memo = Memo::from_bytes(&memo_bytes).unwrap();
@@ -1043,7 +1045,10 @@ pub fn list_transparent_receivers(
 
     match db_data.get_transparent_receivers(account) {
         Ok(receivers) => {
-            let transparent_receivers = receivers.keys().map(|x| **x).collect();
+            let transparent_receivers = receivers
+                .keys()
+                .map(|x| ZcashTransparentAddress::decode(params, x).unwrap())
+                .collect();
             // let taddr = match taddr {
             //     TransparentAddress::PublicKey(data) => {
             //         ZcashAddress::from_transparent_p2pkh(zcash_network, *data)

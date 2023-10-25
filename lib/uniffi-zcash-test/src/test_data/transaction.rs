@@ -116,7 +116,7 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
         .derive_address(0)
         .unwrap();
     let prev_coin = TxOut {
-        value: Amount::from_u64(1200).unwrap(),
+        value: Amount::from_u64(10200).unwrap(),
         script_pubkey: address.script(),
     };
     let secret_key = key.transparent().derive_external_secret_key(0).unwrap();

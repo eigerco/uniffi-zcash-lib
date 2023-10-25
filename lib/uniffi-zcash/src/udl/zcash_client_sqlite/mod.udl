@@ -107,13 +107,13 @@ interface ZcashWalletDb {
     );
 
 	[Throws=ZcashError]
-    record<ZcashTransparentAddress, ZcashAddressMetadata> get_transparent_receivers(ZcashAccountId aid);
+    record<string, ZcashAddressMetadata> get_transparent_receivers(ZcashAccountId aid);
 
 	[Throws=ZcashError]
     sequence<ZcashWalletTransparentOutput> get_unspent_transparent_outputs(ZcashTransparentAddress zta, ZcashBlockHeight zbh, sequence<ZcashOutPoint> zop);
 
 	[Throws=ZcashError]
-    record<ZcashTransparentAddress, ZcashAmount> get_transparent_balances(ZcashAccountId account, ZcashBlockHeight max_height);
+    record<string, ZcashAmount> get_transparent_balances(ZcashAccountId account, ZcashBlockHeight max_height);
 
     // ####################################
     // WalletWrite implementation methods #

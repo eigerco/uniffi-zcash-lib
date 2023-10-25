@@ -7,6 +7,7 @@ use zcash_client_backend::data_api::chain::CommitmentTreeRoot;
 use zcash_client_backend::data_api::scanning::ScanRange;
 use zcash_client_backend::data_api::ScannedBlock;
 use zcash_client_backend::data_api::{NoteId, WalletCommitmentTrees, WalletRead, WalletWrite};
+use zcash_client_backend::encoding::AddressCodec;
 use zcash_client_backend::keys::UnifiedFullViewingKey;
 use zcash_client_backend::wallet::WalletTransparentOutput;
 
@@ -71,9 +72,9 @@ fn cast_err(e: zcash_client_sqlite::error::SqliteClientError) -> ZcashError {
 
 type UFVKMap = HashMap<ZcashAccountId, Arc<ZcashUnifiedFullViewingKey>>;
 
-type TransparentReceiversMap = HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAddressMetadata>>;
+type TransparentReceiversMap = HashMap<String, Arc<ZcashAddressMetadata>>;
 
-type TransparentBalancesMap = HashMap<Arc<ZcashTransparentAddress>, Arc<ZcashAmount>>;
+type TransparentBalancesMap = HashMap<String, Arc<ZcashAmount>>;
 
 #[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ZcashReceivedNoteId(ReceivedNoteId);
@@ -399,7 +400,7 @@ impl ZcashWalletDb {
         let convert_hm =
             |hm: HashMap<TransparentAddress, AddressMetadata>| -> TransparentReceiversMap {
                 hm.into_iter()
-                    .map(|(x, y)| (Arc::new(x.into()), Arc::new(y.into())))
+                    .map(|(x, y)| (x.encode(&self.params), Arc::new(y.into())))
                     .collect()
             };
 
@@ -442,7 +443,7 @@ impl ZcashWalletDb {
     ) -> ZcashResult<TransparentBalancesMap> {
         let convert_hm = |hm: HashMap<TransparentAddress, Amount>| -> TransparentBalancesMap {
             hm.into_iter()
-                .map(|(x, y)| (Arc::new(x.into()), Arc::new(y.into())))
+                .map(|(x, y)| (x.encode(&self.params), Arc::new(y.into())))
                 .collect()
         };
 

@@ -46,7 +46,7 @@ class TransactionBuilderTest(unittest.TestCase):
         address = key.transparent().to_account_pubkey(
         ).derive_external_ivk().derive_address(0)
 
-        prev_coin = ZcashTxOut(ZcashAmount(1200), address.script())
+        prev_coin = ZcashTxOut(ZcashAmount(10200), address.script())
 
         secret_key = key.transparent().derive_external_secret_key(0)
 
@@ -227,7 +227,7 @@ class TransactionExplorationTest(unittest.TestCase):
         self.assertEqual(0, tx.lock_time())
 
         # expiry height
-        self.assertEqual(2030840, tx.expiry_height().value())
+        self.assertEqual(2030860, tx.expiry_height().value())
 
     def test_transparent_bundle(self):
 
