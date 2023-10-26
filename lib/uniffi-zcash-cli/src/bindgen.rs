@@ -10,10 +10,20 @@ use crate::{
 pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyhow::Result<()> {
     // Define paths
     // let config_path = root_dir.join("uniffi-zcash").join("uniffi.toml");
+    println!("root dir: {}", root_dir);
     let releases_path = root_dir
         .join("target")
         .join("release")
         .join("libuniffi_zcash.dylib");
+
+    let release_path = root_dir
+        .join("target")
+        .join("release");
+
+    let lsing = Command::new("ls").arg("-lt").arg(release_path).output().expect("failed to execute process");
+
+    println!("lsing: {:?}", lsing);
+
     let target_bindings_path = root_dir.join("bindings");
     let shared_libs_dir = root_dir.join("shared_libs");
 
@@ -48,7 +58,10 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
 
             cmd_success(command)?;
 
+            Command::new("cargo")
+
             let shared_lib_dest_path = target_bindings_path.join(lang);
+            println!("Generating swift module ...");
 
             file::copy(&linux_shared_lib_path, shared_lib_dest_path.join(LINUX_SHARED_LIB_NAME), &CopyOptions::default())?;
             file::copy(&macos_shared_lib_path, shared_lib_dest_path.join(MACOS_SHARED_LIB_NAME), &CopyOptions::default())?;
