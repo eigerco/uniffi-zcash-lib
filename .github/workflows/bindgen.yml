@@ -14,7 +14,7 @@ on:
         required: true
 env:
   CARGO_TERM_COLOR: always
-  
+
 jobs:
   bindgen:
     runs-on: ubuntu-latest

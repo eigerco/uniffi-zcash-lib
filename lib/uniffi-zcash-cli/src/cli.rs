@@ -1,6 +1,11 @@
+use std::path::Path;
+
 use crate::SUPPORTED_LANGUAGES;
-use clap::{builder::{ValueParser, PossibleValuesParser}, Arg, ArgMatches, Command};
 use anyhow::anyhow;
+use clap::{
+    builder::{PossibleValuesParser, ValueParser},
+    Arg, ArgMatches, ColorChoice, Command,
+};
 
 pub fn get_matches() -> ArgMatches {
     Command::new("UniFFI Zcash CLI")
@@ -31,7 +36,7 @@ pub fn get_matches() -> ArgMatches {
         .subcommand(
             Command::new("sharedlibs")
             .about("Generates shared libs bindings and places them in the shared_libs directory")
-        )        
+        )
         .subcommand(
             Command::new("bindgen")
             .about(format!("Generates UniFFI bindings for all the supported languages ({}) and places it in the bindings directory", SUPPORTED_LANGUAGES.join(",")))
@@ -52,11 +57,11 @@ pub fn get_matches() -> ArgMatches {
                 .arg(arg_version())
             )
             .subcommand(Command::new("ruby").about("Prepares release for Ruby.")
-                .arg(arg_version())           
+                .arg(arg_version())
             )
             .subcommand(Command::new("kotlin").about("Prepares release for Kotlin.")
                 .arg(arg_version())
-            )   
+            )
             .subcommand(Command::new("swift").about("Prepares release for Swift.")
                 .arg(arg_version())
                 .arg(arg_swift_git_repo_url())
@@ -104,7 +109,7 @@ pub fn get_matches() -> ArgMatches {
                     .env("RUBY_REGISTRY_TOKEN")
                     .help("The ruby API key.")
                 )
-            
+
             )
             .subcommand(Command::new("kotlin")
                 .arg(
@@ -127,12 +132,12 @@ pub fn get_matches() -> ArgMatches {
                     .required(true)
                     .env("KOTLIN_REGISTRY_PASSWORD")
                     .help("The kotlin registry password, can be also a token.")
-                )            
+                )
             )
             .subcommand(Command::new("swift").about("Holds the Swift language subcommands")
                 .subcommand(Command::new("git-repo")
                     .about("Publish a previously generated package to a Git swift repository.")
-                    .arg(arg_swift_git_repo_url())                
+                    .arg(arg_swift_git_repo_url())
                 )
                 .subcommand(Command::new("registry")
                     .about("Publish a previously generated package to a registry like https://swiftpackageindex.com/ .")
@@ -151,9 +156,51 @@ pub fn get_matches() -> ArgMatches {
                         .env("SWIFT_REGISTRY_TOKEN")
                         .help("The swift registry token.")
                     )
-                )               
+                )
             )
-        ).subcommand(
+        )
+        .subcommand(
+            Command::new("diff").about("Looks for a diff in the public API of newer librustzcash library versions. Only checks current dependencies.")
+            .arg(
+                Arg::new("lib_name")
+                .long("lib-name")
+                .env("LIB_NAME")
+                .required(true)
+                .help("The libruszcash library that you want to scan for public API diffs.")
+            ).arg(
+                Arg::new("lib_new_version")
+                .long("lib-new-version")
+                .env("LIB_NEW_VERSION")
+                .required(true)
+                .help("The newer/latest version of the library that you want to bump uniffi-zcash to.")
+            ).arg(
+                Arg::new("lib_old_version")
+                .long("lib-old-version")
+                .env("LIB_OLD_VERSION")
+                .required(true)
+                .help("The current version of the library that uniffi-zcash is on.")
+            ).arg(
+                Arg::new("grep_dir")
+                .long("grep-dir")
+                .env("GREP_DIR")
+                .required(true)
+                .value_parser(validator_existing_path())
+                .help("The absolute path of the crate, where the tool will grep for usage of the changed API.")
+            ).arg(
+                Arg::new("color")
+                .long("color")
+                .value_parser(clap::builder::EnumValueParser::<ColorChoice>::new())
+                .help("Color the output of the diff and the grep results. Use \"never\" if you're going to use the render the output in markdown, since ANSI color codes are not supported in markdown.")
+                .required(false)
+            ).arg(
+                Arg::new("librustzcash_path")
+                .long("librustzcash-path")
+                .value_parser(validator_existing_path())
+                .help("Absolute path to an existing fully fetched librustzcash repository. Helps the program run faster.")
+                .required(false)
+            )
+        )
+        .subcommand(
             Command::new("docgen").about("It generates API surface docs per each language and places them in the 'docs' folder.")
             .subcommand_required(true)
             .subcommand(
@@ -167,7 +214,7 @@ pub fn get_matches() -> ArgMatches {
             )
             .subcommand(
                 Command::new("swift").arg(arg_version())
-            )        
+            )
         )
         .get_matches()
 }
@@ -206,7 +253,19 @@ pub fn validator_regex(regex: &'static str, err_msg: &'static str) -> ValueParse
         let reg = regex::Regex::new(regex).unwrap();
         match reg.is_match(input) {
             true => Ok(input.to_owned()),
-            false => Err(anyhow!("Value \"{}\" is not matching format: {}", input, err_msg)),
+            false => Err(anyhow!(
+                "Value \"{}\" is not matching format: {}",
+                input,
+                err_msg
+            )),
         }
+    })
+}
+
+/// Validates if a path exists
+pub fn validator_existing_path() -> ValueParser {
+    ValueParser::from(move |input: &str| -> anyhow::Result<String> {
+        anyhow::ensure!(Path::new(input).is_dir(), "path \"{input}\" not found");
+        Ok(input.to_string())
     })
 }
