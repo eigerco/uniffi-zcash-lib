@@ -1,21 +1,6 @@
+use crate::{ZcashError, ZcashResult};
+use prost::Message;
 use zcash_client_backend::proto::service::TreeState;
-
-// substitutes TreeState from the proto Service
-// pub struct ZcashTreeState {
-//     /// "main" or "test"
-//     pub network: String,
-//     /// block height
-//     pub height: u64,
-//     pub hash: String,
-//     /// Unix epoch time when the block was mined
-//     pub time: u32,
-//     /// sapling commitment tree state
-//     pub sapling_tree: String,
-//     /// orchard commitment tree state
-//     pub orchard_tree: String,
-
-//     internal: TreeState
-// }
 
 #[derive(Clone)]
 pub struct ZcashTreeState(TreeState);
@@ -37,6 +22,13 @@ impl ZcashTreeState {
             sapling_tree,
             orchard_tree,
         })
+    }
+
+    pub fn from_bytes(bytes: Vec<u8>) -> ZcashResult<Self> {
+        let treestate = TreeState::decode(&bytes[..]).map_err(|e| ZcashError::Message {
+            error: format!("Invalid TreeState: {}", e),
+        })?;
+        Ok(Self(treestate))
     }
 }
 

@@ -25,14 +25,33 @@ pub fn decrypt_and_store_transaction(
 ) -> ZcashResult<()> {
     let mut db_data = WalletDb::for_path(&z_db_data.path, params).unwrap();
 
-    match wallet::decrypt_and_store_transaction(&params, &mut db_data, &((*tx).clone().into()))
-    {
+    match wallet::decrypt_and_store_transaction(&params, &mut db_data, &((*tx).clone().into())) {
         Ok(_) => Ok(()),
         Err(x) => Err(ZcashError::Message {
             error: format!("decrypt and store transaction error: {:?}", x),
         }),
     }
 }
+
+// use std::error::Error;
+// use zcash_client_sqlite::ReceivedNoteId;
+// use zcash_primitives::transaction::components::amount::BalanceError;
+// use std::convert::Infallible;
+// use zcash_client_sqlite::error::SqliteClientError;
+// use zcash_client_backend::data_api::wallet::input_selection::GreedyInputSelectorError;
+// // <SqliteClientError, Error, GreedyInputSelectorError<BalanceError, ReceivedNoteId>, Infallible, ReceivedNoteId>
+// fn handle_spend_error(x: zcash_client_backend::data_api::error::Error<SqliteClientError, zcash_client_sqlite::wallet::commitment_tree::Error, GreedyInputSelectorError<zcash_primitives::transaction::components::amount::BalanceError, ReceivedNoteId>, Infallible, ReceivedNoteId>) -> ZcashError {
+//     // match x {
+//     //     Error::GreedyInputSelectorError => println!("greedy"),
+//     //     _ => println!("not")
+//     // }
+//     match x {
+//         zcash_client_backend::data_api::error::Error::InsufficientFunds { available, required } =>
+//             ZcashError::Message { error: format!("Error spending error (spend test): {} {:?}", x, x) },
+//         _ =>
+//             ZcashError::Message { error: format!("spending error (spend test): {} {:?}", x, x) }
+//     }
+// }
 
 #[allow(clippy::too_many_arguments)]
 #[allow(clippy::type_complexity)]
@@ -106,9 +125,7 @@ pub fn spend_test(
             let x: ZcashTxId = txid.into();
             Ok(Arc::new(x))
         }
-        Err(x) => Err(ZcashError::Message {
-            error: format!("spending error (spend test): {:?}", x),
-        }),
+        Err(x) => Err(ZcashError::Message { error: format!("spending error (spend test): {:?}", x) }),
     }
 }
 

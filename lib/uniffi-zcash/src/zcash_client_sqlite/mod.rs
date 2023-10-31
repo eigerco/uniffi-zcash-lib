@@ -585,13 +585,13 @@ impl ZcashFsBlockDb {
     }
 
     // init_blockmeta_db
-    pub fn init(&self, blocks_dir: String) -> Result<(), ZcashError> {
+    pub fn init(&self, blocks_dir: String) -> ZcashResult<()> {
         let mut db = FsBlockDb::for_path(blocks_dir).unwrap();
 
         match init_blockmeta_db(&mut db) {
             Ok(()) => Ok(()),
-            _ => Err(ZcashError::Message {
-                error: "MigratorError".to_string(),
+            e => Err(ZcashError::Message {
+                error: format!("MigratorError: {:?}", e),
             }),
         }
     }

@@ -156,6 +156,9 @@ interface ZcashFsBlockDb {
 	constructor(string fsblockdb_root);
 
 	[Throws=ZcashError]
+	void init(string blocks_dir);
+
+	[Throws=ZcashError]
     ZcashBlockMeta? find_block(ZcashBlockHeight height);
 
 	[Throws=ZcashError]

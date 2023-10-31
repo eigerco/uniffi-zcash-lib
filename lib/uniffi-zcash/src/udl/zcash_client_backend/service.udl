@@ -1,4 +1,7 @@
 
 interface ZcashTreeState {
 	constructor(string network, u64 height, string hash, u32 time, string sapling_tree, string orchard_tree);
+
+	[Name=from_bytes, Throws=ZcashError]
+	constructor(sequence<u8> bytes);
 };

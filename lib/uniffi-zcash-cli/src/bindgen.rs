@@ -16,11 +16,13 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
         .join("release")
         .join("libuniffi_zcash.dylib");
 
-    let release_path = root_dir
-        .join("target")
-        .join("release");
+    let release_path = root_dir.join("target").join("release");
 
-    let lsing = Command::new("ls").arg("-lt").arg(release_path).output().expect("failed to execute process");
+    let lsing = Command::new("ls")
+        .arg("-lt")
+        .arg(release_path)
+        .output()
+        .expect("failed to execute process");
 
     println!("lsing: {:?}", lsing);
 

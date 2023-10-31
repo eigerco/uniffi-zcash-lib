@@ -23,16 +23,16 @@ use std::sync::Arc;
 
 use crate::native_utils as utils;
 use crate::{
-    TupleMinAndMaxBlockHeight, ZcashAccountId, ZcashAmount, ZcashBlockHeight, ZcashBlockMeta,
-    ZcashConsensusParameters, ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule,
-    ZcashFixedSingleOutputChangeStrategy, ZcashFsBlockDb, ZcashKeysEra, ZcashLocalTxProver,
-    ZcashMainGreedyInputSelector, ZcashMemo, ZcashMemoBytes, ZcashNonNegativeAmount, ZcashNoteId,
-    ZcashOutPoint, ZcashOvkPolicy, ZcashPayment, ZcashRecipientAddress, ZcashResult,
-    ZcashScanRange, ZcashScript, ZcashShieldedProtocol, ZcashTestGreedyInputSelector,
-    ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId, ZcashTxOut,
-    ZcashUnifiedAddress, ZcashUnifiedSpendingKey, ZcashWalletDb, ZcashWalletTransparentOutput,
-    scan_cached_blocks, decrypt_and_store_transaction, shield_transparent_funds_main,
-    shield_transparent_funds_test, spend_main, spend_test
+    decrypt_and_store_transaction, scan_cached_blocks, shield_transparent_funds_main,
+    shield_transparent_funds_test, spend_main, spend_test, TupleMinAndMaxBlockHeight,
+    ZcashAccountId, ZcashAmount, ZcashBlockHeight, ZcashBlockMeta, ZcashConsensusParameters,
+    ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule, ZcashFixedSingleOutputChangeStrategy,
+    ZcashFsBlockDb, ZcashKeysEra, ZcashLocalTxProver, ZcashMainGreedyInputSelector, ZcashMemo,
+    ZcashMemoBytes, ZcashNonNegativeAmount, ZcashNoteId, ZcashOutPoint, ZcashOvkPolicy,
+    ZcashPayment, ZcashRecipientAddress, ZcashResult, ZcashScanRange, ZcashScript,
+    ZcashShieldedProtocol, ZcashTestGreedyInputSelector, ZcashTransaction, ZcashTransactionRequest,
+    ZcashTransparentAddress, ZcashTxId, ZcashTxOut, ZcashUnifiedAddress, ZcashUnifiedSpendingKey,
+    ZcashWalletDb, ZcashWalletTransparentOutput,
 };
 
 const ANCHOR_OFFSET: u32 = 10;
@@ -261,8 +261,7 @@ pub fn scan_blocks(
 ) -> ZcashResult<bool> {
     let from_height = ZcashBlockHeight::new(from_height);
 
-    match scan_cached_blocks(params, db_cache, db_data, from_height.into(), limit)
-    {
+    match scan_cached_blocks(params, db_cache, db_data, from_height.into(), limit) {
         Ok(()) => Ok(true),
         Err(e) => Err(ZcashError::Message {
             error: format!(
@@ -465,10 +464,10 @@ pub fn store_decrypted_transaction(
     // let tx_bytes = env.convert_byte_array(tx).unwrap();
     // let tx = Transaction::read(&tx_bytes[..], BranchId::Sapling)?;
     decrypt_and_store_transaction(params, Arc::new(db_data), Arc::new(tx))
-    .map(|_| true)
-    .map_err(|e| ZcashError::Message {
-        error: format!("Error while decrypting transaction {}", e),
-    })
+        .map(|_| true)
+        .map_err(|e| ZcashError::Message {
+            error: format!("Error while decrypting transaction {}", e),
+        })
 }
 
 #[allow(clippy::too_many_arguments)]
