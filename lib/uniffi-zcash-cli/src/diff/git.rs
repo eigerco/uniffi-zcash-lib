@@ -14,7 +14,7 @@ pub(crate) fn init_libs_repo(
     version: &str,
 ) -> anyhow::Result<()> {
     let tag = format!("{}-{}", lib_name, version);
-    let repo = Repository::open(repo_path.to_owned())
+    let repo = Repository::open(repo_path)
         .or_else(|_| Repository::clone(LIBS_REPO_URL, repo_path))
         .context("failed to clone current repo")?;
 

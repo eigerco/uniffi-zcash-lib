@@ -1,5 +1,5 @@
 // An enum representing different types of GrepItems
-#[derive(PartialEq)]
+#[derive(Default, PartialEq)]
 pub(crate) enum GrepType {
     Impl,
     Fn,
@@ -8,6 +8,7 @@ pub(crate) enum GrepType {
     StructField,
     Const,
     Mod,
+    #[default]
     Empty,
     Type,
     Trait,
@@ -53,11 +54,5 @@ where
             "mod" => GrepType::Mod,
             _ => GrepType::Empty,
         }
-    }
-}
-
-impl Default for GrepType {
-    fn default() -> Self {
-        GrepType::Empty
     }
 }
