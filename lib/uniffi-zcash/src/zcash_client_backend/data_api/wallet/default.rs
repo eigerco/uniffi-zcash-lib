@@ -125,7 +125,9 @@ pub fn spend_test(
             let x: ZcashTxId = txid.into();
             Ok(Arc::new(x))
         }
-        Err(x) => Err(ZcashError::Message { error: format!("spending error (spend test): {:?}", x) }),
+        Err(x) => Err(ZcashError::Message {
+            error: format!("spending error (spend test): {:?}", x),
+        }),
     }
 }
 

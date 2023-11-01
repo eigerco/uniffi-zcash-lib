@@ -24,7 +24,7 @@ use std::sync::Arc;
 use crate::native_utils as utils;
 use crate::{
     decrypt_and_store_transaction, scan_cached_blocks, shield_transparent_funds_main,
-    shield_transparent_funds_test, spend_main, spend_test, TupleMinAndMaxBlockHeight,
+    shield_transparent_funds_test, spend_main, spend_test, TupleTargetAndAnchorHeight,
     ZcashAccountId, ZcashAmount, ZcashBlockHeight, ZcashBlockMeta, ZcashConsensusParameters,
     ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule, ZcashFixedSingleOutputChangeStrategy,
     ZcashFsBlockDb, ZcashKeysEra, ZcashLocalTxProver, ZcashMainGreedyInputSelector, ZcashMemo,
@@ -620,7 +620,7 @@ pub fn shield_to_address(
         })
         .and_then(|opt_anchor| {
             opt_anchor
-                .map(|TupleMinAndMaxBlockHeight { max, .. }| max)
+                .map(|TupleTargetAndAnchorHeight { anchor_height, .. }| anchor_height)
                 .ok_or(ZcashError::Message {
                     error: "Anchor height not available; scan required.".to_string(),
                 })
@@ -771,7 +771,7 @@ fn get_transparent_balance(
         })
         .and_then(|opt_anchor| {
             opt_anchor
-                .map(|TupleMinAndMaxBlockHeight { max, .. }| max)
+                .map(|TupleTargetAndAnchorHeight { anchor_height, .. }| anchor_height)
                 .ok_or(ZcashError::Message {
                     error: "Anchor height not available; scan required.".to_string(),
                 })

@@ -1,5 +1,6 @@
 [workspace]
 members = ["uniffi-bindgen", "uniffi-zcash", "uniffi-zcash-cli"]
+resolver = "2"
 
 # We are using eiger fork of uniffi-rs, as we are
 # making improvements (inline documentation) on the
@@ -17,6 +18,7 @@ incrementalmerkletree = { version = "0.5", features = ["legacy-api"] }
 orchard = { version = "0.6", default-features = false }
 hdwallet = "0.4.1"
 group = "0.13.0"
+hex = "0.4"
 
 [profile.release]
 lto = true

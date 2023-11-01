@@ -352,6 +352,13 @@ impl ZcashTxId {
         self.0.write(&mut data)?;
         Ok(data)
     }
+
+    pub fn to_string(&self) -> ZcashResult<String> {
+        let mut data = Vec::with_capacity(32);
+        self.0.write(&mut data)?;
+        data.reverse();
+        Ok(hex::encode(data))
+    }
 }
 
 impl From<ZcashTxId> for TxId {

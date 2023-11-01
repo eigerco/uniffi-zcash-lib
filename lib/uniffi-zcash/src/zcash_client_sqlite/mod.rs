@@ -39,9 +39,9 @@ use crate::{
     ZcashWalletTransparentOutput,
 };
 
-pub struct TupleMinAndMaxBlockHeight {
-    pub min: Arc<ZcashBlockHeight>,
-    pub max: Arc<ZcashBlockHeight>,
+pub struct TupleTargetAndAnchorHeight {
+    pub target_height: Arc<ZcashBlockHeight>,
+    pub anchor_height: Arc<ZcashBlockHeight>,
 }
 
 pub struct TupleAccountIdAndUnifiedSpendingKey {
@@ -184,7 +184,7 @@ impl ZcashWalletDb {
     pub fn get_target_and_anchor_heights(
         &self,
         min_confirmations: u32,
-    ) -> ZcashResult<Option<TupleMinAndMaxBlockHeight>> {
+    ) -> ZcashResult<Option<TupleTargetAndAnchorHeight>> {
         let min = NonZeroU32::new(min_confirmations).unwrap();
 
         match WalletDb::for_path(&self.path, self.params)
@@ -192,9 +192,9 @@ impl ZcashWalletDb {
             .get_target_and_anchor_heights(min)
         {
             Ok(None) => Ok(None),
-            Ok(Some((bh1, bh2))) => Ok(Some(TupleMinAndMaxBlockHeight {
-                min: Arc::new(bh1.into()),
-                max: Arc::new(bh2.into()),
+            Ok(Some((target_height, anchor_height))) => Ok(Some(TupleTargetAndAnchorHeight {
+                target_height: Arc::new(target_height.into()),
+                anchor_height: Arc::new(anchor_height.into()),
             })),
             Err(e) => Err(ZcashError::Message {
                 error: format!("Err: {}", e),
