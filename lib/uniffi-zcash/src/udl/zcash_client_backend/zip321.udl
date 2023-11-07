@@ -1,0 +1,23 @@
+
+[Error]
+interface ZcashZip321Error {
+	TooManyPayments(u32 v);
+	TransparentMemo(u32 v);
+	RecipientMissing(u32 v);
+	ParseError(string v);
+};
+
+interface ZcashTransactionRequest {
+	[Name=empty]
+	constructor();
+
+	[Throws=ZcashZip321Error]
+	constructor(sequence<ZcashPayment> payments);
+
+	[Name=from_uri, Throws=ZcashZip321Error]
+	constructor(ZcashConsensusParameters params, [ByRef] string uri);
+
+	sequence<ZcashPayment> payments();
+
+	string? to_uri(ZcashConsensusParameters params);
+};

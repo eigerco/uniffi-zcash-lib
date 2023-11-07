@@ -14,7 +14,7 @@ use crate::{
 ///
 /// `pk_d` is guaranteed to be prime-order (i.e. in the prime-order subgroup of Jubjub,
 /// and not the identity).
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ZcashPaymentAddress(PaymentAddress);
 
 impl ZcashPaymentAddress {

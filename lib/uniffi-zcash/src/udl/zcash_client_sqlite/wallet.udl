@@ -1,0 +1,8 @@
+[Error]
+interface ZcashWalletMigrationError {
+	SeedRequired();
+	CorruptedData(string v);
+	DbError(string v);
+	BalanceError(string v);
+	CommitmentTreeError(string v);
+};

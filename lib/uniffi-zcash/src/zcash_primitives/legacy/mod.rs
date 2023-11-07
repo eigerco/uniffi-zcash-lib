@@ -1,12 +1,12 @@
 mod keys;
-use crate::ZcashResult;
-
 pub use self::keys::*;
 
 mod transparent_address;
 pub use self::transparent_address::*;
 
 use zcash_primitives::legacy::Script;
+
+use crate::ZcashResult;
 
 pub struct ZcashScript(Script);
 

@@ -47,7 +47,7 @@ impl ZcashOrchardNote {
         Arc::new(self.0.recipient().into())
     }
 
-    pub fn value (&self) -> Arc<ZcashOrchardNoteValue> {
+    pub fn value(&self) -> Arc<ZcashOrchardNoteValue> {
         Arc::new(self.0.value().into())
     }
 

@@ -22,7 +22,6 @@ impl ZcashAnchor {
     }
 }
 
-
 impl From<&Anchor> for ZcashAnchor {
     fn from(inner: &Anchor) -> Self {
         ZcashAnchor(*inner)
@@ -102,8 +101,8 @@ impl ZcashOrchardMerkleHash {
         }
     }
 
-    pub fn from_cmx(cmx: &ZcashExtractedNoteCommitment) -> Self {
-        MerkleHashOrchard::from_cmx(&cmx.into()).into()
+    pub fn from_cmx(cmx: Arc<ZcashExtractedNoteCommitment>) -> Self {
+        MerkleHashOrchard::from_cmx(&(&(*cmx)).into()).into()
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {

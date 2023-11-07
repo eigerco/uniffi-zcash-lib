@@ -1,0 +1,173 @@
+dictionary TupleTargetAndAnchorHeight {
+	ZcashBlockHeight target_height;
+	ZcashBlockHeight anchor_height;
+};
+
+dictionary TupleAccountIdAndUnifiedSpendingKey {
+    ZcashAccountId account_id;
+    ZcashUnifiedSpendingKey unified_spending_key;
+};
+
+dictionary TupleAccountIdAndSaplingNullifier {
+    ZcashAccountId account_id;
+    ZcashSaplingNullifier sapling_nullifier;
+};
+
+dictionary TupleBlockHeightAndHash {
+    ZcashBlockHeight block_height;
+    ZcashBlockHash block_hash;
+};
+
+interface ZcashReceivedNoteId {};
+
+interface ZcashWalletDb {
+  	[Name=for_path, Throws=ZcashError]
+	constructor(string path, ZcashConsensusParameters params);
+
+  	[Throws=ZcashError]
+  	void init(sequence<u8> seed);
+
+    // ####################################
+    // WalletRead implementation methods #
+    // ####################################
+
+	[Throws=ZcashError]
+	ZcashBlockHeight? chain_height();
+
+	[Throws=ZcashError]
+	ZcashBlockMetadata? block_metadata(ZcashBlockHeight height);
+
+	[Throws=ZcashError]
+	ZcashBlockMetadata? block_fully_scanned();
+
+	[Throws=ZcashError]
+	ZcashBlockMetadata? block_max_scanned();
+
+	[Throws=ZcashError]
+    sequence<ZcashScanRange> suggest_scan_ranges();
+
+	[Throws=ZcashError]
+    TupleTargetAndAnchorHeight? get_target_and_anchor_heights(u32 min_confirmations);
+
+	[Throws=ZcashError]
+    ZcashBlockHeight? get_min_unspent_height();
+
+	[Throws=ZcashError]
+    TupleBlockHeightAndHash? get_max_height_hash();
+
+	[Throws=ZcashError]
+	ZcashBlockHeight? get_tx_height(ZcashTxId txid);
+
+	[Throws=ZcashError]
+    ZcashBlockHash?	get_block_hash(ZcashBlockHeight height);
+
+	[Throws=ZcashError]
+    ZcashBlockHeight? get_wallet_birthday();
+
+	[Throws=ZcashError]
+    ZcashBlockHeight get_account_birthday(ZcashAccountId account);
+
+	[Throws=ZcashError]
+	ZcashUnifiedAddress? get_current_address(ZcashAccountId aid);
+
+	[Throws=ZcashError]
+	record<ZcashAccountId, ZcashUnifiedFullViewingKey> get_unified_full_viewing_keys();
+
+	[Throws=ZcashError]
+    ZcashAccountId? get_account_for_ufvk(ZcashUnifiedFullViewingKey zufvk);
+
+	[Throws=ZcashError]
+    boolean is_valid_account_extfvk(ZcashAccountId account, ZcashExtendedFullViewingKey extfvk);
+
+	[Throws=ZcashError]
+    ZcashWalletSummary? get_wallet_summary(u32 min_confirmations);
+
+	[Throws=ZcashError]
+	ZcashMemo get_memo(ZcashNoteId id_note);
+
+	[Throws=ZcashError]
+    ZcashTransaction get_transaction(ZcashTxId txid);
+
+	[Throws=ZcashError]
+    sequence<TupleAccountIdAndSaplingNullifier> get_sapling_nullifiers(ZcashNullifierQuery query);
+
+	[Throws=ZcashError]
+    sequence<ZcashReceivedSaplingNote> get_spendable_sapling_notes(
+        ZcashAccountId account,
+        ZcashBlockHeight anchor_height,
+        sequence<ZcashReceivedNoteId> exclude
+    );
+
+	[Throws=ZcashError]
+    sequence<ZcashReceivedSaplingNote> select_spendable_sapling_notes(
+        ZcashAccountId account,
+        ZcashAmount target_value,
+        ZcashBlockHeight anchor_height,
+        sequence<ZcashReceivedNoteId> exclude
+    );
+
+	[Throws=ZcashError]
+    record<string, ZcashAddressMetadata> get_transparent_receivers(ZcashAccountId aid);
+
+	[Throws=ZcashError]
+    sequence<ZcashWalletTransparentOutput> get_unspent_transparent_outputs(ZcashTransparentAddress zta, ZcashBlockHeight zbh, sequence<ZcashOutPoint> zop);
+
+	[Throws=ZcashError]
+    record<string, ZcashAmount> get_transparent_balances(ZcashAccountId account, ZcashBlockHeight max_height);
+
+    // ####################################
+    // WalletWrite implementation methods #
+    // ####################################
+
+  	[Throws=ZcashError]
+  	TupleAccountIdAndUnifiedSpendingKey create_account(sequence<u8> seed, ZcashAccountBirthday birthday);
+
+  	[Throws=ZcashError]
+	ZcashUnifiedAddress? get_next_available_address(ZcashAccountId account);
+
+  	[Throws=ZcashError]
+    void put_blocks(sequence<ZcashScannedBlock> blocks);
+
+	[Throws=ZcashError]
+	void update_chain_tip(u32 tip_height);
+
+	[Throws=ZcashError]
+    void store_decrypted_tx(ZcashDecryptedTransaction d_tx);
+
+	[Throws=ZcashError]
+    void store_sent_tx(ZcashSentTransaction sent_tx);
+
+	[Throws=ZcashError]
+	void truncate_to_height(u32 block_height);
+
+	[Throws=ZcashError]
+	i64 put_received_transparent_utxo(ZcashWalletTransparentOutput output);
+
+    // WalletCommitmentTrees implementation methods
+
+    // with_sapling_tree_mut
+
+	[Throws=ZcashError]
+    void put_sapling_subtree_roots(u64 start_index, sequence<ZcashCommitmentTreeRoot> roots);
+};
+
+interface ZcashFsBlockDb {
+	[Name=for_path, Throws=ZcashError]
+	constructor(string fsblockdb_root);
+
+	[Throws=ZcashError]
+	void init(string blocks_dir);
+
+	[Throws=ZcashError]
+    ZcashBlockMeta? find_block(ZcashBlockHeight height);
+
+	[Throws=ZcashError]
+	ZcashBlockHeight? get_max_cached_height();
+
+	[Throws=ZcashError]
+	void write_block_metadata(sequence<ZcashBlockMeta> block_meta);
+};
+
+interface ZcashNoteId {
+	constructor(ZcashTxId txid, ZcashShieldedProtocol zsp, u16 output_index);
+};

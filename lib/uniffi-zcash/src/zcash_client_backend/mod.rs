@@ -8,11 +8,29 @@ use crate::ZcashDiversifierIndex;
 mod address;
 pub use self::address::*;
 
+mod data_api;
+pub use self::data_api::*;
+
 mod encoding;
 pub use self::encoding::*;
 
 mod keys;
 pub use self::keys::*;
+
+mod fees;
+pub use self::fees::*;
+
+mod wallet;
+pub use self::wallet::*;
+
+mod zip321;
+pub use self::zip321::*;
+
+mod decrypt;
+pub use self::decrypt::*;
+
+mod service;
+pub use self::service::*;
 
 pub struct ZcashUnifiedAddressAndDiversifierIndex {
     pub address: Arc<ZcashUnifiedAddress>,

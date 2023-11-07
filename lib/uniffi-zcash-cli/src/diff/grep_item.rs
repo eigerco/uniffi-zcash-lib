@@ -95,9 +95,9 @@ impl GrepItem {
 
         let mut last_file_with_match = "";
         for (i, m) in self.matches.iter().enumerate() {
-            if last_file_with_match != &m.file {
+            if last_file_with_match != m.file {
                 if i != 0 {
-                    println!("");
+                    println!();
                 }
 
                 println!("{}", m.file);
@@ -122,7 +122,7 @@ impl GrepItem {
                 println!("{} | {}", m.range.start.line, m.lines);
             }
         }
-        println!("");
+        println!();
     }
 }
 

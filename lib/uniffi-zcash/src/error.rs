@@ -60,8 +60,16 @@ pub enum ZcashError {
         error: transaction::components::sapling::builder::Error,
     },
 
-    #[error("Orchard builder error occurred: {error:?}")]
-    OrchardBuilderError { error: orchard::builder::Error },
+    #[error("Orchard builder BuildError occurred: {error:?}")]
+    OrchardBuilderError { error: orchard::builder::BuildError },
+
+    #[error("Orchard builder SpendError occurred: {error:?}")]
+    OrchardBuilderSpendError { error: orchard::builder::SpendError },
+
+    #[error("Orchard builder OutputError occurred: {error:?}")]
+    OrchardBuilderOutputError {
+        error: orchard::builder::OutputError,
+    },
 
     #[error("Insufficient founds error: {amount}")]
     InsufficientFundsError { amount: u64 },
@@ -171,6 +179,14 @@ impl From<transaction::builder::Error<fees::zip317::FeeError>> for ZcashError {
             transaction::builder::Error::Balance(_) => ZcashError::BuilderError { error },
             transaction::builder::Error::TransparentBuild(_) => ZcashError::BuilderError { error },
             transaction::builder::Error::SaplingBuild(_) => ZcashError::BuilderError { error },
+            transaction::builder::Error::OrchardBuild(_) => ZcashError::BuilderError { error },
+            transaction::builder::Error::OrchardSpend(_) => ZcashError::BuilderError { error },
+            transaction::builder::Error::OrchardRecipient(_) => ZcashError::BuilderError { error },
+            transaction::builder::Error::OrchardAnchorNotAvailable => {
+                ZcashError::BuilderError { error }
+            }
+            #[cfg(feature = "zfuture")]
+            transaction::builder::Error::TzeBuild(_) => ZcashError::BuilderError { error },
         }
     }
 }
@@ -187,8 +203,20 @@ impl From<transaction::components::sapling::builder::Error> for ZcashError {
     }
 }
 
-impl From<orchard::builder::Error> for ZcashError {
-    fn from(error: orchard::builder::Error) -> Self {
+impl From<orchard::builder::OutputError> for ZcashError {
+    fn from(error: orchard::builder::OutputError) -> Self {
+        ZcashError::OrchardBuilderOutputError { error }
+    }
+}
+
+impl From<orchard::builder::SpendError> for ZcashError {
+    fn from(error: orchard::builder::SpendError) -> Self {
+        ZcashError::OrchardBuilderSpendError { error }
+    }
+}
+
+impl From<orchard::builder::BuildError> for ZcashError {
+    fn from(error: orchard::builder::BuildError) -> Self {
         ZcashError::OrchardBuilderError { error }
     }
 }

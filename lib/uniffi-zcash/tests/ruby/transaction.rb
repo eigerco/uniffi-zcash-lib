@@ -1,14 +1,25 @@
 require "test/unit"
 require "zcash"
 
+# Ruby inverts bytes for some reason, so we need to patch it back
+# because Uniffi u8 arguments won't take negative bytes
+class Array
+    def normalized
+        self.map { |b| (256 + b) % 256 }
+    end
+end
+
+def get_bytes(label)
+    zts = Zcash::TestSupport.from_csv_file()
+    zts.get_as_u8_array(label).normalized
+end
+
 class TransactionBuilderTest < Test::Unit::TestCase
     def test_transparent_with_non_standard_fees
-        zts = Zcash::TestSupport.from_csv_file()
-
-        expected_transaction_bytes = zts.get_as_u8_array(
+        expected_transaction_bytes = get_bytes(
             "transaction_non_standard_fee")
        
-        key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD, zts.get_as_u8_array("unified_spending_key"))
+        key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD, get_bytes("unified_spending_key"))
 
         address = key.transparent().to_account_pubkey().derive_external_ivk().derive_address(0)
 
@@ -30,18 +41,16 @@ class TransactionBuilderTest < Test::Unit::TestCase
 
         result = builder.build(prover, fee_rule)
         
-        assert_equal(result.transaction.to_bytes(), expected_transaction_bytes)
+        assert_equal(result.transaction.to_bytes().normalized, expected_transaction_bytes)
     end
     def test_transparent_with_standard_fees
-        zts = Zcash::TestSupport.from_csv_file()
-
-        expected_transaction_bytes = zts.get_as_u8_array(
+        expected_transaction_bytes = get_bytes(
             "transaction_standard_fee")
-        key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD, zts.get_as_u8_array("unified_spending_key"))
+        key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD, get_bytes("unified_spending_key"))
 
         address = key.transparent().to_account_pubkey().derive_external_ivk().derive_address(0)
 
-        prev_coin = Zcash::ZcashTxOut.new(Zcash::ZcashAmount.new(1200), address.script())
+        prev_coin = Zcash::ZcashTxOut.new(Zcash::ZcashAmount.new(10200), address.script())
         
         secret_key = key.transparent().derive_external_secret_key(0)
 
@@ -59,15 +68,13 @@ class TransactionBuilderTest < Test::Unit::TestCase
 
         result = builder.build(prover, fee_rule)
 
-        assert_equal(result.transaction.to_bytes(), expected_transaction_bytes)
+        assert_equal(result.transaction.to_bytes().normalized, expected_transaction_bytes)
 
     end
-    def test_transparent_with_zip317_standard_fee
-        zts = Zcash::TestSupport.from_csv_file()
 
-        expected_transaction_bytes = zts.get_as_u8_array(
-            "transaction_zip317_standard_fee")
-        key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD, zts.get_as_u8_array("unified_spending_key"))
+    def test_transparent_with_zip317_standard_fee
+        expected_transaction_bytes = get_bytes("transaction_zip317_standard_fee")
+        key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD, get_bytes("unified_spending_key"))
 
         address = key.transparent().to_account_pubkey().derive_external_ivk().derive_address(0)
 
@@ -89,15 +96,13 @@ class TransactionBuilderTest < Test::Unit::TestCase
 
         result = builder.build(prover, fee_rule)
 
-        assert_equal(result.transaction.to_bytes(), expected_transaction_bytes)
-
+        assert_equal(result.transaction.to_bytes().normalized, expected_transaction_bytes)
     end
-    def test_transparent_with_zip317_non_standard_fee
-        zts = Zcash::TestSupport.from_csv_file()
 
-        expected_transaction_bytes = zts.get_as_u8_array(
-            "transaction_zip317_non_standard_fee")
-        key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD, zts.get_as_u8_array("unified_spending_key"))
+    def test_transparent_with_zip317_non_standard_fee
+        expected_transaction_bytes = get_bytes("transaction_zip317_non_standard_fee")
+
+        key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD, get_bytes("unified_spending_key"))
 
         address = key.transparent().to_account_pubkey().derive_external_ivk().derive_address(0)
 
@@ -119,14 +124,14 @@ class TransactionBuilderTest < Test::Unit::TestCase
 
         result = builder.build(prover, fee_rule)
 
-        assert_equal(result.transaction.to_bytes(), expected_transaction_bytes)
+        assert_equal(result.transaction.to_bytes().normalized, expected_transaction_bytes)
 
     end
     def test_sapling_with_non_standard_fees
         zts = Zcash::TestSupport.from_csv_file()
 
         key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD,
-                                                 zts.get_as_u8_array("unified_spending_key"))
+                                                 get_bytes("unified_spending_key"))
 
         extsk = key.sapling()
         payment_address = extsk.default_address().address
@@ -160,8 +165,9 @@ class OrchardTransactionBuilderTest < Test::Unit::TestCase
     def test_transaction_generation
         zts = Zcash::TestSupport.from_csv_file()
 
-        key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD,
-                                                 zts.get_as_u8_array("unified_spending_key"))
+        bytes = get_bytes("unified_spending_key")
+
+        key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD, bytes)
 
         ufvk = key.to_unified_full_viewing_key()
         fvk = ufvk.orchard()
@@ -198,7 +204,7 @@ class TransactionSerializationTest < Test::Unit::TestCase
     def test_transaction_from_bytes
         zts = Zcash::TestSupport.from_csv_file()
 
-        transaction_bytes = zts.get_as_u8_array("transaction_non_standard_fee")
+        transaction_bytes = get_bytes("transaction_non_standard_fee")
 
         Zcash::ZcashTransaction.from_bytes(transaction_bytes, Zcash::ZcashBranchId::NU5)
     end
@@ -208,28 +214,28 @@ class TransactionExplorationTest < Test::Unit::TestCase
     def test_first_level_fields
         zts = Zcash::TestSupport.from_csv_file()
 
-        tx_bytes = zts.get_as_u8_array("transaction_standard_fee")
+        tx_bytes = get_bytes("transaction_standard_fee")
         tx = Zcash::ZcashTransaction.from_bytes(tx_bytes, Zcash::ZcashBranchId::NU5)
         
         # Id
-        id_expected_bytes = zts.get_as_u8_array("transaction_standard_fee_id")
-        assert_equal(id_expected_bytes, tx.txid().to_bytes())
+        id_expected_bytes = get_bytes("transaction_standard_fee_id")
+        assert_equal(id_expected_bytes, tx.txid().to_bytes().normalized)
 
         # Version
-        version_expected_bytes = zts.get_as_u8_array(
+        version_expected_bytes = get_bytes(
             "transaction_standard_fee_version")
-        assert_equal(version_expected_bytes, tx.version().to_bytes())
+        assert_equal(version_expected_bytes, tx.version().to_bytes().normalized)
 
         # lock time
         assert_equal(0, tx.lock_time())
 
         # expiry height
-        assert_equal(2030840, tx.expiry_height().value())
+        assert_equal(2030860, tx.expiry_height().value())
     end
     def test_transparent_bundle
         zts = Zcash::TestSupport.from_csv_file()
 
-        tx_bytes = zts.get_as_u8_array("transaction_standard_fee")
+        tx_bytes = get_bytes("transaction_standard_fee")
         tx = Zcash::ZcashTransaction.from_bytes(tx_bytes, Zcash::ZcashBranchId::NU5)
 
         bundle = tx.transparent_bundle()
@@ -242,31 +248,31 @@ class TransactionExplorationTest < Test::Unit::TestCase
         assert_equal(1, vout.length())
         assert_equal(200, vout[0].value().value())
 
-        vout_0_bytes = zts.get_as_u8_array(
+        vout_0_bytes = get_bytes(
             "transaction_standard_fee_vout_0")
-        assert_equal(vout_0_bytes, vout[0].to_bytes())
+        assert_equal(vout_0_bytes, vout[0].to_bytes().normalized)
         
 
-        vout_0_address = zts.get_as_u8_array(
+        vout_0_address = get_bytes(
             "transaction_standard_fee_vout_0_recipient_address")
         assert_equal(
-            vout_0_address, vout[0].recipient_address().to_bytes())
+            vout_0_address, vout[0].recipient_address().to_bytes().normalized)
 
-        script_bytes = zts.get_as_u8_array(
+        script_bytes = get_bytes(
             "transaction_standard_fee_vout_0_script")
-        assert_equal(script_bytes, vout[0].script_pubkey().to_bytes())
+        assert_equal(script_bytes, vout[0].script_pubkey().to_bytes().normalized)
 
         # vin
         vin = bundle.vin()
 
         assert_equal(1, vin.length())
-        vin0_bytes = zts.get_as_u8_array("transaction_standard_fee_vin_0")
-        assert_equal(vin0_bytes, vin[0].to_bytes())
+        vin0_bytes = get_bytes("transaction_standard_fee_vin_0")
+        assert_equal(vin0_bytes, vin[0].to_bytes().normalized)
     end
     def test_sapling_bundle
         zts = Zcash::TestSupport.from_csv_file()
 
-        tx_bytes = zts.get_as_u8_array("transaction_sapling")
+        tx_bytes = get_bytes("transaction_sapling")
         tx = Zcash::ZcashTransaction.from_bytes(tx_bytes, Zcash::ZcashBranchId::NU5)
 
         bundle = tx.sapling_bundle()
@@ -275,23 +281,23 @@ class TransactionExplorationTest < Test::Unit::TestCase
         spends = bundle.shielded_spends()
         assert_equal(1, spends.length())
         the_spend = spends[0]
-        assert_equal(zts.get_as_u8_array(
-            "transaction_sapling_spend_0_cv"), the_spend.cv().to_bytes())
-        assert_equal(zts.get_as_u8_array(
-            "transaction_sapling_spend_0_anchor"), the_spend.anchor())
-        assert_equal(zts.get_as_u8_array(
-            "transaction_sapling_spend_0_nullifier"), the_spend.nullifier().to_bytes())
-        assert_equal(zts.get_as_u8_array(
-            "transaction_sapling_spend_0_rk"), the_spend.rk().to_bytes())
+        assert_equal(get_bytes(
+            "transaction_sapling_spend_0_cv"), the_spend.cv().to_bytes().normalized)
+        assert_equal(get_bytes(
+            "transaction_sapling_spend_0_anchor"), the_spend.anchor().normalized)
+        assert_equal(get_bytes(
+            "transaction_sapling_spend_0_nullifier"), the_spend.nullifier().to_bytes().normalized)
+        assert_equal(get_bytes(
+            "transaction_sapling_spend_0_rk"), the_spend.rk().to_bytes().normalized)
 
         # Shielded outputs
         outputs = bundle.shielded_outputs()
         assert_equal(1, spends.length())
         the_output = outputs[0]
-        assert_equal(zts.get_as_u8_array(
-            "transaction_sapling_output_0_cv"), the_output.cv().to_bytes())
-        assert_equal(zts.get_as_u8_array(
-            "transaction_sapling_output_0_cmu"), the_output.cmu().to_bytes())
+        assert_equal(get_bytes(
+            "transaction_sapling_output_0_cv"), the_output.cv().to_bytes().normalized)
+        assert_equal(get_bytes(
+            "transaction_sapling_output_0_cmu"), the_output.cmu().to_bytes().normalized)
 
         # Value balance
         assert_equal(0, bundle.value_balance().value())
@@ -299,7 +305,7 @@ class TransactionExplorationTest < Test::Unit::TestCase
     def test_orchard_bundle
         zts = Zcash::TestSupport.from_csv_file()
 
-        tx_bytes = zts.get_as_u8_array("transaction_orchard")
+        tx_bytes = get_bytes("transaction_orchard")
         tx = Zcash::ZcashTransaction::from_bytes(tx_bytes, Zcash::ZcashBranchId::NU5)
 
         bundle = tx.orchard_bundle()
@@ -310,36 +316,36 @@ class TransactionExplorationTest < Test::Unit::TestCase
 
         the_action = actions[1]
 
-        assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_action_1_nullifier"), the_action.nullifier().to_bytes())
-        assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_action_1_cmx"), the_action.cmx().to_bytes())
-        assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_action_1_encrypted_note_epk_bytes"), the_action.encrypted_note().epk_bytes)
-        assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_action_1_encrypted_note_enc_ciphertext"), the_action.encrypted_note().enc_ciphertext)
-        assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_action_1_encrypted_note_out_ciphertext"), the_action.encrypted_note().out_ciphertext)
-        assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_action_1_cv_net"), the_action.cv_net().to_bytes())
+        assert_equal(get_bytes(
+            "transaction_orchard_action_1_nullifier"), the_action.nullifier().to_bytes().normalized)
+        assert_equal(get_bytes(
+            "transaction_orchard_action_1_cmx"), the_action.cmx().to_bytes().normalized)
+        assert_equal(get_bytes(
+            "transaction_orchard_action_1_encrypted_note_epk_bytes"), the_action.encrypted_note().epk_bytes.normalized)
+        assert_equal(get_bytes(
+            "transaction_orchard_action_1_encrypted_note_enc_ciphertext"), the_action.encrypted_note().enc_ciphertext.normalized)
+        assert_equal(get_bytes(
+            "transaction_orchard_action_1_encrypted_note_out_ciphertext"), the_action.encrypted_note().out_ciphertext.normalized)
+        assert_equal(get_bytes(
+            "transaction_orchard_action_1_cv_net"), the_action.cv_net().to_bytes().normalized)
 
         # Flags
-        assert_equal(zts.get_as_u8_array(
+        assert_equal(get_bytes(
             "transaction_orchard_flags"), [bundle.flags().to_byte()])
 
         # Value balance
         assert_equal(0, bundle.value_balance().value())
 
         # Anchor
-        assert_equal(zts.get_as_u8_array(
-            "transaction_orchard_anchor"), bundle.anchor().to_bytes())
+        assert_equal(get_bytes(
+            "transaction_orchard_anchor"), bundle.anchor().to_bytes().normalized)
     end
     def test_orchard_bundle_crypto
         zts = Zcash::TestSupport.from_csv_file()
         key = Zcash::ZcashUnifiedSpendingKey.from_bytes(Zcash::ZcashKeysEra::ORCHARD,
-                                                 zts.get_as_u8_array("testnet_unified_spending_key"))
+                                                 get_bytes("testnet_unified_spending_key"))
 
-        tx_bytes = zts.get_as_u8_array("testnet_transaction_orchard")
+        tx_bytes = get_bytes("testnet_transaction_orchard")
         tx = Zcash::ZcashTransaction.from_bytes(tx_bytes, Zcash::ZcashBranchId::NU5)
 
         bundle = tx.orchard_bundle()
@@ -352,10 +358,10 @@ class TransactionExplorationTest < Test::Unit::TestCase
         ivk = key.to_unified_full_viewing_key().orchard().to_ivk(Zcash::ZcashOrchardScope::INTERNAL)
         output = bundle.decrypt_output_with_key(0, ivk)
         assert_equal(1999000, output.note.value().value())
-        assert_equal(zts.get_as_u8_array(
-            "testnet_transaction_orchard_address"), output.address.to_raw_address_bytes())
-        assert_equal(zts.get_as_u8_array(
-            "testnet_transaction_orchard_memo"), output.data)
+        assert_equal(get_bytes(
+            "testnet_transaction_orchard_address"), output.address.to_raw_address_bytes().normalized)
+        assert_equal(get_bytes(
+            "testnet_transaction_orchard_memo"), output.data.normalized)
 
         # Decrypt output with IVKs
         outputs = bundle.decrypt_output_with_keys([ivk])
@@ -364,19 +370,19 @@ class TransactionExplorationTest < Test::Unit::TestCase
         assert_equal(0, the_output.idx)
         assert_equal(1999000, the_output.note.value().value())
         assert_equal(ivk.to_bytes(), the_output.key.to_bytes())
-        assert_equal(zts.get_as_u8_array(
-            "testnet_transaction_orchard_address"), the_output.address.to_raw_address_bytes())
-        assert_equal(zts.get_as_u8_array(
-            "testnet_transaction_orchard_memo"), the_output.data)
+        assert_equal(get_bytes(
+            "testnet_transaction_orchard_address"), the_output.address.to_raw_address_bytes().normalized)
+        assert_equal(get_bytes(
+            "testnet_transaction_orchard_memo"), the_output.data.normalized)
 
         # Decrypt output with OVK
         ovk = key.to_unified_full_viewing_key().orchard().to_ovk(Zcash::ZcashOrchardScope::INTERNAL)
         output = bundle.recover_output_with_ovk(0, ovk)
         assert_equal(1999000, output.note.value().value())
-        assert_equal(zts.get_as_u8_array(
-            "testnet_transaction_orchard_address"), output.address.to_raw_address_bytes())
-        assert_equal(zts.get_as_u8_array(
-            "testnet_transaction_orchard_memo"), output.data)
+        assert_equal(get_bytes(
+            "testnet_transaction_orchard_address"), output.address.to_raw_address_bytes().normalized)
+        assert_equal(get_bytes(
+            "testnet_transaction_orchard_memo"), output.data.normalized)
 
         # Decrypt output with OVKs
         outputs = bundle.recover_outputs_with_ovks([ovk])
@@ -384,10 +390,10 @@ class TransactionExplorationTest < Test::Unit::TestCase
         the_output = outputs[0]
         assert_equal(0, the_output.idx)
         assert_equal(1999000, the_output.note.value().value())
-        assert_equal(ovk.to_bytes(), the_output.key.to_bytes())
-        assert_equal(zts.get_as_u8_array(
-            "testnet_transaction_orchard_address"), the_output.address.to_raw_address_bytes())
-        assert_equal(zts.get_as_u8_array(
-            "testnet_transaction_orchard_memo"), the_output.data)
+        assert_equal(ovk.to_bytes().normalized, the_output.key.to_bytes().normalized)
+        assert_equal(get_bytes(
+            "testnet_transaction_orchard_address"), the_output.address.to_raw_address_bytes().normalized)
+        assert_equal(get_bytes(
+            "testnet_transaction_orchard_memo"), the_output.data.normalized)
     end
 end

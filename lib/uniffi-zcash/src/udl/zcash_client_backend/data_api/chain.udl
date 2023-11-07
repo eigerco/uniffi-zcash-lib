@@ -1,0 +1,7 @@
+interface ZcashCommitmentTreeRoot {
+    [Name=from_parts]
+    constructor(ZcashBlockHeight subtree_end_height, ZcashSaplingNode root_hash);
+
+    ZcashBlockHeight subtree_end_height();
+    ZcashSaplingNode root_hash();
+};

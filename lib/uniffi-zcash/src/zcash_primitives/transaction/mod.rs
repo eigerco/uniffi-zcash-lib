@@ -107,7 +107,8 @@ impl ZcashTransactionBuilder {
         prover: Arc<ZcashLocalTxProver>,
         fee_rule: ZcashFeeRules,
     ) -> ZcashResult<ZcashTransactionAndSaplingMetadata> {
-        let mut builder = Builder::new(self.parameters, (*self.target_height).into());
+        // CHANGED
+        let mut builder = Builder::new(self.parameters, (*self.target_height).into(), None);
 
         self.sapling_spends.read().unwrap().iter().try_for_each(
             |(extsk, diversifier, note, merkle_path)| {
@@ -155,19 +156,25 @@ impl ZcashTransactionBuilder {
 
         match fee_rule {
             ZcashFeeRules::FixedStandard => {
-                let fee = zcash_primitives::transaction::fees::fixed::FeeRule::standard();
-                let result = builder.build(&prover.0, &fee).map_err(ZcashError::from)?;
+                let fee = zcash_primitives::transaction::fees::zip317::FeeRule::standard();
+                let result = builder
+                    .build(&prover.internal, &fee)
+                    .map_err(ZcashError::from)?;
                 Ok(result.into())
             }
             ZcashFeeRules::FixedNonStandard { amount } => {
                 let amount = Amount::from_u64(amount).or(Err("Error parsing amount"))?;
                 let fee = zcash_primitives::transaction::fees::fixed::FeeRule::non_standard(amount);
-                let result = builder.build(&prover.0, &fee).map_err(ZcashError::from)?;
+                let result = builder
+                    .build(&prover.internal, &fee)
+                    .map_err(ZcashError::from)?;
                 Ok(result.into())
             }
             ZcashFeeRules::Zip317Standard => {
                 let fee = zcash_primitives::transaction::fees::zip317::FeeRule::standard();
-                let result = builder.build(&prover.0, &fee).map_err(ZcashError::from)?;
+                let result = builder
+                    .build(&prover.internal, &fee)
+                    .map_err(ZcashError::from)?;
                 Ok(result.into())
             }
             ZcashFeeRules::Zip317NonStandard {
@@ -185,7 +192,9 @@ impl ZcashTransactionBuilder {
                     Some(fee) => fee,
                     None => return Err("p2pkh_standard_input_size and p2pkh_standard_output_size should not be zero".into()),
                 };
-                let result = builder.build(&prover.0, &fee).map_err(ZcashError::from)?;
+                let result = builder
+                    .build(&prover.internal, &fee)
+                    .map_err(ZcashError::from)?;
                 Ok(result.into())
             }
         }
@@ -230,7 +239,16 @@ pub enum ZcashFeeRules {
 }
 
 /// A Zcash transaction.
+#[derive(Debug, PartialEq)]
 pub struct ZcashTransaction(Transaction);
+
+impl Clone for ZcashTransaction {
+    fn clone(&self) -> Self {
+        let bs = (*self).to_bytes().unwrap().clone();
+
+        Self::from_bytes(&bs, (*self).consensus_branch_id()).unwrap()
+    }
+}
 
 impl ZcashTransaction {
     pub fn to_bytes(&self) -> ZcashResult<Vec<u8>> {
@@ -277,23 +295,36 @@ impl ZcashTransaction {
     // TODO: investigate alternative ways of exposing this to FFI, as it accepts a closure as parameter.
 
     pub fn transparent_bundle(&self) -> Option<Arc<ZcashTransparentBundle>> {
-        self.0.transparent_bundle().map(|b| b.into()).map(Arc::new)
+        self.0.transparent_bundle().map(From::from).map(Arc::new)
     }
 
     pub fn sapling_bundle(&self) -> Option<Arc<ZcashSaplingBundle>> {
-        self.0.sapling_bundle().map(|b| b.into()).map(Arc::new)
+        self.0.sapling_bundle().map(From::from).map(Arc::new)
     }
 
     pub fn orchard_bundle(&self) -> Option<Arc<ZcashOrchardBundle>> {
-        self.0.orchard_bundle().map(|b| b.into()).map(Arc::new)
+        self.0.orchard_bundle().map(From::from).map(Arc::new)
+    }
+}
+
+impl From<ZcashTransaction> for Transaction {
+    fn from(inner: ZcashTransaction) -> Self {
+        inner.0
+    }
+}
+
+impl<'a> From<&'a ZcashTransaction> for &'a Transaction {
+    fn from(inner: &'a ZcashTransaction) -> Self {
+        &inner.0
     }
 }
 
 impl From<Transaction> for ZcashTransaction {
-    fn from(inner: Transaction) -> Self {
-        ZcashTransaction(inner)
+    fn from(e: Transaction) -> Self {
+        ZcashTransaction(e)
     }
 }
+
 pub struct ZcashTransactionAndSaplingMetadata {
     pub transaction: Arc<ZcashTransaction>,
     pub sapling_metadata: Arc<ZcashSaplingMetadata>,
@@ -308,6 +339,7 @@ impl From<(Transaction, SaplingMetadata)> for ZcashTransactionAndSaplingMetadata
     }
 }
 
+#[derive(Clone, Copy, PartialOrd, Ord, PartialEq, Eq, Hash)]
 pub struct ZcashTxId(TxId);
 
 impl ZcashTxId {
@@ -319,6 +351,20 @@ impl ZcashTxId {
         let mut data = Vec::with_capacity(32);
         self.0.write(&mut data)?;
         Ok(data)
+    }
+
+    // not present in the librustzcash API but useful
+    pub fn to_hex_string(&self) -> ZcashResult<String> {
+        let mut data = Vec::with_capacity(32);
+        self.0.write(&mut data)?;
+        data.reverse();
+        Ok(hex::encode(data))
+    }
+}
+
+impl From<ZcashTxId> for TxId {
+    fn from(inner: ZcashTxId) -> Self {
+        inner.0
     }
 }
 

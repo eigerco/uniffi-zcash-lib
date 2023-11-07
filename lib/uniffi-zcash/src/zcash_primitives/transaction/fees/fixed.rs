@@ -1,12 +1,13 @@
 use std::sync::Arc;
 
 use zcash_primitives::transaction::fees::fixed::FeeRule;
+use zcash_primitives::transaction::fees::zip317::MINIMUM_FEE;
 
 use crate::ZcashAmount;
 
 /// A fee rule that always returns a fixed fee, irrespective of the structure of
 /// the transaction being constructed.
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct ZcashFixedFeeRule(pub(crate) FeeRule);
 
 impl ZcashFixedFeeRule {
@@ -17,7 +18,7 @@ impl ZcashFixedFeeRule {
 
     /// Creates a new fixed fee rule with the standard default fee.
     pub fn standard() -> Self {
-        FeeRule::standard().into()
+        FeeRule::non_standard(MINIMUM_FEE).into()
     }
 
     /// Returns the fixed fee amount which which this rule was configured.

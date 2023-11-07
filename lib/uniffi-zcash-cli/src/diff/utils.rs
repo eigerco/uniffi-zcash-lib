@@ -51,6 +51,5 @@ pub(crate) fn copy_dir_if_not_exists(
 
 // Get a temporray path (without creating anything) for a certain direcotry name
 pub(crate) fn get_temp_path_for(dir_name: &str) -> PathBuf {
-    let new_temp_dir = temp_dir().join(dir_name);
-    new_temp_dir
+    temp_dir().join(dir_name)
 }

@@ -1,0 +1,3 @@
+interface ZcashZip317SingleOutputChangeStrategy {
+	constructor(ZcashZip317FeeRule fee_rule);
+};

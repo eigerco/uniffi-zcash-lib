@@ -15,7 +15,6 @@ use zcash_primitives::{
     consensus::{BlockHeight, BranchId, MainNetwork, TestNetwork},
     legacy::keys::IncomingViewingKey,
     memo::MemoBytes,
-    merkle_tree::{CommitmentTree, IncrementalWitness},
     sapling::Node,
     transaction::{
         builder::Builder,
@@ -24,6 +23,9 @@ use zcash_primitives::{
         Authorized, Transaction, TransactionData, TxVersion,
     },
 };
+
+// CHANGED
+use incrementalmerkletree::{frontier::CommitmentTree, witness::IncrementalWitness};
 
 use zcash_proofs::prover::LocalTxProver;
 
@@ -67,7 +69,7 @@ pub fn transparent_builder_with_nonstandard_fee_example<W: Write>(
     mut file: W,
     key: &UnifiedSpendingKey,
 ) {
-    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
+    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT), None);
 
     // Transparent data
     let address = key
@@ -103,7 +105,7 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
     mut file: W,
     key: &UnifiedSpendingKey,
 ) {
-    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
+    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT), None);
 
     // Transparent data
     let address = key
@@ -114,7 +116,7 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
         .derive_address(0)
         .unwrap();
     let prev_coin = TxOut {
-        value: Amount::from_u64(1200).unwrap(),
+        value: Amount::from_u64(10200).unwrap(),
         script_pubkey: address.script(),
     };
     let secret_key = key.transparent().derive_external_secret_key(0).unwrap();
@@ -127,7 +129,12 @@ pub fn transparent_builder_with_standard_fee_example<W: Write>(
         .unwrap();
 
     let prover = LocalTxProver::with_default_location().unwrap();
-    let fee_rule = fixed::FeeRule::standard();
+
+    // CHANGED
+    // use zcash_primitives::transaction::fees::fixed::FeeRule;
+    use zcash_primitives::transaction::fees::zip317::FeeRule;
+    // let fee_rule = fixed::FeeRule::standard();
+    let fee_rule = FeeRule::standard();
 
     let (transaction, _) = builder.build(&prover, &fee_rule).unwrap();
 
@@ -147,7 +154,7 @@ pub fn transparent_builder_with_zip317_standard_fee_example<W: Write>(
     mut file: W,
     key: &UnifiedSpendingKey,
 ) {
-    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
+    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT), None);
 
     // Transparent data
     let address = key
@@ -183,7 +190,7 @@ pub fn transparent_builder_with_zip317_non_standard_fee_example<W: Write>(
     mut file: W,
     key: &UnifiedSpendingKey,
 ) {
-    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
+    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT), None);
 
     // Transparent data
     let address = key
@@ -220,7 +227,8 @@ pub fn sapling_transaction_general_builder_example<W: Write>(
     mut file: W,
     key: &UnifiedSpendingKey,
 ) {
-    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT));
+    // CHANGED
+    let mut builder = Builder::new(MainNetwork, BlockHeight::from_u32(BLOCK_HEIGHT), None);
 
     let extsk = key.sapling().clone();
     let (_, payment_address) = extsk.default_address();
@@ -228,7 +236,8 @@ pub fn sapling_transaction_general_builder_example<W: Write>(
     let note = payment_address.create_note(200, rseed);
     let mut tree = CommitmentTree::empty();
     tree.append(Node::from_cmu(&note.cmu())).unwrap();
-    let witness = IncrementalWitness::from_tree(&tree);
+    // CHANGED
+    let witness = IncrementalWitness::from_tree(tree);
 
     builder
         .add_sapling_spend(

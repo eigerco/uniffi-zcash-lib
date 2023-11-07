@@ -35,7 +35,7 @@ pub fn generate_diff(
         copy_dir_if_not_exists(Path::new(librustzcash_path), temp_path_latest.as_path())?;
     }
 
-    let _ = init_libs_repo(
+    init_libs_repo(
         package_name,
         temp_path_current.as_path(),
         package_old_version,
@@ -46,7 +46,7 @@ pub fn generate_diff(
         copy_dir_if_not_exists(temp_path_current.as_path(), temp_path_latest.as_path())?;
     }
 
-    let _ = init_libs_repo(
+    init_libs_repo(
         package_name,
         temp_path_latest.as_path(),
         package_new_version,
@@ -54,8 +54,8 @@ pub fn generate_diff(
 
     rustup_toolchain::install(public_api::MINIMUM_NIGHTLY_RUST_VERSION)?;
 
-    let current_api = get_public_api(temp_path_current.as_path(), &package_name)?;
-    let latest_api = get_public_api(temp_path_latest.as_path(), &package_name)?;
+    let current_api = get_public_api(temp_path_current.as_path(), package_name)?;
+    let latest_api = get_public_api(temp_path_latest.as_path(), package_name)?;
     let public_api_diff = PublicApiDiff::between(current_api, latest_api);
 
     for diff in public_api_diff.removed {
@@ -87,7 +87,7 @@ pub fn generate_diff(
             );
         }
 
-        grep_item.grep(&grep_dir)?.print_result();
+        grep_item.grep(grep_dir)?.print_result();
     }
 
     Ok(())

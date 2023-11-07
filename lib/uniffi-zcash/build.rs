@@ -2,7 +2,6 @@ use std::fs::{read_to_string, OpenOptions};
 use std::io::Write;
 use std::path::Path;
 
-
 fn main() {
     println!("cargo:rerun-if-changed=src/udl");
     println!("cargo:rerun-if-changed=../uniffi-zcash-test/src/udl");

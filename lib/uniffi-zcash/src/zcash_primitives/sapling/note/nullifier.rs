@@ -1,5 +1,6 @@
 use zcash_primitives::sapling::Nullifier;
 
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct ZcashSaplingNullifier(Nullifier);
 
 impl ZcashSaplingNullifier {
@@ -8,8 +9,20 @@ impl ZcashSaplingNullifier {
     }
 }
 
+impl From<ZcashSaplingNullifier> for Nullifier {
+    fn from(outer: ZcashSaplingNullifier) -> Self {
+        outer.0
+    }
+}
+
+impl From<Nullifier> for ZcashSaplingNullifier {
+    fn from(inner: Nullifier) -> Self {
+        Self(inner)
+    }
+}
+
 impl From<&Nullifier> for ZcashSaplingNullifier {
     fn from(inner: &Nullifier) -> Self {
-        ZcashSaplingNullifier(*inner)
+        Self(*inner)
     }
 }

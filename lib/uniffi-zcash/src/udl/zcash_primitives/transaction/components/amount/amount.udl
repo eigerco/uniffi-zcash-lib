@@ -7,3 +7,23 @@ interface ZcashAmount {
 
   i64 value();
 };
+
+interface ZcashNonNegativeAmount {
+    [Name=zero]
+    constructor();
+
+    [Name=from_u64, Throws=ZcashError]
+    constructor(u64 amount);
+
+    [Name=from_nonnegative_i64, Throws=ZcashError]
+    constructor(i64 amount);
+
+    u64 value();
+};
+
+interface ZcashBalance {
+    [Name=zero]
+    constructor();
+
+    ZcashNonNegativeAmount total();
+};

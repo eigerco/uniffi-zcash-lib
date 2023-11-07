@@ -16,6 +16,12 @@ pub use self::orchard::*;
 mod zcash_client_backend;
 pub use self::zcash_client_backend::*;
 
+mod zcash_client_sqlite;
+pub use self::zcash_client_sqlite::*;
+
+mod native;
+pub use self::native::*;
+
 mod zcash_primitives;
 pub use self::zcash_primitives::*;
 
@@ -25,6 +31,7 @@ pub use self::zcash_proofs::*;
 mod jubjub;
 pub use self::jubjub::*;
 
+mod native_utils;
 mod utils;
 
 pub use uniffi_zcash_test::test_support::*;

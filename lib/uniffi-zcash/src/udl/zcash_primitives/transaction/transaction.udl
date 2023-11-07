@@ -75,6 +75,9 @@ interface ZcashTxId {
     constructor([ByRef] sequence<u8> data);
     [Throws=ZcashError]
     sequence<u8> to_bytes();
+
+    [Throws=ZcashError]
+    string to_hex_string();
 };
 
 dictionary ZcashTransactionAndSaplingMetadata {

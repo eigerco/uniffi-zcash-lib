@@ -10,10 +10,7 @@ interface ZcashUnifiedAddress {
   constructor(ZcashConsensusParameters params, [ByRef] string address);
 
   ZcashOrchardAddress? orchard();
-
   ZcashPaymentAddress? sapling();
-
   ZcashTransparentAddress? transparent();
-
   string encode(ZcashConsensusParameters params);
 };

@@ -1,0 +1,134 @@
+
+enum ZcashShieldedProtocol {
+  "Sapling"
+};
+
+enum ZcashNullifierQuery {
+    "Unspent",
+    "All",
+};
+
+interface ZcashDecryptedTransaction {};
+interface TimeOffsetDateTime {};
+
+dictionary ZcashSentTransaction {
+    ZcashTransaction tx;
+    TimeOffsetDateTime created;
+    ZcashAccountId account;
+    sequence<ZcashSentTransactionOutput> outputs;
+    ZcashAmount fee_amount;
+    sequence<ZcashOutPoint> utxos_spent;
+};
+
+interface MerkleTreeFrontier {};
+
+interface ZcashWalletSummary {
+	constructor(record<string, ZcashAccountBalance> account_balances, ZcashBlockHeight chain_tip_height, ZcashBlockHeight fully_scanned_height, ZcashRatio? scan_progress);
+
+	record<string, ZcashAccountBalance> account_balances();
+
+	ZcashBlockHeight chain_tip_height();
+
+	ZcashBlockHeight fully_scanned_height();
+
+	ZcashRatio? scan_progress();
+
+	boolean is_synced();
+};
+
+interface ZcashRatio {
+	constructor(u64 numerator, u64 denominator);
+
+	u64 numerator();
+	u64 denominator();
+};
+
+interface ZcashAccountBalance {
+	[Name=zero]
+	constructor();
+
+	ZcashNonNegativeAmount total();
+	ZcashNonNegativeAmount sapling_spendable_value();
+	ZcashNonNegativeAmount unshielded();
+};
+
+interface ZcashBlockMetadata {
+	[Name=from_parts]
+	constructor(ZcashBlockHeight block_height, ZcashBlockHash block_hash, u32 sapling_tree_size);
+
+	ZcashBlockHeight block_height();
+	ZcashBlockHash block_hash();
+	u32 sapling_tree_size();
+};
+
+interface MerkleTreeRetention {};
+
+dictionary TripleSaplingNullifierMap {
+	ZcashTxId txid;
+    u16 tx_idx;
+    sequence<ZcashSaplingNullifier> nullifiers;
+};
+
+dictionary TupleSaplingCommitments {
+	ZcashSaplingNode node;
+	MerkleTreeRetention retention;
+};
+
+interface ZcashScannedBlock {
+	[Name=from_parts]
+	constructor(ZcashBlockMetadata metadata, u32 block_time, sequence<ZcashWalletTx> transactions, sequence<TripleSaplingNullifierMap> sapling_nullifier_map, sequence<TupleSaplingCommitments> sapling_commitments);
+
+	ZcashBlockHeight height();
+	ZcashBlockHash block_hash();
+	u32 block_time();
+	ZcashBlockMetadata metadata();
+	sequence<ZcashWalletTx> transactions();
+	sequence<TripleSaplingNullifierMap> sapling_nullifier_map();
+	sequence<TupleSaplingCommitments> sapling_commitments();
+};
+
+[Enum]
+interface ZcashPoolType {
+    /// The transparent value pool
+    Transparent();
+    /// A shielded value pool.
+    Shielded(ZcashShieldedProtocol v);
+};
+
+[Enum]
+interface ZcashRecipient {
+    Transparent(sequence<u8> script);
+    Sapling(sequence<u8> payment_address_bytes);
+    Unified(string uae, ZcashConsensusParameters params, ZcashPoolType zpt);
+    InternalAccount(ZcashAccountId aid, ZcashPoolType zpt);
+};
+
+dictionary TupleAccountIdAndSaplingNote {
+    ZcashAccountId account_id;
+    ZcashSaplingNote sapling_note;
+};
+
+interface ZcashSentTransactionOutput {
+	[Name=from_parts]
+	constructor(
+        u32 output_index,
+        ZcashRecipient recipient,
+        ZcashAmount value,
+        ZcashMemoBytes? memo,
+        TupleAccountIdAndSaplingNote? sapling_change_to
+    );
+    u32 output_index();
+    ZcashRecipient recipient();
+    ZcashAmount value();
+    ZcashMemoBytes? memo();
+    TupleAccountIdAndSaplingNote? sapling_change_to();
+};
+
+interface ZcashAccountBirthday {
+	[Name=from_treestate, Throws=ZcashError]
+	constructor(ZcashTreeState treestate, ZcashBlockHeight? recover_until);
+
+    MerkleTreeFrontier sapling_frontier();
+    ZcashBlockHeight height();
+    ZcashBlockHeight? recover_until();
+};

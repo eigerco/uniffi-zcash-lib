@@ -1,6 +1,6 @@
 dictionary ZcashPayment {
-  ZcashRecipientAddress recipent_address;
-  i64 amount;
+  ZcashRecipientAddress recipient_address;
+  ZcashAmount amount;
   ZcashMemoBytes? memo;
   string? label;
   string? message;

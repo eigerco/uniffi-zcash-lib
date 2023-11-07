@@ -1,0 +1,6 @@
+
+interface ZcashBlockMeta {
+	constructor(ZcashBlockHeight height, ZcashBlockHash block_hash, u32 block_time, u32 sapling_outputs_count, u32 orchard_actions_count);
+
+	string block_file_path(string blocks_dir);
+};

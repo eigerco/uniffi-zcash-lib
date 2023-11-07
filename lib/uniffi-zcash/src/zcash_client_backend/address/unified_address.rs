@@ -8,7 +8,7 @@ use crate::{
 };
 
 /// A Unified Address.
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct ZcashUnifiedAddress(UnifiedAddress);
 
 impl From<UnifiedAddress> for ZcashUnifiedAddress {

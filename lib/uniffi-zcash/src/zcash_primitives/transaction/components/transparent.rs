@@ -1,11 +1,13 @@
 use std::sync::Arc;
 
 use zcash_primitives::transaction::components::{
-    transparent::{Authorized, Bundle, TxIn}, OutPoint, TxOut,
+    transparent::{Authorized, Bundle, TxIn},
+    OutPoint, TxOut,
 };
 
 use crate::{utils::cast_slice, ZcashAmount, ZcashResult, ZcashScript, ZcashTransparentAddress};
 
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ZcashOutPoint(OutPoint);
 
 impl ZcashOutPoint {

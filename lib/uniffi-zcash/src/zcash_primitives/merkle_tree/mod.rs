@@ -1,47 +1,48 @@
 mod incremental_witness;
 use std::sync::Arc;
 
-use zcash_primitives::{merkle_tree::MerklePath, sapling::Node};
+use incrementalmerkletree::MerklePath;
+use zcash_primitives::sapling::Node;
 
 use crate::ZcashSaplingNode;
+const DEPTH: u8 = 32;
 
 pub use self::incremental_witness::*;
 
 mod commitment_tree;
 pub use self::commitment_tree::*;
 
-pub struct ZcashSaplingMerklePath(MerklePath<Node>);
+pub struct ZcashSaplingMerklePath(MerklePath<Node, DEPTH>);
 
 impl ZcashSaplingMerklePath {
     pub fn auth_path(&self) -> Vec<ZcashAuthPath> {
         self.0
-            .auth_path
+            .path_elems()
             .iter()
-            .map(|(node, bool)| ZcashAuthPath {
+            .map(|node| ZcashAuthPath {
                 node: Arc::new((*node).into()),
-                bool: *bool,
             })
             .collect()
     }
 
     pub fn position(&self) -> u64 {
-        self.0.position
+        self.0.position().into()
     }
 }
 
-impl From<MerklePath<Node>> for ZcashSaplingMerklePath {
-    fn from(inner: MerklePath<Node>) -> Self {
+impl From<MerklePath<Node, DEPTH>> for ZcashSaplingMerklePath {
+    fn from(inner: MerklePath<Node, DEPTH>) -> Self {
         ZcashSaplingMerklePath(inner)
     }
 }
 
-impl From<ZcashSaplingMerklePath> for MerklePath<Node> {
+impl From<ZcashSaplingMerklePath> for MerklePath<Node, DEPTH> {
     fn from(value: ZcashSaplingMerklePath) -> Self {
         value.0
     }
 }
 
-impl From<&ZcashSaplingMerklePath> for MerklePath<Node> {
+impl From<&ZcashSaplingMerklePath> for MerklePath<Node, DEPTH> {
     fn from(value: &ZcashSaplingMerklePath) -> Self {
         value.0.clone()
     }
@@ -49,5 +50,5 @@ impl From<&ZcashSaplingMerklePath> for MerklePath<Node> {
 
 pub struct ZcashAuthPath {
     pub node: Arc<ZcashSaplingNode>,
-    pub bool: bool,
+    // pub bool: bool,
 }

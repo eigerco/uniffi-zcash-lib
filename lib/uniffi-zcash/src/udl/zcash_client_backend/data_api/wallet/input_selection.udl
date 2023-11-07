@@ -1,0 +1,8 @@
+
+interface ZcashMainGreedyInputSelector {
+	constructor(ZcashFixedSingleOutputChangeStrategy change_strategy, ZcashDustOutputPolicy dust_output_policy);
+};
+
+interface ZcashTestGreedyInputSelector {
+	constructor(ZcashFixedSingleOutputChangeStrategy change_strategy, ZcashDustOutputPolicy dust_output_policy);
+};

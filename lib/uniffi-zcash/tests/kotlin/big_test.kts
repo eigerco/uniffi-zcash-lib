@@ -1708,14 +1708,6 @@ fun testSaplingIvkToRepr() {
 }
 testSaplingIvkToRepr()
 
-
-// todo after transaction PRs are merged
-
-
-// todo after transaction PRs are merged
-
-
-
 fun testDiversifierIndexNew() {
     val index = ZcashDiversifierIndex()
 
@@ -1890,7 +1882,7 @@ class TransactionBuilderTest(supp: TestSupport) {
 
         val address = key.transparent().toAccountPubkey().deriveExternalIvk().deriveAddress(0u)
 
-        val prevCoin = ZcashTxOut(ZcashAmount(1200), address.script())
+        val prevCoin = ZcashTxOut(ZcashAmount(10200), address.script())
 
         val secretKey = key.transparent().deriveExternalSecretKey(0u)
 
@@ -2080,7 +2072,7 @@ class TransactionExplorationTest(supp: TestSupport) {
         assert(0u == tx.lockTime())
 
         // expiry height
-        assert(2030840u == tx.expiryHeight().value())
+        assert(2030860u == tx.expiryHeight().value())
     }
 
     fun testTransparentBundle(){       
