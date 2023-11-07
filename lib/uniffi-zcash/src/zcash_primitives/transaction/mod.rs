@@ -353,7 +353,8 @@ impl ZcashTxId {
         Ok(data)
     }
 
-    pub fn to_string(&self) -> ZcashResult<String> {
+    // not present in the librustzcash API but useful
+    pub fn to_hex_string(&self) -> ZcashResult<String> {
         let mut data = Vec::with_capacity(32);
         self.0.write(&mut data)?;
         data.reverse();
