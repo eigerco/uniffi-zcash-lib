@@ -11,25 +11,27 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
     // Define paths
     // let config_path = root_dir.join("uniffi-zcash").join("uniffi.toml");
     println!("root dir: {:?}", root_dir);
-    let releases_path = root_dir
-        .join("target")
-        .join("release")
-        .join("libuniffi_zcash.dylib");
 
-    let release_path = root_dir.join("target").join("release");
+    // let release_path = root_dir.join("target").join("release");
 
-    let lsing = Command::new("ls")
-        .arg("-lt")
-        .arg(release_path)
-        .output()
-        .expect("failed to execute process");
+    // let releases_path = release_path.join("libuniffi_zcash.dylib");
 
-    println!("lsing: {:?}", lsing);
+    // Command::new("cargo").arg("build").arg("--release")
+
+    // let lsing = Command::new("ls")
+    //     .arg("-lt")
+    //     .arg(release_path)
+    //     .output()
+    //     .expect("failed to execute process");
+
+    // println!("lsing: {:?}", lsing);
 
     let target_bindings_path = root_dir.join("bindings");
     let shared_libs_dir = root_dir.join("shared_libs");
 
+    // static library
     let linux_shared_lib_path = shared_libs_dir.join(LINUX_SHARED_LIB_NAME);
+    // dynamic library
     let macos_shared_lib_path = shared_libs_dir.join(MACOS_SHARED_LIB_NAME);
 
     // NOTE eliminate if it exists
@@ -48,7 +50,7 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
                     .arg("uniffi-bindgen")
                     .arg("generate")
                     .arg("--library")
-                    .arg(&releases_path)
+                    .arg(&macos_shared_lib_path)
                     // .arg("--config")
                     // .arg(&config_path)
                     .arg("--language")
