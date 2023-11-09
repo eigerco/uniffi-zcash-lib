@@ -11,12 +11,13 @@ use crate::{
 };
 
 pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyhow::Result<()> {
-    // Define paths
-    println!("root dir: {:?}", root_dir);
-
     let release_path = root_dir.join("target").join("release");
 
+    #[cfg(target_os = "macos")]
     let releases_path = release_path.join("libuniffi_zcash.dylib");
+
+    #[cfg(not(target_os = "macos"))]
+    let releases_path = release_path.join("libuniffi_zcash.so");
 
     // NOTE if shared_libs_dir is used, there will be some weird metadata errors
     println!("Building release for the dylib...");
@@ -25,14 +26,6 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
         .arg("--release")
         .spawn()?
         .wait()?;
-
-    let ls_cmd = Command::new("ls")
-        .arg("-lt")
-        .arg(release_path)
-        .output()
-        .expect("failed to execute process");
-
-    println!("ls command for target/release: {:?}", ls_cmd);
 
     let target_bindings_path = root_dir.join("bindings");
 
