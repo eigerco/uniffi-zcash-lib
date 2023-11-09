@@ -11,21 +11,13 @@ use crate::{
 };
 
 pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyhow::Result<()> {
-    let release_path = root_dir.join("target").join("release");
-
-    #[cfg(target_os = "macos")]
-    let releases_path = release_path.join("libuniffi_zcash.dylib");
-
-    #[cfg(not(target_os = "macos"))]
-    let releases_path = release_path.join("libuniffi_zcash.so");
-
     // NOTE if shared_libs_dir is used, there will be some weird metadata errors
-    println!("Building release for the dylib...");
-    Command::new("cargo")
-        .arg("build")
-        .arg("--release")
-        .spawn()?
-        .wait()?;
+    // println!("Building release for the dylib...");
+    // Command::new("cargo")
+    //     .arg("build")
+    //     .arg("--release")
+    //     .spawn()?
+    //     .wait()?;
 
     let target_bindings_path = root_dir.join("bindings");
 
@@ -39,7 +31,7 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
         .try_for_each(|lang| {
             println!("Generating language bindings for {}", lang);
 
-            let command = generate_binding(&releases_path, lang, &target_bindings_path);
+            let command = generate_binding(root_dir, lang, &target_bindings_path);
 
             cmd_success(command)?;
 
@@ -59,11 +51,18 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
 }
 
 fn generate_binding(
-    releases_path: &Path,
+    root_dir: &Path,
     lang: &str,
     target_bindings_path: &Path,
 ) -> Result<ExitStatus, std::io::Error> {
     // let config_path = root_dir.join("uniffi-zcash").join("uniffi.toml");
+
+    #[cfg(target_os = "macos")]
+    let releases_path = root_dir.join("shared_libs").join("libuniffi_zcash.dylib");
+    // let releases_path = root_dir.join("target").join("release").join("libuniffi_zcash.dylib");
+
+    #[cfg(not(target_os = "macos"))]
+    let releases_path = root_dir.join("shared_libs").join("libuniffi_zcash.so");
 
     Command::new("cargo")
         .arg("run")
