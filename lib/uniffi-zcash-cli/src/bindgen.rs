@@ -11,33 +11,21 @@ use crate::{
 };
 
 pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyhow::Result<()> {
-    // NOTE if shared_libs_dir is used, there will be some weird metadata errors
-    // println!("Building release for the dylib...");
-    // Command::new("cargo")
-    //     .arg("build")
-    //     .arg("--release")
-    //     .spawn()?
-    //     .wait()?;
-
-    let target_bindings_path = root_dir.join("bindings");
-
     // eliminate directory if it exists already
-    // fs_extra::dir::remove(&target_bindings_path)?;
+    fs_extra::dir::remove(&root_dir.join("bindings"))?;
 
-    println!("Generating language bindings ...");
+    println!("Generating bindings ...");
     SUPPORTED_LANGUAGES
         .into_iter()
         .filter(|sl| enabled_languages.contains(&sl.to_string()))
         .try_for_each(|lang| {
             println!("Generating language bindings for {}", lang);
 
-            let command = generate_binding(root_dir, lang, &target_bindings_path);
+            let lang_binding_path = root_dir.join("bindings").join(lang);
+
+            let command = generate_binding(root_dir, lang, &lang_binding_path);
 
             cmd_success(command)?;
-
-            let lang_binding_path = target_bindings_path.join(lang);
-
-            println!("Copying bindings to proper folder...");
 
             copy_bindings(root_dir, &lang_binding_path)?;
 
@@ -53,13 +41,12 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
 fn generate_binding(
     root_dir: &Path,
     lang: &str,
-    target_bindings_path: &Path,
+    lang_binding_path: &Path,
 ) -> Result<ExitStatus, std::io::Error> {
     // let config_path = root_dir.join("uniffi-zcash").join("uniffi.toml");
 
     #[cfg(target_os = "macos")]
     let releases_path = root_dir.join("shared_libs").join("libuniffi_zcash.dylib");
-    // let releases_path = root_dir.join("target").join("release").join("libuniffi_zcash.dylib");
 
     #[cfg(not(target_os = "macos"))]
     let releases_path = root_dir.join("shared_libs").join("libuniffi_zcash.so");
@@ -76,12 +63,14 @@ fn generate_binding(
         .arg("--language")
         .arg(lang)
         .arg("--out-dir")
-        .arg(target_bindings_path.join(lang))
+        .arg(lang_binding_path)
         .spawn()?
         .wait()
 }
 
 fn copy_bindings(root_dir: &Path, shared_lib_dest_path: &Path) -> Result<(), anyhow::Error> {
+    println!("Copying bindings to proper folder...");
+
     let shared_libs_dir = root_dir.join("shared_libs");
 
     let linux_shared_lib_path = shared_libs_dir.join(LINUX_SHARED_LIB_NAME);
