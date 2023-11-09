@@ -141,17 +141,21 @@ fn kotlin_binding_generation(root_dir: &Path, bindings_dir: &Path) -> Result<(),
     file::move_file(
         bindings_dir.join(LINUX_SHARED_LIB_NAME),
         inner_dir.join(LINUX_SHARED_LIB_NAME),
-        &CopyOptions::default()
+        &CopyOptions::default(),
     )?;
 
     file::move_file(
         bindings_dir.join(MACOS_SHARED_LIB_NAME),
         inner_dir.join(MACOS_SHARED_LIB_NAME),
-        &CopyOptions::default()
+        &CopyOptions::default(),
     )?;
 
     // Copying over java native library
-    file::copy(root_dir.join("jna.jar"), inner_dir.join("jna.jar"), &CopyOptions::default())?;
+    file::copy(
+        root_dir.join("jna.jar"),
+        inner_dir.join("jna.jar"),
+        &CopyOptions::default(),
+    )?;
 
     Ok(())
 }
