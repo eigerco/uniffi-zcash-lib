@@ -34,7 +34,7 @@ pub fn install_zig_build() -> anyhow::Result<()> {
     )
 }
 
-const MACOS_SDK_VERSION: &str = "MacOSX11.3";
+const MACOS_SDK_VERSION: &str = "11.3";
 const MACOS_SDK_SHA256_SUM: &str =
     "cd4f08a75577145b8f05245a2975f7c81401d75e9535dcffbb879ee1deefcbf4";
 
@@ -52,8 +52,8 @@ pub fn install_macos_sdk() -> anyhow::Result<()> {
     cmd_success(
         Command::new("wget")
             .arg(format!(
-                "https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/{}.sdk.tar.xz",
-                MACOS_SDK_VERSION
+                "https://github.com/phracker/MacOSX-SDKs/releases/download/{}/MacOSX{}.sdk.tar.xz",
+                MACOS_SDK_VERSION, MACOS_SDK_VERSION
             ))
             .current_dir(&apple_sdk_install_path)
             .spawn()?
@@ -75,7 +75,7 @@ pub fn install_macos_sdk() -> anyhow::Result<()> {
         Command::new("tar")
             .arg("-J")
             .arg("-xf")
-            .arg("MacOSX11.3.sdk.tar.xz")
+            .arg(format!("MacOSX{}.sdk.tar.xz", MACOS_SDK_VERSION))
             .current_dir(&apple_sdk_install_path)
             .spawn()?
             .wait(),
@@ -87,11 +87,11 @@ pub fn macos_sdk_install_path() -> PathBuf {
 }
 
 pub fn macos_sdk_require_path() -> PathBuf {
-    macos_sdk_install_path().join(format!("{}.sdk", MACOS_SDK_VERSION))
+    macos_sdk_install_path().join(format!("MacOSX{}.sdk", MACOS_SDK_VERSION))
 }
 
 pub fn macos_sdk_tar_path() -> PathBuf {
-    macos_sdk_install_path().join(format!("{}.sdk.tar.xz", MACOS_SDK_VERSION))
+    macos_sdk_install_path().join(format!("MacOSX{}.sdk.tar.xz", MACOS_SDK_VERSION))
 }
 
 pub fn home_dir() -> anyhow::Result<PathBuf> {

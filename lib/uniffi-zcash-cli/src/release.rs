@@ -304,11 +304,14 @@ pub fn swift(cfg: &SwiftConfig) -> anyhow::Result<()> {
         .write(true)
         .truncate(true)
         .open(cfg.package_dir.join("processing_at.txt"))?;
+
     pointer.write_all(tmp_package_dir.to_str().unwrap().as_bytes())?;
 
     let package_subfolder = tmp_package_dir.join("Zcash");
 
     dir::create_all(&package_subfolder, false)?;
+
+    println!("git_repo_url: {}", cfg.git_repo_url);
 
     cmd_success(
         Command::new("git")
@@ -389,7 +392,6 @@ pub fn swift(cfg: &SwiftConfig) -> anyhow::Result<()> {
     )?;
 
     // Execute the test app for testing all generated stuff.
-    println!("Executing the test app...");
     let test_app_path = tmp_folder()?;
 
     // Also, copy the shared lib to the root of testing app,
@@ -411,8 +413,6 @@ pub fn swift(cfg: &SwiftConfig) -> anyhow::Result<()> {
     )?;
 
     // Use the previously generated git package for testing against.
-
-    println!("Use the previously generated git package for testing...");
 
     let data = &json!({ "version": cfg.version, "git_repo_path": &package_subfolder});
     in_file_template_replace(test_app_path.join("Package.swift"), data)?;

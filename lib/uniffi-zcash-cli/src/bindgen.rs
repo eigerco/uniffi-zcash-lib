@@ -12,7 +12,7 @@ use crate::{
 
 pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyhow::Result<()> {
     // eliminate directory if it exists already
-    fs_extra::dir::remove(&root_dir.join("bindings"))?;
+    fs_extra::dir::remove(root_dir.join("bindings"))?;
 
     println!("Generating bindings ...");
     SUPPORTED_LANGUAGES
