@@ -26,6 +26,14 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
         .spawn()?
         .wait()?;
 
+    let ls_cmd = Command::new("ls")
+        .arg("-lt")
+        .arg(release_path)
+        .output()
+        .expect("failed to execute process");
+
+    println!("ls command for target/release: {:?}", ls_cmd);
+
     let target_bindings_path = root_dir.join("bindings");
 
     // eliminate directory if it exists already
@@ -42,17 +50,15 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
 
             cmd_success(command)?;
 
-            let shared_lib_dest_path = target_bindings_path.join(lang);
+            let lang_binding_path = target_bindings_path.join(lang);
 
             println!("Copying bindings to proper folder...");
 
-            copy_bindings(root_dir, &shared_lib_dest_path)?;
-
-            let bindings_dir = target_bindings_path.join(lang);
+            copy_bindings(root_dir, &lang_binding_path)?;
 
             match lang {
-                KOTLIN => kotlin_binding_generation(root_dir, &bindings_dir),
-                SWIFT => swift_binding_generation(&bindings_dir),
+                KOTLIN => kotlin_binding_generation(root_dir, &lang_binding_path),
+                SWIFT => swift_binding_generation(&lang_binding_path),
                 RUBY | PYTHON => Ok(()),
                 &_ => panic!("Unrecognized language (programming error). A language was added to supported list, but has no support in code !"),
             }
