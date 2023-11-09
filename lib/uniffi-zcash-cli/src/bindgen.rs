@@ -1,4 +1,7 @@
-use std::{path::Path, process::Command};
+use std::{
+    path::Path,
+    process::{Command, ExitStatus},
+};
 
 use fs_extra::file::{self, CopyOptions};
 
@@ -9,33 +12,24 @@ use crate::{
 
 pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyhow::Result<()> {
     // Define paths
-    // let config_path = root_dir.join("uniffi-zcash").join("uniffi.toml");
     println!("root dir: {:?}", root_dir);
 
-    // let release_path = root_dir.join("target").join("release");
+    let release_path = root_dir.join("target").join("release");
 
-    // let releases_path = release_path.join("libuniffi_zcash.dylib");
+    let releases_path = release_path.join("libuniffi_zcash.dylib");
 
-    // Command::new("cargo").arg("build").arg("--release")
-
-    // let lsing = Command::new("ls")
-    //     .arg("-lt")
-    //     .arg(release_path)
-    //     .output()
-    //     .expect("failed to execute process");
-
-    // println!("lsing: {:?}", lsing);
+    // NOTE if shared_libs_dir is used, there will be some weird metadata errors
+    println!("Building release for the dylib...");
+    Command::new("cargo")
+        .arg("build")
+        .arg("--release")
+        .spawn()?
+        .wait()?;
 
     let target_bindings_path = root_dir.join("bindings");
-    let shared_libs_dir = root_dir.join("shared_libs");
 
-    // static library
-    let linux_shared_lib_path = shared_libs_dir.join(LINUX_SHARED_LIB_NAME);
-    // dynamic library
-    let macos_shared_lib_path = shared_libs_dir.join(MACOS_SHARED_LIB_NAME);
-
-    // NOTE eliminate if it exists
-    // dir::remove(&target_bindings_path)?;
+    // eliminate directory if it exists already
+    // fs_extra::dir::remove(&target_bindings_path)?;
 
     println!("Generating language bindings ...");
     SUPPORTED_LANGUAGES
@@ -44,81 +38,120 @@ pub fn generate_bindings(root_dir: &Path, enabled_languages: &[String]) -> anyho
         .try_for_each(|lang| {
             println!("Generating language bindings for {}", lang);
 
-            let command = Command::new("cargo")
-                    .arg("run")
-                    .arg("--bin")
-                    .arg("uniffi-bindgen")
-                    .arg("generate")
-                    .arg("--library")
-                    .arg(&macos_shared_lib_path)
-                    // .arg("--config")
-                    // .arg(&config_path)
-                    .arg("--language")
-                    .arg(lang)
-                    .arg("--out-dir")
-                    .arg(target_bindings_path.join(lang))
-                    .spawn()?
-                    .wait();
+            let command = generate_binding(&releases_path, lang, &target_bindings_path);
 
             cmd_success(command)?;
 
             let shared_lib_dest_path = target_bindings_path.join(lang);
-            println!("Generating swift module ...");
 
-            file::copy(&linux_shared_lib_path, shared_lib_dest_path.join(LINUX_SHARED_LIB_NAME), &CopyOptions::default())?;
-            file::copy(&macos_shared_lib_path, shared_lib_dest_path.join(MACOS_SHARED_LIB_NAME), &CopyOptions::default())?;
+            println!("Copying bindings to proper folder...");
+
+            copy_bindings(root_dir, &shared_lib_dest_path)?;
 
             let bindings_dir = target_bindings_path.join(lang);
 
-            // Language specific build stuff
             match lang {
-                PYTHON => Ok(()),
-                KOTLIN => {
-                    let inner_dir = bindings_dir.join("uniffi").join("zcash");
-                    file::move_file(
-                        bindings_dir.join(LINUX_SHARED_LIB_NAME),
-                        inner_dir.join(LINUX_SHARED_LIB_NAME),
-                        &CopyOptions::default()
-                    )?;
-                    file::move_file(
-                        bindings_dir.join(MACOS_SHARED_LIB_NAME),
-                        inner_dir.join(MACOS_SHARED_LIB_NAME),
-                        &CopyOptions::default()
-                    )?;
-                    file::copy(root_dir.join("jna.jar"), inner_dir.join("jna.jar"), &CopyOptions::default())?;
-                    Ok(())
-                }
-                SWIFT => {
-                    println!("Generating swift module ...");
-                    // We are generating this module for completion, but we are probably not going
-                    // to use it. See https://mozilla.github.io/uniffi-rs/swift/module.html
-                    cmd_success(
-                        Command::new("swiftc")
-                            .arg("-v")
-                            .arg("-module-name")
-                            .arg("zcash")
-                            .arg("-emit-library")
-                            .arg("-o")
-                            .arg(bindings_dir.join("libuniffi_zcash_swift_module.dylib"))
-                            .arg("-emit-module")
-                            .arg("-emit-module-path")
-                            .arg(&bindings_dir)
-                            .arg("-L")
-                            .arg(&bindings_dir)
-                            .arg(format!("-l{}", "uniffi_zcash"))
-                            .arg("-Xcc")
-                            .arg(format!(
-                                "-fmodule-map-file={}",
-                                bindings_dir.join("zcashFFI.modulemap").to_string_lossy() // Should not contain no unicode chars.
-                            ))
-                            .arg(bindings_dir.join("zcash.swift"))
-                            .spawn()?
-                            .wait(),
-                    )?;
-                    Ok(())
-                }
-                RUBY => Ok(()),
+                KOTLIN => kotlin_binding_generation(root_dir, &bindings_dir),
+                SWIFT => swift_binding_generation(&bindings_dir),
+                RUBY | PYTHON => Ok(()),
                 &_ => panic!("Unrecognized language (programming error). A language was added to supported list, but has no support in code !"),
             }
         })
+}
+
+fn generate_binding(
+    releases_path: &Path,
+    lang: &str,
+    target_bindings_path: &Path,
+) -> Result<ExitStatus, std::io::Error> {
+    // let config_path = root_dir.join("uniffi-zcash").join("uniffi.toml");
+
+    Command::new("cargo")
+        .arg("run")
+        .arg("--bin")
+        .arg("uniffi-bindgen")
+        .arg("generate")
+        .arg("--library")
+        .arg(releases_path)
+        // .arg("--config")
+        // .arg(&config_path)
+        .arg("--language")
+        .arg(lang)
+        .arg("--out-dir")
+        .arg(target_bindings_path.join(lang))
+        .spawn()?
+        .wait()
+}
+
+fn copy_bindings(root_dir: &Path, shared_lib_dest_path: &Path) -> Result<(), anyhow::Error> {
+    let shared_libs_dir = root_dir.join("shared_libs");
+
+    let linux_shared_lib_path = shared_libs_dir.join(LINUX_SHARED_LIB_NAME);
+    file::copy(
+        linux_shared_lib_path,
+        shared_lib_dest_path.join(LINUX_SHARED_LIB_NAME),
+        &CopyOptions::default(),
+    )?;
+
+    let macos_shared_lib_path = shared_libs_dir.join(MACOS_SHARED_LIB_NAME);
+    file::copy(
+        macos_shared_lib_path,
+        shared_lib_dest_path.join(MACOS_SHARED_LIB_NAME),
+        &CopyOptions::default(),
+    )?;
+
+    Ok(())
+}
+
+// We are generating this module for the sake of a complete implementation, but we are probably not going
+// to use it. See https://mozilla.github.io/uniffi-rs/swift/module.html
+fn swift_binding_generation(bindings_dir: &Path) -> Result<(), anyhow::Error> {
+    println!("Generating swift module ...");
+
+    cmd_success(
+        Command::new("swiftc")
+            .arg("-v")
+            .arg("-module-name")
+            .arg("zcash")
+            .arg("-emit-library")
+            .arg("-o")
+            .arg(bindings_dir.join("libuniffi_zcash_swift_module.dylib"))
+            .arg("-emit-module")
+            .arg("-emit-module-path")
+            .arg(bindings_dir)
+            .arg("-L")
+            .arg(bindings_dir)
+            .arg(format!("-l{}", "uniffi_zcash"))
+            .arg("-Xcc")
+            .arg(format!(
+                "-fmodule-map-file={}",
+                bindings_dir.join("zcashFFI.modulemap").to_string_lossy() // Should not contain no unicode chars.
+            ))
+            .arg(bindings_dir.join("zcash.swift"))
+            .spawn()?
+            .wait(),
+    )?;
+
+    Ok(())
+}
+
+fn kotlin_binding_generation(root_dir: &Path, bindings_dir: &Path) -> Result<(), anyhow::Error> {
+    let inner_dir = bindings_dir.join("uniffi").join("zcash");
+
+    file::move_file(
+        bindings_dir.join(LINUX_SHARED_LIB_NAME),
+        inner_dir.join(LINUX_SHARED_LIB_NAME),
+        &CopyOptions::default()
+    )?;
+
+    file::move_file(
+        bindings_dir.join(MACOS_SHARED_LIB_NAME),
+        inner_dir.join(MACOS_SHARED_LIB_NAME),
+        &CopyOptions::default()
+    )?;
+
+    // Copying over java native library
+    file::copy(root_dir.join("jna.jar"), inner_dir.join("jna.jar"), &CopyOptions::default())?;
+
+    Ok(())
 }
