@@ -389,12 +389,15 @@ pub fn swift(cfg: &SwiftConfig) -> anyhow::Result<()> {
     )?;
 
     // Execute the test app for testing all generated stuff.
+    println!("Executing the test app...");
     let test_app_path = tmp_folder()?;
 
     // Also, copy the shared lib to the root of testing app,
     // so it can be located by search rules.
     // This is needed, as the MacOS integrity protection
-    // wipes out all the DYLD_* env vars. See https://developer.apple.com/library/prerelease/mac/documentation/Security/Conceptual/System_Integrity_Protection_Guide/RuntimeProtections/RuntimeProtections.html
+    // wipes out all the DYLD_* env vars.
+    // See https://developer.apple.com/library/prerelease/mac/documentation/Security/Conceptual/System_Integrity_Protection_Guide/RuntimeProtections/RuntimeProtections.html
+
     file::copy(
         cfg.bindings_dir.join(MACOS_SHARED_LIB_NAME),
         test_app_path.join(MACOS_SHARED_LIB_NAME),
@@ -408,6 +411,9 @@ pub fn swift(cfg: &SwiftConfig) -> anyhow::Result<()> {
     )?;
 
     // Use the previously generated git package for testing against.
+
+    println!("Use the previously generated git package for testing...");
+
     let data = &json!({ "version": cfg.version, "git_repo_path": &package_subfolder});
     in_file_template_replace(test_app_path.join("Package.swift"), data)?;
 
