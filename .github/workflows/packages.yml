@@ -54,7 +54,7 @@ jobs:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
 
-      - name: Set up cargo cache
+      - name: Set up Python cargo cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
@@ -94,7 +94,7 @@ jobs:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
 
-      - name: Set up cargo cache
+      - name: Set up Ruby cargo cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
@@ -139,7 +139,7 @@ jobs:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
 
-      - name: Set up cargo cache
+      - name: Set up Kotlin cargo cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
@@ -183,7 +183,7 @@ jobs:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
 
-      - name: Set up cargo cache
+      - name: Set up Swift cargo cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
@@ -193,7 +193,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          key: 2-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
       - name: Swift package generation
