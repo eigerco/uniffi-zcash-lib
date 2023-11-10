@@ -49,7 +49,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download bindgen artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
@@ -73,7 +73,7 @@ jobs:
 
       - name: Save artifacts for Python package
         if: ${{ inputs.save-artifacts }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-python-data-${{ github.run_number }}
           path: lib/packages/python
@@ -89,7 +89,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download bindgen artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
@@ -118,7 +118,7 @@ jobs:
 
       - name: Save artifacts for Ruby package
         if: ${{ inputs.save-artifacts }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-ruby-data-${{ github.run_number }}
           path: lib/packages/ruby
@@ -134,7 +134,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download bindgen artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
@@ -162,7 +162,7 @@ jobs:
 
       - name: Save artifacts for Kotlin package
         if: ${{ inputs.save-artifacts }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-kotlin-data-${{ github.run_number }}
           path: lib/packages/kotlin
@@ -178,7 +178,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Download bindgen artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
@@ -207,7 +207,7 @@ jobs:
 
       - name: Save artifacts package pointer file for Swift package
         if: ${{ inputs.save-artifacts }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-swift-pointer-data-${{ github.run_number }}
           path: |
@@ -216,7 +216,7 @@ jobs:
 
       - name: Save artifacts package for Swift package
         if: ${{ inputs.save-artifacts }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-swift-package-data-${{ github.run_number }}
           path: |
