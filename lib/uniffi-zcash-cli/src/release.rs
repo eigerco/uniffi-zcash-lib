@@ -1,4 +1,4 @@
-use std::{fs::OpenOptions, io::Write, ops::Add, path::PathBuf, process::Command};
+use std::{env, fs::OpenOptions, io::Write, ops::Add, path::PathBuf, process::Command};
 
 use fs_extra::{
     dir::{self, CopyOptions},
@@ -216,22 +216,20 @@ pub fn kotlin(cfg: &KotlinConfig) -> anyhow::Result<()> {
 
     // Copy all needed files from previously generated bindings operation
     let bindings_code = cfg.bindings_dir.join("uniffi").join("zcash");
+    let libs_dir = cfg.package_dir.join("lib").join("libs");
+
     file::copy(
         bindings_code.join(LINUX_SHARED_LIB_NAME),
-        cfg.package_dir
-            .join("lib")
-            .join("libs")
-            .join(LINUX_SHARED_LIB_NAME),
+        libs_dir.join(LINUX_SHARED_LIB_NAME),
         &file::CopyOptions::default(),
     )?;
+
     file::copy(
         bindings_code.join(MACOS_SHARED_LIB_NAME),
-        cfg.package_dir
-            .join("lib")
-            .join("libs")
-            .join(MACOS_SHARED_LIB_NAME),
+        libs_dir.join(MACOS_SHARED_LIB_NAME),
         &file::CopyOptions::default(),
     )?;
+
     file::copy(
         bindings_code.join("zcash.kt"),
         cfg.package_dir
@@ -294,7 +292,7 @@ pub fn swift(cfg: &SwiftConfig) -> anyhow::Result<()> {
 
     // Generate a /tmp subfolder , so git does not have problems git the parent
     // project repository. From here all operations will be done in that folder.
-    let tmp_package_dir = std::env::temp_dir().join("zcash_uniffi_swift_package_build");
+    let tmp_package_dir = env::temp_dir().join("zcash_uniffi_swift_package_build");
     clean_dir(&tmp_package_dir)?;
 
     // We will leave a pointer (a text file) to properly signalize we are operating
@@ -328,31 +326,28 @@ pub fn swift(cfg: &SwiftConfig) -> anyhow::Result<()> {
         &CopyOptions::new().overwrite(true).content_only(true),
     )?;
 
+    let generated_shared_lib_path = package_subfolder.join("Sources").join("zcashFFI");
+
     // Copy all needed files from previously generated bindings operation
+
     file::copy(
         cfg.bindings_dir.join(LINUX_SHARED_LIB_NAME),
-        package_subfolder
-            .join("Sources")
-            .join("zcashFFI")
-            .join(LINUX_SHARED_LIB_NAME),
+        generated_shared_lib_path.join(LINUX_SHARED_LIB_NAME),
         &file::CopyOptions::default(),
     )?;
+
     file::copy(
         cfg.bindings_dir.join(MACOS_SHARED_LIB_NAME),
-        package_subfolder
-            .join("Sources")
-            .join("zcashFFI")
-            .join(MACOS_SHARED_LIB_NAME),
+        generated_shared_lib_path.join(MACOS_SHARED_LIB_NAME),
         &file::CopyOptions::default(),
     )?;
+
     file::copy(
         cfg.bindings_dir.join("zcashFFI.h"),
-        package_subfolder
-            .join("Sources")
-            .join("zcashFFI")
-            .join("uniffi_zcash.h"),
+        generated_shared_lib_path.join("uniffi_zcash.h"),
         &file::CopyOptions::default(),
     )?;
+
     file::copy(
         cfg.bindings_dir.join("zcash.swift"),
         package_subfolder
@@ -362,22 +357,16 @@ pub fn swift(cfg: &SwiftConfig) -> anyhow::Result<()> {
         &file::CopyOptions::default(),
     )?;
 
+    env::set_current_dir(&package_subfolder)?;
+
     // Commit and tag the version
-    cmd_success(
-        Command::new("git")
-            .arg("add")
-            .arg(".")
-            .current_dir(&package_subfolder)
-            .spawn()?
-            .wait(),
-    )?;
+    cmd_success(Command::new("git").arg("add").arg(".").spawn()?.wait())?;
 
     cmd_success(
         Command::new("git")
             .arg("commit")
             .arg("-m")
             .arg(format!("Version {}", &cfg.version))
-            .current_dir(&package_subfolder)
             .spawn()?
             .wait(),
     )?;
@@ -386,7 +375,6 @@ pub fn swift(cfg: &SwiftConfig) -> anyhow::Result<()> {
         Command::new("git")
             .arg("tag")
             .arg(&cfg.version)
-            .current_dir(&package_subfolder)
             .spawn()?
             .wait(),
     )?;
@@ -417,7 +405,6 @@ pub fn swift(cfg: &SwiftConfig) -> anyhow::Result<()> {
     let data = &json!({ "version": cfg.version, "git_repo_path": &package_subfolder});
     in_file_template_replace(test_app_path.join("Package.swift"), data)?;
 
-    let generated_shared_lib_path = package_subfolder.join("Sources").join("zcashFFI");
     cmd_success(
         Command::new("swift")
             .current_dir(test_app_path)

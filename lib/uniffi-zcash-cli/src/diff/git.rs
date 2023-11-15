@@ -1,7 +1,6 @@
+use crate::helper::cmd_success;
 use std::path::Path;
 use std::process::Command;
-use anyhow::Context;
-// use git2::Repository;
 
 const LIBS_REPO_URL: &str = "https://github.com/zcash/librustzcash.git";
 
@@ -15,12 +14,17 @@ pub(crate) fn init_libs_repo(
 ) -> anyhow::Result<()> {
     let tag = format!("{lib_name}-{version}");
 
-    // open or clone
-    // let repo = Repository::open(repo_path)
-    //     .or_else(|_| Repository::clone(LIBS_REPO_URL, repo_path))
-    //     .context("failed to clone current repo")?;
-    let repo_exists = Command::new("cd").arg(repo_path.join(".git")).spawn().is_ok();
-    if(repo_exists) {
+    if Path::new(&repo_path.join(".git")).is_dir() {
+        std::env::set_current_dir(repo_path)?;
+
+        cmd_success(
+            Command::new("git")
+                .arg("fetch")
+                .arg("--tags")
+                .spawn()?
+                .wait(),
+        )?;
+    } else {
         cmd_success(
             Command::new("git")
                 .arg("clone")
@@ -29,45 +33,17 @@ pub(crate) fn init_libs_repo(
                 .spawn()?
                 .wait(),
         )?;
+
+        std::env::set_current_dir(repo_path)?;
     }
 
-    // checkout_tag(&repo, &tag)?;
-    let revparse_out = Command::new("git").arg("rev-parse").arg(&tag).spawn().map_err(|_| format!("git object \"{}\" not found", tag))?.output();
-    let (object, reference) = parse_args(revparse_out);
-    Command::new("git").arg("checkout").arg(&object)
-
-    match reference {
-        // gref is an actual reference like branches or tags
-        // repo.set_head(gref.name().unwrap()),
-        Some(gref) => Command::new("git").arg("remote").arg("set-head").arg(&gref.name().unwrap()).spawn()?.wait(),
-        // this is a commit, not a reference
-        // repo.set_head_detached(object.id()),                 // does this arg exist???
-        None => Command::new("git").arg("remote").arg("set-head").arg("--detached").arg(&object.id()).spawn()?.wait(),
-    }
+    cmd_success(
+        Command::new("git")
+            .arg("checkout")
+            .arg(&tag)
+            .spawn()?
+            .wait(),
+    )?;
 
     Ok(())
 }
-
-fn parse_args(output: &str) -> (Any, Some(Any)) {
-
-}
-
-// Chckout a certain tag from a given repository
-// fn checkout_tag(repo: &git2::Repository, tag: &str) -> anyhow::Result<()> {
-//     let (object, reference) = repo
-//         .revparse_ext(tag)
-//         .with_context(|| format!("git object \"{}\" not found", tag))?;
-
-//     repo.checkout_tree(&object, None)
-//         .with_context(|| format!("failed to checkout tree for \"{}\"", tag))?;
-
-//     match reference {
-//         // gref is an actual reference like branches or tags
-//         Some(gref) => repo.set_head(gref.name().unwrap()),
-//         // this is a commit, not a reference
-//         None => repo.set_head_detached(object.id()),
-//     }
-//     .with_context(|| format!("failed to set HEAD for \"{}\"", tag))?;
-
-//     Ok(())
-// }
