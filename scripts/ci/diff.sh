@@ -30,10 +30,9 @@ diff() {
 			continue
 		fi
 
-		# this is faster than "cargo outdated", especially in a loop
 		local lib_latest_version
 		lib_latest_version=$(curl --silent "https://crates.io/api/v1/crates/$lib_name" | jq -r '.crate.max_stable_version')
-		# this is faster than "cargo outdated", especially in a loop
+
 		local lib_current_version
 		lib_current_version=$(cargo metadata --format-version=1 -q --manifest-path="$uniffi_cargo_path" |
 			jq -r --arg lib_name "$lib_name" '.packages[] | select(.name == $lib_name) | .version')

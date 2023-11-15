@@ -3,26 +3,39 @@
 # be stricter
 set -eou pipefail
 
-# Use jq to get the outdated libs from the "cargo outdated" JSON string and generate Github issue labels
+# Generate Github issue labels based on outdated librustzcash dependencies
 #
 # Takes the following function args:
-# $1 - "cargo outdated" JSON string
+# $1 - outdated libs separated by ";"
 #
 # Returns:
 # - The labels that are used when searching for or creating a Github issue, in format 'lib_name-current_ver-latest_ver'
 generate_issue_labels() {
-	local outdated_libs_json="$1"
-	if [[ -z "$outdated_libs_json" ]]; then
+	local outdated_libs="$1"
+	if [[ -z "$outdated_libs" ]]; then
 		echo "required parameter for generate_issue_labels() is empty" 1>&2
 		exit 1
 	fi
 
-	# Export ISSUE_LABELS in format - "crate_name-current_version-latest_version;..."
-	local issue_labels
-	issue_labels=$(echo "$outdated_libs_json" |
-		jq -r 'select(.crate_name | startswith("uniffi-") or .=="zcash").dependencies[] | select(.project != .latest) | (.name+"-"+.project+"-"+.latest)' |
-		sort -u |
-		tr '\n' ';')
+	IFS=';' read -ra arr <<<"$outdated_libs"
+	local issue_labels=""
+	for lib_name in "${arr[@]}"; do
+		if [[ -z "$lib_name" ]]; then
+			continue
+		fi
+
+		local lib_latest_version
+		lib_latest_version=$(curl --silent "https://crates.io/api/v1/crates/$lib_name" |
+			jq -r '.crate.max_stable_version')
+
+		local lib_current_version
+		lib_current_version=$(cargo metadata --format-version=1 -q --manifest-path=./uniffi-zcash-lib/lib/Cargo.toml |
+			jq -r ".packages[] | select(.name == \"$lib_name\") | .version")
+
+		if [ "$lib_latest_version" != "$lib_current_version" ] && [ "$lib_current_version" != "" ] && [ "$lib_latest_version" != "" ]; then
+			issue_labels="${issue_labels}${lib_name}-${lib_current_version}-${lib_latest_version};"
+		fi
+	done
 
 	echo "$issue_labels"
 }
