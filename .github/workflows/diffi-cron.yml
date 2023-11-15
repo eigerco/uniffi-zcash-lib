@@ -5,7 +5,7 @@ on:
 
 jobs:
   check_for_public_api_diffs:
-    if: true # <- set this to false to disable the cron job above
+    if: false # <- set this to false to disable the cron job above
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
