@@ -45,7 +45,7 @@ jobs:
           CARGO_TERM_COLOR: always
         run: |
           source ./uniffi-zcash-lib/scripts/ci/libs.sh
-          # outdated_libs_json=$(get_outdated_libs_json "$USED_LIBS" uniffi-zcash-lib/lib/Cargo.toml)
+          outdated_libs_json=$(get_outdated_libs_json "$USED_LIBS" uniffi-zcash-lib/lib/Cargo.toml)
           outdated_libs=$(get_outdated_libs "$USED_LIBS")
           echo "OUTDATED_LIBS=$outdated_libs" >> $GITHUB_ENV
 
