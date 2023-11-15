@@ -22,7 +22,7 @@ jobs:
           path: uniffi-zcash-lib
 
       - name: Install cargo
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@v2
         with:
           profile: minimal
           toolchain: nightly # public-api needs nightly installed so public-api can use rustdoc JSON output
