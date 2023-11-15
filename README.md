@@ -114,7 +114,6 @@ Currently, for `kotlin` documentation, we need to setup some dependencies by:
 $ cargo run -p uniffi-zcash-cli setup builddoc
 ```
 
-<<<<<<< HEAD
 ## Automatic check for `librustzcash` version
 
 There is a tool in the `uniffi-zcash-cli` package, called `diff`, that runs at midnight UTC time every day.
@@ -145,12 +144,12 @@ The steps in the CI job are as follows:
 
 6. Show public API diffs - for easier readability
 
-7. Create workflow summary
+7. Create workflow summary. Shows diffs only if the build is failing.
 
-8. Create issue
+8. Create issue. Created only if the build is failing.
 
-`NOTE:` This tool is currently disabled and can be enabled by removing line 8 in `./github/workflows/diff-cron.yml`.
-=======
+# `NOTE:` This tool is currently disabled and can be enabled by removing line 8 in `./github/workflows/diff-cron.yml`.
+
 ## <a href="contributing"></a> Generating Native files for Android
 
 There are issues of compilation with the Ring package, so we have to use another [crate](https://crates.io/crates/cargo-ndk):
@@ -159,8 +158,6 @@ There are issues of compilation with the Ring package, so we have to use another
 cargo install cargo-ndk
 cargo ndk -t armeabi-v7a -t arm64-v8a -o ./jniLibs build --release
 ```
-
->>>>>>> cd4bd28 (small updates)
 
 ## <a href="contributing"></a> Contributing
 
