@@ -45,13 +45,13 @@ jobs:
           CARGO_TERM_COLOR: always
         run: |
           source ./uniffi-zcash-lib/scripts/ci/libs.sh
-          outdated_libs_json=$(get_outdated_libs_json "$USED_LIBS" uniffi-zcash-lib/lib/Cargo.toml)
+          # outdated_libs_json=$(get_outdated_libs_json "$USED_LIBS" uniffi-zcash-lib/lib/Cargo.toml)
           outdated_libs=$(get_outdated_libs "$USED_LIBS")
           echo "OUTDATED_LIBS=$outdated_libs" >> $GITHUB_ENV
 
           source ./uniffi-zcash-lib/scripts/ci/issue.sh
-          issue_labels=$(generate_issue_labels "$outdated_libs_json")
-          echo "ISSUE_LABELS=$issue_labels" >> $GITHUB_ENV
+          # issue_labels=$(generate_issue_labels "$outdated_libs_json")
+          echo "ISSUE_LABELS=fake-issue_labels" >> $GITHUB_ENV
 
           if [ -z "$outdated_libs" ]; then
             echo "LIBS_UP_TO_DATE=true" >> $GITHUB_ENV
