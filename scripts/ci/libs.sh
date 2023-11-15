@@ -41,16 +41,33 @@ get_libs() {
 # Returns:
 # - outdated uniffi librustzcash dependency where the version is not latest, in format - "crate_name;..."
 get_outdated_libs() {
-	local outdated_libs_json="$1"
-	if [[ -z "$outdated_libs_json" ]]; then
+	local used_libs="$1"
+	if [[ -z "$used_libs" ]]; then
 		echo "required parameter for get_outdated_libs() is empty" 1>&2
 		exit 1
 	fi
 
-	echo "$outdated_libs_json" |
-		jq -r 'select(.crate_name | startswith("uniffi-") or .=="zcash").dependencies[] | select(.project != .latest) | .name' |
-		sort -u |
-		tr '\n' ';'
+	IFS=';' read -ra arr <<<"$used_libs"
+	local outdated_libs=""
+	for lib_name in "${arr[@]}"; do
+		if [[ -z "$lib_name" ]]; then
+			continue
+		fi
+
+		local lib_latest_version
+		lib_latest_version=$(curl --silent "https://crates.io/api/v1/crates/$lib_name" |
+			jq -r '.crate.max_stable_version')
+
+		local lib_current_version
+		lib_current_version=$(cargo metadata --format-version=1 -q --manifest-path=./uniffi-zcash-lib/lib/Cargo.toml |
+			jq -r ".packages[] | select(.name == \"$lib_name\") | .version")
+
+		if [ "$lib_latest_version" != "$lib_current_version" ] && [ "$lib_current_version" != "" ] && [ "$lib_latest_version" != "" ]; then
+			outdated_libs="${outdated_libs}${lib_name};"
+		fi
+	done
+
+	echo "$outdated_libs"
 }
 
 # Get the outdated librustzcash dependecies, used in uniffi-zcash-lib
