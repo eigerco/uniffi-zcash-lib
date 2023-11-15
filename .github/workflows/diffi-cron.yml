@@ -21,11 +21,9 @@ jobs:
           repository: eigerco/uniffi-zcash-lib
           path: uniffi-zcash-lib
 
+      # public-api needs nightly installed so public-api can use rustdoc JSON output
       - name: Install cargo
-        uses: actions-rs/toolchain@v2
-        with:
-          profile: minimal
-          toolchain: nightly # public-api needs nightly installed so public-api can use rustdoc JSON output
+        uses: dtolnay/rust-toolchain@nightly
 
       # caches installed cargo tools
       - uses: Swatinem/rust-cache@v2
