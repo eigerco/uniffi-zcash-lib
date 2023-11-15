@@ -23,7 +23,7 @@ jobs:
         working-directory: ./lib
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Set up cargo cache
         uses: actions/cache@v3
@@ -60,7 +60,7 @@ jobs:
           cargo run -p uniffi-zcash-cli bindgen --languages=${{ secrets.languages }}
 
       - name: Save artifacts for bindgen
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings

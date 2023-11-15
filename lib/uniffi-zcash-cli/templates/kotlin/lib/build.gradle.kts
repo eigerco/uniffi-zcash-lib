@@ -1,5 +1,5 @@
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.8.10"
+    id("org.jetbrains.kotlin.jvm") version "1.9.20"
 
     `java-library`
     // Added the maven-publish plugin
@@ -15,7 +15,7 @@ repositories {
 
 dependencies {
   // Add the JNA. No need to manually include the jar: https://github.com/java-native-access/jna
-  implementation("net.java.dev.jna:jna:5.8.0")
+  implementation("net.java.dev.jna:jna:5.13.0")
 }
 
 java {

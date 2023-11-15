@@ -75,7 +75,7 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-publish
 
       - name: Download python artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-python-data-${{ github.run_number }}
           path: lib/packages/python
@@ -114,7 +114,7 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-publish
 
       - name: Download Ruby artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-ruby-data-${{ github.run_number }}
           path: lib/packages/ruby
@@ -152,7 +152,7 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-publish
 
       - name: Download kotlin artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-kotlin-data-${{ github.run_number }}
           path: lib/packages/kotlin
@@ -191,14 +191,14 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-publish
 
       - name: Download swift package pointer artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-swift-pointer-data-${{ github.run_number }}
           path: |
             lib/packages/swift
 
       - name: Download swift package artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-swift-package-data-${{ github.run_number }}
           path: |
@@ -236,14 +236,14 @@ jobs:
           restore-keys: ${{ runner.os }}-cargo-publish
 
       - name: Download swift package pointer artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-swift-pointer-data-${{ github.run_number }}
           path: |
             lib/packages/swift
 
       - name: Download swift package artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-swift-package-data-${{ github.run_number }}
           path: |

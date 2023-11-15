@@ -5,7 +5,7 @@ on:
 
 jobs:
   check_for_public_api_diffs:
-    if: ${{ false }} // <- Remove this line, to enable and run the job everyday at midnight UTC (cron 0 0 * * *)
+    if: false # <- set this to false to disable the cron job above
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
@@ -21,11 +21,9 @@ jobs:
           repository: eigerco/uniffi-zcash-lib
           path: uniffi-zcash-lib
 
+      # public-api needs nightly installed so public-api can use rustdoc JSON output
       - name: Install cargo
-        uses: actions-rs/toolchain@v1
-        with:
-          profile: minimal
-          toolchain: nightly # public-api needs nightly installed so public-api can use rustdoc JSON output
+        uses: dtolnay/rust-toolchain@nightly
 
       # caches installed cargo tools
       - uses: Swatinem/rust-cache@v2
@@ -47,12 +45,11 @@ jobs:
           CARGO_TERM_COLOR: always
         run: |
           source ./uniffi-zcash-lib/scripts/ci/libs.sh
-          outdated_libs_json=$(get_outdated_libs_json "$USED_LIBS" uniffi-zcash-lib/lib/Cargo.toml)
-          outdated_libs=$(get_outdated_libs "$outdated_libs_json")
+          outdated_libs=$(get_outdated_libs "$USED_LIBS" uniffi-zcash-lib/lib/Cargo.toml)
           echo "OUTDATED_LIBS=$outdated_libs" >> $GITHUB_ENV
 
           source ./uniffi-zcash-lib/scripts/ci/issue.sh
-          issue_labels=$(generate_issue_labels "$outdated_libs_json")
+          issue_labels=$(generate_issue_labels "$outdated_libs")
           echo "ISSUE_LABELS=$issue_labels" >> $GITHUB_ENV
 
           if [ -z "$outdated_libs" ]; then
@@ -158,15 +155,17 @@ jobs:
 
           source ./uniffi-zcash-lib/scripts/ci/print.sh
 
-          diff_job_url=$(get_diff_job_url)
-          print_workflow_diff $OUTDATED_LIBS $diff_job_url >> $GITHUB_STEP_SUMMARY
-
           build_job_url=$(get_build_job_url)
           print_workflow_build_result $BUILD_FAILING $build_job_url >> $GITHUB_STEP_SUMMARY
 
+          if [[ "$BUILD_FAILING" == "true" ]]; then
+            diff_job_url=$(get_diff_job_url)
+            print_workflow_diff $OUTDATED_LIBS $diff_job_url >> $GITHUB_STEP_SUMMARY
+          fi
+
       # Run only if an issue doesnt exist and the build fails
       - name: Create issue
-        if: env.ISSUE_ALREADY_EXISTS == 'false'
+        if: env.ISSUE_ALREADY_EXISTS == 'false' && env.BUILD_FAILING == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

@@ -1,7 +1,6 @@
+use crate::helper::cmd_success;
 use std::path::Path;
-
-use anyhow::Context;
-// use git2::Repository;
+use std::process::Command;
 
 const LIBS_REPO_URL: &str = "https://github.com/zcash/librustzcash.git";
 
@@ -13,32 +12,38 @@ pub(crate) fn init_libs_repo(
     repo_path: &Path,
     version: &str,
 ) -> anyhow::Result<()> {
-    let tag = format!("{}-{}", lib_name, version);
-    // let repo = Repository::open(repo_path)
-    //     .or_else(|_| Repository::clone(LIBS_REPO_URL, repo_path))
-    //     .context("failed to clone current repo")?;
+    let tag = format!("{lib_name}-{version}");
 
-    // checkout_tag(&repo, &tag)?;
+    if Path::new(&repo_path.join(".git")).is_dir() {
+        std::env::set_current_dir(repo_path)?;
+
+        cmd_success(
+            Command::new("git")
+                .arg("fetch")
+                .arg("--tags")
+                .spawn()?
+                .wait(),
+        )?;
+    } else {
+        cmd_success(
+            Command::new("git")
+                .arg("clone")
+                .arg(LIBS_REPO_URL)
+                .arg(repo_path)
+                .spawn()?
+                .wait(),
+        )?;
+
+        std::env::set_current_dir(repo_path)?;
+    }
+
+    cmd_success(
+        Command::new("git")
+            .arg("checkout")
+            .arg(&tag)
+            .spawn()?
+            .wait(),
+    )?;
 
     Ok(())
 }
-
-// Chckout a certain tag from a given repository
-// fn checkout_tag(repo: &git2::Repository, tag: &str) -> anyhow::Result<()> {
-//     let (object, reference) = repo
-//         .revparse_ext(tag)
-//         .with_context(|| format!("git object \"{}\" not found", tag))?;
-
-//     repo.checkout_tree(&object, None)
-//         .with_context(|| format!("failed to checkout tree for \"{}\"", tag))?;
-
-//     match reference {
-//         // gref is an actual reference like branches or tags
-//         Some(gref) => repo.set_head(gref.name().unwrap()),
-//         // this is a commit, not a reference
-//         None => repo.set_head_detached(object.id()),
-//     }
-//     .with_context(|| format!("failed to set HEAD for \"{}\"", tag))?;
-
-//     Ok(())
-// }

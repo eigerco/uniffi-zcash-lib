@@ -48,7 +48,7 @@ RUN mkdir -p /tmp/setup-kotlin \
 
 RUN mkdir -p /tmp/setup-jna \
   && cd /tmp/setup-jna \
-  && curl -o jna.jar https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.9.0/jna-5.9.0.jar \
+  && curl -o jna.jar https://repo1.maven.org/maven2/net/java/dev/jna/jna/5.13.0/jna-5.13.0.jar \
   && mv jna.jar /opt \
   && cd ../ \
   && rm -rf ./setup-jna

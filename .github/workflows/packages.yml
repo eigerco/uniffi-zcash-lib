@@ -46,15 +46,15 @@ jobs:
         working-directory: ./lib
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Download bindgen artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
 
-      - name: Set up cargo cache
+      - name: Set up Python cargo cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
@@ -73,7 +73,7 @@ jobs:
 
       - name: Save artifacts for Python package
         if: ${{ inputs.save-artifacts }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-python-data-${{ github.run_number }}
           path: lib/packages/python
@@ -86,15 +86,15 @@ jobs:
         working-directory: ./lib
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Download bindgen artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
 
-      - name: Set up cargo cache
+      - name: Set up Ruby cargo cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
@@ -118,7 +118,7 @@ jobs:
 
       - name: Save artifacts for Ruby package
         if: ${{ inputs.save-artifacts }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-ruby-data-${{ github.run_number }}
           path: lib/packages/ruby
@@ -131,15 +131,15 @@ jobs:
         working-directory: ./lib
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Download bindgen artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
 
-      - name: Set up cargo cache
+      - name: Set up Kotlin cargo cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
@@ -162,7 +162,7 @@ jobs:
 
       - name: Save artifacts for Kotlin package
         if: ${{ inputs.save-artifacts }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-kotlin-data-${{ github.run_number }}
           path: lib/packages/kotlin
@@ -175,15 +175,15 @@ jobs:
         working-directory: ./lib
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Download bindgen artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
 
-      - name: Set up cargo cache
+      - name: Set up Swift cargo cache
         uses: actions/cache@v3
         continue-on-error: false
         with:
@@ -193,7 +193,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          key: 2-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
       - name: Swift package generation
@@ -207,7 +207,7 @@ jobs:
 
       - name: Save artifacts package pointer file for Swift package
         if: ${{ inputs.save-artifacts }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-swift-pointer-data-${{ github.run_number }}
           path: |
@@ -216,7 +216,7 @@ jobs:
 
       - name: Save artifacts package for Swift package
         if: ${{ inputs.save-artifacts }}
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-package-swift-package-data-${{ github.run_number }}
           path: |
