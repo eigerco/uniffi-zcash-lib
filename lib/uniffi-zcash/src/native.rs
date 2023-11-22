@@ -318,7 +318,7 @@ pub fn init_data_db(
     //         if matches!(error, WalletMigrationError::SeedRequired) => { Ok(1) }
     //     Err(e) => Err(format_err!("Error while initializing data DB: {}", e)),
     // }
-    db_data.init(seed).map(|_| 0u8)
+    db_data.initialize(seed).map(|_| 0u8)
 }
 
 pub fn rewind_to_height(
