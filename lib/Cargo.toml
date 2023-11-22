@@ -9,11 +9,10 @@ resolver = "2"
 [workspace.dependencies]
 uniffi = {git = "https://github.com/eigerco/uniffi-rs", rev = "57fe1a5"}
 zcash_primitives = { version = "=0.13.0", features = ["transparent-inputs"] }
-# zcash_primitives = { path = "../librustzcash/zcash_primitives", features = ["transparent-inputs"] }
 zcash_proofs = { version = "=0.13.0" }
 zcash_client_backend = { version = "=0.10.0", features = ["transparent-inputs", "unstable"] }
 zcash_address = "0.3"
-zcash_client_sqlite = { version = "=0.8.0", features = ["transparent-inputs", "unstable"] }
+zcash_client_sqlite = { version = "=0.8.1", features = ["transparent-inputs", "unstable"] }
 incrementalmerkletree = { version = "0.5", features = ["legacy-api"] }
 orchard = { version = "0.6", default-features = false }
 hdwallet = "0.4.1"
