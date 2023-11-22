@@ -79,14 +79,26 @@ namespace zcash {
   void decrypt_and_store_transaction(ZcashConsensusParameters params, ZcashWalletDb z_db_data, ZcashTransaction tx);
 
   [Throws=ZcashError]
-  ZcashTxId spend_main(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashMainGreedyInputSelector input_selector, ZcashUnifiedSpendingKey usk, ZcashTransactionRequest request, ZcashOvkPolicy ovk_policy, u32 min_confirmations);
+  ZcashTxId spend_main_fixed(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashMainFixedGreedyInputSelector input_selector, ZcashUnifiedSpendingKey usk, ZcashTransactionRequest request, ZcashOvkPolicy ovk_policy, u32 min_confirmations);
 
   [Throws=ZcashError]
-  ZcashTxId spend_test(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashTestGreedyInputSelector input_selector, ZcashUnifiedSpendingKey usk, ZcashTransactionRequest request, ZcashOvkPolicy ovk_policy, u32 min_confirmations);
+  ZcashTxId spend_test_fixed(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashTestFixedGreedyInputSelector input_selector, ZcashUnifiedSpendingKey usk, ZcashTransactionRequest request, ZcashOvkPolicy ovk_policy, u32 min_confirmations);
 
   [Throws=ZcashError]
-  ZcashTxId shield_transparent_funds_main(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashMainGreedyInputSelector input_selector, u64 shielding_threshold, ZcashUnifiedSpendingKey usk, sequence<ZcashTransparentAddress> from_addrs, ZcashMemoBytes memo, u32 min_confirmations);
+  ZcashTxId spend_main_zip317(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashMainZip317GreedyInputSelector input_selector, ZcashUnifiedSpendingKey usk, ZcashTransactionRequest request, ZcashOvkPolicy ovk_policy, u32 min_confirmations);
 
   [Throws=ZcashError]
-  ZcashTxId shield_transparent_funds_test(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashTestGreedyInputSelector input_selector, u64 shielding_threshold, ZcashUnifiedSpendingKey usk, sequence<ZcashTransparentAddress> from_addrs, ZcashMemoBytes memo, u32 min_confirmations);
+  ZcashTxId spend_test_zip317(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashTestZip317GreedyInputSelector input_selector, ZcashUnifiedSpendingKey usk, ZcashTransactionRequest request, ZcashOvkPolicy ovk_policy, u32 min_confirmations);
+
+  [Throws=ZcashError]
+  ZcashTxId shield_transparent_funds_main_fixed(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashMainFixedGreedyInputSelector input_selector, u64 shielding_threshold, ZcashUnifiedSpendingKey usk, sequence<ZcashTransparentAddress> from_addrs, ZcashMemoBytes memo, u32 min_confirmations);
+
+  [Throws=ZcashError]
+  ZcashTxId shield_transparent_funds_test_fixed(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashTestFixedGreedyInputSelector input_selector, u64 shielding_threshold, ZcashUnifiedSpendingKey usk, sequence<ZcashTransparentAddress> from_addrs, ZcashMemoBytes memo, u32 min_confirmations);
+
+  [Throws=ZcashError]
+  ZcashTxId shield_transparent_funds_main_zip317(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashMainZip317GreedyInputSelector input_selector, u64 shielding_threshold, ZcashUnifiedSpendingKey usk, sequence<ZcashTransparentAddress> from_addrs, ZcashMemoBytes memo, u32 min_confirmations);
+
+  [Throws=ZcashError]
+  ZcashTxId shield_transparent_funds_test_zip317(ZcashWalletDb z_db_data, ZcashConsensusParameters params, ZcashLocalTxProver prover, ZcashTestZip317GreedyInputSelector input_selector, u64 shielding_threshold, ZcashUnifiedSpendingKey usk, sequence<ZcashTransparentAddress> from_addrs, ZcashMemoBytes memo, u32 min_confirmations);
 };
