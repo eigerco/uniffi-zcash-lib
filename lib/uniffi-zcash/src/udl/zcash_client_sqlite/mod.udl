@@ -25,7 +25,7 @@ interface ZcashWalletDb {
 	constructor(string path, ZcashConsensusParameters params);
 
   	[Throws=ZcashError]
-  	void init(sequence<u8> seed);
+  	void initialize(sequence<u8> seed);
 
     // ####################################
     // WalletRead implementation methods #
@@ -156,7 +156,7 @@ interface ZcashFsBlockDb {
 	constructor(string fsblockdb_root);
 
 	[Throws=ZcashError]
-	void init(string blocks_dir);
+	void initialize(string blocks_dir);
 
 	[Throws=ZcashError]
     ZcashBlockMeta? find_block(ZcashBlockHeight height);

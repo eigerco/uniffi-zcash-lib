@@ -120,7 +120,7 @@ impl ZcashWalletDb {
     }
 
     /// From wallet::init
-    pub fn init(&self, seed: Vec<u8>) -> ZcashResult<()> {
+    pub fn initialize(&self, seed: Vec<u8>) -> ZcashResult<()> {
         let mut db_data =
             WalletDb::for_path(&self.path, self.params).expect("Cannot access the DB!");
         let secvec = SecretVec::new(seed);
@@ -585,7 +585,7 @@ impl ZcashFsBlockDb {
     }
 
     // init_blockmeta_db
-    pub fn init(&self, blocks_dir: String) -> ZcashResult<()> {
+    pub fn initialize(&self, blocks_dir: String) -> ZcashResult<()> {
         let mut db = FsBlockDb::for_path(blocks_dir).unwrap();
 
         match init_blockmeta_db(&mut db) {

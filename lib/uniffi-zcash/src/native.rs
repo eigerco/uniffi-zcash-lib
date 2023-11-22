@@ -23,16 +23,19 @@ use std::sync::Arc;
 
 use crate::native_utils as utils;
 use crate::{
-    decrypt_and_store_transaction, scan_cached_blocks, shield_transparent_funds_main,
-    shield_transparent_funds_test, spend_main, spend_test, TupleTargetAndAnchorHeight,
-    ZcashAccountId, ZcashAmount, ZcashBlockHeight, ZcashBlockMeta, ZcashConsensusParameters,
-    ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule, ZcashFixedSingleOutputChangeStrategy,
-    ZcashFsBlockDb, ZcashKeysEra, ZcashLocalTxProver, ZcashMainGreedyInputSelector, ZcashMemo,
+    decrypt_and_store_transaction, scan_cached_blocks, shield_transparent_funds_main_fixed,
+    shield_transparent_funds_main_zip317, shield_transparent_funds_test_fixed,
+    shield_transparent_funds_test_zip317, spend_main_fixed, spend_main_zip317, spend_test_fixed,
+    spend_test_zip317, TupleTargetAndAnchorHeight, ZcashAccountId, ZcashAmount, ZcashBlockHeight,
+    ZcashBlockMeta, ZcashConsensusParameters, ZcashDustOutputPolicy, ZcashError, ZcashFixedFeeRule,
+    ZcashFixedSingleOutputChangeStrategy, ZcashFsBlockDb, ZcashKeysEra, ZcashLocalTxProver,
+    ZcashMainFixedGreedyInputSelector, ZcashMainZip317GreedyInputSelector, ZcashMemo,
     ZcashMemoBytes, ZcashNonNegativeAmount, ZcashNoteId, ZcashOutPoint, ZcashOvkPolicy,
     ZcashPayment, ZcashRecipientAddress, ZcashResult, ZcashScanRange, ZcashScript,
-    ZcashShieldedProtocol, ZcashTestGreedyInputSelector, ZcashTransaction, ZcashTransactionRequest,
-    ZcashTransparentAddress, ZcashTxId, ZcashTxOut, ZcashUnifiedAddress, ZcashUnifiedSpendingKey,
-    ZcashWalletDb, ZcashWalletTransparentOutput,
+    ZcashShieldedProtocol, ZcashTestFixedGreedyInputSelector, ZcashTestZip317GreedyInputSelector,
+    ZcashTransaction, ZcashTransactionRequest, ZcashTransparentAddress, ZcashTxId, ZcashTxOut,
+    ZcashUnifiedAddress, ZcashUnifiedSpendingKey, ZcashWalletDb, ZcashWalletTransparentOutput,
+    ZcashZip317FeeRule, ZcashZip317SingleOutputChangeStrategy,
 };
 
 const ANCHOR_OFFSET: u32 = 10;
@@ -318,7 +321,7 @@ pub fn init_data_db(
     //         if matches!(error, WalletMigrationError::SeedRequired) => { Ok(1) }
     //     Err(e) => Err(format_err!("Error while initializing data DB: {}", e)),
     // }
-    db_data.init(seed).map(|_| 0u8)
+    db_data.initialize(seed).map(|_| 0u8)
 }
 
 pub fn rewind_to_height(
@@ -480,7 +483,7 @@ pub fn create_to_address(
     spend_params: String,
     output_params: String,
     params: ZcashConsensusParameters,
-    _use_zip317_fees: bool,
+    use_zip317_fees: bool,
 ) -> ZcashResult<ZcashTxId> {
     let db_data = wallet_db(params, db_data)?;
     // let usk = decode_usk(&env, usk)?;
@@ -534,61 +537,97 @@ pub fn create_to_address(
     })?;
 
     let fixed_rule = ZcashFixedFeeRule::standard().into();
+    let zip317_rule = ZcashZip317FeeRule::standard().into();
+    let dust_policy = ZcashDustOutputPolicy::default().into();
 
     match params {
         ZcashConsensusParameters::MainNetwork => {
-            let insel = ZcashMainGreedyInputSelector::new(
-                ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
-                ZcashDustOutputPolicy::default().into(),
-            );
+            if use_zip317_fees {
+                let insel = ZcashMainZip317GreedyInputSelector::new(
+                    ZcashZip317SingleOutputChangeStrategy::new(zip317_rule).into(),
+                    dust_policy,
+                );
 
-            spend_main(
-                Arc::new(db_data),
-                params,
-                Arc::new(prover),
-                Arc::new(insel),
-                Arc::new(usk),
-                Arc::new(request),
-                ZcashOvkPolicy::Sender,
-                ANCHOR_OFFSET,
-            )
-            .map(|x| *x)
-            .map_err(|e| ZcashError::Message {
-                error: format!("Error while creating transaction: {}", e),
-            })
+                spend_main_zip317(
+                    Arc::new(db_data),
+                    params,
+                    Arc::new(prover),
+                    Arc::new(insel),
+                    Arc::new(usk),
+                    Arc::new(request),
+                    ZcashOvkPolicy::Sender,
+                    ANCHOR_OFFSET,
+                )
+                .map(|x| *x)
+                .map_err(|e| ZcashError::Message {
+                    error: format!("Error while creating transaction: {}", e),
+                })
+            } else {
+                let insel = ZcashMainFixedGreedyInputSelector::new(
+                    ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
+                    dust_policy,
+                );
+
+                spend_main_fixed(
+                    Arc::new(db_data),
+                    params,
+                    Arc::new(prover),
+                    Arc::new(insel),
+                    Arc::new(usk),
+                    Arc::new(request),
+                    ZcashOvkPolicy::Sender,
+                    ANCHOR_OFFSET,
+                )
+                .map(|x| *x)
+                .map_err(|e| ZcashError::Message {
+                    error: format!("Error while creating transaction: {}", e),
+                })
+            }
         }
         ZcashConsensusParameters::TestNetwork => {
-            let insel = ZcashTestGreedyInputSelector::new(
-                ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
-                ZcashDustOutputPolicy::default().into(),
-            );
+            if use_zip317_fees {
+                let insel = ZcashTestZip317GreedyInputSelector::new(
+                    ZcashZip317SingleOutputChangeStrategy::new(zip317_rule).into(),
+                    dust_policy,
+                );
 
-            spend_test(
-                Arc::new(db_data),
-                params,
-                Arc::new(prover),
-                Arc::new(insel),
-                Arc::new(usk),
-                Arc::new(request),
-                ZcashOvkPolicy::Sender,
-                ANCHOR_OFFSET,
-            )
-            .map(|x| *x)
-            .map_err(|e| ZcashError::Message {
-                error: format!("Error while creating transaction: {}", e),
-            })
+                spend_test_zip317(
+                    Arc::new(db_data),
+                    params,
+                    Arc::new(prover),
+                    Arc::new(insel),
+                    Arc::new(usk),
+                    Arc::new(request),
+                    ZcashOvkPolicy::Sender,
+                    ANCHOR_OFFSET,
+                )
+                .map(|x| *x)
+                .map_err(|e| ZcashError::Message {
+                    error: format!("Error while creating transaction: {}", e),
+                })
+            } else {
+                let insel = ZcashTestFixedGreedyInputSelector::new(
+                    ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into(),
+                    dust_policy,
+                );
+
+                spend_test_fixed(
+                    Arc::new(db_data),
+                    params,
+                    Arc::new(prover),
+                    Arc::new(insel),
+                    Arc::new(usk),
+                    Arc::new(request),
+                    ZcashOvkPolicy::Sender,
+                    ANCHOR_OFFSET,
+                )
+                .map(|x| *x)
+                .map_err(|e| ZcashError::Message {
+                    error: format!("Error while creating transaction: {}", e),
+                })
+            }
         }
     }
-    // NOTE only for Fixed ATM
-    // if use_zip317_fees == true {
-    //     ZcashGreedyInputSelector::new(
-    //         zip317::SingleOutputChangeStrategy::new(zip317::FeeRule::standard()),
-    //         DustOutputPolicy::default(),
-    //     )
-    // }
-    // else {
-
-    // };
 }
 
 pub fn shield_to_address(
@@ -598,7 +637,7 @@ pub fn shield_to_address(
     spend_params: String,
     output_params: String,
     params: ZcashConsensusParameters,
-    _use_zip317_fees: bool,
+    use_zip317_fees: bool,
 ) -> ZcashResult<ZcashTxId> {
     let db_data = wallet_db(params, db_data)?;
     // let usk = decode_usk(&env, usk)?;
@@ -649,46 +688,90 @@ pub fn shield_to_address(
 
     let fixed_rule = ZcashFixedFeeRule::standard().into();
     let fixed_strategy = ZcashFixedSingleOutputChangeStrategy::new(fixed_rule).into();
+
+    let zip317_rule = ZcashZip317FeeRule::standard().into();
+    let zip317_strategy = ZcashZip317SingleOutputChangeStrategy::new(zip317_rule).into();
+
     let do_policy = ZcashDustOutputPolicy::default().into();
 
     match params {
         ZcashConsensusParameters::MainNetwork => {
-            let insel = ZcashMainGreedyInputSelector::new(fixed_strategy, do_policy);
+            if use_zip317_fees {
+                let insel = ZcashMainZip317GreedyInputSelector::new(zip317_strategy, do_policy);
 
-            shield_transparent_funds_main(
-                Arc::new(db_data),
-                params,
-                Arc::new(prover),
-                Arc::new(insel),
-                shielding_threshold,
-                Arc::new(usk),
-                from_addrs,
-                Arc::new(memo),
-                min_confirmations,
-            )
-            .map(|x| *x)
-            .map_err(|e| ZcashError::Message {
-                error: format!("Error while creating transaction: {}", e),
-            })
+                shield_transparent_funds_main_zip317(
+                    Arc::new(db_data),
+                    params,
+                    Arc::new(prover),
+                    Arc::new(insel),
+                    shielding_threshold,
+                    Arc::new(usk),
+                    from_addrs,
+                    Arc::new(memo),
+                    min_confirmations,
+                )
+                .map(|x| *x)
+                .map_err(|e| ZcashError::Message {
+                    error: format!("Error while creating transaction: {}", e),
+                })
+            } else {
+                let insel = ZcashMainFixedGreedyInputSelector::new(fixed_strategy, do_policy);
+
+                shield_transparent_funds_main_fixed(
+                    Arc::new(db_data),
+                    params,
+                    Arc::new(prover),
+                    Arc::new(insel),
+                    shielding_threshold,
+                    Arc::new(usk),
+                    from_addrs,
+                    Arc::new(memo),
+                    min_confirmations,
+                )
+                .map(|x| *x)
+                .map_err(|e| ZcashError::Message {
+                    error: format!("Error while creating transaction: {}", e),
+                })
+            }
         }
         ZcashConsensusParameters::TestNetwork => {
-            let insel = ZcashTestGreedyInputSelector::new(fixed_strategy, do_policy);
+            if use_zip317_fees {
+                let insel = ZcashTestZip317GreedyInputSelector::new(zip317_strategy, do_policy);
 
-            shield_transparent_funds_test(
-                Arc::new(db_data),
-                params,
-                Arc::new(prover),
-                Arc::new(insel),
-                shielding_threshold,
-                Arc::new(usk),
-                from_addrs,
-                Arc::new(memo),
-                min_confirmations,
-            )
-            .map(|x| *x)
-            .map_err(|e| ZcashError::Message {
-                error: format!("Error while creating transaction: {}", e),
-            })
+                shield_transparent_funds_test_zip317(
+                    Arc::new(db_data),
+                    params,
+                    Arc::new(prover),
+                    Arc::new(insel),
+                    shielding_threshold,
+                    Arc::new(usk),
+                    from_addrs,
+                    Arc::new(memo),
+                    min_confirmations,
+                )
+                .map(|x| *x)
+                .map_err(|e| ZcashError::Message {
+                    error: format!("Error while creating transaction: {}", e),
+                })
+            } else {
+                let insel = ZcashTestFixedGreedyInputSelector::new(fixed_strategy, do_policy);
+
+                shield_transparent_funds_test_fixed(
+                    Arc::new(db_data),
+                    params,
+                    Arc::new(prover),
+                    Arc::new(insel),
+                    shielding_threshold,
+                    Arc::new(usk),
+                    from_addrs,
+                    Arc::new(memo),
+                    min_confirmations,
+                )
+                .map(|x| *x)
+                .map_err(|e| ZcashError::Message {
+                    error: format!("Error while creating transaction: {}", e),
+                })
+            }
         }
     }
 }
