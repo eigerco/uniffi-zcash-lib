@@ -54,7 +54,7 @@ pub fn install_macos_sdk() -> anyhow::Result<()> {
         Command::new("wget")
             .arg(format!(
                 "https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX{}.sdk.tar.xz",
-                MACOS_SDK_VERSION, MACOS_SDK_VERSION
+                MACOS_SDK_VERSION
             ))
             .current_dir(&apple_sdk_install_path)
             .spawn()?
