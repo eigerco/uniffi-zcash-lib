@@ -1,3 +1,5 @@
+name: "Diff cron job for librustzcash"
+
 on:
   push:
   schedule:

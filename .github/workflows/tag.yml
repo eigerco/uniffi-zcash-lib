@@ -1,4 +1,4 @@
-name: Publish packages
+name: Tag packages
 
 on:
   push:

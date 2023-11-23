@@ -204,7 +204,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 3-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          key: 2-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
       - name: Swift package generation
