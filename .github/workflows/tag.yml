@@ -1,4 +1,4 @@
-name: Tag packages
+name: "Tag packages"
 
 on:
   push:
