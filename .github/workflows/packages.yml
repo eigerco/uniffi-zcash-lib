@@ -183,6 +183,11 @@ jobs:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
           path: lib/bindings
 
+      - name: Install Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '14.3.1'
+
       - name: Set up Swift cargo cache
         uses: actions/cache@v3
         continue-on-error: false

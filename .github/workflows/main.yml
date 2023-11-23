@@ -88,8 +88,19 @@ jobs:
   #     swift-git-repo-url: ${{ secrets.SWIFT_GIT_REPO_URL }}
 
   macos-build-packages:
-    runs-on: macos-latest
     needs: bindgen
+    # Kotlin variables/secrets only need to be present, without value,
+    # in the build stage, as they are checked by gradle.
+    # They are required because we use System.getenv()
+    # in the build.gradle.kts template for security reasons.
+    uses: ./.github/workflows/packages.yml
+    with:
+      # We are using a fixed-version SDK (see bindgen)
+      # so we need to keep in check the MacOS version used.
+      runs-on: macos-13
+      version: "0.0.0" # dummy version we are only testing the build.
+      artifacts-storage-prefix: "build-test"
+      save-artifacts: false
     secrets:
       git-user-name: ${{ secrets.GIT_USER_NAME }}
       git-user-email: ${{ secrets.GIT_USER_EMAIL }}
@@ -98,18 +109,3 @@ jobs:
       kotlin-registry-password: "" # dummy, we are testing the build.
       # Swift needs to clone the package repo for build.
       swift-git-repo-url: ${{ secrets.SWIFT_GIT_REPO_URL }}
-    steps:
-      - name: Install Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '14.3.1'
-    # Kotlin variables/secrets only need to be present, without value,
-    # in the build stage, as they are checked by gradle.
-    # They are required because we use System.getenv()
-    # in the build.gradle.kts template for security reasons.
-      - name: Build packages for publishing
-        uses: ./.github/workflows/packages.yml
-        with:
-          version: "0.0.0" # dummy version we are only testing the build.
-          artifacts-storage-prefix: "build-test"
-          save-artifacts: false
