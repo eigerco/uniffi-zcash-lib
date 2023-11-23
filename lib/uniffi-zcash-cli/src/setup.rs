@@ -34,10 +34,8 @@ pub fn install_zig_build() -> anyhow::Result<()> {
     )
 }
 
-const MACOS_SDK_VERSION: &str = "11.1";
-// const MACOS_SDK_SHA256_SUM: &str = "cd4f08a75577145b8f05245a2975f7c81401d75e9535dcffbb879ee1deefcbf4"; // 11.3
-const MACOS_SDK_SHA256_SUM: &str =
-    "68797baaacb52f56f713400de306a58a7ca00b05c3dc6d58f0a8283bcac721f8";
+const MACOS_SDK_VERSION: &str = "11.3";
+const MACOS_SDK_SHA256_SUM: &str = "cd4f08a75577145b8f05245a2975f7c81401d75e9535dcffbb879ee1deefcbf4"; // 11.3
 
 pub fn install_macos_sdk() -> anyhow::Result<()> {
     if macos_sdk_require_path().exists() {
@@ -53,6 +51,7 @@ pub fn install_macos_sdk() -> anyhow::Result<()> {
     cmd_success(
         Command::new("wget")
             .arg(format!(
+                // the version hardcoded corresponds to the github release tag, not the version
                 "https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX{}.sdk.tar.xz",
                 MACOS_SDK_VERSION
             ))

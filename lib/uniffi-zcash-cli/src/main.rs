@@ -44,8 +44,8 @@ fn main() -> anyhow::Result<()> {
         Some(("setup", args)) => match args.subcommand() {
             Some(("buildenv", _)) => {
                 add_rust_targets()?;
-                install_zig_build()?;
-                Ok(install_macos_sdk()?)
+                Ok(install_zig_build()?)
+                // Ok(install_macos_sdk()?)
             }
             Some(("builddoc", _)) => Ok(install_dokka_cli()?),
             Some(("saplingparams", _)) => match download_sapling_parameters(None) {

@@ -47,11 +47,11 @@ jobs:
           key: home-build-${{ hashFiles('.zcash-uniffi/**') }}
           restore-keys: home-build
 
-      - name: Prepare build env
+      - name: Prepare build environment
         run: |
           cargo run -p uniffi-zcash-cli setup buildenv
 
-      - name: Generate shared lib
+      - name: Generate shared libraries
         run: |
           cargo run -p uniffi-zcash-cli sharedlibs
 
