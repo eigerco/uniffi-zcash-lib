@@ -49,6 +49,7 @@ fn generate_binding(
     // let releases_path = root_dir.join("shared_libs").join("libuniffi_zcash.dylib");
 
     // #[cfg(not(target_os = "macos"))]
+    // The static library should be OK for all OSs
     let releases_path = root_dir.join("shared_libs").join("libuniffi_zcash.so");
 
     Command::new("cargo")

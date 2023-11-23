@@ -21,7 +21,7 @@ pub fn run(cfg: &Config) -> anyhow::Result<()> {
     let tmp_package_dir = env::temp_dir().join("zcash_uniffi_swift_package_build");
     clean_dir(&tmp_package_dir)?;
 
-    // We will leave a pointer (a text file) to properly signalize we are operating
+    // We will leave a pointer (a text file) to properly signal that we are operating
     // outside the working tree, by adding the absolute path to the temporary subfolder.
     let mut pointer = OpenOptions::new()
         .create(true)
