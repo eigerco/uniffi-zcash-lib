@@ -95,7 +95,9 @@ jobs:
     # in the build.gradle.kts template for security reasons.
     uses: ./.github/workflows/packages.yml
     with:
-      runs-on: macos-11
+      # We are using a fixed-version SDK (see bindgen)
+      # so we need to keep in check the MacOS version used.
+      runs-on: macos-12
       version: "0.0.0" # dummy version we are only testing the build.
       artifacts-storage-prefix: "build-test"
       save-artifacts: false
