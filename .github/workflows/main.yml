@@ -11,9 +11,6 @@ env:
 
 jobs:
   diagnostic:
-    defaults:
-      run:
-        working-directory: ./lib
     runs-on: macos-13
     steps:
       - name: Install Xcode
