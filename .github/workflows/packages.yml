@@ -40,7 +40,6 @@ env:
 
 jobs:
   python:
-    if: false
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -81,7 +80,6 @@ jobs:
           if-no-files-found: error
 
   ruby:
-    if: false
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -170,6 +168,8 @@ jobs:
           path: lib/packages/kotlin
           if-no-files-found: error
 
+  # this case needs to be handled more closely,
+  # so the libraries will need to be recompiled again.
   swift:
     runs-on: ${{ inputs.runs-on }}
     defaults:
@@ -178,14 +178,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-
-      # run this on macos to get the correct dylib
-
-      # - name: Download bindgen artifacts
-      #   uses: actions/download-artifact@v3
-      #   with:
-      #     name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
-      #     path: lib/bindings
 
       - name: Install Xcode
         uses: maxim-lobanov/setup-xcode@v1
