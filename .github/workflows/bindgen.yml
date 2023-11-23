@@ -35,7 +35,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-bindgen-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-bindgen-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-bindgen
 
       - name: Set up home cache

@@ -65,7 +65,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
       - name: Python package generation
@@ -106,7 +106,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
       - name: Setting up Ruby env
@@ -151,7 +151,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
       - name: Kotlin package generation
@@ -190,10 +190,6 @@ jobs:
         with:
           xcode-version: '14.3.1'
 
-      - name: Verify Xcode path
-        run: |
-          xcode-select -p
-
       - name: Set up Swift cargo cache
         uses: actions/cache@v3
         continue-on-error: false
@@ -204,7 +200,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 2-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
       - name: Swift package generation

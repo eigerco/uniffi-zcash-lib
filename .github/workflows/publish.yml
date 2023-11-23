@@ -71,7 +71,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-publish
 
       - name: Download python artifacts
@@ -110,7 +110,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-publish
 
       - name: Download Ruby artifacts
@@ -148,7 +148,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-publish
 
       - name: Download kotlin artifacts
@@ -187,7 +187,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-publish
 
       - name: Download swift package pointer artifacts
@@ -232,7 +232,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-publish-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-publish
 
       - name: Download swift package pointer artifacts
