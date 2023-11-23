@@ -45,10 +45,10 @@ fn generate_binding(
 ) -> Result<ExitStatus, std::io::Error> {
     // let config_path = root_dir.join("uniffi-zcash").join("uniffi.toml");
 
-    #[cfg(target_os = "macos")]
-    let releases_path = root_dir.join("shared_libs").join("libuniffi_zcash.dylib");
+    // #[cfg(target_os = "macos")]
+    // let releases_path = root_dir.join("shared_libs").join("libuniffi_zcash.dylib");
 
-    #[cfg(not(target_os = "macos"))]
+    // #[cfg(not(target_os = "macos"))]
     let releases_path = root_dir.join("shared_libs").join("libuniffi_zcash.so");
 
     Command::new("cargo")
