@@ -122,10 +122,11 @@ fn main() -> anyhow::Result<()> {
                 Some((SWIFT, args)) => {
                     let cfg = release::Config {
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
-                        git_repo_url: Some(args
-                            .try_get_one::<String>("git_repo_url")?
-                            .unwrap()
-                            .to_owned()),
+                        git_repo_url: Some(
+                            args.try_get_one::<String>("git_repo_url")?
+                                .unwrap()
+                                .to_owned(),
+                        ),
                         package_template_dir: package_template_dir.join(SWIFT),
                         test_app_template_dir: package_template_dir.join("swift_test_app"),
                         bindings_dir: bindings_dir.join(SWIFT),
