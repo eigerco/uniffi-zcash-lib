@@ -61,7 +61,6 @@ jobs:
           cargo test --verbose
 
   bindgen:
-    if: false
     needs: build
     uses: ./.github/workflows/bindgen.yml
     with:
