@@ -135,7 +135,7 @@ pub fn run(cfg: &Config) -> anyhow::Result<()> {
 
     let linked_lib_path = generated_shared_lib_path.as_path().to_string_lossy();
 
-    print!("SWIFT COMMAND");
+    print!("SWIFT COMMAND\n");
     print!(
         "swift {:?} run -Xlinker -L{linked_lib_path} (LD_LIBRARY_PATH = {:?})",
         test_app_path, generated_shared_lib_path
