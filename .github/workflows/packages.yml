@@ -184,7 +184,7 @@ jobs:
 
       ## IF MACOS
       - name: Set up Swift cargo cache
-        if: ${{ startsWith(inputs.runs-on, 'ubuntu') }}
+        if: ${{ startsWith(inputs.runs-on, 'macos') }}
         uses: actions/cache@v3
         continue-on-error: false
         with:
