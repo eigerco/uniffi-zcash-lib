@@ -17,7 +17,7 @@ env:
 
 jobs:
   bindgen:
-    name: false
+    name:
     runs-on: ubuntu-latest
     defaults:
       run:
