@@ -69,7 +69,7 @@ jobs:
       languages: ${{ secrets.LANGUAGES }}
 
   build-packages:
-    name: "Packaging on Ubuntu (latest)"
+    name: "Build on Ubuntu"
     needs: bindgen
     # Kotlin variables/secrets only need to be present, without value,
     # in the build stage, as they are checked by gradle.
@@ -91,7 +91,7 @@ jobs:
       swift-git-repo-url: ${{ secrets.SWIFT_GIT_REPO_URL }}
 
   macos-build-packages:
-    name: "Packaging on MacOS (latest)"
+    name: "Build on MacOS"
     needs: bindgen
     # Kotlin variables/secrets only need to be present, without value,
     # in the build stage, as they are checked by gradle.
