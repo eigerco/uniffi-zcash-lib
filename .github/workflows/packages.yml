@@ -198,6 +198,11 @@ jobs:
           key: ${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
+      - uses: maxim-lobanov/setup-xcode@v1
+        if: ${{ startsWith(inputs.runs-on, 'macos') }}
+        with:
+          xcode-version: latest-stable
+
       - name: Prepare build environment
         if: ${{ startsWith(inputs.runs-on, 'macos') }}
         run: |
