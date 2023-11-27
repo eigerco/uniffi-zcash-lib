@@ -69,6 +69,7 @@ jobs:
       languages: ${{ secrets.LANGUAGES }}
 
   build-packages:
+    name: "Packaging on Ubuntu (latest)"
     needs: bindgen
     # Kotlin variables/secrets only need to be present, without value,
     # in the build stage, as they are checked by gradle.
@@ -76,6 +77,7 @@ jobs:
     # in the build.gradle.kts template for security reasons.
     uses: ./.github/workflows/packages.yml
     with:
+      runs-on: ubuntu-latest
       version: "0.0.0" # dummy version we are only testing the build.
       artifacts-storage-prefix: "build-test"
       save-artifacts: false
@@ -89,6 +91,7 @@ jobs:
       swift-git-repo-url: ${{ secrets.SWIFT_GIT_REPO_URL }}
 
   macos-build-packages:
+    name: "Packaging on MacOS (latest)"
     needs: bindgen
     # Kotlin variables/secrets only need to be present, without value,
     # in the build stage, as they are checked by gradle.
@@ -98,7 +101,7 @@ jobs:
     with:
       # We are using a fixed-version SDK (see bindgen)
       # so we need to keep in check the MacOS version used.
-      runs-on: macos-13
+      runs-on: macos-latest
       version: "0.0.0" # dummy version we are only testing the build.
       artifacts-storage-prefix: "build-test"
       save-artifacts: false
