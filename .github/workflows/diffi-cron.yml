@@ -2,6 +2,8 @@ name: "Diff cron job for librustzcash"
 
 on:
   push:
+    tags:
+      - "diffi-cron"
   schedule:
     - cron: 0 0 * * * # at the end of each day
 
