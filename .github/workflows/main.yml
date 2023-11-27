@@ -58,7 +58,7 @@ jobs:
       - name: 🔎 Test
         run: |
           cargo run -p uniffi-zcash-cli setup saplingparams
-          cargo test -j 4 -- --test-threads=4 --verbose
+          cargo test --verbose --jobs 4 -- --test-threads=4
 
   bindgen:
     name: "Generate binding languages files and upload"
