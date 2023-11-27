@@ -17,6 +17,7 @@ env:
 
 jobs:
   bindgen:
+    name: "Generate binding languages files and upload"
     runs-on: ubuntu-latest
     defaults:
       run:

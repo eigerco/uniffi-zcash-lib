@@ -11,6 +11,7 @@ env:
 
 jobs:
   build:
+    name: "Building and testing Rust and UniFFI interface"
     runs-on: ubuntu-latest
     defaults:
       run:

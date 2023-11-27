@@ -40,6 +40,7 @@ env:
 
 jobs:
   python:
+    name: Python package being built on ${{ inputs.runs-on }}
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -80,6 +81,7 @@ jobs:
           if-no-files-found: error
 
   ruby:
+    name: Ruby package being built on ${{ inputs.runs-on }}
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -125,6 +127,7 @@ jobs:
           if-no-files-found: error
 
   kotlin:
+    name: Kotlin package being built on ${{ inputs.runs-on }}
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -171,6 +174,7 @@ jobs:
   # this case needs to be handled more closely,
   # so the libraries will need to be recompiled again.
   swift:
+    name: Swift package being built on ${{ inputs.runs-on }}
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:

@@ -7,6 +7,7 @@ on:
 
 jobs:
   check_for_public_api_diffs:
+    name: "Checking for public API diff"
     if: false # <- set this to false to disable the cron job above
     runs-on: ubuntu-latest
     permissions: write-all
