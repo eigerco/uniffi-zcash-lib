@@ -7,7 +7,7 @@ resolver = "2"
 # library. Whenever such changes goes upstream, we
 # will add directly the uniffi-rs libraries from crates.io.
 [workspace.dependencies]
-uniffi = {git = "https://github.com/eigerco/uniffi-rs", rev = "57fe1a5"}
+uniffi = "0.25.2"
 zcash_primitives = { version = "=0.13.0", features = ["transparent-inputs"] }
 zcash_proofs = { version = "=0.13.0" }
 zcash_client_backend = { version = "=0.10.0", features = ["transparent-inputs", "unstable"] }
