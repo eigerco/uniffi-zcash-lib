@@ -184,23 +184,23 @@ jobs:
 
       ## IF MACOS
       - name: Prepare build environment
-        if: ${{ inputs.runs-on == macos-latest }}
+        if: ${{ startsWith(inputs.runs-on, 'macos') }}
         run: |
           cargo run -p uniffi-zcash-cli setup buildenv
 
       - name: Generate shared libraries
-        if: ${{ inputs.runs-on == macos-latest }}
+        if: ${{ startsWith(inputs.runs-on, 'macos') }}
         run: |
           cargo run -p uniffi-zcash-cli sharedlibs
 
       - name: Generate languages bindings
-        if: ${{ inputs.runs-on == macos-latest }}
+        if: ${{ startsWith(inputs.runs-on, 'macos') }}
         run: |
           cargo run -p uniffi-zcash-cli bindgen --languages=swift
 
       ## IF UBUNTU
       - name: Download bindgen artifacts
-        if: ${{ inputs.runs-on == ubuntu-latest }}
+        if: ${{ startsWith(inputs.runs-on, 'ubuntu') }}
         uses: actions/download-artifact@v3
         with:
           name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
