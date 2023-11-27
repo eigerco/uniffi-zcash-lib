@@ -8,9 +8,8 @@ on:
         type: string
 
       runs-on:
-        required: false
+        required: true
         type: string
-        default: ubuntu-latest
       # In order to discriminate across workflows, a prefix is needed.
       # I.e , the operation name, like "publishing" or "building"
       artifacts-storage-prefix:
@@ -40,7 +39,7 @@ env:
 
 jobs:
   python:
-    name: Python package being built on ${{ inputs.runs-on }}
+    name: Python package
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -81,7 +80,7 @@ jobs:
           if-no-files-found: error
 
   ruby:
-    name: Ruby package being built on ${{ inputs.runs-on }}
+    name: Ruby package
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -127,7 +126,7 @@ jobs:
           if-no-files-found: error
 
   kotlin:
-    name: Kotlin package being built on ${{ inputs.runs-on }}
+    name: Kotlin package
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -174,7 +173,7 @@ jobs:
   # this case needs to be handled more closely,
   # so the libraries will need to be recompiled again.
   swift:
-    name: Swift package being built on ${{ inputs.runs-on }}
+    name: Swift package
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
