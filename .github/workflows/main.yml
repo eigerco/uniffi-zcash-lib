@@ -61,6 +61,7 @@ jobs:
           cargo test --verbose
 
   bindgen:
+    name: "Generate binding languages files and upload"
     needs: build
     uses: ./.github/workflows/bindgen.yml
     with:
