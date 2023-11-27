@@ -183,6 +183,21 @@ jobs:
         uses: actions/checkout@v3
 
       ## IF MACOS
+      - name: Set up Swift cargo cache
+        if: ${{ startsWith(inputs.runs-on, 'ubuntu') }}
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+            lib/bindings
+          key: ${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-packages
+
       - name: Prepare build environment
         if: ${{ startsWith(inputs.runs-on, 'macos') }}
         run: |
@@ -207,6 +222,7 @@ jobs:
           path: lib/bindings
 
       - name: Set up Swift cargo cache
+        if: ${{ startsWith(inputs.runs-on, 'ubuntu') }}
         uses: actions/cache@v3
         continue-on-error: false
         with:

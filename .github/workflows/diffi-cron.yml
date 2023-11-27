@@ -2,15 +2,15 @@ name: "Diff cron job for librustzcash"
 
 on:
   push:
+  ## change schedule or job only with this tag
     tags:
-      - "diffi-cron"
+      - "diffi-cron*"
   schedule:
     - cron: 0 0 * * * # at the end of each day
 
 jobs:
   check_for_public_api_diffs:
     name: "Checking for public API diff"
-    if: false # <- set this to false to disable the cron job above
     runs-on: ubuntu-latest
     permissions: write-all
     steps:
