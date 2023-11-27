@@ -87,48 +87,52 @@ fn main() -> anyhow::Result<()> {
             let package_template_dir = root_dir.join("uniffi-zcash-cli").join("templates");
             match args.subcommand() {
                 Some((PYTHON, args)) => {
-                    let cfg = release::PythonConfig {
+                    let cfg = release::Config {
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
+                        git_repo_url: None,
                         package_template_dir: package_template_dir.join(PYTHON),
                         test_app_template_dir: package_template_dir.join("python_test_app"),
                         bindings_dir: bindings_dir.join(PYTHON),
                         package_dir: packages_dir.join(PYTHON),
                     };
-                    Ok(release::python(&cfg)?)
+                    Ok(release::python::run(&cfg)?)
                 }
                 Some((RUBY, args)) => {
-                    let cfg = release::RubyConfig {
+                    let cfg = release::Config {
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
+                        git_repo_url: None,
                         package_template_dir: package_template_dir.join(RUBY),
                         test_app_template_dir: package_template_dir.join("ruby_test_app"),
                         bindings_dir: bindings_dir.join(RUBY),
                         package_dir: packages_dir.join(RUBY),
                     };
-                    Ok(release::ruby(&cfg)?)
+                    Ok(release::ruby::run(&cfg)?)
                 }
                 Some((KOTLIN, args)) => {
-                    let cfg = release::KotlinConfig {
+                    let cfg = release::Config {
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
+                        git_repo_url: None,
                         package_template_dir: package_template_dir.join(KOTLIN),
                         test_app_template_dir: package_template_dir.join("kotlin_test_app"),
                         bindings_dir: bindings_dir.join(KOTLIN),
                         package_dir: packages_dir.join(KOTLIN),
                     };
-                    Ok(release::kotlin(&cfg)?)
+                    Ok(release::kotlin::run(&cfg)?)
                 }
                 Some((SWIFT, args)) => {
-                    let cfg = release::SwiftConfig {
+                    let cfg = release::Config {
                         version: args.try_get_one::<String>("version")?.unwrap().to_owned(),
-                        git_repo_url: args
-                            .try_get_one::<String>("git_repo_url")?
-                            .unwrap()
-                            .to_owned(),
+                        git_repo_url: Some(
+                            args.try_get_one::<String>("git_repo_url")?
+                                .unwrap()
+                                .to_owned(),
+                        ),
                         package_template_dir: package_template_dir.join(SWIFT),
                         test_app_template_dir: package_template_dir.join("swift_test_app"),
                         bindings_dir: bindings_dir.join(SWIFT),
                         package_dir: packages_dir.join(SWIFT),
                     };
-                    Ok(release::swift(&cfg)?)
+                    Ok(release::swift::run(&cfg)?)
                 }
                 _ => Err(anyhow!("Command not found. See help.")),
             }

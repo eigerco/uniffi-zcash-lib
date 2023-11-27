@@ -35,8 +35,7 @@ pub fn install_zig_build() -> anyhow::Result<()> {
 }
 
 const MACOS_SDK_VERSION: &str = "11.3";
-const MACOS_SDK_SHA256_SUM: &str =
-    "cd4f08a75577145b8f05245a2975f7c81401d75e9535dcffbb879ee1deefcbf4";
+const MACOS_SDK_SHA256_SUM: &str = "cd4f08a75577145b8f05245a2975f7c81401d75e9535dcffbb879ee1deefcbf4"; // 11.3
 
 pub fn install_macos_sdk() -> anyhow::Result<()> {
     if macos_sdk_require_path().exists() {
@@ -52,8 +51,9 @@ pub fn install_macos_sdk() -> anyhow::Result<()> {
     cmd_success(
         Command::new("wget")
             .arg(format!(
-                "https://github.com/phracker/MacOSX-SDKs/releases/download/{}/MacOSX{}.sdk.tar.xz",
-                MACOS_SDK_VERSION, MACOS_SDK_VERSION
+                // the version hardcoded corresponds to the github release tag, not the version
+                "https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX{}.sdk.tar.xz",
+                MACOS_SDK_VERSION
             ))
             .current_dir(&apple_sdk_install_path)
             .spawn()?

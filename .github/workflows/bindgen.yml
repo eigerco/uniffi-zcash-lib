@@ -17,6 +17,7 @@ env:
 
 jobs:
   bindgen:
+    name:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -35,7 +36,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-bindgen-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-bindgen-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-bindgen
 
       - name: Set up home cache
@@ -47,11 +48,11 @@ jobs:
           key: home-build-${{ hashFiles('.zcash-uniffi/**') }}
           restore-keys: home-build
 
-      - name: Prepare build env
+      - name: Prepare build environment
         run: |
           cargo run -p uniffi-zcash-cli setup buildenv
 
-      - name: Generate shared lib
+      - name: Generate shared libraries
         run: |
           cargo run -p uniffi-zcash-cli sharedlibs
 

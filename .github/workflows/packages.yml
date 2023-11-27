@@ -8,9 +8,8 @@ on:
         type: string
 
       runs-on:
-        required: false
+        required: true
         type: string
-        default: ubuntu-latest
       # In order to discriminate across workflows, a prefix is needed.
       # I.e , the operation name, like "publishing" or "building"
       artifacts-storage-prefix:
@@ -40,6 +39,7 @@ env:
 
 jobs:
   python:
+    name: Python package
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -64,7 +64,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
       - name: Python package generation
@@ -80,6 +80,7 @@ jobs:
           if-no-files-found: error
 
   ruby:
+    name: Ruby package
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -104,7 +105,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
       - name: Setting up Ruby env
@@ -125,6 +126,7 @@ jobs:
           if-no-files-found: error
 
   kotlin:
+    name: Kotlin package
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -149,7 +151,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
       - name: Kotlin package generation
@@ -168,7 +170,10 @@ jobs:
           path: lib/packages/kotlin
           if-no-files-found: error
 
+  # this case needs to be handled more closely,
+  # so the libraries will need to be recompiled again.
   swift:
+    name: Swift package
     runs-on: ${{ inputs.runs-on }}
     defaults:
       run:
@@ -177,13 +182,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Download bindgen artifacts
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
-          path: lib/bindings
-
+      ## IF MACOS
       - name: Set up Swift cargo cache
+        if: ${{ startsWith(inputs.runs-on, 'macos') }}
         uses: actions/cache@v3
         continue-on-error: false
         with:
@@ -193,7 +194,45 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 2-${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+            lib/bindings
+          key: ${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-packages
+
+      - name: Prepare build environment
+        if: ${{ startsWith(inputs.runs-on, 'macos') }}
+        run: |
+          cargo run -p uniffi-zcash-cli setup buildenv
+
+      - name: Generate shared libraries
+        if: ${{ startsWith(inputs.runs-on, 'macos') }}
+        run: |
+          cargo run -p uniffi-zcash-cli sharedlibs
+
+      - name: Generate languages bindings
+        if: ${{ startsWith(inputs.runs-on, 'macos') }}
+        run: |
+          cargo run -p uniffi-zcash-cli bindgen --languages=swift
+
+      ## IF UBUNTU
+      - name: Download bindgen artifacts
+        if: ${{ startsWith(inputs.runs-on, 'ubuntu') }}
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ inputs.artifacts-storage-prefix }}-bindings-generation-data-${{ github.run_number }}
+          path: lib/bindings
+
+      - name: Set up Swift cargo cache
+        if: ${{ startsWith(inputs.runs-on, 'ubuntu') }}
+        uses: actions/cache@v3
+        continue-on-error: false
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            lib/target
+          key: ${{ runner.os }}-cargo-packages-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-packages
 
       - name: Swift package generation

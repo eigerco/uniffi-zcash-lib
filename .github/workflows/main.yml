@@ -11,6 +11,7 @@ env:
 
 jobs:
   build:
+    name: "Building and testing Rust and UniFFI interface"
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -39,7 +40,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             lib/target
-          key: 1-${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
           restore-keys: ${{ runner.os }}-cargo-build
 
       - name: Set up Zcash params cache
@@ -60,6 +61,7 @@ jobs:
           cargo test --verbose
 
   bindgen:
+    name: "Generate binding languages files and upload"
     needs: build
     uses: ./.github/workflows/bindgen.yml
     with:
@@ -68,6 +70,7 @@ jobs:
       languages: ${{ secrets.LANGUAGES }}
 
   build-packages:
+    name: "Build on Ubuntu"
     needs: bindgen
     # Kotlin variables/secrets only need to be present, without value,
     # in the build stage, as they are checked by gradle.
@@ -75,6 +78,7 @@ jobs:
     # in the build.gradle.kts template for security reasons.
     uses: ./.github/workflows/packages.yml
     with:
+      runs-on: ubuntu-latest
       version: "0.0.0" # dummy version we are only testing the build.
       artifacts-storage-prefix: "build-test"
       save-artifacts: false
@@ -88,6 +92,7 @@ jobs:
       swift-git-repo-url: ${{ secrets.SWIFT_GIT_REPO_URL }}
 
   macos-build-packages:
+    name: "Build on MacOS"
     needs: bindgen
     # Kotlin variables/secrets only need to be present, without value,
     # in the build stage, as they are checked by gradle.
@@ -95,6 +100,8 @@ jobs:
     # in the build.gradle.kts template for security reasons.
     uses: ./.github/workflows/packages.yml
     with:
+      # We are using a fixed-version SDK (see bindgen)
+      # so we need to keep in check the MacOS version used.
       runs-on: macos-latest
       version: "0.0.0" # dummy version we are only testing the build.
       artifacts-storage-prefix: "build-test"
