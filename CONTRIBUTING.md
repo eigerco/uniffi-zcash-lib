@@ -1,16 +1,14 @@
 # Contributing
 
-Welcome ! and thanks for landing here. We are currently in the first stages of this project. Your contributions, in any point of the wide spectrum
-ideas, opinions, code .. Are more than welcome.
+Welcome ! and thanks for landing here. We are currently in the first stages of this project. Your contributions, in any point of the wide spectrum ideas, opinions, code .. Are more than welcome.
 
 We just must follow this initially established (but not fixed) conventions.
 
 ## <a href="conventions"></a> Conventions
 
-* We have defined [some conventions](../../wiki/Bindings-source-code-conventions) for dealing with the rough edges of our Rust wrapper code. They must be followed,
-  unless new agreements are met.
+* We have defined [some conventions](../../wiki/Bindings-source-code-conventions) for dealing with the rough edges of our Rust wrapper code. They must be followed, unless new agreements are met.
 * Keep all repository workflows in the internal [CLI](./lib/uniffi-zcash-cli/README.md).
-* We use Github Actions for the CI/CD, as long as it's maintainable and practical. We try to avoid putting lots of logic there by moving it to our  [CLI](./lib/uniffi-zcash-cli/README.md).
+* We use Github Actions for the CI/CD, as long as it's maintainable and practical. We try to avoid putting lots of logic there by moving it to our [CLI](./lib/uniffi-zcash-cli/README.md).
 * All knowledge should be added to our [wiki](../../wiki) and maintained.
 * No functionality is implemented, only translated from the [librustzcash](https://github.com/zcash/librustzcash) library. As such, we may only accept contributions that respect this principle.
 
