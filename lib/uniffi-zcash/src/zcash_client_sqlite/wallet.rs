@@ -5,7 +5,7 @@ use zcash_client_sqlite::wallet::init::WalletMigrationError;
 #[derive(Debug, thiserror::Error)]
 pub enum ZcashWalletMigrationError {
     /// The seed is required for the migration.
-    SeedRequired(),
+    SeedRequired { v: String },
 
     /// Decoding of an existing value from its serialized form has failed.
     CorruptedData { v: String },
@@ -26,7 +26,7 @@ impl fmt::Display for ZcashWalletMigrationError {
     // This trait requires `fmt` with this exact signature.
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            ZcashWalletMigrationError::SeedRequired() => write!(f, "SeedRequired"),
+            ZcashWalletMigrationError::SeedRequired { v: _ } => write!(f, "SeedRequired"),
             ZcashWalletMigrationError::CorruptedData { v } => write!(f, "CorruptedData: {}", v),
             ZcashWalletMigrationError::DbError { v } => write!(f, "DbError: {}", v),
             ZcashWalletMigrationError::BalanceError { v } => write!(f, "BalanceError: {}", v),
@@ -40,7 +40,7 @@ impl fmt::Display for ZcashWalletMigrationError {
 impl From<WalletMigrationError> for ZcashWalletMigrationError {
     fn from(e: WalletMigrationError) -> Self {
         match e {
-            WalletMigrationError::SeedRequired => ZcashWalletMigrationError::SeedRequired(),
+            WalletMigrationError::SeedRequired => ZcashWalletMigrationError::SeedRequired{ v: "".to_string() },
             WalletMigrationError::CorruptedData(v) => {
                 ZcashWalletMigrationError::CorruptedData { v }
             }
