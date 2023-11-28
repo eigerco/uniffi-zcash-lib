@@ -37,6 +37,13 @@ This divide is caused by the support of Github packages: while it does support R
 
 [Manuals](../../wiki/Manuals) are part of our [wiki](../../wiki). We recommend to check the home page for other interesting documentation.
 
+## Example mobile apps
+
+There are two example mobile apps (Swift and Kotlin) where some features are showcased:
+
+* [Swift (iOS)](https://github.com/eigerco/zcash-ios-demo-app)
+* [Kotlin (Android)](https://github.com/eigerco/zcash-android-demo-app)
+
 ## <a href="building-packages-locally"></a> Building packages locally
 
 As an alternative to the [languages package registries](#-where-to-find-packages), this repository provides a [CLI](./lib/uniffi-zcash-cli/README.md) for managing internal repo workflows. It allows developers to access all generation stages. Before continuing, the [setup of some basic software](./CONTRIBUTING.md#-local-environment-setup) is needed.
