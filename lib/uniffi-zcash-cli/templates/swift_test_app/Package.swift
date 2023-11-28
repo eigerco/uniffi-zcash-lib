@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "App",
+    platforms: [
+        .macOS(.v10_15), .iOS(.v13),
+    ],
     dependencies: [
         .package(url: "{{git_repo_path}}", from: "{{version}}"),
     ],
