@@ -9,25 +9,9 @@ use crate::{
     ZcashResult,
 };
 
-impl From<ExtendedFullViewingKey> for ZcashExtendedFullViewingKey {
-    fn from(key: ExtendedFullViewingKey) -> Self {
-        ZcashExtendedFullViewingKey(key)
-    }
-}
+use derive_more::{From, Into};
 
-impl From<ZcashExtendedFullViewingKey> for ExtendedFullViewingKey {
-    fn from(key: ZcashExtendedFullViewingKey) -> Self {
-        key.0.clone()
-    }
-}
-
-impl From<&ZcashExtendedFullViewingKey> for ExtendedFullViewingKey {
-    fn from(key: &ZcashExtendedFullViewingKey) -> Self {
-        key.0.clone()
-    }
-}
-
-#[derive(Clone)]
+#[derive(Clone, From, Into)]
 pub struct ZcashExtendedFullViewingKey(ExtendedFullViewingKey);
 
 impl ZcashExtendedFullViewingKey {
@@ -111,5 +95,11 @@ impl ZcashExtendedFullViewingKey {
 
     pub fn to_diversifiable_full_viewing_key(&self) -> Arc<ZcashDiversifiableFullViewingKey> {
         Arc::new(self.0.to_diversifiable_full_viewing_key().into())
+    }
+}
+
+impl From<&ZcashExtendedFullViewingKey> for ExtendedFullViewingKey {
+    fn from(key: &ZcashExtendedFullViewingKey) -> Self {
+        key.0.clone()
     }
 }

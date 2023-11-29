@@ -2,7 +2,10 @@ use zcash_primitives::sapling::keys::OutgoingViewingKey;
 
 use crate::{utils, ZcashResult};
 
+use derive_more::{From, Into};
+
 /// An outgoing viewing key
+#[derive(From, Into)]
 pub struct ZcashOutgoingViewingKey(OutgoingViewingKey);
 
 impl ZcashOutgoingViewingKey {
@@ -13,18 +16,6 @@ impl ZcashOutgoingViewingKey {
 
     pub fn to_bytes(&self) -> Vec<u8> {
         self.0 .0.to_vec()
-    }
-}
-
-impl From<OutgoingViewingKey> for ZcashOutgoingViewingKey {
-    fn from(key: OutgoingViewingKey) -> Self {
-        ZcashOutgoingViewingKey(key)
-    }
-}
-
-impl From<ZcashOutgoingViewingKey> for OutgoingViewingKey {
-    fn from(value: ZcashOutgoingViewingKey) -> Self {
-        value.0
     }
 }
 

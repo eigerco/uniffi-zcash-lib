@@ -3,7 +3,9 @@ use zcash_client_sqlite::chain::BlockMeta;
 
 use crate::{ZcashBlockHash, ZcashBlockHeight};
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+use derive_more::{From, Into};
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq, From, Into)]
 pub struct ZcashBlockMeta(pub BlockMeta);
 
 impl ZcashBlockMeta {
@@ -28,17 +30,5 @@ impl ZcashBlockMeta {
             .block_file_path(&blocks_dir)
             .to_string_lossy()
             .to_string()
-    }
-}
-
-impl From<ZcashBlockMeta> for BlockMeta {
-    fn from(inner: ZcashBlockMeta) -> Self {
-        inner.0
-    }
-}
-
-impl From<BlockMeta> for ZcashBlockMeta {
-    fn from(e: BlockMeta) -> Self {
-        ZcashBlockMeta(e)
     }
 }

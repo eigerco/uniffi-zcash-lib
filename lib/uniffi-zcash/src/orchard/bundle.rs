@@ -41,7 +41,7 @@ impl ZcashOrchardBundle {
 
     /// Returns the root of the Orchard commitment tree that this bundle commits to.
     pub fn anchor(&self) -> Arc<ZcashAnchor> {
-        Arc::new(self.0.anchor().into())
+        Arc::new((*self.0.anchor()).into())
     }
 
     /// Verifies the proof for this bundle.

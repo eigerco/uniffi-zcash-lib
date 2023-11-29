@@ -31,7 +31,7 @@ impl ZcashOrchardNote {
         rseed: Arc<ZcashOrchardRandomSeed>,
     ) -> ZcashResult<Self> {
         let opt: Option<Note> = Note::from_parts(
-            recipient.as_ref().into(),
+            (*recipient.as_ref()).clone().into(),
             (*value).into(),
             rho.as_ref().into(),
             rseed.as_ref().into(),

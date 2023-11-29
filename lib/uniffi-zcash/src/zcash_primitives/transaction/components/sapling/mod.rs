@@ -63,7 +63,7 @@ impl ZcashSaplingSpendDescription {
 
     /// Returns the nullifier of the note being spent.
     pub fn nullifier(&self) -> Arc<ZcashSaplingNullifier> {
-        Arc::new(self.0.nullifier().into())
+        Arc::new((*self.0.nullifier()).into())
     }
 
     /// Returns the randomized verification key for the note being spent.

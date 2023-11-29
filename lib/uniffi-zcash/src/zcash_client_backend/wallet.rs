@@ -17,6 +17,9 @@ use zcash_client_sqlite::ReceivedNoteId;
 
 use incrementalmerkletree::Position;
 
+use derive_more::{From, Into};
+
+#[derive(From, Into)]
 pub struct ZcashWalletSaplingSpend(WalletSaplingSpend);
 
 impl Clone for ZcashWalletSaplingSpend {
@@ -29,18 +32,7 @@ impl Clone for ZcashWalletSaplingSpend {
     }
 }
 
-impl From<WalletSaplingSpend> for ZcashWalletSaplingSpend {
-    fn from(inner: WalletSaplingSpend) -> Self {
-        Self(inner)
-    }
-}
-
-impl From<ZcashWalletSaplingSpend> for WalletSaplingSpend {
-    fn from(outer: ZcashWalletSaplingSpend) -> Self {
-        outer.0
-    }
-}
-
+#[derive(From, Into)]
 pub struct ZcashWalletSaplingOutput(WalletSaplingOutput<sapling::Nullifier>);
 
 impl Clone for ZcashWalletSaplingOutput {
@@ -58,19 +50,8 @@ impl Clone for ZcashWalletSaplingOutput {
     }
 }
 
-impl From<WalletSaplingOutput<sapling::Nullifier>> for ZcashWalletSaplingOutput {
-    fn from(inner: WalletSaplingOutput<sapling::Nullifier>) -> Self {
-        Self(inner)
-    }
-}
-
-impl From<ZcashWalletSaplingOutput> for WalletSaplingOutput<sapling::Nullifier> {
-    fn from(outer: ZcashWalletSaplingOutput) -> Self {
-        outer.0
-    }
-}
-
 /// A subset of a [`ZcashTransaction`] relevant to wallets and light clients.
+#[derive(From, Into)]
 pub struct ZcashWalletTx(WalletTx<sapling::Nullifier>);
 
 impl ZcashWalletTx {
@@ -131,19 +112,7 @@ impl Clone for ZcashWalletTx {
     }
 }
 
-impl From<WalletTx<sapling::Nullifier>> for ZcashWalletTx {
-    fn from(inner: WalletTx<sapling::Nullifier>) -> Self {
-        Self(inner)
-    }
-}
-
-impl From<ZcashWalletTx> for WalletTx<sapling::Nullifier> {
-    fn from(outer: ZcashWalletTx) -> Self {
-        outer.0
-    }
-}
-
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, From, Into)]
 pub struct ZcashWalletTransparentOutput(pub WalletTransparentOutput);
 
 impl ZcashWalletTransparentOutput {
@@ -153,7 +122,7 @@ impl ZcashWalletTransparentOutput {
         height: Arc<ZcashBlockHeight>,
     ) -> ZcashResult<Self> {
         let opt: Option<WalletTransparentOutput> = WalletTransparentOutput::from_parts(
-            outpoint.as_ref().into(),
+            (*outpoint.as_ref()).clone().into(),
             txout.as_ref().into(),
             height.as_ref().into(),
         );
@@ -185,66 +154,16 @@ impl ZcashWalletTransparentOutput {
     }
 }
 
-impl From<WalletTransparentOutput> for ZcashWalletTransparentOutput {
-    fn from(inner: WalletTransparentOutput) -> Self {
-        Self(inner)
-    }
-}
-
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, From, Into)]
 pub struct MerkleTreePosition(Position);
 
-impl From<MerkleTreePosition> for Position {
-    fn from(inner: MerkleTreePosition) -> Self {
-        inner.0
-    }
-}
-
-impl From<Position> for MerkleTreePosition {
-    fn from(e: Position) -> Self {
-        Self(e)
-    }
-}
-
-#[derive(Debug)]
+#[derive(Debug, From, Into)]
 pub struct ZcashReceivedSaplingNote(ReceivedSaplingNote<ReceivedNoteId>);
 
 impl ZcashReceivedSaplingNote {
-    // pub fn from_parts(
-    //     note_id: Arc<ReceivedNoteId>,
-    //     txid: Arc<ZcashTxId>,
-    //     output_index: u16,
-    //     diversifier: Arc<ZcashDiversifier>,
-    //     note_value: Arc<ZcashAmount>,
-    //     rseed: Arc<ZcashRseed>,
-    //     note_commitment_tree_position: Arc<MerkleTreePosition>,
-    // ) -> Self {
-    //     let note_id: ReceivedNoteId = (*note_id).into();
-
-    //     Self(
-    //         ReceivedSaplingNote::from_parts(
-    //             note_id,
-    //             (*txid).into(),
-    //             output_index,
-    //             (*diversifier).into(),
-    //             (*note_value).into(),
-    //             (*rseed).into(),
-    //             (*note_commitment_tree_position).into(),
-    //         )
-    //     )
-    // }
-
     pub fn internal_note_id(&self) -> Arc<ZcashReceivedNoteId> {
         Arc::new(self.0.note_id.into())
     }
-
-    // pub fn txid(&self) -> Arc<ZcashTxId> {
-    //     Arc::new(self.0.txid().into())
-    // }
-
-    // pub fn output_index(&self) -> u16 {
-    //     self.0.output_index()
-    // }
 
     pub fn diversifier(&self) -> Arc<ZcashDiversifier> {
         Arc::new(self.0.diversifier.into())
@@ -254,24 +173,8 @@ impl ZcashReceivedSaplingNote {
         Arc::new(self.0.note_value.into())
     }
 
-    // pub fn rseed(&self) -> Arc<ZcashRseed> {
-    //     Arc::new(self.0.rseed.into())
-    // }
-
     pub fn note_commitment_tree_position(&self) -> Arc<MerkleTreePosition> {
         Arc::new(self.0.note_commitment_tree_position.into())
-    }
-}
-
-impl From<ZcashReceivedSaplingNote> for ReceivedSaplingNote<ReceivedNoteId> {
-    fn from(inner: ZcashReceivedSaplingNote) -> Self {
-        inner.0
-    }
-}
-
-impl From<ReceivedSaplingNote<ReceivedNoteId>> for ZcashReceivedSaplingNote {
-    fn from(e: ReceivedSaplingNote<ReceivedNoteId>) -> Self {
-        Self(e)
     }
 }
 

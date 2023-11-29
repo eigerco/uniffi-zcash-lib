@@ -20,6 +20,7 @@ use zcash_primitives::sapling;
 use zcash_primitives::transaction::components::{Amount, OutPoint};
 use zcash_primitives::zip32::AccountId;
 
+use derive_more::{From, Into};
 use secrecy::SecretVec;
 
 mod chain;
@@ -77,39 +78,15 @@ type TransparentReceiversMap = HashMap<String, Arc<ZcashAddressMetadata>>;
 
 type TransparentBalancesMap = HashMap<String, Arc<ZcashAmount>>;
 
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, From, Into)]
 pub struct ZcashReceivedNoteId(ReceivedNoteId);
 
-impl From<ReceivedNoteId> for ZcashReceivedNoteId {
-    fn from(e: ReceivedNoteId) -> Self {
-        Self(e)
-    }
-}
-
-impl From<ZcashReceivedNoteId> for ReceivedNoteId {
-    fn from(inner: ZcashReceivedNoteId) -> Self {
-        inner.0
-    }
-}
-
-#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, PartialOrd, Ord, From, Into)]
 pub struct ZcashNoteId(NoteId);
 
 impl ZcashNoteId {
     pub fn new(txid: Arc<ZcashTxId>, zsp: ZcashShieldedProtocol, output_index: u16) -> Self {
         Self(NoteId::new((*txid).into(), zsp.into(), output_index))
-    }
-}
-
-impl From<NoteId> for ZcashNoteId {
-    fn from(e: NoteId) -> Self {
-        Self(e)
-    }
-}
-
-impl From<ZcashNoteId> for NoteId {
-    fn from(inner: ZcashNoteId) -> Self {
-        inner.0
     }
 }
 
@@ -351,7 +328,7 @@ impl ZcashWalletDb {
                 x.iter()
                     .map(|(aid, nf)| TupleAccountIdAndSaplingNullifier {
                         account_id: (*aid).into(),
-                        sapling_nullifier: Arc::new(nf.into()),
+                        sapling_nullifier: Arc::new((*nf).into()),
                     })
                     .collect()
             })

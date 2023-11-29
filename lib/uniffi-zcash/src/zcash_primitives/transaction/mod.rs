@@ -6,6 +6,8 @@ pub use self::fees::*;
 
 use std::sync::{Arc, RwLock};
 
+use derive_more::{From, Into};
+
 use hdwallet::rand_core::OsRng;
 use orchard::{
     builder::{InProgress, Unauthorized, Unproven},
@@ -113,7 +115,7 @@ impl ZcashTransactionBuilder {
         self.sapling_spends.read().unwrap().iter().try_for_each(
             |(extsk, diversifier, note, merkle_path)| {
                 builder.add_sapling_spend(
-                    extsk.as_ref().into(),
+                    (*extsk.as_ref()).clone().into(),
                     diversifier.as_ref().into(),
                     note.as_ref().into(),
                     merkle_path.as_ref().into(),
@@ -141,7 +143,7 @@ impl ZcashTransactionBuilder {
             .try_for_each(|(sk, utxo, coin)| {
                 builder.add_transparent_input(
                     sk.as_ref().into(),
-                    utxo.as_ref().into(),
+                    (*utxo.as_ref()).clone().into(),
                     coin.as_ref().into(),
                 )
             })?;
@@ -239,7 +241,7 @@ pub enum ZcashFeeRules {
 }
 
 /// A Zcash transaction.
-#[derive(Debug, PartialEq)]
+#[derive(Debug, PartialEq, From, Into)]
 pub struct ZcashTransaction(Transaction);
 
 impl Clone for ZcashTransaction {
@@ -307,21 +309,9 @@ impl ZcashTransaction {
     }
 }
 
-impl From<ZcashTransaction> for Transaction {
-    fn from(inner: ZcashTransaction) -> Self {
-        inner.0
-    }
-}
-
 impl<'a> From<&'a ZcashTransaction> for &'a Transaction {
     fn from(inner: &'a ZcashTransaction) -> Self {
         &inner.0
-    }
-}
-
-impl From<Transaction> for ZcashTransaction {
-    fn from(e: Transaction) -> Self {
-        ZcashTransaction(e)
     }
 }
 
@@ -339,7 +329,7 @@ impl From<(Transaction, SaplingMetadata)> for ZcashTransactionAndSaplingMetadata
     }
 }
 
-#[derive(Clone, Copy, PartialOrd, Ord, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialOrd, Ord, PartialEq, Eq, Hash, From, Into)]
 pub struct ZcashTxId(TxId);
 
 impl ZcashTxId {
@@ -359,18 +349,6 @@ impl ZcashTxId {
         self.0.write(&mut data)?;
         data.reverse();
         Ok(hex::encode(data))
-    }
-}
-
-impl From<ZcashTxId> for TxId {
-    fn from(inner: ZcashTxId) -> Self {
-        inner.0
-    }
-}
-
-impl From<TxId> for ZcashTxId {
-    fn from(inner: TxId) -> Self {
-        ZcashTxId(inner)
     }
 }
 
@@ -458,7 +436,7 @@ impl ZcashOrchardTransactionBuilder {
             .try_for_each(|(ovk, recipient, value, memo)| {
                 builder.add_recipient(
                     ovk.clone().map(|k| k.as_ref().into()),
-                    recipient.as_ref().into(),
+                    (*recipient.as_ref()).clone().into(),
                     (**value).into(),
                     *memo,
                 )
@@ -558,6 +536,7 @@ impl From<ZcashTxVersionSelection> for TxVersion {
 /// transaction fields. Note that this is not dependent on epoch, only on transaction encoding.
 /// For example, if a particular epoch defines a new transaction version but also allows the
 /// previous version, then only the new version would be added to this enum.
+#[derive(From)]
 pub struct ZcashTxVersion(TxVersion);
 
 impl ZcashTxVersion {
@@ -601,11 +580,5 @@ impl ZcashTxVersion {
 
     pub fn suggested_for_branch(consensus_branch_id: ZcashBranchId) -> Self {
         TxVersion::suggested_for_branch(consensus_branch_id.into()).into()
-    }
-}
-
-impl From<TxVersion> for ZcashTxVersion {
-    fn from(inner: TxVersion) -> Self {
-        ZcashTxVersion(inner)
     }
 }

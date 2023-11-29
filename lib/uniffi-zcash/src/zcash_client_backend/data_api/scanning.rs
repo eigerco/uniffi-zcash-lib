@@ -3,6 +3,8 @@ use std::sync::Arc;
 use zcash_client_backend::data_api::scanning::{ScanPriority, ScanRange};
 use zcash_primitives::consensus::BlockHeight;
 
+use derive_more::{From, Into};
+
 use crate::ZcashBlockHeight;
 
 /// Scanning range priority levels.
@@ -54,7 +56,7 @@ impl From<ScanPriority> for ZcashScanPriority {
 }
 
 /// A range of blocks to be scanned, along with its associated priority.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, From, Into)]
 pub struct ZcashScanRange(ScanRange);
 
 impl fmt::Display for ZcashScanRange {
@@ -104,19 +106,5 @@ impl ZcashScanRange {
     /// Returns the number of blocks in the scan range.
     pub fn len(&self) -> u32 {
         u32::try_from(self.0.len()).unwrap()
-    }
-
-    // NOTE truncate_start, truncate_end, split_at missing, not needed
-}
-
-impl From<ZcashScanRange> for ScanRange {
-    fn from(outer: ZcashScanRange) -> Self {
-        outer.0
-    }
-}
-
-impl From<ScanRange> for ZcashScanRange {
-    fn from(inner: ScanRange) -> Self {
-        ZcashScanRange(inner)
     }
 }

@@ -64,9 +64,3 @@ impl From<ZcashLocalTxProver> for LocalTxProver {
         value.internal
     }
 }
-
-// impl From<ZcashLocalTxProver> for LocalTxProver {
-//     fn from(value: ZcashLocalTxProver) -> Self {
-//         value.0
-//     }
-// }

@@ -1,9 +1,10 @@
 mod parameters;
 pub use self::parameters::*;
 
+use derive_more::{From, Into};
 use zcash_primitives::consensus::{BlockHeight, BranchId};
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, From, Into)]
 pub struct ZcashBlockHeight(BlockHeight);
 
 impl ZcashBlockHeight {
@@ -16,21 +17,9 @@ impl ZcashBlockHeight {
     }
 }
 
-impl From<ZcashBlockHeight> for BlockHeight {
-    fn from(value: ZcashBlockHeight) -> Self {
-        value.0
-    }
-}
-
 impl From<&ZcashBlockHeight> for BlockHeight {
     fn from(value: &ZcashBlockHeight) -> Self {
         value.0
-    }
-}
-
-impl From<BlockHeight> for ZcashBlockHeight {
-    fn from(inner: BlockHeight) -> Self {
-        ZcashBlockHeight(inner)
     }
 }
 

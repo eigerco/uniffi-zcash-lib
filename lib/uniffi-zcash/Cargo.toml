@@ -52,6 +52,9 @@ libc = "0.2"
 # - Data Access API
 time = "0.3.22"
 
+# converts among structs in uniffi and librustzcash
+derive_more = "0.99.17"
+
 # Logging
 log-panics = "2.0.0"
 paranoid-android = "0.2"

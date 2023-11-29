@@ -11,6 +11,9 @@ use crate::{
     ZcashDiversifierIndexAndPaymentAddress, ZcashError, ZcashResult,
 };
 
+use derive_more::{From, Into};
+
+#[derive(From, Into, Clone)]
 pub struct ZcashExtendedSpendingKey(ExtendedSpendingKey);
 
 impl ZcashExtendedSpendingKey {
@@ -41,7 +44,7 @@ impl ZcashExtendedSpendingKey {
     /// Returns the child key corresponding to the path derived from the master key
     pub fn from_path(master: Arc<ZcashExtendedSpendingKey>, path: Vec<ZcashChildIndex>) -> Self {
         let inner_path: Vec<ChildIndex> = path.into_iter().map(|i| i.into()).collect();
-        ExtendedSpendingKey::from_path(&(&(*master)).into(), inner_path.as_slice()).into()
+        ExtendedSpendingKey::from_path(&(*master).clone().into(), inner_path.as_slice()).into()
     }
 
     /// Encodes the extended spending key to the its seralized representation as defined in
@@ -69,17 +72,5 @@ impl ZcashExtendedSpendingKey {
 
     pub fn to_diversifiable_full_viewing_key(&self) -> Arc<ZcashDiversifiableFullViewingKey> {
         Arc::new(self.0.to_diversifiable_full_viewing_key().into())
-    }
-}
-
-impl From<&ZcashExtendedSpendingKey> for ExtendedSpendingKey {
-    fn from(value: &ZcashExtendedSpendingKey) -> Self {
-        value.0.clone()
-    }
-}
-
-impl From<ExtendedSpendingKey> for ZcashExtendedSpendingKey {
-    fn from(inner: ExtendedSpendingKey) -> Self {
-        ZcashExtendedSpendingKey(inner)
     }
 }

@@ -4,6 +4,8 @@ use zcash_client_backend::data_api::chain::CommitmentTreeRoot;
 use zcash_client_sqlite::{FsBlockDb, WalletDb};
 use zcash_primitives::sapling::Node;
 
+use derive_more::{From, Into};
+
 use crate::{
     ZcashBlockHeight, ZcashConsensusParameters, ZcashError, ZcashResult, ZcashSaplingNode,
 };
@@ -30,6 +32,7 @@ pub fn scan_cached_blocks(
     })
 }
 
+#[derive(From, Into)]
 pub struct ZcashCommitmentTreeRoot(CommitmentTreeRoot<Node>);
 
 impl Clone for ZcashCommitmentTreeRoot {
@@ -61,17 +64,5 @@ impl ZcashCommitmentTreeRoot {
     /// Returns the root of the complete subtree.
     pub fn root_hash(&self) -> Arc<ZcashSaplingNode> {
         Arc::new((*self.0.root_hash()).into())
-    }
-}
-
-impl From<ZcashCommitmentTreeRoot> for CommitmentTreeRoot<Node> {
-    fn from(outer: ZcashCommitmentTreeRoot) -> Self {
-        outer.0
-    }
-}
-
-impl From<CommitmentTreeRoot<Node>> for ZcashCommitmentTreeRoot {
-    fn from(inner: CommitmentTreeRoot<Node>) -> Self {
-        Self(inner)
     }
 }

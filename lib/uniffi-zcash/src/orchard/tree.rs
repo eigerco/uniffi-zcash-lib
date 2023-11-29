@@ -7,6 +7,9 @@ use orchard::tree::{MerkleHashOrchard, MerklePath};
 
 use orchard::Anchor;
 
+use derive_more::{From, Into};
+
+#[derive(From, Into)]
 pub struct ZcashAnchor(Anchor);
 
 impl ZcashAnchor {
@@ -19,18 +22,6 @@ impl ZcashAnchor {
     }
     pub fn to_bytes(&self) -> Vec<u8> {
         self.0.to_bytes().to_vec()
-    }
-}
-
-impl From<&Anchor> for ZcashAnchor {
-    fn from(inner: &Anchor) -> Self {
-        ZcashAnchor(*inner)
-    }
-}
-
-impl From<Anchor> for ZcashAnchor {
-    fn from(inner: Anchor) -> Self {
-        ZcashAnchor(inner)
     }
 }
 
@@ -77,7 +68,7 @@ impl ZcashOrchardMerklePath {
     ///        layer = 31, l = 0
     ///      - when hashing to the final root, we produce the anchor with layer = 0, l = 31.
     pub fn root(&self, cmx: Arc<ZcashExtractedNoteCommitment>) -> Arc<ZcashAnchor> {
-        Arc::new(self.inner.root(cmx.as_ref().into()).into())
+        Arc::new(self.inner.root((*cmx.as_ref()).clone().into()).into())
     }
 }
 
@@ -89,12 +80,14 @@ impl From<&ZcashOrchardMerklePath> for MerklePath {
 
 /// A newtype wrapper for leaves and internal nodes in the Orchard
 /// incremental note commitment tree.
+#[derive(From)]
 pub struct ZcashOrchardMerkleHash(MerkleHashOrchard);
 
 impl ZcashOrchardMerkleHash {
     pub fn from_bytes(data: &[u8]) -> ZcashResult<Self> {
         let opt: Option<MerkleHashOrchard> =
             MerkleHashOrchard::from_bytes(&cast_slice(data)?).into();
+
         match opt {
             Some(merkle_hash) => Ok(merkle_hash.into()),
             None => Err("Error parsing bytes".into()),
@@ -102,16 +95,10 @@ impl ZcashOrchardMerkleHash {
     }
 
     pub fn from_cmx(cmx: Arc<ZcashExtractedNoteCommitment>) -> Self {
-        MerkleHashOrchard::from_cmx(&(&(*cmx)).into()).into()
+        MerkleHashOrchard::from_cmx(&(*cmx).clone().into()).into()
     }
 
     pub fn to_bytes(&self) -> Vec<u8> {
         self.0.to_bytes().to_vec()
-    }
-}
-
-impl From<MerkleHashOrchard> for ZcashOrchardMerkleHash {
-    fn from(inner: MerkleHashOrchard) -> Self {
-        ZcashOrchardMerkleHash(inner)
     }
 }

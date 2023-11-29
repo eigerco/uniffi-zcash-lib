@@ -7,7 +7,9 @@ use zcash_primitives::transaction::components::{
 
 use crate::{utils::cast_slice, ZcashAmount, ZcashResult, ZcashScript, ZcashTransparentAddress};
 
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+use derive_more::{From, Into};
+
+#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, From, Into)]
 pub struct ZcashOutPoint(OutPoint);
 
 impl ZcashOutPoint {
@@ -17,24 +19,7 @@ impl ZcashOutPoint {
     }
 }
 
-impl From<OutPoint> for ZcashOutPoint {
-    fn from(inner: OutPoint) -> Self {
-        ZcashOutPoint(inner)
-    }
-}
-
-impl From<ZcashOutPoint> for OutPoint {
-    fn from(value: ZcashOutPoint) -> Self {
-        value.0
-    }
-}
-
-impl From<&ZcashOutPoint> for OutPoint {
-    fn from(value: &ZcashOutPoint) -> Self {
-        value.0.clone()
-    }
-}
-
+#[derive(From)]
 pub struct ZcashTxOut(TxOut);
 
 impl ZcashTxOut {
@@ -62,12 +47,6 @@ impl ZcashTxOut {
     /// Returns the address to which the TxOut was sent, if this is a valid P2SH or P2PKH output.
     pub fn recipient_address(&self) -> Option<Arc<ZcashTransparentAddress>> {
         self.0.recipient_address().map(From::from).map(Arc::new)
-    }
-}
-
-impl From<ZcashTxOut> for TxOut {
-    fn from(value: ZcashTxOut) -> Self {
-        value.0
     }
 }
 
@@ -110,30 +89,9 @@ impl ZcashTransparentBundle {
         self.0.vin.iter().map(|i| Arc::new(i.into())).collect()
     }
 
-    /// Returns `true` if this bundle matches the definition of a coinbase transaction.
-    ///
-    /// Note that this is defined purely in terms of the transparent transaction part. The
-    /// consensus rules enforce additional rules on the shielded parts (namely, that they
-    /// don't have any inputs) of transactions with a transparent part that matches this
-    /// definition.
     pub fn is_coinbase(&self) -> bool {
         self.0.is_coinbase()
     }
-
-    // /// The amount of value added to or removed from the transparent pool by the action of this
-    // /// bundle. A positive value represents that the containing transaction has funds being
-    // /// transferred out of the transparent pool into shielded pools or to fees; a negative value
-    // /// means that the containing transaction has funds being transferred into the transparent pool
-    // /// from the shielded pools.
-    // pub fn value_balance(&self) -> ZcashResult<Arc<ZcashAmount>> {
-    //     match self
-    //         .0
-    //         .value_balance::<BalanceError, _>(|_| Ok(Amount::zero()))
-    //     {
-    //         Ok(amount) => Ok(Arc::new(amount.into())),
-    //         Err(err) => Err(err.into()),
-    //     }
-    // }
 }
 
 impl From<&Bundle<Authorized>> for ZcashTransparentBundle {

@@ -2,6 +2,9 @@ use zcash_primitives::sapling::Diversifier;
 
 use crate::{utils, ZcashResult};
 
+use derive_more::{From, Into};
+
+#[derive(From, Into)]
 pub struct ZcashDiversifier(Diversifier);
 
 impl ZcashDiversifier {
@@ -15,20 +18,8 @@ impl ZcashDiversifier {
     }
 }
 
-impl From<ZcashDiversifier> for Diversifier {
-    fn from(value: ZcashDiversifier) -> Self {
-        value.0
-    }
-}
-
 impl From<&ZcashDiversifier> for Diversifier {
     fn from(value: &ZcashDiversifier) -> Self {
         value.0
-    }
-}
-
-impl From<Diversifier> for ZcashDiversifier {
-    fn from(diversifier: Diversifier) -> Self {
-        ZcashDiversifier(diversifier)
     }
 }

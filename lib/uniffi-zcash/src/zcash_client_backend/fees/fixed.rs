@@ -5,6 +5,9 @@ use zcash_client_backend::fees::ChangeStrategy;
 
 use crate::ZcashFixedFeeRule;
 
+use derive_more::{From, Into};
+
+#[derive(From, Into)]
 pub struct ZcashFixedSingleOutputChangeStrategy(SingleOutputChangeStrategy);
 
 impl ZcashFixedSingleOutputChangeStrategy {
@@ -12,18 +15,6 @@ impl ZcashFixedSingleOutputChangeStrategy {
     /// fee parameters.
     pub fn new(fee_rule: Arc<ZcashFixedFeeRule>) -> Self {
         Self(SingleOutputChangeStrategy::new((*fee_rule).clone().into()))
-    }
-}
-
-impl From<SingleOutputChangeStrategy> for ZcashFixedSingleOutputChangeStrategy {
-    fn from(inner: SingleOutputChangeStrategy) -> Self {
-        ZcashFixedSingleOutputChangeStrategy(inner)
-    }
-}
-
-impl From<ZcashFixedSingleOutputChangeStrategy> for SingleOutputChangeStrategy {
-    fn from(outer: ZcashFixedSingleOutputChangeStrategy) -> Self {
-        outer.0
     }
 }
 

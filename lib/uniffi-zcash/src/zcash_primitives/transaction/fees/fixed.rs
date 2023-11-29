@@ -5,9 +5,11 @@ use zcash_primitives::transaction::fees::zip317::MINIMUM_FEE;
 
 use crate::ZcashAmount;
 
+use derive_more::{From, Into};
+
 /// A fee rule that always returns a fixed fee, irrespective of the structure of
 /// the transaction being constructed.
-#[derive(Clone)]
+#[derive(Clone, From, Into)]
 pub struct ZcashFixedFeeRule(pub(crate) FeeRule);
 
 impl ZcashFixedFeeRule {
@@ -24,18 +26,6 @@ impl ZcashFixedFeeRule {
     /// Returns the fixed fee amount which which this rule was configured.
     pub fn fixed_fee(&self) -> Arc<ZcashAmount> {
         Arc::new(self.0.fixed_fee().into())
-    }
-}
-
-impl From<FeeRule> for ZcashFixedFeeRule {
-    fn from(inner: FeeRule) -> Self {
-        ZcashFixedFeeRule(inner)
-    }
-}
-
-impl From<ZcashFixedFeeRule> for FeeRule {
-    fn from(value: ZcashFixedFeeRule) -> Self {
-        value.0
     }
 }
 

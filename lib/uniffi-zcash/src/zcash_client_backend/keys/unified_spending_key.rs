@@ -7,9 +7,11 @@ use crate::{
     ZcashKeysEra, ZcashOrchardSpendingKey, ZcashResult, ZcashUnifiedFullViewingKey,
 };
 
+use derive_more::{From, Into};
+
 /// A set of viewing keys that are all associated with a single
 /// ZIP-0032 account identifier.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, From, Into)]
 pub struct ZcashUnifiedSpendingKey(UnifiedSpendingKey);
 
 impl ZcashUnifiedSpendingKey {
@@ -62,17 +64,5 @@ impl ZcashUnifiedSpendingKey {
         UnifiedSpendingKey::from_bytes(era.into(), encoded)
             .map_err(From::from)
             .map(From::from)
-    }
-}
-
-impl From<UnifiedSpendingKey> for ZcashUnifiedSpendingKey {
-    fn from(inner: UnifiedSpendingKey) -> Self {
-        ZcashUnifiedSpendingKey(inner)
-    }
-}
-
-impl From<ZcashUnifiedSpendingKey> for UnifiedSpendingKey {
-    fn from(outer: ZcashUnifiedSpendingKey) -> Self {
-        outer.0
     }
 }

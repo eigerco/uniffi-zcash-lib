@@ -1,4 +1,5 @@
 use crate::ZcashAmount;
+use derive_more::Into;
 use std::sync::Arc;
 use zcash_client_backend::fees::{DustAction, DustOutputPolicy};
 
@@ -37,7 +38,7 @@ impl From<DustAction> for ZcashDustAction {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Into)]
 pub struct ZcashDustOutputPolicy(DustOutputPolicy);
 
 impl ZcashDustOutputPolicy {
@@ -54,12 +55,6 @@ impl ZcashDustOutputPolicy {
 
     pub fn dust_threshold(&self) -> Option<Arc<ZcashAmount>> {
         self.0.dust_threshold().map(From::from).map(Arc::new)
-    }
-}
-
-impl From<ZcashDustOutputPolicy> for DustOutputPolicy {
-    fn from(inner: ZcashDustOutputPolicy) -> Self {
-        inner.0
     }
 }
 

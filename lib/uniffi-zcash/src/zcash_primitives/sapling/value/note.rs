@@ -1,6 +1,8 @@
 use zcash_primitives::sapling::value::NoteValue;
 
-#[derive(Clone, Copy)]
+use derive_more::{From, Into};
+
+#[derive(Clone, Copy, From, Into)]
 pub struct ZcashSaplingNoteValue(NoteValue);
 
 impl ZcashSaplingNoteValue {
@@ -11,17 +13,5 @@ impl ZcashSaplingNoteValue {
     /// Returns the raw underlying value.
     pub fn inner(&self) -> u64 {
         self.0.inner()
-    }
-}
-
-impl From<NoteValue> for ZcashSaplingNoteValue {
-    fn from(inner: NoteValue) -> Self {
-        ZcashSaplingNoteValue(inner)
-    }
-}
-
-impl From<ZcashSaplingNoteValue> for NoteValue {
-    fn from(value: ZcashSaplingNoteValue) -> Self {
-        value.0
     }
 }
