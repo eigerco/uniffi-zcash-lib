@@ -2,19 +2,16 @@ use std::sync::Arc;
 
 use orchard::note::{ExtractedNoteCommitment, NoteCommitment};
 
+use derive_more::{From, Into};
+
 use crate::{utils::cast_slice, ZcashResult};
 
+#[derive(From)]
 pub struct ZcashOrchardNoteCommitment(NoteCommitment);
 
 impl ZcashOrchardNoteCommitment {
     pub fn to_extracted_note_commitment(&self) -> Arc<ZcashExtractedNoteCommitment> {
         Arc::new(self.into())
-    }
-}
-
-impl From<NoteCommitment> for ZcashOrchardNoteCommitment {
-    fn from(inner: NoteCommitment) -> Self {
-        ZcashOrchardNoteCommitment(inner)
     }
 }
 
@@ -24,6 +21,7 @@ impl From<&ZcashOrchardNoteCommitment> for ZcashExtractedNoteCommitment {
     }
 }
 
+#[derive(From, Into)]
 pub struct ZcashExtractedNoteCommitment(ExtractedNoteCommitment);
 
 impl ZcashExtractedNoteCommitment {
@@ -42,20 +40,16 @@ impl ZcashExtractedNoteCommitment {
     }
 }
 
+impl Clone for ZcashExtractedNoteCommitment {
+    fn clone(&self) -> Self {
+        let bs = (*self).to_bytes().clone();
+
+        Self::from_bytes(&bs).unwrap()
+    }
+}
+
 impl From<&ExtractedNoteCommitment> for ZcashExtractedNoteCommitment {
     fn from(inner: &ExtractedNoteCommitment) -> Self {
         ZcashExtractedNoteCommitment(*inner)
-    }
-}
-
-impl From<&ZcashExtractedNoteCommitment> for ExtractedNoteCommitment {
-    fn from(value: &ZcashExtractedNoteCommitment) -> Self {
-        value.0
-    }
-}
-
-impl From<ExtractedNoteCommitment> for ZcashExtractedNoteCommitment {
-    fn from(inner: ExtractedNoteCommitment) -> Self {
-        ZcashExtractedNoteCommitment(inner)
     }
 }

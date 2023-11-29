@@ -4,7 +4,10 @@ use orchard::Address;
 
 use crate::{utils, ZcashError, ZcashOrchardDiversifier, ZcashResult};
 
+use derive_more::{From, Into};
+
 /// A shielded payment address.
+#[derive(From, Into)]
 pub struct ZcashOrchardAddress(pub Address);
 
 impl ZcashOrchardAddress {
@@ -32,20 +35,10 @@ impl ZcashOrchardAddress {
     }
 }
 
-impl From<&ZcashOrchardAddress> for Address {
-    fn from(address: &ZcashOrchardAddress) -> Self {
-        address.0
-    }
-}
+impl Clone for ZcashOrchardAddress {
+    fn clone(&self) -> Self {
+        let bs = (*self).to_raw_address_bytes().clone();
 
-impl From<ZcashOrchardAddress> for Address {
-    fn from(address: ZcashOrchardAddress) -> Self {
-        address.0
-    }
-}
-
-impl From<Address> for ZcashOrchardAddress {
-    fn from(address: Address) -> Self {
-        Self(address)
+        Self::from_raw_address_bytes(bs).unwrap()
     }
 }

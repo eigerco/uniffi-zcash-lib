@@ -12,7 +12,9 @@ use crate::{
 use std::sync::Arc;
 use zcash_primitives::sapling::{Note, Rseed};
 
-#[derive(Clone)]
+use derive_more::{From, Into};
+
+#[derive(Clone, From, Into)]
 pub struct ZcashSaplingNote(Note);
 
 impl ZcashSaplingNote {
@@ -49,18 +51,6 @@ impl ZcashSaplingNote {
     /// Computes the note commitment
     pub fn cmu(&self) -> Arc<ZcashSaplingExtractedNoteCommitment> {
         Arc::new(self.0.cmu().into())
-    }
-}
-
-impl From<Note> for ZcashSaplingNote {
-    fn from(inner: Note) -> Self {
-        ZcashSaplingNote(inner)
-    }
-}
-
-impl From<ZcashSaplingNote> for Note {
-    fn from(value: ZcashSaplingNote) -> Self {
-        value.0
     }
 }
 

@@ -7,6 +7,7 @@ use zcash_primitives::transaction::components::{
 use zcash_client_backend::data_api::Balance;
 
 use crate::{ZcashError, ZcashResult};
+use derive_more::{From, Into};
 
 /// A type-safe representation of some quantity of Zcash.
 ///
@@ -19,7 +20,7 @@ use crate::{ZcashError, ZcashResult};
 /// by the network consensus rules.
 ///
 /// [`Transaction`]: crate::transaction::Transaction
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, From, Into)]
 pub struct ZcashAmount(Amount);
 
 impl std::ops::Deref for ZcashAmount {
@@ -30,21 +31,9 @@ impl std::ops::Deref for ZcashAmount {
     }
 }
 
-impl From<Amount> for ZcashAmount {
-    fn from(value: Amount) -> Self {
-        ZcashAmount(value)
-    }
-}
-
 impl From<&Amount> for ZcashAmount {
     fn from(value: &Amount) -> Self {
         ZcashAmount(*value)
-    }
-}
-
-impl From<ZcashAmount> for Amount {
-    fn from(value: ZcashAmount) -> Self {
-        value.0
     }
 }
 
@@ -91,7 +80,7 @@ impl ZcashAmount {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Eq, Ord)]
+#[derive(Clone, Copy, Debug, PartialEq, PartialOrd, Eq, Ord, From, Into)]
 pub struct ZcashNonNegativeAmount(NonNegativeAmount);
 
 impl ZcashNonNegativeAmount {
@@ -122,20 +111,6 @@ impl ZcashNonNegativeAmount {
     pub fn value(&self) -> u64 {
         let amount: Amount = self.0.into();
         amount.into()
-    }
-}
-
-// converters
-
-impl From<ZcashNonNegativeAmount> for NonNegativeAmount {
-    fn from(inner: ZcashNonNegativeAmount) -> Self {
-        inner.0
-    }
-}
-
-impl From<NonNegativeAmount> for ZcashNonNegativeAmount {
-    fn from(e: NonNegativeAmount) -> Self {
-        ZcashNonNegativeAmount(e)
     }
 }
 

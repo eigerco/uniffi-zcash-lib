@@ -11,6 +11,8 @@ use crate::{
     ZcashTransaction, ZcashUnifiedFullViewingKey,
 };
 
+use derive_more::{From, Into};
+
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub enum ZcashTransferType {
     /// The output was received on one of the wallet's external addresses via decryption using the
@@ -45,19 +47,8 @@ impl From<TransferType> for ZcashTransferType {
 }
 
 /// A decrypted shielded output.
+#[derive(From, Into)]
 pub struct ZcashDecryptedOutput(DecryptedOutput<sapling::Note>);
-
-impl From<DecryptedOutput<sapling::Note>> for ZcashDecryptedOutput {
-    fn from(inner: DecryptedOutput<sapling::Note>) -> Self {
-        ZcashDecryptedOutput(inner)
-    }
-}
-
-impl From<ZcashDecryptedOutput> for DecryptedOutput<sapling::Note> {
-    fn from(value: ZcashDecryptedOutput) -> Self {
-        value.0
-    }
-}
 
 impl ZcashDecryptedOutput {
     pub fn index(&self) -> u64 {

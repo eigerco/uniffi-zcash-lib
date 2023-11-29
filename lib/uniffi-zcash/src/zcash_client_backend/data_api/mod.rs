@@ -33,6 +33,7 @@ use crate::{
     ZcashTreeState, ZcashTxId, ZcashWalletTx,
 };
 
+use derive_more::{From, Into};
 use incrementalmerkletree::frontier::Frontier;
 use incrementalmerkletree::Retention;
 
@@ -41,34 +42,11 @@ pub fn clone_orig<P: Clone, T: std::convert::From<P>>(x: &P) -> T {
     (*x).clone().into()
 }
 
+#[derive(From, Into)]
 pub struct MerkleTreeFrontier(SaplingFrontier);
 
-impl From<MerkleTreeFrontier> for SaplingFrontier {
-    fn from(inner: MerkleTreeFrontier) -> Self {
-        inner.0
-    }
-}
-
-impl From<SaplingFrontier> for MerkleTreeFrontier {
-    fn from(e: SaplingFrontier) -> Self {
-        Self(e)
-    }
-}
-
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, From, Into)]
 pub struct MerkleTreeRetention(Retention<BlockHeight>);
-
-impl From<MerkleTreeRetention> for Retention<BlockHeight> {
-    fn from(inner: MerkleTreeRetention) -> Self {
-        inner.0
-    }
-}
-
-impl From<Retention<BlockHeight>> for MerkleTreeRetention {
-    fn from(e: Retention<BlockHeight>) -> Self {
-        Self(e)
-    }
-}
 
 type SaplingFrontier = Frontier<sapling::Node, { sapling::NOTE_COMMITMENT_TREE_DEPTH }>;
 
@@ -95,6 +73,7 @@ impl From<NullifierQuery> for ZcashNullifierQuery {
     }
 }
 
+#[derive(From, Into)]
 pub struct ZcashDecryptedTransaction(DecryptedTransaction<'static>);
 
 impl Clone for ZcashDecryptedTransaction {
@@ -106,32 +85,8 @@ impl Clone for ZcashDecryptedTransaction {
     }
 }
 
-impl From<DecryptedTransaction<'static>> for ZcashDecryptedTransaction {
-    fn from(e: DecryptedTransaction<'static>) -> Self {
-        Self(e)
-    }
-}
-
-impl<'a> From<ZcashDecryptedTransaction> for DecryptedTransaction<'a> {
-    fn from(inner: ZcashDecryptedTransaction) -> Self {
-        inner.0
-    }
-}
-
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, From, Into)]
 pub struct TimeOffsetDateTime(time::OffsetDateTime);
-
-impl From<time::OffsetDateTime> for TimeOffsetDateTime {
-    fn from(e: time::OffsetDateTime) -> Self {
-        Self(e)
-    }
-}
-
-impl From<TimeOffsetDateTime> for time::OffsetDateTime {
-    fn from(inner: TimeOffsetDateTime) -> Self {
-        inner.0
-    }
-}
 
 /// A transaction that was constructed and sent by the wallet.
 ///
@@ -228,6 +183,7 @@ impl From<ShieldedProtocol> for ZcashShieldedProtocol {
     }
 }
 
+#[derive(From, Into)]
 pub struct ZcashWalletSummary(WalletSummary);
 
 impl ZcashWalletSummary {
@@ -289,19 +245,7 @@ impl ZcashWalletSummary {
     }
 }
 
-impl From<WalletSummary> for ZcashWalletSummary {
-    fn from(e: WalletSummary) -> Self {
-        ZcashWalletSummary(e)
-    }
-}
-
-impl From<ZcashWalletSummary> for WalletSummary {
-    fn from(inner: ZcashWalletSummary) -> Self {
-        inner.0
-    }
-}
-
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, From, Into)]
 pub struct ZcashRatio(Ratio<u64>);
 
 impl ZcashRatio {
@@ -321,19 +265,7 @@ impl ZcashRatio {
     }
 }
 
-impl From<Ratio<u64>> for ZcashRatio {
-    fn from(e: Ratio<u64>) -> Self {
-        ZcashRatio(e)
-    }
-}
-
-impl From<ZcashRatio> for Ratio<u64> {
-    fn from(inner: ZcashRatio) -> Self {
-        inner.0
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, From, Into)]
 pub struct ZcashAccountBalance(AccountBalance);
 
 impl ZcashAccountBalance {
@@ -361,19 +293,7 @@ impl ZcashAccountBalance {
     }
 }
 
-impl From<ZcashAccountBalance> for AccountBalance {
-    fn from(inner: ZcashAccountBalance) -> Self {
-        inner.0
-    }
-}
-
-impl From<AccountBalance> for ZcashAccountBalance {
-    fn from(e: AccountBalance) -> Self {
-        ZcashAccountBalance(e)
-    }
-}
-
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, From, Into)]
 pub struct ZcashBlockMetadata(BlockMetadata);
 
 impl ZcashBlockMetadata {
@@ -404,18 +324,6 @@ impl ZcashBlockMetadata {
     /// [`BlockMetadata`] describes.
     pub fn sapling_tree_size(&self) -> u32 {
         self.0.sapling_tree_size()
-    }
-}
-
-impl From<ZcashBlockMetadata> for BlockMetadata {
-    fn from(inner: ZcashBlockMetadata) -> Self {
-        inner.0
-    }
-}
-
-impl From<BlockMetadata> for ZcashBlockMetadata {
-    fn from(e: BlockMetadata) -> Self {
-        ZcashBlockMetadata(e)
     }
 }
 
@@ -471,6 +379,7 @@ impl From<(sapling::Node, Retention<BlockHeight>)> for TupleSaplingCommitments {
 /// decrypted and extracted from a [`CompactBlock`].
 ///
 /// [`CompactBlock`]: crate::proto::compact_formats::CompactBlock
+#[derive(From, Into)]
 pub struct ZcashScannedBlock(ScannedBlock<sapling::Nullifier>);
 
 impl ZcashScannedBlock {
@@ -598,18 +507,6 @@ impl Clone for ZcashScannedBlock {
             self.0.sapling_nullifier_map().to_vec(),
             self.0.sapling_commitments().to_vec(),
         ))
-    }
-}
-
-impl From<ZcashScannedBlock> for ScannedBlock<sapling::Nullifier> {
-    fn from(inner: ZcashScannedBlock) -> Self {
-        inner.0
-    }
-}
-
-impl From<ScannedBlock<sapling::Nullifier>> for ZcashScannedBlock {
-    fn from(e: ScannedBlock<sapling::Nullifier>) -> Self {
-        Self(e)
     }
 }
 
@@ -764,6 +661,7 @@ impl From<(AccountId, sapling::Note)> for TupleAccountIdAndSaplingNote {
 }
 
 /// A type that represents an output (either Sapling or transparent) that was sent by the wallet.
+#[derive(From, Into)]
 pub struct ZcashSentTransactionOutput(SentTransactionOutput);
 
 impl Clone for ZcashSentTransactionOutput {
@@ -829,19 +727,7 @@ impl ZcashSentTransactionOutput {
     }
 }
 
-impl From<ZcashSentTransactionOutput> for SentTransactionOutput {
-    fn from(inner: ZcashSentTransactionOutput) -> Self {
-        inner.0
-    }
-}
-
-impl From<SentTransactionOutput> for ZcashSentTransactionOutput {
-    fn from(e: SentTransactionOutput) -> Self {
-        Self(e)
-    }
-}
-
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, From, Into)]
 pub struct ZcashAccountBirthday(AccountBirthday);
 
 impl ZcashAccountBirthday {
@@ -883,17 +769,5 @@ impl ZcashAccountBirthday {
     /// Returns the height at which the wallet should exit "recovery mode".
     pub fn recover_until(&self) -> Option<Arc<ZcashBlockHeight>> {
         self.0.recover_until().map(From::from).map(Arc::new)
-    }
-}
-
-impl From<ZcashAccountBirthday> for AccountBirthday {
-    fn from(inner: ZcashAccountBirthday) -> Self {
-        inner.0
-    }
-}
-
-impl From<AccountBirthday> for ZcashAccountBirthday {
-    fn from(e: AccountBirthday) -> Self {
-        ZcashAccountBirthday(e)
     }
 }

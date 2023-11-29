@@ -1,6 +1,8 @@
 use std::sync::Arc;
 use zcash_client_backend::address::AddressMetadata;
 
+use derive_more::{From, Into};
+
 use crate::{ZcashAccountId, ZcashDiversifierIndex};
 
 mod recipient_address;
@@ -9,6 +11,7 @@ pub use self::recipient_address::*;
 mod unified_address;
 pub use self::unified_address::*;
 
+#[derive(From, Into)]
 pub struct ZcashAddressMetadata(AddressMetadata);
 
 impl ZcashAddressMetadata {
@@ -25,17 +28,5 @@ impl ZcashAddressMetadata {
 
     pub fn diversifier_index(&self) -> Arc<ZcashDiversifierIndex> {
         Arc::new((*self.0.diversifier_index()).into())
-    }
-}
-
-impl From<AddressMetadata> for ZcashAddressMetadata {
-    fn from(inner: AddressMetadata) -> Self {
-        ZcashAddressMetadata(inner)
-    }
-}
-
-impl From<ZcashAddressMetadata> for AddressMetadata {
-    fn from(outer: ZcashAddressMetadata) -> Self {
-        outer.0
     }
 }

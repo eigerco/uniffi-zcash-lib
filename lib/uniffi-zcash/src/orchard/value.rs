@@ -1,7 +1,8 @@
+use derive_more::{From, Into};
 use orchard::value::{NoteValue, ValueCommitment};
 
 /// The non-negative value of an individual Orchard note.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, From, Into)]
 pub struct ZcashOrchardNoteValue(NoteValue);
 
 impl ZcashOrchardNoteValue {
@@ -16,18 +17,6 @@ impl ZcashOrchardNoteValue {
     /// Returns the raw underlying value.
     pub fn value(&self) -> u64 {
         self.0.inner()
-    }
-}
-
-impl From<NoteValue> for ZcashOrchardNoteValue {
-    fn from(inner: NoteValue) -> Self {
-        ZcashOrchardNoteValue(inner)
-    }
-}
-
-impl From<ZcashOrchardNoteValue> for NoteValue {
-    fn from(value: ZcashOrchardNoteValue) -> Self {
-        value.0
     }
 }
 

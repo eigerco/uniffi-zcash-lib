@@ -6,12 +6,14 @@ use crate::{
     utils, ZcashError, ZcashOrchardAddress, ZcashOrchardDiversifier, ZcashOrchardDiversifierIndex,
     ZcashResult,
 };
+use derive_more::{From, Into};
 
 /// A key that provides the capability to detect and decrypt incoming notes from the block
 /// chain, without being able to spend the notes or detect when they are spent.
 ///
 /// This key is useful in situations where you only need the capability to detect inbound
 /// payments, such as merchant terminals.
+#[derive(From, Into)]
 pub struct ZcashOrchardIncomingViewingKey(pub(crate) IncomingViewingKey);
 
 impl ZcashOrchardIncomingViewingKey {
@@ -39,7 +41,7 @@ impl ZcashOrchardIncomingViewingKey {
         addr: Arc<ZcashOrchardAddress>,
     ) -> Option<Arc<ZcashOrchardDiversifierIndex>> {
         self.0
-            .diversifier_index(&addr.as_ref().into())
+            .diversifier_index(&(*addr.as_ref()).clone().into())
             .map(From::from)
             .map(Arc::new)
     }
@@ -53,12 +55,6 @@ impl ZcashOrchardIncomingViewingKey {
     /// Returns the payment address for this key corresponding to the given diversifier.
     pub fn address(&self, diversifier: Arc<ZcashOrchardDiversifier>) -> Arc<ZcashOrchardAddress> {
         Arc::new(self.0.address(diversifier.0).into())
-    }
-}
-
-impl From<IncomingViewingKey> for ZcashOrchardIncomingViewingKey {
-    fn from(key: IncomingViewingKey) -> Self {
-        Self(key)
     }
 }
 

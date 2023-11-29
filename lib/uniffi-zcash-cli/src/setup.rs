@@ -35,7 +35,8 @@ pub fn install_zig_build() -> anyhow::Result<()> {
 }
 
 const MACOS_SDK_VERSION: &str = "11.3";
-const MACOS_SDK_SHA256_SUM: &str = "cd4f08a75577145b8f05245a2975f7c81401d75e9535dcffbb879ee1deefcbf4"; // 11.3
+const MACOS_SDK_SHA256_SUM: &str =
+    "cd4f08a75577145b8f05245a2975f7c81401d75e9535dcffbb879ee1deefcbf4"; // 11.3
 
 pub fn install_macos_sdk() -> anyhow::Result<()> {
     if macos_sdk_require_path().exists() {

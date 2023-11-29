@@ -1,5 +1,7 @@
 use std::fmt;
 
+use derive_more::{From, Into};
+
 use zcash_client_backend::zip321::{TransactionRequest, Zip321Error};
 
 use crate::{ZcashConsensusParameters, ZcashPayment};
@@ -93,7 +95,7 @@ pub type ZcashZip321Result<T> = Result<T, ZcashZip321Error>;
 /// When constructing a transaction in response to such a request,
 /// a separate output should be added to the transaction for each
 /// payment value in the request.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, From, Into)]
 pub struct ZcashTransactionRequest(TransactionRequest);
 
 impl ZcashTransactionRequest {
@@ -132,17 +134,5 @@ impl ZcashTransactionRequest {
 impl Clone for ZcashTransactionRequest {
     fn clone(&self) -> Self {
         Self::new(self.payments()).expect("Cannot clone from payments!")
-    }
-}
-
-impl From<ZcashTransactionRequest> for TransactionRequest {
-    fn from(inner: ZcashTransactionRequest) -> Self {
-        inner.0
-    }
-}
-
-impl From<TransactionRequest> for ZcashTransactionRequest {
-    fn from(e: TransactionRequest) -> Self {
-        ZcashTransactionRequest(e)
     }
 }

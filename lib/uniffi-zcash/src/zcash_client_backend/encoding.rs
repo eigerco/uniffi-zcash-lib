@@ -9,7 +9,7 @@ use crate::{
 
 /// Writes an [`ExtendedSpendingKey`] as a Bech32-encoded string.
 pub fn encode_extended_spending_key(hrp: &str, extsk: Arc<ZcashExtendedSpendingKey>) -> String {
-    encoding::encode_extended_spending_key(hrp, &extsk.as_ref().into())
+    encoding::encode_extended_spending_key(hrp, &(*extsk.as_ref()).clone().into())
 }
 
 /// Decodes an [`ExtendedSpendingKey`] from a Bech32-encoded string.

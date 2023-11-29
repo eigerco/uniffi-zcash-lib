@@ -1,8 +1,9 @@
 use crate::{ZcashError, ZcashResult};
+use derive_more::{From, Into};
 use prost::Message;
 use zcash_client_backend::proto::service::TreeState;
 
-#[derive(Clone)]
+#[derive(Clone, From, Into)]
 pub struct ZcashTreeState(TreeState);
 
 impl ZcashTreeState {
@@ -29,17 +30,5 @@ impl ZcashTreeState {
             error: format!("Invalid TreeState: {}", e),
         })?;
         Ok(Self(treestate))
-    }
-}
-
-impl From<TreeState> for ZcashTreeState {
-    fn from(e: TreeState) -> Self {
-        Self(e)
-    }
-}
-
-impl From<ZcashTreeState> for TreeState {
-    fn from(inner: ZcashTreeState) -> Self {
-        inner.0
     }
 }

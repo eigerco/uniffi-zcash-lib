@@ -40,7 +40,9 @@ impl fmt::Display for ZcashWalletMigrationError {
 impl From<WalletMigrationError> for ZcashWalletMigrationError {
     fn from(e: WalletMigrationError) -> Self {
         match e {
-            WalletMigrationError::SeedRequired => ZcashWalletMigrationError::SeedRequired{ v: "".to_string() },
+            WalletMigrationError::SeedRequired => {
+                ZcashWalletMigrationError::SeedRequired { v: "".to_string() }
+            }
             WalletMigrationError::CorruptedData(v) => {
                 ZcashWalletMigrationError::CorruptedData { v }
             }

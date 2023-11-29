@@ -1,6 +1,7 @@
 mod incremental_witness;
 use std::sync::Arc;
 
+use derive_more::{From, Into};
 use incrementalmerkletree::MerklePath;
 use zcash_primitives::sapling::Node;
 
@@ -12,6 +13,7 @@ pub use self::incremental_witness::*;
 mod commitment_tree;
 pub use self::commitment_tree::*;
 
+#[derive(From, Into)]
 pub struct ZcashSaplingMerklePath(MerklePath<Node, DEPTH>);
 
 impl ZcashSaplingMerklePath {
@@ -30,18 +32,6 @@ impl ZcashSaplingMerklePath {
     }
 }
 
-impl From<MerklePath<Node, DEPTH>> for ZcashSaplingMerklePath {
-    fn from(inner: MerklePath<Node, DEPTH>) -> Self {
-        ZcashSaplingMerklePath(inner)
-    }
-}
-
-impl From<ZcashSaplingMerklePath> for MerklePath<Node, DEPTH> {
-    fn from(value: ZcashSaplingMerklePath) -> Self {
-        value.0
-    }
-}
-
 impl From<&ZcashSaplingMerklePath> for MerklePath<Node, DEPTH> {
     fn from(value: &ZcashSaplingMerklePath) -> Self {
         value.0.clone()
@@ -50,5 +40,4 @@ impl From<&ZcashSaplingMerklePath> for MerklePath<Node, DEPTH> {
 
 pub struct ZcashAuthPath {
     pub node: Arc<ZcashSaplingNode>,
-    // pub bool: bool,
 }

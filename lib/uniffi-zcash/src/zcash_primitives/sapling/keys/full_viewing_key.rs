@@ -3,20 +3,10 @@ use std::sync::Arc;
 use zcash_primitives::sapling::keys::FullViewingKey;
 
 use crate::{ZcashExpandedSpendingKey, ZcashOutgoingViewingKey, ZcashResult, ZcashViewingKey};
+use derive_more::{From, Into};
 
+#[derive(From, Into)]
 pub struct ZcashFullViewingKey(FullViewingKey);
-
-impl From<FullViewingKey> for ZcashFullViewingKey {
-    fn from(key: FullViewingKey) -> Self {
-        ZcashFullViewingKey(key)
-    }
-}
-
-impl From<ZcashFullViewingKey> for FullViewingKey {
-    fn from(key: ZcashFullViewingKey) -> Self {
-        key.0
-    }
-}
 
 impl ZcashFullViewingKey {
     pub fn from_bytes(bytes: Vec<u8>) -> ZcashResult<Self> {

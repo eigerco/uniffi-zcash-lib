@@ -4,7 +4,9 @@ use zcash_primitives::transaction::fees::zip317::FeeRule;
 
 use crate::{ZcashAmount, ZcashResult};
 
-#[derive(Debug, Clone)]
+use derive_more::{From, Into};
+
+#[derive(Debug, Clone, From, Into)]
 pub struct ZcashZip317FeeRule(FeeRule);
 
 impl ZcashZip317FeeRule {
@@ -39,17 +41,5 @@ impl ZcashZip317FeeRule {
     /// Returns the ZIP 317 marginal fee.
     pub fn marginal_fee(&self) -> Arc<ZcashAmount> {
         Arc::new(self.0.marginal_fee().into())
-    }
-}
-
-impl From<FeeRule> for ZcashZip317FeeRule {
-    fn from(inner: FeeRule) -> Self {
-        ZcashZip317FeeRule(inner)
-    }
-}
-
-impl From<ZcashZip317FeeRule> for FeeRule {
-    fn from(value: ZcashZip317FeeRule) -> Self {
-        value.0
     }
 }

@@ -8,13 +8,15 @@ use crate::{
     ZcashSaplingDiversifiedTransmissionKey, ZcashSaplingNote,
 };
 
+use derive_more::{From, Into};
+
 /// A Sapling payment address.
 ///
 /// # Invariants
 ///
 /// `pk_d` is guaranteed to be prime-order (i.e. in the prime-order subgroup of Jubjub,
 /// and not the identity).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, From, Into)]
 pub struct ZcashPaymentAddress(PaymentAddress);
 
 impl ZcashPaymentAddress {
@@ -60,20 +62,8 @@ impl ZcashPaymentAddress {
     }
 }
 
-impl From<PaymentAddress> for ZcashPaymentAddress {
-    fn from(address: PaymentAddress) -> Self {
-        ZcashPaymentAddress(address)
-    }
-}
-
 impl From<&ZcashPaymentAddress> for PaymentAddress {
     fn from(value: &ZcashPaymentAddress) -> Self {
-        value.0
-    }
-}
-
-impl From<ZcashPaymentAddress> for PaymentAddress {
-    fn from(value: ZcashPaymentAddress) -> Self {
         value.0
     }
 }
