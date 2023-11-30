@@ -1,8 +1,8 @@
 # <a href="project"></a> Zcash UniFFI project
 
-This is a satellite 🛰️ project that aims to extend the accessibility/adoption of the Zcash core library ecosystem, aka [librustzcash](https://github.com/zcash/librustzcash) library to other language communities :handshake:
+This is a satellite 🛰️ project that aims to extend the accessibility/adoption of the Zcash core library ecosystem, aka [librustzcash](https://github.com/zcash/librustzcash) library to other language communities :handshake:. It is result of two grant proposals made for the Zcash Foundation and released through the Zcash Grant Committee. The details about the proposals may be found [here](https://forum.zcashcommunity.com/t/zcash-uniffi-library-rfp/43468) and [here](https://forum.zcashcommunity.com/t/zcash-uniffi-library-addenda-resubmission/44904). After that period, this was left as a community-maintained project.
 
-It makes use of the mozilla [UniFFI tool](https://mozilla.github.io/uniffi-rs/) under the hood for generating an `FFI` layer for the currently targeted languages: `python`, `ruby`, `kotlin` and `swift` .
+It uses the mozilla [UniFFI tool](https://mozilla.github.io/uniffi-rs/) under the hood, for generating an `FFI` layer for the currently targeted languages: `python`, `ruby`, `kotlin` and `swift` . Python, Kotlin, Swift are maintained by Mozilla, while Ruby is externally handled.
 
 Heres is diagram that shows the mental model of the project and how the updates in the code are flowing.
 
@@ -22,7 +22,7 @@ All the commented steps happens in the [CI pipeline](./.github/workflows/), but 
 
 This project provides a [CI pipeline](./.github/workflows/) that automatically publish each language package:
 
-- Swift: Go to `File > Add Packages ...` and paste this URL into the search bar in the upper right corner of the modal: https://github.com/eigerco/uniffi-swift-pkg/
+- Swift: Go to `File > Add Packages ...` and paste [this URL](https://github.com/eigerco/uniffi-swift-pkg/) into the search bar in the upper right corner of the modal window.
 - Ruby: published on RubyGems through Github, instructions at [this link](https://github.com/orgs/eigerco/packages/rubygems/zcash)
 - Kotlin: published on Maven through Github, instructions at [this link](https://github.com/eigerco/uniffi-kotlin-pkg/packages/1895780)
 - Python: it may be downloaded with pip as a release from our repo:
@@ -31,7 +31,16 @@ This project provides a [CI pipeline](./.github/workflows/) that automatically p
 pip3 install git+https://github.com/eigerco/uniffi-python-pkg.git#egg=uniffi-zcash
 ```
 
-This divide is caused by the support of Github packages: while it does support RubyGems and Apache Maven registries, it isn't the same for Python and Swift, which may be instead released and downloaded directly as tarballs.
+This divide is caused by the support of Github packages: while it does support RubyGems and Apache Maven registries, it isn't the same for Python and Swift, which may be instead released and downloaded directly as tarballs. The repositories for those releases/packages are located, respectively:
+
+ - [Swift GitHub Repo](https://github.com/eigerco/uniffi-swift-pkg)
+   - [iOS distribution GitHub Repo](https://github.com/eigerco/uniffi-ios-pkg)
+ - [Ruby GitHub Repo](https://github.com/eigerco/uniffi-ruby-pkg)
+ - [Python GitHub Repo](https://github.com/eigerco/uniffi-python-pkg)
+ - [Kotlin GitHub Repo](https://github.com/eigerco/uniffi-kotlin-pkg)
+   - [Android distribution GitHub Repo](https://github.com/eigerco/uniffi-android-pkg)
+
+Those were manually updated with the last release we worked on during the grant period. A CI workflow is available for automatic release to the official channels.
 
 ## <a href="manuals-and-docs"></a> Manuals and other docs
 
@@ -39,7 +48,7 @@ This divide is caused by the support of Github packages: while it does support R
 
 ## Example mobile apps
 
-There are two example mobile apps (Swift and Kotlin) where some features are showcased:
+There are two example mobile apps (Swift and Kotlin) where [these features](https://forum.zcashcommunity.com/t/zcash-uniffi-library-addenda-resubmission/44904#milestone-2-uniffi-demo-codebase-4) are showcased
 
 * [Swift (iOS)](https://github.com/eigerco/zcash-ios-demo-app)
 * [Kotlin (Android)](https://github.com/eigerco/zcash-android-demo-app)
