@@ -187,3 +187,10 @@ Visit our [CONTRIBUTING.md](./CONTRIBUTING.md) section.
   - We wanted to favor a better user experience of the packages. Similar to what a pure language lib looks like.
 - I am developing with `Xcode` or `macos` in general. Where i can find the files to include them on my project ?
   - By following the step `2` of [build locally](#-building-the-packages-locally) instructions you should get all files by free. Then there is documentation [here](https://mozilla.github.io/uniffi-rs/swift/xcode.html) and a example application [here](https://github.com/mozilla/uniffi-rs/tree/main/examples/app/ios). If you have any problems, please, open a [new issue](../../issue/new). We are happy to know about your endeavors.
+
+## About [Eiger](https://www.eiger.co)
+
+We are engineers. We contribute to various ecosystems by building low level implementations and core components. We believe in Zcash because privacy is critical to a well functioning society.
+
+Contact us at hello@eiger.co
+Follow us on [X/Twitter](https://x.com/eiger_co)
